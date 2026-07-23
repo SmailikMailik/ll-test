@@ -9,11 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1726182683, guid: a4865f1ab4504ed8a368670db22f409c, type: 3}
-  m_Name: AOTGenerationConfig
+  m_Script: {fileID: 240468018, guid: a4865f1ab4504ed8a368670db22f409c, type: 3}
+  m_Name: OdinVisualDesignerConfig
   m_EditorClassIdentifier: 
-  automateBeforeBuilds: 0
-  deleteDllAfterBuilds: 1
-  AutomateForAllAOTPlatforms: 1
-  automateForPlatforms: 0900000014000000
-  supportSerializedTypes: []
+  SerializedFavoriteAttributes: []
+  savePath: Assets/Plugins/Sirenix/Odin Inspector/Visual Designer/Saved
+  searchPathRoots: []
