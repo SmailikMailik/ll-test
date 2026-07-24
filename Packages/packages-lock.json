@@ -9,6 +9,15 @@
       },
       "hash": "2f4016c3864f66353c97953a35010959534e9a35"
     },
+    "com.cysharp.r3": {
+      "version": "https://github.com/Cysharp/R3.git?path=src/R3.Unity/Assets/R3.Unity",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.modules.imgui": "1.0.0"
+      },
+      "hash": "c6f8a932d9b8e771a9f405e6d72058a21ce0b457"
+    },
     "com.unity.addressables": {
       "version": "1.25.0",
       "depth": 1,
