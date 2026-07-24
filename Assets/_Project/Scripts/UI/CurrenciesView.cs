@@ -11,7 +11,7 @@ namespace LL.UI
             UserData.Instance.SoftAmount.Changed += OnSoftAmountChanged;
 
             _softItemView.Button.Clicked += () =>
-                WindowsController.Instance.Show(WindowType.Shop, new ShopParameters(ShopTabType.SoftPacks));
+                WindowController.Instance.Show(new ShopParameters(ShopTabType.SoftPacks));
 
             OnSoftAmountChanged(UserData.Instance.SoftAmount.Value);
         }

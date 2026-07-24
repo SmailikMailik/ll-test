@@ -1,9 +1,9 @@
 ﻿using LL.Helpers;
 using UnityEngine;
 
-namespace LL.UI.Windows.View
+namespace LL.UI.Windows.Views
 {
-    internal sealed class RewardWindow : Window<RewardParameters>
+    internal sealed class RewardWindow : Window<RewardWindowParameters>
     {
         [SerializeField] private RewardsContainer _container;
         [SerializeField] private CommonButton _continueButton;
@@ -24,11 +24,11 @@ namespace LL.UI.Windows.View
         }
     }
 
-    internal sealed class RewardParameters : IWindowParameters
+    internal sealed class RewardWindowParameters : IWindowParameters
     {
         internal IReward[] Rewards { get; }
 
-        internal RewardParameters(params IReward[] rewards)
+        internal RewardWindowParameters(params IReward[] rewards)
         {
             Rewards = rewards;
         }

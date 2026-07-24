@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 using VContainer;
 
 namespace LL.UI.Windows
@@ -8,6 +9,8 @@ namespace LL.UI.Windows
     internal abstract class Window<TParameter> : WindowBase
         where TParameter : class, IWindowParameters
     {
+        internal override Type ParameterType => typeof(TParameter);
+
         protected TParameter Parameters { get; private set; }
 
         internal void Show(TParameter parameters)
@@ -20,19 +23,20 @@ namespace LL.UI.Windows
     [RequireComponent(typeof(Canvas))]
     internal abstract class WindowBase : RectMonoBehaviour
     {
-        internal WindowType Type { get; private set; }
-        internal WindowData Data { get; private set; }
+        internal abstract Type ParameterType { get; }
+
+        internal WindowDefinition Definition { get; private set; }
         internal bool IsVisible { get; private set; }
 
         protected virtual bool CanGoBack => true;
 
         private Canvas _canvas;
-        private WindowsController _windowsController;
+        private WindowController _windowController;
 
         [Inject]
-        private void Construct(WindowsController windowsController)
+        private void Construct(WindowController windowController)
         {
-            _windowsController = windowsController;
+            _windowController = windowController;
         }
 
         protected void Awake()
@@ -41,10 +45,9 @@ namespace LL.UI.Windows
             _canvas.enabled = false;
         }
 
-        internal void Initialize(WindowType type, WindowData data)
+        internal void Initialize(WindowDefinition definition)
         {
-            Type = type;
-            Data = data;
+            Definition = definition;
         }
 
         internal void Show()
@@ -72,7 +75,7 @@ namespace LL.UI.Windows
         internal void Back()
         {
             if (CanGoBack)
-                _windowsController.Back();
+                _windowController.Back();
         }
 
         protected virtual void OnShow() { }

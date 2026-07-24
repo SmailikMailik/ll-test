@@ -2,9 +2,9 @@
 using TMPro;
 using UnityEngine;
 
-namespace LL.UI.Windows.View
+namespace LL.UI.Windows.Views
 {
-    internal sealed class ModalWindow : Window<ModalParameters>
+    internal sealed class ModalWindow : Window<ModalWindowParameters>
     {
         [SerializeField] private TMP_Text _headerLabel;
         [SerializeField] private TMP_Text _messageLabel;
@@ -62,7 +62,7 @@ namespace LL.UI.Windows.View
         }
     }
 
-    internal sealed class ModalParameters : IWindowParameters
+    internal sealed class ModalWindowParameters : IWindowParameters
     {
         internal string HeaderText { get; set; } = string.Empty;
         internal string MessageText { get; set; } = string.Empty;

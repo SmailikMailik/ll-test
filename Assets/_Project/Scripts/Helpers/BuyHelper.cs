@@ -42,7 +42,7 @@ namespace LL.Helpers
                     if (CurrenciesHelper.TrySpend(currencyType, priceable.PriceValue) is false)
                     {
                         //GlobalMessage.Instance.ShowForced(Localization.Get("ui.not-enough-soft"));
-                        //WindowsController.Instance.Show(WindowType.Shop, new ShopParameters(ShopTabType.SoftPacks));
+                        //WindowController.Instance.Show(new ShopParameters(ShopTabType.SoftPacks));
                         return;
                     }
 
@@ -55,7 +55,7 @@ namespace LL.Helpers
                     if (CurrenciesHelper.TrySpend(currencyType, priceable.PriceValue) is false)
                     {
                         //GlobalMessage.Instance.ShowForced(Localization.Get("ui.not-enough-hard"));
-                        //WindowsController.Instance.Show(WindowType.Shop, new ShopParameters(ShopTabType.SoftPacks));
+                        //WindowController.Instance.Show(new ShopParameters(ShopTabType.SoftPacks));
                         return;
                     }
 

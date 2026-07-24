@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LL.UI.Windows.View.Upgrade
+namespace LL.UI.Windows.Views.Upgrade
 {
     internal sealed class UpgradeItemView : MonoBehaviour { }
 }

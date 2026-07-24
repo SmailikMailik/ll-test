@@ -8,12 +8,12 @@ namespace LL.UI
     {
         [SerializeField] private CommonButton _button;
 
-        private WindowsController _windowController;
+        private WindowController _windowController;
 
         [Inject]
-        private void Construct(WindowsController windowsController)
+        private void Construct(WindowController windowController)
         {
-            _windowController = windowsController;
+            _windowController = windowController;
         }
 
         private void OnEnable() => _button.Clicked += OnClicked;
