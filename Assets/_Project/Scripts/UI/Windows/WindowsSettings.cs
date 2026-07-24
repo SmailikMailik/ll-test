@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LL.UI.Windows.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -45,13 +44,14 @@ namespace LL.UI.Windows
     [Serializable]
     internal sealed class WindowData
     {
-        [field: SerializeField] internal WindowSimple Prefab { get; private set; }
+        [field: SerializeField] internal WindowBase Prefab { get; private set; }
         [field: SerializeField] internal bool IsPopup { get; private set; }
     }
 
     internal enum WindowType : byte
     {
         Unknown = 0,
-        Modal = 1
+        Modal = 1,
+        Upgrade = 2
     }
 }

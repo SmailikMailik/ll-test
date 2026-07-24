@@ -1,8 +1,6 @@
-﻿using LL.UI.Windows.Core;
-
-namespace LL.UI.Windows.View.Upgrade
+﻿namespace LL.UI.Windows.View.Upgrade
 {
-    internal sealed class UpgradeWindow : WindowParameterized<UpgradeParameters> { }
+    internal sealed class UpgradeWindow : Window<UpgradeParameters> { }
 
     internal sealed class UpgradeParameters : IWindowParameters
     {

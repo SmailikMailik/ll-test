@@ -15,7 +15,9 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects: []
+    ReferencedUnityObjects:
+    - {fileID: 8980530091766475065, guid: 8ad01bf50e0090048b1fe091e3147f25, type: 3}
+    - {fileID: 1935193051742944739, guid: 01b6b5c7be2c9c541b679466617a2da1, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -40,7 +42,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
@@ -51,8 +53,29 @@ MonoBehaviour:
       Entry: 7
       Data: 2|LL.UI.Windows.WindowData, LL.Runtime
     - Name: <Prefab>k__BackingField
-      Entry: 6
+      Entry: 10
+      Data: 0
+    - Name: <IsPopup>k__BackingField
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 7
+      Data: 3|LL.UI.Windows.WindowData, LL.Runtime
+    - Name: <Prefab>k__BackingField
+      Entry: 10
+      Data: 1
     - Name: <IsPopup>k__BackingField
       Entry: 5
       Data: false

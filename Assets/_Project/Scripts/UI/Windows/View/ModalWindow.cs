@@ -1,11 +1,10 @@
 ﻿using System;
-using LL.UI.Windows.Core;
 using TMPro;
 using UnityEngine;
 
 namespace LL.UI.Windows.View
 {
-    internal sealed class ModalWindow : WindowParameterized<ModalParameters>
+    internal sealed class ModalWindow : Window<ModalParameters>
     {
         [SerializeField] private TMP_Text _headerLabel;
         [SerializeField] private TMP_Text _messageLabel;
@@ -16,33 +15,24 @@ namespace LL.UI.Windows.View
         [SerializeField] private CommonButton _negativeButton;
         [SerializeField] private CommonButton _closeButton;
 
-        internal override void Init()
+        protected override bool CanGoBack => Parameters.CanClose;
+
+        private void OnEnable()
         {
-            base.Init();
-
-            _positiveButton.Clicked += () =>
-            {
-                Back();
-                Parameters.PositiveCallback?.Invoke();
-            };
-
-            _negativeButton.Clicked += () =>
-            {
-                Back();
-                Parameters.NegativeCallback?.Invoke();
-            };
-
-            _closeButton.Clicked += () =>
-            {
-                Back();
-                Parameters.CloseCallback?.Invoke();
-            };
+            _positiveButton.Clicked += OnPositiveClicked;
+            _negativeButton.Clicked += OnNegativeClicked;
+            _closeButton.Clicked += OnCloseClicked;
         }
 
-        internal override void Show()
+        private void OnDisable()
         {
-            base.Show();
+            _positiveButton.Clicked -= OnPositiveClicked;
+            _negativeButton.Clicked -= OnNegativeClicked;
+            _closeButton.Clicked -= OnCloseClicked;
+        }
 
+        protected override void OnShow()
+        {
             _positiveButton.gameObject.SetActive(Parameters.PositiveActive);
             _negativeButton.gameObject.SetActive(Parameters.NegativeActive);
             _closeButton.gameObject.SetActive(Parameters.CloseActive);
@@ -53,10 +43,22 @@ namespace LL.UI.Windows.View
             _negativeLabel.text = Parameters.NegativeText;
         }
 
-        internal override void Back()
+        private void OnPositiveClicked()
         {
-            if (Parameters.CanClose)
-                base.Back();
+            Back();
+            Parameters.PositiveCallback?.Invoke();
+        }
+
+        private void OnNegativeClicked()
+        {
+            Back();
+            Parameters.NegativeCallback?.Invoke();
+        }
+
+        private void OnCloseClicked()
+        {
+            Back();
+            Parameters.CloseCallback?.Invoke();
         }
     }
 

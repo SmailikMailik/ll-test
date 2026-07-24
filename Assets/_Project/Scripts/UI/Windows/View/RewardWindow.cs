@@ -1,25 +1,25 @@
 ﻿using LL.Helpers;
-using LL.UI.Windows.Core;
 using UnityEngine;
 
 namespace LL.UI.Windows.View
 {
-    internal sealed class RewardWindow : WindowParameterized<RewardParameters>
+    internal sealed class RewardWindow : Window<RewardParameters>
     {
         [SerializeField] private RewardsContainer _container;
         [SerializeField] private CommonButton _continueButton;
 
-        internal override void Init()
+        private void OnEnable()
         {
-            base.Init();
-
             _continueButton.Clicked += Back;
         }
 
-        internal override void Show()
+        private void OnDisable()
         {
-            base.Show();
+            _continueButton.Clicked -= Back;
+        }
 
+        protected override void OnShow()
+        {
             _container.ShowRewardsDelayed(Parameters.Rewards);
         }
     }

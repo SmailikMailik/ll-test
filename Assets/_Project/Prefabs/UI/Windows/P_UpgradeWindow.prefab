@@ -528,10 +528,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5181137100511837447, guid: f9350fce70addb8428188df130a79330, type: 3}
-      propertyPath: m_AdditionalShaderChannelsFlag
-      value: 25
-      objectReference: {fileID: 0}
     - target: {fileID: 5342419485409765225, guid: f9350fce70addb8428188df130a79330, type: 3}
       propertyPath: m_Name
       value: P_UpgradeWindow
@@ -548,10 +544,30 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3947941758236112535, guid: f9350fce70addb8428188df130a79330, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7999206141835159129}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5342419485409765225, guid: f9350fce70addb8428188df130a79330, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1935193051742944739}
   m_SourcePrefab: {fileID: 100100000, guid: f9350fce70addb8428188df130a79330, type: 3}
 --- !u!224 &4389539773312815778 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3947941758236112535, guid: f9350fce70addb8428188df130a79330, type: 3}
   m_PrefabInstance: {fileID: 730479475390309429}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4613719020169003868 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5342419485409765225, guid: f9350fce70addb8428188df130a79330, type: 3}
+  m_PrefabInstance: {fileID: 730479475390309429}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1935193051742944739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4613719020169003868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea8290e1ded4bd99896e6f25f7c42f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
