@@ -1,7 +1,8 @@
+using LL.User.Core.Data;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.User
+namespace LL.User.Configuration
 {
     [CreateAssetMenu(fileName = nameof(UserDataConfig), menuName = CreationPath)]
     [HideMonoScript]
@@ -13,27 +14,27 @@ namespace LL.User
         [LabelText("Soft Currency")]
         [SuffixLabel("SOFT", true)]
         [MinValue(0)]
-        [SerializeField] private int _softAmount = 99;
+        [SerializeField] private int _softAmount;
 
         [BoxGroup("Wallet")]
         [LabelText("Hard Currency")]
         [SuffixLabel("HARD", true)]
         [MinValue(0)]
-        [SerializeField] private int _hardAmount = 99;
+        [SerializeField] private int _hardAmount;
 
         [BoxGroup("Wallet")]
         [LabelText("Master Points")]
         [SuffixLabel("MP", true)]
         [MinValue(0)]
-        [SerializeField] private int _masterPointAmount = 99;
+        [SerializeField] private int _masterPointAmount;
 
         [BoxGroup("Progress")]
         [LabelText("Total Experience")]
         [SuffixLabel("XP", true)]
         [MinValue(0)]
-        [SerializeField] private int _totalExperience = 12_861;
+        [SerializeField] private int _totalExperience;
 
-        UserDataSnapshot IUserDataSource.Load() => new
+        UserData IUserDataSource.Load() => new
         (
             _softAmount,
             _hardAmount,

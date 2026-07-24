@@ -1,7 +1,7 @@
-namespace LL.User
+namespace LL.User.Core.Data
 {
     internal interface IUserDataSource
     {
-        UserDataSnapshot Load();
+        UserData Load();
     }
 }

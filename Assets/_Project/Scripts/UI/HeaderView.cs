@@ -1,5 +1,5 @@
 using LL.Extensions;
-using LL.User;
+using LL.User.Core.Wallet;
 using LL.UI.Windows;
 using R3;
 using TMPro;

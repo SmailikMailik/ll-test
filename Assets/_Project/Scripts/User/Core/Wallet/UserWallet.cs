@@ -1,7 +1,8 @@
 using System;
+using LL.User.Core.Data;
 using R3;
 
-namespace LL.User
+namespace LL.User.Core.Wallet
 {
     internal sealed class UserWallet : IUserWallet, IDisposable
     {
@@ -9,7 +10,7 @@ namespace LL.User
         private readonly ReactiveProperty<int> _hardAmount;
         private readonly ReactiveProperty<int> _masterPointAmount;
 
-        internal UserWallet(UserDataSnapshot initialData)
+        internal UserWallet(UserData initialData)
         {
             _softAmount = new ReactiveProperty<int>(initialData.SoftAmount);
             _hardAmount = new ReactiveProperty<int>(initialData.HardAmount);

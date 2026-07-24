@@ -1,7 +1,8 @@
 using System;
+using LL.User.Core.Data;
 using R3;
 
-namespace LL.User
+namespace LL.User.Core.Progress
 {
     internal sealed class UserProgress : IUserProgress, IDisposable
     {
@@ -11,7 +12,7 @@ namespace LL.User
         private readonly ReactiveProperty<int> _totalExperience;
         private readonly Observable<int> _level;
 
-        internal UserProgress(UserDataSnapshot initialData, ILevelProgression levelProgression)
+        internal UserProgress(UserData initialData, ILevelProgression levelProgression)
         {
             _totalExperience = new ReactiveProperty<int>(initialData.TotalExperience);
             _level = _totalExperience

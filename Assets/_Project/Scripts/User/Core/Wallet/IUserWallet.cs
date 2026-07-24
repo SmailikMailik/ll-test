@@ -1,6 +1,6 @@
 using R3;
 
-namespace LL.User
+namespace LL.User.Core.Wallet
 {
     internal interface IUserWallet
     {

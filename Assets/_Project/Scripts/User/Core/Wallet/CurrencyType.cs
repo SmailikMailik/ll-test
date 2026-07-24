@@ -1,4 +1,4 @@
-namespace LL.User
+namespace LL.User.Core.Wallet
 {
     internal enum CurrencyType : byte
     {

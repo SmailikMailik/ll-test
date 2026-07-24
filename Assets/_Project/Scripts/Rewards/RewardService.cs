@@ -1,4 +1,5 @@
-using LL.User;
+using LL.User.Core.Progress;
+using LL.User.Core.Wallet;
 
 namespace LL.Rewards
 {

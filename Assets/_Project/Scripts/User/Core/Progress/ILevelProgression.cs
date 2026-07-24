@@ -1,4 +1,4 @@
-namespace LL.User
+namespace LL.User.Core.Progress
 {
     internal interface ILevelProgression
     {

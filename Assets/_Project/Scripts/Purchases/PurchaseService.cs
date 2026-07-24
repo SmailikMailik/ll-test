@@ -1,4 +1,4 @@
-using LL.User;
+using LL.User.Core.Wallet;
 
 namespace LL.Purchases
 {
@@ -18,8 +18,7 @@ namespace LL.Purchases
 
         public bool TryPurchase(IPurchase purchase)
         {
-            return purchase != null &&
-                   _wallet.TrySpend(purchase.Currency, purchase.Price);
+            return purchase != null && _wallet.TrySpend(purchase.Currency, purchase.Price);
         }
     }
 }

@@ -1,15 +1,15 @@
 using System;
 
-namespace LL.User
+namespace LL.User.Core.Data
 {
-    internal sealed class UserDataSnapshot
+    internal sealed class UserData
     {
         internal int SoftAmount { get; }
         internal int HardAmount { get; }
         internal int MasterPointAmount { get; }
         internal int TotalExperience { get; }
 
-        internal UserDataSnapshot(
+        internal UserData(
             int softAmount,
             int hardAmount,
             int masterPointAmount,

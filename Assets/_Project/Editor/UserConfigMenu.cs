@@ -1,4 +1,4 @@
-using LL.User;
+using LL.User.Configuration;
 using UnityEditor;
 
 namespace LLEditor
