@@ -7,7 +7,8 @@ namespace LL.UI.Windows
     {
         [SerializeField] private Transform _container;
 
-        internal ReactiveParameter<WindowBase> CurrentWindow => _navigator.CurrentWindow;
+        internal IReadOnlyReactiveParameter<WindowBase> CurrentWindow => _navigator.CurrentWindow;
+        internal bool CanGoBack => _navigator.CanGoBack;
 
         private WindowProvider _provider;
         private WindowNavigator _navigator;
@@ -40,23 +41,15 @@ namespace LL.UI.Windows
                 return;
             }
 
-            if (CurrentWindow.Value?.ParameterType == typeof(TParameter))
+            if (_container == null)
                 return;
 
-            if (_provider.TryGet<TParameter>(_container, out var window) is false)
+            if (_provider.TryGetOrCreate<TParameter>(_container, out var window) is false)
                 return;
 
-            if (_navigator.TryShow(window, parameters) is false)
-            {
-                Debug.LogWarning(
-                    $"[WindowController::Show] Window for {typeof(TParameter).Name} " +
-                    "is already in history. " +
-                    "Use Back to return to it.",
-                    this);
-                return;
-            }
+            _navigator.Show(window, parameters);
         }
 
-        internal void Back() => _navigator.Back();
+        internal bool Back() => _navigator.Back();
     }
 }

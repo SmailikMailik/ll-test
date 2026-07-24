@@ -10,12 +10,20 @@ namespace LL.UI.Windows
         where TParameter : class, IWindowParameters
     {
         internal override Type ParameterType => typeof(TParameter);
+        internal override IWindowParameters CurrentParameters => Parameters;
 
         protected TParameter Parameters { get; private set; }
 
-        internal void Show(TParameter parameters)
+        internal override void Show(IWindowParameters parameters)
         {
-            Parameters = parameters;
+            if (parameters is not TParameter typedParameters)
+            {
+                throw new ArgumentException(
+                    $"Expected {typeof(TParameter).Name}, got {parameters?.GetType().Name ?? "null"}",
+                    nameof(parameters));
+            }
+
+            Parameters = typedParameters;
             Show();
         }
     }
@@ -24,11 +32,12 @@ namespace LL.UI.Windows
     internal abstract class WindowBase : RectMonoBehaviour
     {
         internal abstract Type ParameterType { get; }
+        internal abstract IWindowParameters CurrentParameters { get; }
 
         internal WindowDefinition Definition { get; private set; }
         internal bool IsVisible { get; private set; }
 
-        protected virtual bool CanGoBack => true;
+        internal virtual bool CanClose => true;
 
         private Canvas _canvas;
         private WindowController _windowController;
@@ -49,6 +58,8 @@ namespace LL.UI.Windows
         {
             Definition = definition;
         }
+
+        internal abstract void Show(IWindowParameters parameters);
 
         internal void Show()
         {
@@ -72,11 +83,7 @@ namespace LL.UI.Windows
             IsVisible = false;
         }
 
-        internal void Back()
-        {
-            if (CanGoBack)
-                _windowController.Back();
-        }
+        protected bool TryClose() => _windowController.Back();
 
         protected virtual void OnShow() { }
         protected virtual void OnHide() { }

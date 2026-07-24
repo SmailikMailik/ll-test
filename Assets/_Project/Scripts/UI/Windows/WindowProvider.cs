@@ -8,8 +8,8 @@ namespace LL.UI.Windows
 {
     internal sealed class WindowProvider
     {
-        private readonly Dictionary<Type, WindowDefinition> _definitions = new();
         private readonly Dictionary<Type, WindowBase> _windows = new();
+        private readonly Dictionary<Type, WindowDefinition> _definitions = new();
 
         private readonly WindowCatalog _catalog;
         private readonly IObjectResolver _resolver;
@@ -23,7 +23,7 @@ namespace LL.UI.Windows
             BuildDefinitions();
         }
 
-        internal bool TryGet<TParameter>(Transform parent, out Window<TParameter> window)
+        internal bool TryGetOrCreate<TParameter>(Transform parent, out Window<TParameter> window)
             where TParameter : class, IWindowParameters
         {
             window = null;

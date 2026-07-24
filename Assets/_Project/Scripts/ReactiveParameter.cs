@@ -2,23 +2,24 @@
 
 namespace LL
 {
-    internal sealed class ReactiveParameter<T>
+    internal interface IReadOnlyReactiveParameter<out T>
     {
-        internal event Action<T> Changed;
+        event Action<T> Changed;
 
-        internal T DefaultValue { get; }
+        T DefaultValue { get; }
+        T Value { get; }
+    }
 
-        internal T Value
+    internal sealed class ReactiveParameter<T> : IReadOnlyReactiveParameter<T>
+    {
+        public event Action<T> Changed;
+
+        public T DefaultValue { get; }
+
+        public T Value
         {
             get => _value;
-            set
-            {
-                if (_value is not null && _value.Equals(value))
-                    return;
-
-                _value = value;
-                Changed?.Invoke(_value);
-            }
+            set => SetValue(value);
         }
 
         private T _value;
@@ -27,6 +28,15 @@ namespace LL
         {
             DefaultValue = defaultValue;
             _value = defaultValue;
+        }
+
+        internal void SetValue(T value, bool forceNotify = false)
+        {
+            if (forceNotify is false && Equals(_value, value))
+                return;
+
+            _value = value;
+            Changed?.Invoke(_value);
         }
     }
 }

@@ -2,51 +2,124 @@ using System.Collections.Generic;
 
 namespace LL.UI.Windows
 {
+    internal readonly struct WindowHistoryEntry
+    {
+        internal WindowBase Window { get; }
+        internal IWindowParameters Parameters { get; }
+
+        internal WindowHistoryEntry(WindowBase window, IWindowParameters parameters)
+        {
+            Window = window;
+            Parameters = parameters;
+        }
+    }
+
     internal sealed class WindowNavigator
     {
         internal ReactiveParameter<WindowBase> CurrentWindow { get; } = new();
-        internal bool CanGoBack => _history.Count > 1 || CurrentWindow.Value?.Definition.IsPopup == true;
 
-        private readonly Stack<WindowBase> _history = new();
+        internal bool CanGoBack
+        {
+            get
+            {
+                if (_history.Count == 0)
+                    return false;
 
-        internal bool TryShow<TParameter>(Window<TParameter> window, TParameter parameters)
+                var currentWindow = _history.Peek().Window;
+                return currentWindow.CanClose && (_history.Count > 1 || currentWindow.Definition.IsPopup);
+            }
+        }
+
+        private readonly Stack<WindowHistoryEntry> _history = new();
+        private readonly HashSet<WindowBase> _knownWindows = new();
+
+        private readonly List<WindowHistoryEntry> _visibleEntries = new();
+        private readonly HashSet<WindowBase> _visibleWindows = new();
+
+        internal void Show<TParameter>(Window<TParameter> window, TParameter parameters)
             where TParameter : class, IWindowParameters
         {
-            if (_history.Contains(window))
+            _history.Push(new WindowHistoryEntry(window, parameters));
+            _knownWindows.Add(window);
+
+            try
+            {
+                ApplyVisibleState(window);
+            }
+            catch
+            {
+                _history.Pop();
+                ApplyVisibleState();
+                throw;
+            }
+
+            CurrentWindow.SetValue(window, true);
+        }
+
+        internal bool Back()
+        {
+            if (CanGoBack is false)
                 return false;
 
-            if (window.Definition.IsPopup is false && CurrentWindow.Value != null)
-                CurrentWindow.Value.Hide();
+            var currentEntry = _history.Pop();
 
-            window.RectTransform.SetAsLastSibling();
-            _history.Push(window);
+            try
+            {
+                ApplyVisibleState();
+            }
+            catch
+            {
+                _history.Push(currentEntry);
+                ApplyVisibleState(currentEntry.Window);
+                CurrentWindow.Value = currentEntry.Window;
+                throw;
+            }
 
-            window.Show(parameters);
-            CurrentWindow.Value = window;
+            CurrentWindow.SetValue(_history.Count > 0 ? _history.Peek().Window : null, true);
 
             return true;
         }
 
-        internal void Back()
+        private void ApplyVisibleState(WindowBase forceRefresh = null)
         {
-            if (CanGoBack is false)
-                return;
+            CollectVisibleEntries();
 
-            var currentWindow = _history.Pop();
-            currentWindow.Hide();
-
-            if (_history.Count == 0)
+            foreach (var window in _knownWindows)
             {
-                CurrentWindow.Value = null;
-                return;
+                if (_visibleWindows.Contains(window) is false)
+                    window.Hide();
             }
 
-            var previousWindow = _history.Peek();
+            for (var i = _visibleEntries.Count - 1; i >= 0; i--)
+            {
+                var entry = _visibleEntries[i];
+                var window = entry.Window;
 
-            if (previousWindow.IsVisible is false)
-                previousWindow.Show();
+                if (window == forceRefresh ||
+                    window.IsVisible is false ||
+                    ReferenceEquals(window.CurrentParameters, entry.Parameters) is false)
+                {
+                    window.Hide();
+                    window.Show(entry.Parameters);
+                }
 
-            CurrentWindow.Value = previousWindow;
+                window.RectTransform.SetAsLastSibling();
+            }
+        }
+
+        private void CollectVisibleEntries()
+        {
+            _visibleEntries.Clear();
+            _visibleWindows.Clear();
+
+            foreach (var entry in _history)
+            {
+                if (_visibleWindows.Add(entry.Window))
+                    _visibleEntries.Add(entry);
+
+                if (entry.Window.Definition.IsPopup is false)
+                    break;
+            }
         }
     }
 }

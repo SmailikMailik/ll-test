@@ -15,7 +15,7 @@ namespace LL.UI.Windows.Views
         [SerializeField] private CommonButton _negativeButton;
         [SerializeField] private CommonButton _closeButton;
 
-        protected override bool CanGoBack => Parameters.CanClose;
+        internal override bool CanClose => Parameters.CanClose;
 
         private void OnEnable()
         {
@@ -39,45 +39,69 @@ namespace LL.UI.Windows.Views
 
             _headerLabel.text = Parameters.HeaderText;
             _messageLabel.text = Parameters.MessageText;
+
             _positiveLabel.text = Parameters.PositiveText;
             _negativeLabel.text = Parameters.NegativeText;
         }
 
-        private void OnPositiveClicked()
-        {
-            Back();
-            Parameters.PositiveCallback?.Invoke();
-        }
+        private void OnPositiveClicked() => HandleClick(Parameters.PositiveCallback);
+        private void OnNegativeClicked() => HandleClick(Parameters.NegativeCallback);
+        private void OnCloseClicked() => HandleClick(Parameters.CloseCallback);
 
-        private void OnNegativeClicked()
+        private void HandleClick(Action callback)
         {
-            Back();
-            Parameters.NegativeCallback?.Invoke();
-        }
-
-        private void OnCloseClicked()
-        {
-            Back();
-            Parameters.CloseCallback?.Invoke();
+            // The argument captures the current callback before TryClose can replace Parameters.
+            TryClose();
+            callback?.Invoke();
         }
     }
 
     internal sealed class ModalWindowParameters : IWindowParameters
     {
-        internal string HeaderText { get; set; } = string.Empty;
-        internal string MessageText { get; set; } = string.Empty;
+        internal string HeaderText { get; }
+        internal string MessageText { get; }
 
-        internal string PositiveText { get; set; } = string.Empty;
-        internal Action PositiveCallback { get; set; } = null;
-        internal bool PositiveActive { get; set; } = true;
+        internal string PositiveText { get; }
+        internal Action PositiveCallback { get; }
+        internal bool PositiveActive { get; }
 
-        internal string NegativeText { get; set; } = string.Empty;
-        internal Action NegativeCallback { get; set; } = null;
-        internal bool NegativeActive { get; set; } = true;
+        internal string NegativeText { get; }
+        internal Action NegativeCallback { get; }
+        internal bool NegativeActive { get; }
 
-        internal Action CloseCallback { get; set; } = null;
-        internal bool CloseActive { get; set; } = true;
+        internal Action CloseCallback { get; }
+        internal bool CloseActive { get; }
 
-        internal bool CanClose { get; set; } = true;
+        internal bool CanClose { get; }
+
+        internal ModalWindowParameters(
+            string headerText,
+            string messageText,
+            string positiveText = "",
+            Action positiveCallback = null,
+            bool positiveActive = true,
+            string negativeText = "",
+            Action negativeCallback = null,
+            bool negativeActive = true,
+            Action closeCallback = null,
+            bool closeActive = true,
+            bool canClose = true)
+        {
+            HeaderText = headerText ?? string.Empty;
+            MessageText = messageText ?? string.Empty;
+
+            PositiveText = positiveText ?? string.Empty;
+            PositiveCallback = positiveCallback;
+            PositiveActive = positiveActive;
+
+            NegativeText = negativeText ?? string.Empty;
+            NegativeCallback = negativeCallback;
+            NegativeActive = negativeActive;
+
+            CloseCallback = closeCallback;
+            CloseActive = closeActive;
+
+            CanClose = canClose;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using LL.Coroutines;
 using LL.Extensions;
@@ -12,7 +13,7 @@ namespace LL.UI
         [SerializeField] private RewardItemView _viewTemplate;
         [SerializeField] private RectTransform _container;
 
-        internal void ShowRewardsDelayed(params IReward[] rewards)
+        internal void ShowRewardsDelayed(IReadOnlyList<IReward> rewards)
         {
             StartCoroutine(ShowRewardsDelayedInner(rewards));
         }
@@ -30,7 +31,7 @@ namespace LL.UI
             _container.DestroyAllChildren();
         }
 
-        private IEnumerator ShowRewardsDelayedInner(params IReward[] rewards)
+        private IEnumerator ShowRewardsDelayedInner(IReadOnlyList<IReward> rewards)
         {
             ClearRewards();
 

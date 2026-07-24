@@ -1,4 +1,7 @@
-﻿using LL.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using LL.Helpers;
 using UnityEngine;
 
 namespace LL.UI.Windows.Views
@@ -10,27 +13,29 @@ namespace LL.UI.Windows.Views
 
         private void OnEnable()
         {
-            _continueButton.Clicked += Back;
+            _continueButton.Clicked += OnContinueClicked;
         }
 
         private void OnDisable()
         {
-            _continueButton.Clicked -= Back;
+            _continueButton.Clicked -= OnContinueClicked;
         }
 
         protected override void OnShow()
         {
             _container.ShowRewardsDelayed(Parameters.Rewards);
         }
+
+        private void OnContinueClicked() => TryClose();
     }
 
     internal sealed class RewardWindowParameters : IWindowParameters
     {
-        internal IReward[] Rewards { get; }
+        internal IReadOnlyList<IReward> Rewards { get; }
 
         internal RewardWindowParameters(params IReward[] rewards)
         {
-            Rewards = rewards;
+            Rewards = Array.AsReadOnly(rewards?.ToArray() ?? Array.Empty<IReward>());
         }
     }
 }
