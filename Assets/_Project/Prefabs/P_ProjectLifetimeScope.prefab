@@ -48,4 +48,7 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  _windowsSettings: {fileID: 11400000, guid: eb1646ea480b2cc4fb2985ea08cc1104, type: 2}
+  _windowCatalog: {fileID: 11400000, guid: eb1646ea480b2cc4fb2985ea08cc1104, type: 2}
+  _defaultSoftAmount: 99
+  _defaultHardAmount: 99
+  _defaultMasterPointAmount: 99
