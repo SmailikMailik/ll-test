@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
@@ -9,17 +8,24 @@ namespace LL.UI.Windows
     {
         [SerializeField] private Transform _container;
 
-        internal event Action<WindowType> WindowOpened;
-        internal event Action<WindowType> WindowClosed;
-
-        internal WindowBase CurrentWindow { get; private set; }
-        internal bool CanGoBack => _history.Count > 1 || (_history.Count == 1 && _history.Peek().Data.IsPopup);
+        internal ReactiveParameter<WindowBase> CurrentWindow { get; } = new();
+        internal bool CanGoBack => _history.Count > 1 || CurrentWindow.Value?.Data.IsPopup == true;
 
         private readonly Dictionary<WindowType, List<WindowBase>> _createdWindows = new();
         private readonly Stack<WindowBase> _history = new();
 
         private WindowsSettings _settings;
         private WindowsFactory _factory;
+
+        private void Awake()
+        {
+            if (_container == null)
+            {
+                Debug.LogError(
+                    "[WindowsController::Awake] Window container is not assigned",
+                    this);
+            }
+        }
 
         [Inject]
         private void Construct(WindowsSettings settings, WindowsFactory factory)
@@ -32,59 +38,45 @@ namespace LL.UI.Windows
             where TParameter : class, IWindowParameters
         {
             if (windowType == WindowType.Unknown)
+            {
+                Debug.LogError(
+                    "[WindowsController::Show] Window type is Unknown",
+                    this);
                 return;
+            }
 
             if (parameters is null)
             {
-                Debug.LogError($"[WindowsController::Show] Parameters for {windowType} are null");
-                return;
-            }
-
-            if (CurrentWindow && CurrentWindow.Type == windowType)
-                return;
-
-            if (_settings.Items.TryGetValue(windowType, out var windowData) is false)
-            {
-                Debug.LogError($"[WindowsController::Show] Window {windowType} is not configured");
-                return;
-            }
-
-            if (windowData.Prefab == null)
-            {
-                Debug.LogError($"[WindowsController::Show] Prefab for {windowType} is not assigned");
-                return;
-            }
-
-            if (windowData.Prefab is not Window<TParameter>)
-            {
                 Debug.LogError(
-                    $"[WindowsController::Show] Window {windowType} does not accept " +
-                    $"{typeof(TParameter).Name}");
+                    $"[WindowsController::Show] Parameters for {windowType} are null",
+                    this);
                 return;
             }
+
+            if (CurrentWindow.Value && CurrentWindow.Value.Type == windowType)
+                return;
+
+            if (TryGetWindowData<TParameter>(windowType, out var windowData) is false)
+                return;
 
             var window = GetWindow(windowType, windowData);
             if (window is not Window<TParameter> parameterizedWindow)
             {
                 Debug.LogError(
                     $"[WindowsController::Show] Window {windowType} must inherit " +
-                    $"{typeof(Window<TParameter>).Name}");
+                    $"{typeof(Window<TParameter>).Name}",
+                    this);
                 return;
             }
 
-            if (parameterizedWindow.Data.IsPopup is false && CurrentWindow != null)
-            {
-                CurrentWindow.Hide();
-                WindowClosed?.Invoke(CurrentWindow.Type);
-            }
+            if (parameterizedWindow.Data.IsPopup is false && CurrentWindow.Value != null)
+                CurrentWindow.Value.Hide();
 
             parameterizedWindow.RectTransform.SetAsLastSibling();
-
-            CurrentWindow = parameterizedWindow;
             _history.Push(parameterizedWindow);
 
             parameterizedWindow.Show(parameters);
-            WindowOpened?.Invoke(parameterizedWindow.Type);
+            CurrentWindow.Value = parameterizedWindow;
         }
 
         internal void Back()
@@ -95,21 +87,50 @@ namespace LL.UI.Windows
             var currentWindow = _history.Pop();
 
             currentWindow.Hide();
-            WindowClosed?.Invoke(currentWindow.Type);
 
             if (_history.Count == 0)
             {
-                CurrentWindow = null;
+                CurrentWindow.Value = null;
                 return;
             }
 
             var previousWindow = _history.Peek();
-            CurrentWindow = previousWindow;
 
             if (previousWindow.IsVisible is false)
                 previousWindow.Show();
 
-            WindowOpened?.Invoke(previousWindow.Type);
+            CurrentWindow.Value = previousWindow;
+        }
+
+        private bool TryGetWindowData<TParameter>(WindowType windowType, out WindowData windowData)
+            where TParameter : class, IWindowParameters
+        {
+            if (_settings.Items.TryGetValue(windowType, out windowData) is false)
+            {
+                Debug.LogError(
+                    $"[WindowsController::Show] Window {windowType} is not configured",
+                    this);
+                return false;
+            }
+
+            if (windowData.Prefab == null)
+            {
+                Debug.LogError(
+                    $"[WindowsController::Show] Prefab for {windowType} is not assigned",
+                    this);
+                return false;
+            }
+
+            if (windowData.Prefab is not Window<TParameter>)
+            {
+                Debug.LogError(
+                    $"[WindowsController::Show] Window {windowType} does not accept " +
+                    $"{typeof(TParameter).Name}",
+                    this);
+                return false;
+            }
+
+            return true;
         }
 
         private WindowBase GetWindow(WindowType windowType, WindowData windowData)

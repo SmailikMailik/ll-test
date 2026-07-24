@@ -19,6 +19,6 @@ namespace LL.UI
         private void OnEnable() => _button.Clicked += OnClicked;
         private void OnDisable() => _button.Clicked -= OnClicked;
 
-        private void OnClicked() => _windowController.CurrentWindow?.Back();
+        private void OnClicked() => _windowController.CurrentWindow.Value?.Back();
     }
 }
