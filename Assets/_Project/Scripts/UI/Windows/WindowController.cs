@@ -1,3 +1,4 @@
+using R3;
 using UnityEngine;
 using VContainer;
 
@@ -7,7 +8,7 @@ namespace LL.UI.Windows
     {
         [SerializeField] private Transform _container;
 
-        internal IReadOnlyReactiveParameter<WindowBase> CurrentWindow => _navigator.CurrentWindow;
+        internal Observable<WindowBase> CurrentWindow => _navigator.CurrentWindow;
         internal bool CanGoBack => _navigator.CanGoBack;
 
         private WindowProvider _provider;

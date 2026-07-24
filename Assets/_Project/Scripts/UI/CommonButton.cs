@@ -1,4 +1,4 @@
-﻿using System;
+using R3;
 using UnityEngine;
 
 namespace LL.UI
@@ -6,38 +6,50 @@ namespace LL.UI
     internal sealed class CommonButton : MonoBehaviour
     {
         [SerializeField] private ClickHandler _clickHandler;
+        [SerializeField] private PressHandler _pressHandler;
 
-        internal event Action Clicked;
+        internal Observable<Unit> Clicked => _clicked;
+        internal Observable<bool> Pressed => _pressed;
+        internal Observable<bool> Interactable => _interactable;
 
-        internal ReactiveParameter<bool> IsPressed { get; } = new();
-        internal ReactiveParameter<bool> IsInteractable { get; } = new();
+        private readonly Subject<Unit> _clicked = new();
+        private readonly ReactiveProperty<bool> _pressed = new();
+        private readonly ReactiveProperty<bool> _interactable = new(true);
 
-        private void OnEnable()
+        private void Start()
         {
-            IsInteractable.Changed += IsInteractableChanged;
-
-            _clickHandler.Clicked += OnClicked;
+            _clickHandler.Clicked.Subscribe(OnClicked).AddTo(this);
+            _pressHandler.Pressed.Subscribe(OnPressedChanged).AddTo(this);
+            _interactable.Subscribe(OnInteractableChanged).AddTo(this);
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
-            IsInteractable.Changed -= IsInteractableChanged;
-
-            _clickHandler.Clicked -= OnClicked;
+            _clicked.Dispose();
+            _pressed.Dispose();
+            _interactable.Dispose();
         }
 
-        private void IsInteractableChanged(bool isInteractable)
+        internal void SetInteractable(bool isInteractable)
         {
-            if (isInteractable is false && IsPressed.Value)
-                IsPressed.Value = false;
+            _interactable.Value = isInteractable;
         }
 
-        private void OnClicked()
+        private void OnInteractableChanged(bool isInteractable)
         {
-            if (IsInteractable.Value is false)
-                return;
+            if (isInteractable is false)
+                _pressed.Value = false;
+        }
 
-            Clicked?.Invoke();
+        private void OnPressedChanged(bool isPressed)
+        {
+            _pressed.Value = isActiveAndEnabled && _interactable.Value && isPressed;
+        }
+
+        private void OnClicked(Unit _)
+        {
+            if (isActiveAndEnabled && _interactable.Value)
+                _clicked.OnNext(Unit.Default);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using R3;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,8 +6,12 @@ namespace LL.UI
 {
     internal sealed class ClickHandler : MonoBehaviour, IPointerClickHandler
     {
-        internal event Action Clicked;
+        internal Observable<Unit> Clicked => _clicked;
 
-        public void OnPointerClick(PointerEventData eventData = null) => Clicked?.Invoke();
+        private readonly Subject<Unit> _clicked = new();
+
+        public void OnPointerClick(PointerEventData eventData) => _clicked.OnNext(Unit.Default);
+
+        private void OnDestroy() => _clicked.Dispose();
     }
 }

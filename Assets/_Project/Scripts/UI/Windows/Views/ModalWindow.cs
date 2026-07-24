@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using R3;
 using TMPro;
 using UnityEngine;
 
@@ -17,18 +18,11 @@ namespace LL.UI.Windows.Views
 
         internal override bool CanClose => Parameters.CanClose;
 
-        private void OnEnable()
+        private void Start()
         {
-            _positiveButton.Clicked += OnPositiveClicked;
-            _negativeButton.Clicked += OnNegativeClicked;
-            _closeButton.Clicked += OnCloseClicked;
-        }
-
-        private void OnDisable()
-        {
-            _positiveButton.Clicked -= OnPositiveClicked;
-            _negativeButton.Clicked -= OnNegativeClicked;
-            _closeButton.Clicked -= OnCloseClicked;
+            _positiveButton.Clicked.Subscribe(_ => HandleClick(Parameters.PositiveCallback)).AddTo(this);
+            _negativeButton.Clicked.Subscribe(_ => HandleClick(Parameters.NegativeCallback)).AddTo(this);
+            _closeButton.Clicked.Subscribe(_ => HandleClick(Parameters.CloseCallback)).AddTo(this);
         }
 
         protected override void OnShow()
@@ -43,10 +37,6 @@ namespace LL.UI.Windows.Views
             _positiveLabel.text = Parameters.PositiveText;
             _negativeLabel.text = Parameters.NegativeText;
         }
-
-        private void OnPositiveClicked() => HandleClick(Parameters.PositiveCallback);
-        private void OnNegativeClicked() => HandleClick(Parameters.NegativeCallback);
-        private void OnCloseClicked() => HandleClick(Parameters.CloseCallback);
 
         private void HandleClick(Action callback)
         {

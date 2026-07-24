@@ -1,5 +1,6 @@
 using LL.Extensions;
 using LL.UI.Windows;
+using R3;
 using TMPro;
 using UnityEngine;
 using VContainer;
@@ -27,41 +28,12 @@ namespace LL.UI
 
         private void Start()
         {
-            _backButton.Clicked += OnBackClicked;
-            _homeButton.Clicked += OnHomeClicked;
+            _backButton.Clicked.Subscribe(_ => _windowController.Back()).AddTo(this);
+            _homeButton.Clicked.Subscribe(_ => Debug.LogError("OnHomeClicked")).AddTo(this);
 
-            _userData.SoftAmount.Changed += OnSoftAmountChanged;
-            _userData.HardAmount.Changed += OnHardAmountChanged;
-            _userData.MasterPointAmount.Changed += OnMasterPointAmountChanged;
-
-            Refresh();
+            _userData.SoftAmount.Subscribe(value => _softLabel.text = value.ToNumber()).AddTo(this);
+            _userData.HardAmount.Subscribe(value => _hardLabel.text = value.ToNumber()).AddTo(this);
+            _userData.MasterPointAmount.Subscribe(value => _masterPointLabel.text = value.ToNumber()).AddTo(this);
         }
-
-        private void OnDestroy()
-        {
-            _backButton.Clicked -= OnBackClicked;
-            _homeButton.Clicked -= OnHomeClicked;
-
-            if (_userData == null)
-                return;
-
-            _userData.SoftAmount.Changed -= OnSoftAmountChanged;
-            _userData.HardAmount.Changed -= OnHardAmountChanged;
-            _userData.MasterPointAmount.Changed -= OnMasterPointAmountChanged;
-        }
-
-        private void Refresh()
-        {
-            OnSoftAmountChanged(_userData.SoftAmount.Value);
-            OnHardAmountChanged(_userData.HardAmount.Value);
-            OnMasterPointAmountChanged(_userData.MasterPointAmount.Value);
-        }
-
-        private void OnBackClicked() => _windowController.Back();
-        private void OnHomeClicked() => Debug.LogError("OnHomeClicked");
-
-        private void OnSoftAmountChanged(int value) => _softLabel.text = value.ToNumber();
-        private void OnHardAmountChanged(int value) => _hardLabel.text = value.ToNumber();
-        private void OnMasterPointAmountChanged(int value) => _masterPointLabel.text = value.ToNumber();
     }
 }

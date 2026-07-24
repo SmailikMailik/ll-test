@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Helpers;
+using R3;
 using UnityEngine;
 
 namespace LL.UI.Windows.Views
@@ -11,22 +12,15 @@ namespace LL.UI.Windows.Views
         [SerializeField] private RewardsContainer _container;
         [SerializeField] private CommonButton _continueButton;
 
-        private void OnEnable()
+        private void Start()
         {
-            _continueButton.Clicked += OnContinueClicked;
-        }
-
-        private void OnDisable()
-        {
-            _continueButton.Clicked -= OnContinueClicked;
+            _continueButton.Clicked.Subscribe(_ => TryClose()).AddTo(this);
         }
 
         protected override void OnShow()
         {
             _container.ShowRewardsDelayed(Parameters.Rewards);
         }
-
-        private void OnContinueClicked() => TryClose();
     }
 
     internal sealed class RewardWindowParameters : IWindowParameters

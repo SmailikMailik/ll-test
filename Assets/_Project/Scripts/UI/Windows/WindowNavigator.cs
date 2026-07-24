@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using R3;
 
 namespace LL.UI.Windows
 {
@@ -14,9 +16,9 @@ namespace LL.UI.Windows
         }
     }
 
-    internal sealed class WindowNavigator
+    internal sealed class WindowNavigator : IDisposable
     {
-        internal ReactiveParameter<WindowBase> CurrentWindow { get; } = new();
+        internal ReactiveProperty<WindowBase> CurrentWindow { get; } = new();
 
         internal bool CanGoBack
         {
@@ -53,7 +55,7 @@ namespace LL.UI.Windows
                 throw;
             }
 
-            CurrentWindow.SetValue(window, true);
+            CurrentWindow.OnNext(window);
         }
 
         internal bool Back()
@@ -75,10 +77,12 @@ namespace LL.UI.Windows
                 throw;
             }
 
-            CurrentWindow.SetValue(_history.Count > 0 ? _history.Peek().Window : null, true);
+            CurrentWindow.OnNext(_history.Count > 0 ? _history.Peek().Window : null);
 
             return true;
         }
+
+        public void Dispose() => CurrentWindow.Dispose();
 
         private void ApplyVisibleState(WindowBase forceRefresh = null)
         {
