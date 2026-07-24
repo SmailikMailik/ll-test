@@ -49,6 +49,5 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   _windowCatalog: {fileID: 11400000, guid: eb1646ea480b2cc4fb2985ea08cc1104, type: 2}
-  _defaultSoftAmount: 99
-  _defaultHardAmount: 99
-  _defaultMasterPointAmount: 99
+  _userDataConfig: {fileID: 11400000, guid: 08915e9948d847e18fc2884bf8f88076, type: 2}
+  _levelProgressionConfig: {fileID: 11400000, guid: f72188eb8aa54013998b38cecaada8dd, type: 2}

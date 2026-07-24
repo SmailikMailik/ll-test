@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 852f251d7d014bfab5f07d84557ea907, type: 3}
+  m_Name: LevelProgressionConfig
+  m_EditorClassIdentifier:
+  _levelThresholds:
+  - _level: 1
+    _totalExperience: 0
+  - _level: 2
+    _totalExperience: 5000
+  - _level: 3
+    _totalExperience: 10000
+  - _level: 4
+    _totalExperience: 15000
+  - _level: 5
+    _totalExperience: 20000
+  - _level: 6
+    _totalExperience: 25000
+  - _level: 7
+    _totalExperience: 30000
+  - _level: 8
+    _totalExperience: 35000
+  - _level: 9
+    _totalExperience: 40000

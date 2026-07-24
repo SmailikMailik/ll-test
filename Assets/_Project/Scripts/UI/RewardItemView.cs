@@ -1,4 +1,4 @@
-﻿using LL.Helpers;
+using LL.Rewards;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +16,8 @@ namespace LL.UI
         {
             Data = reward;
 
-            _rewardImage.sprite = RewardsHelper.GetRewardIcon(reward);
-            _rewardLabel.text = $"{reward.ItemsCount}";
+            _rewardImage.sprite = RewardFormatter.GetIcon(reward);
+            _rewardLabel.text = RewardFormatter.GetText(reward);
         }
     }
 }

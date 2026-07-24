@@ -1,4 +1,5 @@
 using LL.Extensions;
+using LL.User;
 using LL.UI.Windows;
 using R3;
 using TMPro;
@@ -16,13 +17,13 @@ namespace LL.UI
         [SerializeField] private TMP_Text _hardLabel;
         [SerializeField] private TMP_Text _masterPointLabel;
 
-        private UserData _userData;
+        private IUserWallet _userWallet;
         private WindowController _windowController;
 
         [Inject]
-        private void Construct(UserData userData, WindowController windowController)
+        private void Construct(IUserWallet userWallet, WindowController windowController)
         {
-            _userData = userData;
+            _userWallet = userWallet;
             _windowController = windowController;
         }
 
@@ -31,9 +32,17 @@ namespace LL.UI
             _backButton.Clicked.Subscribe(_ => _windowController.Back()).AddTo(this);
             _homeButton.Clicked.Subscribe(_ => Debug.LogError("OnHomeClicked")).AddTo(this);
 
-            _userData.SoftAmount.Subscribe(value => _softLabel.text = value.ToNumber()).AddTo(this);
-            _userData.HardAmount.Subscribe(value => _hardLabel.text = value.ToNumber()).AddTo(this);
-            _userData.MasterPointAmount.Subscribe(value => _masterPointLabel.text = value.ToNumber()).AddTo(this);
+            _userWallet.ObserveAmount(CurrencyType.Soft)
+                .Subscribe(value => _softLabel.text = value.ToNumber())
+                .AddTo(this);
+
+            _userWallet.ObserveAmount(CurrencyType.Hard)
+                .Subscribe(value => _hardLabel.text = value.ToNumber())
+                .AddTo(this);
+
+            _userWallet.ObserveAmount(CurrencyType.MasterPoint)
+                .Subscribe(value => _masterPointLabel.text = value.ToNumber())
+                .AddTo(this);
         }
     }
 }

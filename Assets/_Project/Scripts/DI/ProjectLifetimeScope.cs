@@ -1,4 +1,8 @@
+using LL.Purchases;
+using LL.Rewards;
+using LL.User;
 using LL.UI.Windows;
+using LL.UI.Windows.Configuration;
 using UnityEngine;
 using UnityEngine.Serialization;
 using VContainer;
@@ -11,10 +15,9 @@ namespace LL.DI
         [FormerlySerializedAs("_windowsSettings")]
         [SerializeField] private WindowCatalog _windowCatalog;
 
-        [Header("User Data Defaults")]
-        [SerializeField, Min(0)] private int _defaultSoftAmount = 99;
-        [SerializeField, Min(0)] private int _defaultHardAmount = 99;
-        [SerializeField, Min(0)] private int _defaultMasterPointAmount = 99;
+        [Header("User")]
+        [SerializeField] private UserDataConfig _userDataConfig;
+        [SerializeField] private LevelProgressionConfig _levelProgressionConfig;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -22,12 +25,17 @@ namespace LL.DI
             builder.Register<WindowProvider>(Lifetime.Scoped);
             builder.Register<WindowNavigator>(Lifetime.Scoped);
 
+            builder.RegisterInstance<IUserDataSource>(_userDataConfig);
+            builder.RegisterInstance<ILevelProgression>(_levelProgressionConfig);
+
             builder.Register(
-                _ => new UserData(
-                    _defaultSoftAmount,
-                    _defaultHardAmount,
-                    _defaultMasterPointAmount),
+                resolver => resolver.Resolve<IUserDataSource>().Load(),
                 Lifetime.Singleton);
+
+            builder.Register<UserWallet>(Lifetime.Singleton).As<IUserWallet>();
+            builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
+            builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
+            builder.Register<PurchaseService>(Lifetime.Singleton).As<IPurchaseService>();
         }
     }
 }
