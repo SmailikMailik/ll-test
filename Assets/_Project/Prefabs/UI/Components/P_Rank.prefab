@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: 4307659956896197305}
   - component: {fileID: 1831121333569486635}
   m_Layer: 5
-  m_Name: Label_Level
+  m_Name: Label_Rank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

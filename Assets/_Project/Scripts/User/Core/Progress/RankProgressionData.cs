@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace LL.User.Core.Progress
 {
-    internal sealed class LevelProgressionData
+    internal sealed class RankProgressionData
     {
         internal IReadOnlyList<int> ExperienceThresholds { get; }
 
-        internal LevelProgressionData(IEnumerable<int> experienceThresholds)
+        internal RankProgressionData(IEnumerable<int> experienceThresholds)
         {
             var copy = experienceThresholds?.ToArray() ?? Array.Empty<int>();
             ExperienceThresholds = Array.AsReadOnly(copy);

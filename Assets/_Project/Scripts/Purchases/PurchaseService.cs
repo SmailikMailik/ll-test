@@ -1,4 +1,5 @@
 using LL.User.Core.Wallet;
+using VContainer;
 
 namespace LL.Purchases
 {
@@ -11,6 +12,7 @@ namespace LL.Purchases
     {
         private readonly IUserWallet _wallet;
 
+        [Inject]
         internal PurchaseService(IUserWallet wallet)
         {
             _wallet = wallet;

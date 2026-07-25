@@ -1,22 +1,24 @@
 using System;
 using LL.User.Core.Data;
 using R3;
+using VContainer;
 
 namespace LL.User.Core.Progress
 {
     internal sealed class UserProgress : IUserProgress, IDisposable
     {
         public Observable<int> TotalExperience => _totalExperience;
-        public Observable<int> Level => _level;
+        public Observable<int> Rank => _rank;
 
         private readonly ReactiveProperty<int> _totalExperience;
-        private readonly Observable<int> _level;
+        private readonly Observable<int> _rank;
 
-        internal UserProgress(UserData initialData, ILevelProgression levelProgression)
+        [Inject]
+        internal UserProgress(UserData initialData, IRankProgression rankProgression)
         {
             _totalExperience = new ReactiveProperty<int>(initialData.TotalExperience);
-            _level = _totalExperience
-                .Select(levelProgression.GetLevel)
+            _rank = _totalExperience
+                .Select(rankProgression.GetRank)
                 .DistinctUntilChanged();
         }
 

@@ -1,6 +1,7 @@
 using System;
 using LL.User.Core.Data;
 using R3;
+using VContainer;
 
 namespace LL.User.Core.Wallet
 {
@@ -10,6 +11,7 @@ namespace LL.User.Core.Wallet
         private readonly ReactiveProperty<int> _hardAmount;
         private readonly ReactiveProperty<int> _masterPointAmount;
 
+        [Inject]
         internal UserWallet(UserData initialData)
         {
             _softAmount = new ReactiveProperty<int>(initialData.SoftAmount);

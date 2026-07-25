@@ -1,5 +1,6 @@
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
+using VContainer;
 
 namespace LL.Rewards
 {
@@ -13,6 +14,7 @@ namespace LL.Rewards
         private readonly IUserWallet _wallet;
         private readonly IUserProgress _progress;
 
+        [Inject]
         internal RewardService(IUserWallet wallet, IUserProgress progress)
         {
             _wallet = wallet;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using R3;
+using VContainer;
 
 namespace LL.UI.Windows
 {
@@ -37,6 +38,9 @@ namespace LL.UI.Windows
 
         private readonly List<WindowHistoryEntry> _visibleEntries = new();
         private readonly HashSet<WindowBase> _visibleWindows = new();
+
+        [Inject]
+        internal WindowNavigator() { }
 
         internal void Show<TParameter>(Window<TParameter> window, TParameter parameters)
             where TParameter : class, IWindowParameters

@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using VContainer;
 
 namespace LL.User.Core.Progress
 {
-    internal sealed class LevelProgression : ILevelProgression
+    internal sealed class RankProgression : IRankProgression
     {
         private readonly IReadOnlyList<int> _experienceThresholds;
 
-        internal LevelProgression(ILevelProgressionSource source)
+        [Inject]
+        internal RankProgression(IRankProgressionSource source)
         {
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
@@ -15,7 +17,7 @@ namespace LL.User.Core.Progress
             _experienceThresholds = Normalize(source.Load()?.ExperienceThresholds);
         }
 
-        public int GetLevel(int totalExperience)
+        public int GetRank(int totalExperience)
         {
             var experience = Math.Max(0, totalExperience);
 
