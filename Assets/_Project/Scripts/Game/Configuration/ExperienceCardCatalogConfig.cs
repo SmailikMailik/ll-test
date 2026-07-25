@@ -4,21 +4,22 @@ using System.Linq;
 using LL.Game.ExperienceCards;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace LL.Game.Configuration
 {
     [CreateAssetMenu(fileName = nameof(ExperienceCardCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class ExperienceCardCatalogConfig : ScriptableObject, IDataLoader<ExperienceCardCatalogData>
+    internal sealed class ExperienceCardCatalogConfig : ScriptableObject, IDataLoader<ExperienceCardCatalog>
     {
         internal const string CreationPath = "LL/Game Data/Experience Card Catalog";
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ExperienceCardDefinitionEntry[] _cards;
 
-        public ExperienceCardCatalogData Load() => new
+        public ExperienceCardCatalog Load() => new
         (
-            _cards?.Select(card => card?.ToData())
+            _cards?.Select(card => card?.ToCard())
         );
 
         private void OnValidate()
@@ -64,35 +65,36 @@ namespace LL.Game.Configuration
         [MinValue(1)]
         [SerializeField] private int _experienceAmount;
 
-        [LabelText("Capacity")]
+        [LabelText("Max Amount")]
         [MinValue(0)]
-        [SerializeField] private int _capacity;
+        [FormerlySerializedAs("_capacity")]
+        [SerializeField] private int _maxAmount;
 
         internal string Id => _id;
 
         internal ExperienceCardDefinitionEntry(
             string id,
             int experienceAmount,
-            int capacity)
+            int maxAmount)
         {
             _id = id;
             _experienceAmount = experienceAmount;
-            _capacity = capacity;
+            _maxAmount = maxAmount;
         }
 
-        internal ExperienceCardDefinitionData ToData()
+        internal IExperienceCard ToCard()
         {
-            return new ExperienceCardDefinitionData(
+            return new ExperienceCard(
                 new ExperienceCardId(_id),
                 _experienceAmount,
-                _capacity);
+                _maxAmount);
         }
 
         internal void Normalize(string id)
         {
             _id = id;
             _experienceAmount = Math.Max(1, _experienceAmount);
-            _capacity = Math.Max(0, _capacity);
+            _maxAmount = Math.Max(0, _maxAmount);
         }
     }
 }

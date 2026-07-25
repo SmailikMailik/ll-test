@@ -1,4 +1,4 @@
-namespace LL.Game.Progression
+namespace LL.Game.Ranks
 {
     internal interface IRankProgression
     {

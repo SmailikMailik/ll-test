@@ -1,6 +1,6 @@
 using LL.Game.Configuration;
 using LL.Game.ExperienceCards;
-using LL.Game.Progression;
+using LL.Game.Ranks;
 using LL.Purchases;
 using LL.Rewards;
 using LL.Saving;
@@ -25,7 +25,8 @@ namespace LL.DI
         [SerializeField] private WindowCatalog _windowCatalog;
 
         [Header("Game Data")]
-        [SerializeField] private RankProgressionConfig _rankProgressionConfig;
+        [FormerlySerializedAs("_rankProgressionConfig")]
+        [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private ExperienceCardCatalogConfig _experienceCardCatalogConfig;
 
         [Header("User")]
@@ -39,8 +40,8 @@ namespace LL.DI
             builder.Register<WindowProvider>(Lifetime.Scoped);
             builder.Register<WindowNavigator>(Lifetime.Scoped);
 
-            builder.RegisterInstance<IDataLoader<RankProgressionData>>(_rankProgressionConfig);
-            builder.RegisterInstance<IDataLoader<ExperienceCardCatalogData>>(_experienceCardCatalogConfig);
+            builder.RegisterInstance<IDataLoader<RankCatalog>>(_rankCatalogConfig);
+            builder.RegisterInstance<IDataLoader<ExperienceCardCatalog>>(_experienceCardCatalogConfig);
             builder.RegisterInstance<IDefaultDataLoader<UserInitialData>>(_userDefaultsConfig);
 
             builder.Register<JsonFileSaveService>(Lifetime.Singleton).As<ISaveService>();

@@ -7,34 +7,34 @@ namespace LL.User.Core.ExperienceCards
 {
     internal sealed class ExperienceCardsInitialData
     {
-        internal IReadOnlyList<ExperienceCardAmountData> Cards { get; }
+        internal IReadOnlyList<ExperienceCardStack> Stacks { get; }
 
         internal ExperienceCardsInitialData(
-            IEnumerable<ExperienceCardAmountData> cards)
+            IEnumerable<ExperienceCardStack> stacks)
         {
             var amounts = new Dictionary<ExperienceCardId, long>();
 
-            if (cards != null)
+            if (stacks != null)
             {
-                foreach (var card in cards)
+                foreach (var stack in stacks)
                 {
-                    if (card == null || card.Id.IsEmpty)
+                    if (stack == null || stack.Id.IsEmpty)
                         continue;
 
-                    amounts.TryGetValue(card.Id, out var current);
-                    amounts[card.Id] = Math.Min(
-                        current + card.Amount,
+                    amounts.TryGetValue(stack.Id, out var current);
+                    amounts[stack.Id] = Math.Min(
+                        current + stack.Amount,
                         int.MaxValue);
                 }
             }
 
             var copy = amounts
-                .Select(pair => new ExperienceCardAmountData(
+                .Select(pair => new ExperienceCardStack(
                     pair.Key,
                     (int)pair.Value))
                 .ToArray();
 
-            Cards = Array.AsReadOnly(copy);
+            Stacks = Array.AsReadOnly(copy);
         }
     }
 }

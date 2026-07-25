@@ -25,7 +25,7 @@ namespace LL.User.Persistence
                 new ProgressInitialData(data.TotalExperience),
                 new ExperienceCardsInitialData(
                     data.ExperienceCards.Select(card =>
-                        new ExperienceCardAmountData(
+                        new ExperienceCardStack(
                             new ExperienceCardId(card.Id),
                             card.Amount))));
         }
@@ -65,10 +65,10 @@ namespace LL.User.Persistence
                 hardAmount,
                 masterPointAmount,
                 totalExperience,
-                experienceCards.Cards
-                    .Select(card => new ExperienceCardSaveData(
-                        card.Id.Value,
-                        card.Amount))
+                experienceCards.Stacks
+                    .Select(stack => new ExperienceCardSaveData(
+                        stack.Id.Value,
+                        stack.Amount))
                     .ToArray());
         }
     }

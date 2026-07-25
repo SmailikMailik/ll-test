@@ -1,22 +1,22 @@
 using System;
 using System.Linq;
-using LL.Game.Progression;
+using LL.Game.Ranks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace LL.Game.Configuration
 {
-    [CreateAssetMenu(fileName = nameof(RankProgressionConfig), menuName = CreationPath)]
+    [CreateAssetMenu(fileName = nameof(RankCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class RankProgressionConfig : ScriptableObject, IDataLoader<RankProgressionData>
+    internal sealed class RankCatalogConfig : ScriptableObject, IDataLoader<RankCatalog>
     {
-        internal const string CreationPath = "LL/Game Data/Rank Progression Config";
+        internal const string CreationPath = "LL/Game Data/Rank Catalog";
 
         [InfoBox("Total accumulated experience required to reach each rank.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private RankThresholdEntry[] _rankThresholds;
 
-        public RankProgressionData Load() => new
+        public RankCatalog Load() => new
         (
             _rankThresholds?.Select(threshold => threshold?.TotalExperience ?? 0)
         );

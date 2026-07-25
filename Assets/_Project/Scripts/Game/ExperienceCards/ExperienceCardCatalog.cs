@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace LL.Game.ExperienceCards
 {
-    internal sealed class ExperienceCardCatalogData
+    internal sealed class ExperienceCardCatalog
     {
-        internal IReadOnlyList<ExperienceCardDefinitionData> Cards { get; }
+        internal IReadOnlyList<IExperienceCard> Cards { get; }
 
-        internal ExperienceCardCatalogData(
-            IEnumerable<ExperienceCardDefinitionData> cards)
+        internal ExperienceCardCatalog(
+            IEnumerable<IExperienceCard> cards)
         {
             var uniqueIds = new HashSet<ExperienceCardId>();
             var copy = cards?
@@ -18,7 +18,7 @@ namespace LL.Game.ExperienceCards
                     card.Id.IsEmpty is false &&
                     uniqueIds.Add(card.Id))
                 .ToArray()
-                ?? Array.Empty<ExperienceCardDefinitionData>();
+                ?? Array.Empty<IExperienceCard>();
 
             Cards = Array.AsReadOnly(copy);
         }

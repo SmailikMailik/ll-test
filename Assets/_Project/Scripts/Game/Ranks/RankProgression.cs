@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using VContainer;
 
-namespace LL.Game.Progression
+namespace LL.Game.Ranks
 {
     internal sealed class RankProgression : IRankProgression
     {
         private readonly IReadOnlyList<int> _experienceThresholds;
 
         [Inject]
-        internal RankProgression(IDataLoader<RankProgressionData> loader)
+        internal RankProgression(IDataLoader<RankCatalog> loader)
         {
             if (loader is null)
                 throw new ArgumentNullException(nameof(loader));

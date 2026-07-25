@@ -1,5 +1,5 @@
 using System;
-using LL.Game.Progression;
+using LL.Game.Ranks;
 using R3;
 using VContainer;
 

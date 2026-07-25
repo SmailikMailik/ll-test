@@ -7,11 +7,11 @@ namespace LLEditor
     {
         private const string MenuPath = ConfigurationAssetMenu.RootPath + "Game Data/";
 
-        [MenuItem(MenuPath + "Rank Progression Config")]
-        private static void SelectRankProgressionConfig()
+        [MenuItem(MenuPath + "Rank Catalog")]
+        private static void SelectRankCatalog()
         {
-            ConfigurationAssetMenu.Select<RankProgressionConfig>(
-                RankProgressionConfig.CreationPath);
+            ConfigurationAssetMenu.Select<RankCatalogConfig>(
+                RankCatalogConfig.CreationPath);
         }
 
         [MenuItem(MenuPath + "Experience Card Catalog")]

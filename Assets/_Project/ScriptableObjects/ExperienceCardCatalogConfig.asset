@@ -15,10 +15,10 @@ MonoBehaviour:
   _cards:
   - _id: card_100
     _experienceAmount: 100
-    _capacity: 99999
+    _maxAmount: 99999
   - _id: card_500
     _experienceAmount: 500
-    _capacity: 999
+    _maxAmount: 999
   - _id: card_2000
     _experienceAmount: 2000
-    _capacity: 99
+    _maxAmount: 99

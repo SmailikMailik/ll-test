@@ -1,5 +1,5 @@
 using LL.Extensions;
-using LL.Game.Progression;
+using LL.Game.Ranks;
 using LL.User.Core.Progress;
 using TMPro;
 using UnityEngine;

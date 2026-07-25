@@ -58,24 +58,22 @@ namespace LL.User.Configuration
             new UserIdentity(_regionCode, _userId),
             new WalletInitialData(_softAmount, _hardAmount, _masterPointAmount),
             new ProgressInitialData(_totalExperience),
-            new ExperienceCardsInitialData(
-                _experienceCards?.Select(card => card?.ToData()))
+            new ExperienceCardsInitialData(_experienceCards?.Select(card => card?.ToData()))
         );
     }
 
     [Serializable]
     internal sealed class ExperienceCardAmountEntry
     {
-        [LabelText("Card ID")]
-        [SerializeField] private string _id;
+        [LabelText("Card ID")] [SerializeField]
+        private string _id;
 
-        [LabelText("Amount")]
-        [MinValue(0)]
-        [SerializeField] private int _amount;
+        [LabelText("Amount")] [MinValue(0)] [SerializeField]
+        private int _amount;
 
-        internal ExperienceCardAmountData ToData()
+        internal ExperienceCardStack ToData()
         {
-            return new ExperienceCardAmountData(
+            return new ExperienceCardStack(
                 new ExperienceCardId(_id),
                 _amount);
         }
