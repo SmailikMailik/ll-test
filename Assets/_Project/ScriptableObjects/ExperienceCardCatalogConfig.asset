@@ -11,14 +11,14 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e13daf2006774a298f00fd83a9899392, type: 3}
   m_Name: ExperienceCardCatalogConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   _cards:
-  - _id: card_100
+  - _id: card_1
     _experienceAmount: 100
     _maxAmount: 99999
-  - _id: card_500
+  - _id: card_2
     _experienceAmount: 500
     _maxAmount: 999
-  - _id: card_2000
+  - _id: card_3
     _experienceAmount: 2000
     _maxAmount: 99

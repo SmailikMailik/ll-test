@@ -1,6 +1,9 @@
 using LL.Game.Configuration;
+using LL.Game.Currencies;
 using LL.Game.ExperienceCards;
 using LL.Game.Ranks;
+using LL.Presentation.Configuration;
+using LL.Presentation.Icons;
 using LL.Purchases;
 using LL.Rewards;
 using LL.Saving;
@@ -29,6 +32,10 @@ namespace LL.DI
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private ExperienceCardCatalogConfig _experienceCardCatalogConfig;
 
+        [Header("Presentation")]
+        [SerializeField] private CurrencyIconCatalogConfig _currencyIconCatalogConfig;
+        [SerializeField] private ExperienceCardIconCatalogConfig _experienceCardIconCatalogConfig;
+
         [Header("User")]
         [FormerlySerializedAs("_userDataConfig")]
         [SerializeField]
@@ -42,7 +49,25 @@ namespace LL.DI
 
             builder.RegisterInstance<IDataLoader<RankCatalog>>(_rankCatalogConfig);
             builder.RegisterInstance<IDataLoader<ExperienceCardCatalog>>(_experienceCardCatalogConfig);
+            builder.RegisterInstance<IDataLoader<IconCatalog<CurrencyId>>>(_currencyIconCatalogConfig);
+            builder.RegisterInstance<IDataLoader<IconCatalog<ExperienceCardId>>>(
+                _experienceCardIconCatalogConfig);
             builder.RegisterInstance<IDefaultDataLoader<UserInitialData>>(_userDefaultsConfig);
+
+            builder
+                .Register(
+                    resolver => resolver
+                        .Resolve<IDataLoader<IconCatalog<CurrencyId>>>()
+                        .Load(),
+                    Lifetime.Singleton)
+                .As<IIconProvider<CurrencyId>>();
+            builder
+                .Register(
+                    resolver => resolver
+                        .Resolve<IDataLoader<IconCatalog<ExperienceCardId>>>()
+                        .Load(),
+                    Lifetime.Singleton)
+                .As<IIconProvider<ExperienceCardId>>();
 
             builder.Register<JsonFileSaveService>(Lifetime.Singleton).As<ISaveService>();
             builder.Register<UserInitialDataLoader>(Lifetime.Singleton).As<IDataLoader<UserInitialData>>();

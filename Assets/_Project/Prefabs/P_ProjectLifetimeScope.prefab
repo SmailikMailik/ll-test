@@ -52,3 +52,5 @@ MonoBehaviour:
   _userDataConfig: {fileID: 11400000, guid: 08915e9948d847e18fc2884bf8f88076, type: 2}
   _rankCatalogConfig: {fileID: 11400000, guid: f72188eb8aa54013998b38cecaada8dd, type: 2}
   _experienceCardCatalogConfig: {fileID: 11400000, guid: 3f842080888c4b8da27d1418c074ad9b, type: 2}
+  _currencyIconCatalogConfig: {fileID: 11400000, guid: a0f86a11d13b4dc3b7ea62ec0e009846, type: 2}
+  _experienceCardIconCatalogConfig: {fileID: 11400000, guid: b0d176f1182a45dc98a9eb624bd41b82, type: 2}

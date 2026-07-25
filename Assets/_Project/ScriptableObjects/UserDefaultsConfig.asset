@@ -23,9 +23,9 @@ MonoBehaviour:
     _amount: 33333
   _totalExperience: 12861
   _experienceCards:
-  - _id: card_100
-    _amount: 0
-  - _id: card_500
-    _amount: 0
-  - _id: card_2000
-    _amount: 0
+  - _id: card_1
+    _amount: 99
+  - _id: card_2
+    _amount: 99
+  - _id: card_3
+    _amount: 99
