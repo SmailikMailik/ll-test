@@ -19,6 +19,10 @@ MonoBehaviour:
     m_Key: main.rank
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440960
+    m_Key: main.upgrade
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

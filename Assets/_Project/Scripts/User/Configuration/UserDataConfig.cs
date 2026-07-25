@@ -10,6 +10,14 @@ namespace LL.User.Configuration
     {
         internal const string CreationPath = "LL/User/User Data Config";
 
+        [BoxGroup("Identity")]
+        [LabelText("Region Code")]
+        [SerializeField] private string _regionCode;
+
+        [BoxGroup("Identity")]
+        [LabelText("User ID")]
+        [SerializeField] private string _userId;
+
         [BoxGroup("Wallet")]
         [LabelText("Soft Currency")]
         [SuffixLabel("SOFT", true)]
@@ -36,6 +44,8 @@ namespace LL.User.Configuration
 
         UserData IUserDataSource.Load() => new
         (
+            _regionCode,
+            _userId,
             _softAmount,
             _hardAmount,
             _masterPointAmount,

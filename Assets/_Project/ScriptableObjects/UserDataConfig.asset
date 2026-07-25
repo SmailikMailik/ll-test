@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 136ef401d8bd4e36a63d113ba196e540, type: 3}
   m_Name: UserDataConfig
   m_EditorClassIdentifier: 
+  _regionCode: EU
+  _userId: 7252511
   _softAmount: 2443313
   _hardAmount: 33290
   _masterPointAmount: 33333
