@@ -1,6 +1,7 @@
 using System;
 using LL.UI.Windows.Configuration;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 
 namespace LL.UI.Windows
@@ -30,6 +31,7 @@ namespace LL.UI.Windows
     }
 
     [RequireComponent(typeof(Canvas))]
+    [RequireComponent(typeof(GraphicRaycaster))]
     internal abstract class WindowBase : RectMonoBehaviour
     {
         internal abstract Type ParameterType { get; }

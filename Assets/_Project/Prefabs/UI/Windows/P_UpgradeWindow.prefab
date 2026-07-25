@@ -304,18 +304,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3947941758236112535, guid: f9350fce70addb8428188df130a79330, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3947941758236112535, guid: f9350fce70addb8428188df130a79330, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3947941758236112535, guid: f9350fce70addb8428188df130a79330, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3947941758236112535, guid: f9350fce70addb8428188df130a79330, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -362,10 +350,6 @@ PrefabInstance:
     - target: {fileID: 3947941758236112535, guid: f9350fce70addb8428188df130a79330, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5181137100511837447, guid: f9350fce70addb8428188df130a79330, type: 3}
-      propertyPath: m_AdditionalShaderChannelsFlag
-      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 5342419485409765225, guid: f9350fce70addb8428188df130a79330, type: 3}
       propertyPath: m_Name
