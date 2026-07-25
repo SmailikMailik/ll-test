@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.972549, g: 0.8392157, b: 0.53333336, a: 1}
+  m_Color: {r: 0.972549, g: 0.8392157, b: 0.53333336, a: 0.5019608}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -234,7 +234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.972549, g: 0.8392157, b: 0.53333336, a: 1}
+  m_Color: {r: 0.972549, g: 0.8392157, b: 0.53333336, a: 0.5019608}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -482,8 +482,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4287158008
-  m_fontColor: {r: 0.972549, g: 0.8392157, b: 0.53333336, a: 1}
+    rgba: 3431519992
+  m_fontColor: {r: 0.972549, g: 0.8392157, b: 0.53333336, a: 0.8}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1155,6 +1155,22 @@ PrefabInstance:
     - target: {fileID: 2531455665732260880, guid: e8fd7b9daa455964097009b19e91afc7, type: 3}
       propertyPath: m_Name
       value: P_Hard
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024729844224574589, guid: e8fd7b9daa455964097009b19e91afc7, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.53333336
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024729844224574589, guid: e8fd7b9daa455964097009b19e91afc7, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.8392157
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024729844224574589, guid: e8fd7b9daa455964097009b19e91afc7, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.972549
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024729844224574589, guid: e8fd7b9daa455964097009b19e91afc7, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4287158008
       objectReference: {fileID: 0}
     - target: {fileID: 5252616865448714475, guid: e8fd7b9daa455964097009b19e91afc7, type: 3}
       propertyPath: m_Sprite
