@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using LL.Game.ExperienceCards;
 using LL.User.Core;
+using LL.User.Core.ExperienceCards;
 using LL.User.Core.Identity;
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
@@ -19,7 +22,12 @@ namespace LL.User.Persistence
                     data.SoftAmount,
                     data.HardAmount,
                     data.MasterPointAmount),
-                new ProgressInitialData(data.TotalExperience));
+                new ProgressInitialData(data.TotalExperience),
+                new ExperienceCardsInitialData(
+                    data.ExperienceCards.Select(card =>
+                        new ExperienceCardAmountData(
+                            new ExperienceCardId(card.Id),
+                            card.Amount))));
         }
 
         internal static UserSaveData ToSaveData(UserInitialData data)
@@ -32,7 +40,8 @@ namespace LL.User.Persistence
                 data.Wallet.SoftAmount,
                 data.Wallet.HardAmount,
                 data.Wallet.MasterPointAmount,
-                data.Progress.TotalExperience);
+                data.Progress.TotalExperience,
+                data.ExperienceCards);
         }
 
         internal static UserSaveData ToSaveData(
@@ -40,10 +49,14 @@ namespace LL.User.Persistence
             int softAmount,
             int hardAmount,
             int masterPointAmount,
-            int totalExperience)
+            int totalExperience,
+            ExperienceCardsInitialData experienceCards)
         {
             if (identity == null)
                 throw new ArgumentNullException(nameof(identity));
+
+            if (experienceCards == null)
+                throw new ArgumentNullException(nameof(experienceCards));
 
             return new UserSaveData(
                 identity.RegionCode,
@@ -51,7 +64,12 @@ namespace LL.User.Persistence
                 softAmount,
                 hardAmount,
                 masterPointAmount,
-                totalExperience);
+                totalExperience,
+                experienceCards.Cards
+                    .Select(card => new ExperienceCardSaveData(
+                        card.Id.Value,
+                        card.Amount))
+                    .ToArray());
         }
     }
 }

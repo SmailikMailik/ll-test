@@ -1,4 +1,8 @@
+using System;
+using System.Linq;
+using LL.Game.ExperienceCards;
 using LL.User.Core;
+using LL.User.Core.ExperienceCards;
 using LL.User.Core.Identity;
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
@@ -45,11 +49,35 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _totalExperience;
 
+        [BoxGroup("Experience Cards")]
+        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [SerializeField] private ExperienceCardAmountEntry[] _experienceCards;
+
         UserInitialData IDataLoader<UserInitialData>.Load() => new
         (
             new UserIdentity(_regionCode, _userId),
             new WalletInitialData(_softAmount, _hardAmount, _masterPointAmount),
-            new ProgressInitialData(_totalExperience)
+            new ProgressInitialData(_totalExperience),
+            new ExperienceCardsInitialData(
+                _experienceCards?.Select(card => card?.ToData()))
         );
+    }
+
+    [Serializable]
+    internal sealed class ExperienceCardAmountEntry
+    {
+        [LabelText("Card ID")]
+        [SerializeField] private string _id;
+
+        [LabelText("Amount")]
+        [MinValue(0)]
+        [SerializeField] private int _amount;
+
+        internal ExperienceCardAmountData ToData()
+        {
+            return new ExperienceCardAmountData(
+                new ExperienceCardId(_id),
+                _amount);
+        }
     }
 }

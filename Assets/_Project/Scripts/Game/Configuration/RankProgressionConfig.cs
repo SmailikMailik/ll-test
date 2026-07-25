@@ -1,16 +1,16 @@
 using System;
 using System.Linq;
-using LL.User.Core.Progress;
+using LL.Game.Progression;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.User.Configuration
+namespace LL.Game.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankProgressionConfig), menuName = CreationPath)]
     [HideMonoScript]
     internal sealed class RankProgressionConfig : ScriptableObject, IDataLoader<RankProgressionData>
     {
-        internal const string CreationPath = "LL/User/Rank Progression Config";
+        internal const string CreationPath = "LL/Game Data/Rank Progression Config";
 
         [InfoBox("Total accumulated experience required to reach each rank.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]

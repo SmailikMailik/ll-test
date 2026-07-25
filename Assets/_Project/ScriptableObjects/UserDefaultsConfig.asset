@@ -18,3 +18,10 @@ MonoBehaviour:
   _hardAmount: 33290
   _masterPointAmount: 33333
   _totalExperience: 12861
+  _experienceCards:
+  - _id: card_100
+    _amount: 0
+  - _id: card_500
+    _amount: 0
+  - _id: card_2000
+    _amount: 0

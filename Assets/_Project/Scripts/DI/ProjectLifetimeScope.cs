@@ -1,3 +1,6 @@
+using LL.Game.Configuration;
+using LL.Game.ExperienceCards;
+using LL.Game.Progression;
 using LL.Purchases;
 using LL.Rewards;
 using LL.Saving;
@@ -5,6 +8,7 @@ using LL.UI.Windows;
 using LL.UI.Windows.Configuration;
 using LL.User.Configuration;
 using LL.User.Core;
+using LL.User.Core.ExperienceCards;
 using LL.User.Core.Identity;
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
@@ -20,10 +24,14 @@ namespace LL.DI
     {
         [SerializeField] private WindowCatalog _windowCatalog;
 
-        [Header("User")] [FormerlySerializedAs("_userDataConfig")] [SerializeField]
-        private UserDefaultsConfig _userDefaultsConfig;
-
+        [Header("Game Data")]
         [SerializeField] private RankProgressionConfig _rankProgressionConfig;
+        [SerializeField] private ExperienceCardCatalogConfig _experienceCardCatalogConfig;
+
+        [Header("User")]
+        [FormerlySerializedAs("_userDataConfig")]
+        [SerializeField]
+        private UserDefaultsConfig _userDefaultsConfig;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -32,6 +40,7 @@ namespace LL.DI
             builder.Register<WindowNavigator>(Lifetime.Scoped);
 
             builder.RegisterInstance<IDataLoader<RankProgressionData>>(_rankProgressionConfig);
+            builder.RegisterInstance<IDataLoader<ExperienceCardCatalogData>>(_experienceCardCatalogConfig);
             builder.RegisterInstance<IDefaultDataLoader<UserInitialData>>(_userDefaultsConfig);
 
             builder.Register<JsonFileSaveService>(Lifetime.Singleton).As<ISaveService>();
@@ -41,6 +50,7 @@ namespace LL.DI
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Identity, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Wallet, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Progress, Lifetime.Singleton);
+            builder.Register(resolver => resolver.Resolve<UserInitialData>().ExperienceCards, Lifetime.Singleton);
 
             builder.Register<UserWallet>(Lifetime.Singleton).As<IUserWallet>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();

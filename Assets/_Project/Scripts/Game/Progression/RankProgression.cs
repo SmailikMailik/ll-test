@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using VContainer;
 
-namespace LL.User.Core.Progress
+namespace LL.Game.Progression
 {
     internal sealed class RankProgression : IRankProgression
     {

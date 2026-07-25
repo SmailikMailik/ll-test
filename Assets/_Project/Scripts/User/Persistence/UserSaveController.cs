@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Saving;
+using LL.User.Core.ExperienceCards;
 using LL.User.Core.Identity;
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
@@ -16,6 +17,7 @@ namespace LL.User.Persistence
         private readonly IUserWallet _wallet;
         private readonly IUserProgress _progress;
         private readonly ISaveService _saveService;
+        private readonly ExperienceCardsInitialData _experienceCards;
         private readonly List<IDisposable> _subscriptions = new();
 
         private int _softAmount;
@@ -28,6 +30,7 @@ namespace LL.User.Persistence
             UserIdentity identity,
             WalletInitialData walletInitialData,
             ProgressInitialData progressInitialData,
+            ExperienceCardsInitialData experienceCards,
             IUserWallet wallet,
             IUserProgress progress,
             ISaveService saveService)
@@ -39,6 +42,9 @@ namespace LL.User.Persistence
 
             if (progressInitialData == null)
                 throw new ArgumentNullException(nameof(progressInitialData));
+
+            _experienceCards = experienceCards
+                ?? throw new ArgumentNullException(nameof(experienceCards));
 
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
@@ -92,7 +98,8 @@ namespace LL.User.Persistence
                 _softAmount,
                 _hardAmount,
                 _masterPointAmount,
-                _totalExperience);
+                _totalExperience,
+                _experienceCards);
 
             _saveService.TrySave(UserInitialDataLoader.SaveKey, data);
         }

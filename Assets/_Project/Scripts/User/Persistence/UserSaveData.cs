@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace LL.User.Persistence
@@ -14,6 +16,7 @@ namespace LL.User.Persistence
         [JsonProperty] private int _hardAmount;
         [JsonProperty] private int _masterPointAmount;
         [JsonProperty] private int _totalExperience;
+        [JsonProperty] private ExperienceCardSaveData[] _experienceCards;
 
         internal bool IsSupported => _version == CurrentVersion;
         internal string RegionCode => _regionCode;
@@ -22,6 +25,8 @@ namespace LL.User.Persistence
         internal int HardAmount => _hardAmount;
         internal int MasterPointAmount => _masterPointAmount;
         internal int TotalExperience => _totalExperience;
+        internal IReadOnlyList<ExperienceCardSaveData> ExperienceCards =>
+            _experienceCards ?? Array.Empty<ExperienceCardSaveData>();
 
         [JsonConstructor]
         private UserSaveData() { }
@@ -32,7 +37,8 @@ namespace LL.User.Persistence
             int softAmount,
             int hardAmount,
             int masterPointAmount,
-            int totalExperience)
+            int totalExperience,
+            ExperienceCardSaveData[] experienceCards)
         {
             _version = CurrentVersion;
             _regionCode = regionCode;
@@ -41,6 +47,26 @@ namespace LL.User.Persistence
             _hardAmount = hardAmount;
             _masterPointAmount = masterPointAmount;
             _totalExperience = totalExperience;
+            _experienceCards = experienceCards ?? Array.Empty<ExperienceCardSaveData>();
+        }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    internal sealed class ExperienceCardSaveData
+    {
+        [JsonProperty] private string _id;
+        [JsonProperty] private int _amount;
+
+        internal string Id => _id;
+        internal int Amount => _amount;
+
+        [JsonConstructor]
+        private ExperienceCardSaveData() { }
+
+        internal ExperienceCardSaveData(string id, int amount)
+        {
+            _id = id;
+            _amount = amount;
         }
     }
 }

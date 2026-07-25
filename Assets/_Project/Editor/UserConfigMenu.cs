@@ -13,10 +13,5 @@ namespace LLEditor
             ConfigurationAssetMenu.Select<UserDefaultsConfig>(UserDefaultsConfig.CreationPath);
         }
 
-        [MenuItem(MenuPath + "Rank Progression Config")]
-        private static void SelectRankProgressionConfig()
-        {
-            ConfigurationAssetMenu.Select<RankProgressionConfig>(RankProgressionConfig.CreationPath);
-        }
     }
 }
