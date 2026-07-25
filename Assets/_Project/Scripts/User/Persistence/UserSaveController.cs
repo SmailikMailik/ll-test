@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using LL.Game.Currencies;
 using LL.Saving;
 using LL.User.Core.ExperienceCards;
 using LL.User.Core.Identity;
@@ -20,9 +22,7 @@ namespace LL.User.Persistence
         private readonly ExperienceCardsInitialData _experienceCards;
         private readonly List<IDisposable> _subscriptions = new();
 
-        private int _softAmount;
-        private int _hardAmount;
-        private int _masterPointAmount;
+        private readonly Dictionary<CurrencyId, int> _currencyAmounts;
         private int _totalExperience;
 
         [Inject]
@@ -50,25 +50,21 @@ namespace LL.User.Persistence
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
 
-            _softAmount = walletInitialData.SoftAmount;
-            _hardAmount = walletInitialData.HardAmount;
-            _masterPointAmount = walletInitialData.MasterPointAmount;
+            _currencyAmounts = walletInitialData.Balances.ToDictionary(
+                balance => balance.Id,
+                balance => balance.Amount);
             _totalExperience = progressInitialData.TotalExperience;
         }
 
         public void Initialize()
         {
-            _subscriptions.Add(_wallet
-                .ObserveAmount(CurrencyType.Soft)
-                .Subscribe(value => UpdateAndSave(ref _softAmount, value)));
-
-            _subscriptions.Add(_wallet
-                .ObserveAmount(CurrencyType.Hard)
-                .Subscribe(value => UpdateAndSave(ref _hardAmount, value)));
-
-            _subscriptions.Add(_wallet
-                .ObserveAmount(CurrencyType.MasterPoint)
-                .Subscribe(value => UpdateAndSave(ref _masterPointAmount, value)));
+            foreach (var id in _currencyAmounts.Keys.ToArray())
+            {
+                var currencyId = id;
+                _subscriptions.Add(_wallet
+                    .ObserveAmount(currencyId)
+                    .Subscribe(value => UpdateCurrencyAndSave(currencyId, value)));
+            }
 
             _subscriptions.Add(_progress.TotalExperience
                 .Subscribe(value => UpdateAndSave(ref _totalExperience, value)));
@@ -91,13 +87,21 @@ namespace LL.User.Persistence
             Save();
         }
 
+        private void UpdateCurrencyAndSave(CurrencyId id, int value)
+        {
+            if (_currencyAmounts[id] == value)
+                return;
+
+            _currencyAmounts[id] = value;
+            Save();
+        }
+
         private void Save()
         {
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
-                _softAmount,
-                _hardAmount,
-                _masterPointAmount,
+                _currencyAmounts.Select(pair =>
+                    new CurrencyBalance(pair.Key, pair.Value)),
                 _totalExperience,
                 _experienceCards);
 

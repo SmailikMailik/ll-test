@@ -23,7 +23,7 @@ namespace LL.Rewards
 
         public bool TryApply(IReward reward) => reward switch
         {
-            CurrencyReward currency => _wallet.TryAdd(currency.Currency, currency.Amount),
+            CurrencyReward currency => _wallet.TryAdd(currency.CurrencyId, currency.Amount),
             ExperienceReward experience => _progress.TryAddExperience(experience.Amount),
             _ => false
         };

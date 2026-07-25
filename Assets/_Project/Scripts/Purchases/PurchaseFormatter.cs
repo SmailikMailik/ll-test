@@ -6,6 +6,6 @@ namespace LL.Purchases
     {
         internal static string GetPriceText(IPurchase purchase) => purchase == null
             ? string.Empty
-            : $"{purchase.Price} {TextAtlasHelper.GetCurrencyIcon(purchase.Currency)}";
+            : $"{purchase.Price} {TextAtlasHelper.GetCurrencyIcon(purchase.CurrencyId)}";
     }
 }

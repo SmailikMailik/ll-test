@@ -14,9 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _regionCode: EU
   _userId: 7252511
-  _softAmount: 2443313
-  _hardAmount: 33290
-  _masterPointAmount: 33333
+  _currencies:
+  - _id: soft
+    _amount: 2443313
+  - _id: hard
+    _amount: 33290
+  - _id: master_point
+    _amount: 33333
   _totalExperience: 12861
   _experienceCards:
   - _id: card_100

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using LL.Game.Currencies;
 using LL.Game.ExperienceCards;
 using LL.User.Core;
 using LL.User.Core.ExperienceCards;
@@ -26,22 +27,8 @@ namespace LL.User.Configuration
         [SerializeField] private string _userId;
 
         [BoxGroup("Wallet")]
-        [LabelText("Soft Currency")]
-        [SuffixLabel("SOFT", true)]
-        [MinValue(0)]
-        [SerializeField] private int _softAmount;
-
-        [BoxGroup("Wallet")]
-        [LabelText("Hard Currency")]
-        [SuffixLabel("HARD", true)]
-        [MinValue(0)]
-        [SerializeField] private int _hardAmount;
-
-        [BoxGroup("Wallet")]
-        [LabelText("Master Points")]
-        [SuffixLabel("MP", true)]
-        [MinValue(0)]
-        [SerializeField] private int _masterPointAmount;
+        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [SerializeField] private CurrencyBalanceEntry[] _currencies;
 
         [BoxGroup("Progress")]
         [LabelText("Total Experience")]
@@ -56,10 +43,27 @@ namespace LL.User.Configuration
         UserInitialData IDataLoader<UserInitialData>.Load() => new
         (
             new UserIdentity(_regionCode, _userId),
-            new WalletInitialData(_softAmount, _hardAmount, _masterPointAmount),
+            new WalletInitialData(_currencies?.Select(currency => currency?.ToData())),
             new ProgressInitialData(_totalExperience),
             new ExperienceCardsInitialData(_experienceCards?.Select(card => card?.ToData()))
         );
+    }
+
+    [Serializable]
+    internal sealed class CurrencyBalanceEntry
+    {
+        [LabelText("Currency ID")] [SerializeField]
+        private string _id;
+
+        [LabelText("Amount")] [MinValue(0)] [SerializeField]
+        private int _amount;
+
+        internal CurrencyBalance ToData()
+        {
+            return new CurrencyBalance(
+                new CurrencyId(_id),
+                _amount);
+        }
     }
 
     [Serializable]

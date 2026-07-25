@@ -9,7 +9,7 @@ namespace LL.Rewards
 
         internal static string GetText(IReward reward) => reward switch
         {
-            CurrencyReward currency => $"{currency.Amount} {TextAtlasHelper.GetCurrencyIcon(currency.Currency)}",
+            CurrencyReward currency => $"{currency.Amount} {TextAtlasHelper.GetCurrencyIcon(currency.CurrencyId)}",
             ExperienceReward experience => $"{experience.Amount} XP",
             _ => string.Empty
         };

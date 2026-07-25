@@ -12,18 +12,15 @@ namespace LL.User.Persistence
         [JsonProperty] private int _version;
         [JsonProperty] private string _regionCode;
         [JsonProperty] private string _userId;
-        [JsonProperty] private int _softAmount;
-        [JsonProperty] private int _hardAmount;
-        [JsonProperty] private int _masterPointAmount;
+        [JsonProperty] private CurrencySaveData[] _currencies;
         [JsonProperty] private int _totalExperience;
         [JsonProperty] private ExperienceCardSaveData[] _experienceCards;
 
         internal bool IsSupported => _version == CurrentVersion;
         internal string RegionCode => _regionCode;
         internal string UserId => _userId;
-        internal int SoftAmount => _softAmount;
-        internal int HardAmount => _hardAmount;
-        internal int MasterPointAmount => _masterPointAmount;
+        internal IReadOnlyList<CurrencySaveData> Currencies =>
+            _currencies ?? Array.Empty<CurrencySaveData>();
         internal int TotalExperience => _totalExperience;
         internal IReadOnlyList<ExperienceCardSaveData> ExperienceCards =>
             _experienceCards ?? Array.Empty<ExperienceCardSaveData>();
@@ -34,20 +31,35 @@ namespace LL.User.Persistence
         internal UserSaveData(
             string regionCode,
             string userId,
-            int softAmount,
-            int hardAmount,
-            int masterPointAmount,
+            CurrencySaveData[] currencies,
             int totalExperience,
             ExperienceCardSaveData[] experienceCards)
         {
             _version = CurrentVersion;
             _regionCode = regionCode;
             _userId = userId;
-            _softAmount = softAmount;
-            _hardAmount = hardAmount;
-            _masterPointAmount = masterPointAmount;
+            _currencies = currencies ?? Array.Empty<CurrencySaveData>();
             _totalExperience = totalExperience;
             _experienceCards = experienceCards ?? Array.Empty<ExperienceCardSaveData>();
+        }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    internal sealed class CurrencySaveData
+    {
+        [JsonProperty] private string _id;
+        [JsonProperty] private int _amount;
+
+        internal string Id => _id;
+        internal int Amount => _amount;
+
+        [JsonConstructor]
+        private CurrencySaveData() { }
+
+        internal CurrencySaveData(string id, int amount)
+        {
+            _id = id;
+            _amount = amount;
         }
     }
 

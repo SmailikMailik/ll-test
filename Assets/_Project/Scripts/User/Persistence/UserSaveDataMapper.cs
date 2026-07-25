@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Currencies;
 using LL.Game.ExperienceCards;
 using LL.User.Core;
 using LL.User.Core.ExperienceCards;
@@ -19,9 +21,10 @@ namespace LL.User.Persistence
             return new UserInitialData(
                 new UserIdentity(data.RegionCode, data.UserId),
                 new WalletInitialData(
-                    data.SoftAmount,
-                    data.HardAmount,
-                    data.MasterPointAmount),
+                    data.Currencies.Select(currency =>
+                        new CurrencyBalance(
+                            new CurrencyId(currency.Id),
+                            currency.Amount))),
                 new ProgressInitialData(data.TotalExperience),
                 new ExperienceCardsInitialData(
                     data.ExperienceCards.Select(card =>
@@ -37,23 +40,22 @@ namespace LL.User.Persistence
 
             return ToSaveData(
                 data.Identity,
-                data.Wallet.SoftAmount,
-                data.Wallet.HardAmount,
-                data.Wallet.MasterPointAmount,
+                data.Wallet.Balances,
                 data.Progress.TotalExperience,
                 data.ExperienceCards);
         }
 
         internal static UserSaveData ToSaveData(
             UserIdentity identity,
-            int softAmount,
-            int hardAmount,
-            int masterPointAmount,
+            IEnumerable<CurrencyBalance> balances,
             int totalExperience,
             ExperienceCardsInitialData experienceCards)
         {
             if (identity == null)
                 throw new ArgumentNullException(nameof(identity));
+
+            if (balances == null)
+                throw new ArgumentNullException(nameof(balances));
 
             if (experienceCards == null)
                 throw new ArgumentNullException(nameof(experienceCards));
@@ -61,9 +63,12 @@ namespace LL.User.Persistence
             return new UserSaveData(
                 identity.RegionCode,
                 identity.UserId,
-                softAmount,
-                hardAmount,
-                masterPointAmount,
+                balances
+                    .Where(balance => balance != null)
+                    .Select(balance => new CurrencySaveData(
+                        balance.Id.Value,
+                        balance.Amount))
+                    .ToArray(),
                 totalExperience,
                 experienceCards.Stacks
                     .Select(stack => new ExperienceCardSaveData(

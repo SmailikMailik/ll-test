@@ -20,7 +20,7 @@ namespace LL.Purchases
 
         public bool TryPurchase(IPurchase purchase)
         {
-            return purchase != null && _wallet.TrySpend(purchase.Currency, purchase.Price);
+            return purchase != null && _wallet.TrySpend(purchase.CurrencyId, purchase.Price);
         }
     }
 }

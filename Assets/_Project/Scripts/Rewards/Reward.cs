@@ -1,4 +1,4 @@
-using LL.User.Core.Wallet;
+using LL.Game.Currencies;
 
 namespace LL.Rewards
 {
@@ -9,12 +9,12 @@ namespace LL.Rewards
 
     internal sealed class CurrencyReward : IReward
     {
-        internal CurrencyType Currency { get; }
+        internal CurrencyId CurrencyId { get; }
         public int Amount { get; }
 
-        internal CurrencyReward(CurrencyType currency, int amount)
+        internal CurrencyReward(CurrencyId currencyId, int amount)
         {
-            Currency = currency;
+            CurrencyId = currencyId;
             Amount = amount;
         }
     }

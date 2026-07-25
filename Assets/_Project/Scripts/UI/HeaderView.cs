@@ -1,4 +1,5 @@
 using LL.Extensions;
+using LL.Game.Currencies;
 using LL.UI.Windows;
 using LL.User.Core.Identity;
 using LL.User.Core.Wallet;
@@ -41,15 +42,15 @@ namespace LL.UI
 
             _userLabel.text = $"{_identity.RegionCode} {_identity.UserId}";
 
-            _userWallet.ObserveAmount(CurrencyType.Soft)
+            _userWallet.ObserveAmount(CurrencyIds.Soft)
                 .Subscribe(value => _softLabel.text = value.ToNumber())
                 .AddTo(this);
 
-            _userWallet.ObserveAmount(CurrencyType.Hard)
+            _userWallet.ObserveAmount(CurrencyIds.Hard)
                 .Subscribe(value => _hardLabel.text = value.ToNumber())
                 .AddTo(this);
 
-            _userWallet.ObserveAmount(CurrencyType.MasterPoint)
+            _userWallet.ObserveAmount(CurrencyIds.MasterPoint)
                 .Subscribe(value => _masterPointLabel.text = value.ToNumber())
                 .AddTo(this);
         }

@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using LL.Game.Currencies;
 using R3;
 using VContainer;
 
@@ -6,56 +9,54 @@ namespace LL.User.Core.Wallet
 {
     internal sealed class UserWallet : IUserWallet, IDisposable
     {
-        private readonly ReactiveProperty<int> _softAmount;
-        private readonly ReactiveProperty<int> _hardAmount;
-        private readonly ReactiveProperty<int> _masterPointAmount;
+        private readonly IReadOnlyDictionary<CurrencyId, ReactiveProperty<int>> _balances;
 
         [Inject]
         internal UserWallet(WalletInitialData initialData)
         {
-            _softAmount = new ReactiveProperty<int>(initialData.SoftAmount);
-            _hardAmount = new ReactiveProperty<int>(initialData.HardAmount);
-            _masterPointAmount = new ReactiveProperty<int>(initialData.MasterPointAmount);
+            if (initialData == null)
+                throw new ArgumentNullException(nameof(initialData));
+
+            _balances = initialData.Balances.ToDictionary(
+                balance => balance.Id,
+                balance => new ReactiveProperty<int>(balance.Amount));
         }
 
-        public Observable<int> ObserveAmount(CurrencyType type) => GetBalance(type);
+        public Observable<int> ObserveAmount(CurrencyId id) => GetBalance(id);
 
-        public bool TryAdd(CurrencyType type, int amount)
+        public bool TryAdd(CurrencyId id, int amount)
         {
-            return TryGetBalance(type, out var balance) && TryAdd(balance, amount);
+            return TryGetBalance(id, out var balance) && TryAdd(balance, amount);
         }
 
-        public bool TrySpend(CurrencyType type, int amount)
+        public bool TrySpend(CurrencyId id, int amount)
         {
-            return TryGetBalance(type, out var balance) && TrySpend(balance, amount);
+            return TryGetBalance(id, out var balance) && TrySpend(balance, amount);
         }
 
         public void Dispose()
         {
-            _softAmount.Dispose();
-            _hardAmount.Dispose();
-            _masterPointAmount.Dispose();
+            foreach (var balance in _balances.Values)
+                balance.Dispose();
         }
 
-        private ReactiveProperty<int> GetBalance(CurrencyType type)
+        private ReactiveProperty<int> GetBalance(CurrencyId id)
         {
-            if (TryGetBalance(type, out var balance))
+            if (TryGetBalance(id, out var balance))
                 return balance;
 
-            throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown currency type");
+            throw new KeyNotFoundException($"Unknown currency ID: {id}");
         }
 
-        private bool TryGetBalance(CurrencyType type, out ReactiveProperty<int> balance)
+        private bool TryGetBalance(CurrencyId id, out ReactiveProperty<int> balance)
         {
-            balance = type switch
+            if (id.IsEmpty)
             {
-                CurrencyType.Soft => _softAmount,
-                CurrencyType.Hard => _hardAmount,
-                CurrencyType.MasterPoint => _masterPointAmount,
-                _ => null
-            };
+                balance = null;
+                return false;
+            }
 
-            return balance != null;
+            return _balances.TryGetValue(id, out balance);
         }
 
         private static bool TryAdd(ReactiveProperty<int> balance, int amount)

@@ -1,4 +1,4 @@
-using LL.User.Core.Wallet;
+using LL.Game.Currencies;
 
 namespace LL.Helpers
 {
@@ -10,12 +10,17 @@ namespace LL.Helpers
         private static readonly string _hard = string.Format(Mask, "T_Hard");
         private static readonly string _masterPoint = string.Format(Mask, "T_MasterPoint");
 
-        internal static string GetCurrencyIcon(CurrencyType type) => type switch
+        internal static string GetCurrencyIcon(CurrencyId id)
         {
-            CurrencyType.Soft => _soft,
-            CurrencyType.Hard => _hard,
-            CurrencyType.MasterPoint => _masterPoint,
-            _ => string.Empty
-        };
+            if (id == CurrencyIds.Soft)
+                return _soft;
+
+            if (id == CurrencyIds.Hard)
+                return _hard;
+
+            return id == CurrencyIds.MasterPoint
+                ? _masterPoint
+                : string.Empty;
+        }
     }
 }
