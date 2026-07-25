@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 136ef401d8bd4e36a63d113ba196e540, type: 3}
-  m_Name: UserDataConfig
+  m_Name: UserDefaultsConfig
   m_EditorClassIdentifier: 
   _regionCode: EU
   _userId: 7252511

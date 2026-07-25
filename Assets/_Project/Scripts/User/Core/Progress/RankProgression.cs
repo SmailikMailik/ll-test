@@ -9,12 +9,12 @@ namespace LL.User.Core.Progress
         private readonly IReadOnlyList<int> _experienceThresholds;
 
         [Inject]
-        internal RankProgression(IRankProgressionSource source)
+        internal RankProgression(IDataLoader<RankProgressionData> loader)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            if (loader is null)
+                throw new ArgumentNullException(nameof(loader));
 
-            _experienceThresholds = Normalize(source.Load()?.ExperienceThresholds);
+            _experienceThresholds = Normalize(loader.Load()?.ExperienceThresholds);
         }
 
         public int GetRank(int totalExperience)

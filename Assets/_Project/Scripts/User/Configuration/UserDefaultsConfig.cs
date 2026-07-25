@@ -1,14 +1,17 @@
-using LL.User.Core.Data;
+using LL.User.Core;
+using LL.User.Core.Identity;
+using LL.User.Core.Progress;
+using LL.User.Core.Wallet;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace LL.User.Configuration
 {
-    [CreateAssetMenu(fileName = nameof(UserDataConfig), menuName = CreationPath)]
+    [CreateAssetMenu(fileName = nameof(UserDefaultsConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class UserDataConfig : ScriptableObject, IUserDataSource
+    internal sealed class UserDefaultsConfig : ScriptableObject, IDefaultDataLoader<UserInitialData>
     {
-        internal const string CreationPath = "LL/User/User Data Config";
+        internal const string CreationPath = "LL/User/User Defaults Config";
 
         [BoxGroup("Identity")]
         [LabelText("Region Code")]
@@ -42,14 +45,11 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _totalExperience;
 
-        UserData IUserDataSource.Load() => new
+        UserInitialData IDataLoader<UserInitialData>.Load() => new
         (
-            _regionCode,
-            _userId,
-            _softAmount,
-            _hardAmount,
-            _masterPointAmount,
-            _totalExperience
+            new UserIdentity(_regionCode, _userId),
+            new WalletInitialData(_softAmount, _hardAmount, _masterPointAmount),
+            new ProgressInitialData(_totalExperience)
         );
     }
 }

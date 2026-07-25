@@ -7,10 +7,10 @@ namespace LLEditor
     {
         private const string MenuPath = ConfigurationAssetMenu.RootPath + "User/";
 
-        [MenuItem(MenuPath + "User Data Config")]
-        private static void SelectUserDataConfig()
+        [MenuItem(MenuPath + "User Defaults Config")]
+        private static void SelectUserDefaultsConfig()
         {
-            ConfigurationAssetMenu.Select<UserDataConfig>(UserDataConfig.CreationPath);
+            ConfigurationAssetMenu.Select<UserDefaultsConfig>(UserDefaultsConfig.CreationPath);
         }
 
         [MenuItem(MenuPath + "Rank Progression Config")]

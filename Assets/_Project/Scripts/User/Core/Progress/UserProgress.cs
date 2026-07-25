@@ -1,5 +1,4 @@
 using System;
-using LL.User.Core.Data;
 using R3;
 using VContainer;
 
@@ -7,6 +6,7 @@ namespace LL.User.Core.Progress
 {
     internal sealed class UserProgress : IUserProgress, IDisposable
     {
+        public int CurrentTotalExperience => _totalExperience.Value;
         public Observable<int> TotalExperience => _totalExperience;
         public Observable<int> Rank => _rank;
 
@@ -14,7 +14,9 @@ namespace LL.User.Core.Progress
         private readonly Observable<int> _rank;
 
         [Inject]
-        internal UserProgress(UserData initialData, IRankProgression rankProgression)
+        internal UserProgress(
+            ProgressInitialData initialData,
+            IRankProgression rankProgression)
         {
             _totalExperience = new ReactiveProperty<int>(initialData.TotalExperience);
             _rank = _totalExperience

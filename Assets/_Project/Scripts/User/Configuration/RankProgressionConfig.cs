@@ -8,7 +8,7 @@ namespace LL.User.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankProgressionConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class RankProgressionConfig : ScriptableObject, IRankProgressionSource
+    internal sealed class RankProgressionConfig : ScriptableObject, IDataLoader<RankProgressionData>
     {
         internal const string CreationPath = "LL/User/Rank Progression Config";
 
