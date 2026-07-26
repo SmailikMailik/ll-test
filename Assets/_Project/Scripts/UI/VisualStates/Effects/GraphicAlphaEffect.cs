@@ -9,7 +9,7 @@ namespace LL.UI.VisualStates.Effects
 {
     [AddComponentMenu("LL/UI/Visual States/Effects/Graphic Alpha Effect")]
     [HideMonoScript]
-    internal sealed class VisualGraphicAlphaEffect : VisualStateEffect
+    internal sealed class GraphicAlphaEffect : TweenStateEffect
     {
         [Required]
         [SerializeField] private Graphic _target;
@@ -17,13 +17,7 @@ namespace LL.UI.VisualStates.Effects
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<AlphaStateValue> _states = new();
 
-        [MinValue(0f)]
-        [SerializeField] private float _transitionSeconds = 0.08f;
-
-        [SerializeField] private Ease _ease = Ease.OutQuad;
-
         private float _initialAlpha;
-        private Tween _transition;
 
         protected override void CaptureInitialValue()
         {
@@ -36,29 +30,18 @@ namespace LL.UI.VisualStates.Effects
             if (_target == null)
                 return;
 
-            StopTransition();
-
             var targetAlpha = TryGetStateValue(_states, state, out var stateValue)
                 ? stateValue.Alpha
                 : _initialAlpha;
 
-            if (instantly || _transitionSeconds <= 0f)
+            if (ShouldApplyImmediately(instantly))
             {
+                StopTransition();
                 SetAlpha(targetAlpha);
                 return;
             }
 
-            _transition = _target
-                .DOFade(targetAlpha, _transitionSeconds)
-                .SetEase(_ease)
-                .SetUpdate(true)
-                .Play();
-        }
-
-        protected override void StopTransition()
-        {
-            _transition?.Kill();
-            _transition = null;
+            PlayTransition(_target.DOFade(targetAlpha, TransitionSeconds));
         }
 
         protected override void RestoreInitialValue()
@@ -85,7 +68,6 @@ namespace LL.UI.VisualStates.Effects
         protected override void OnValidate()
         {
             base.OnValidate();
-            _transitionSeconds = Mathf.Max(0f, _transitionSeconds);
             SynchronizeValues();
         }
 

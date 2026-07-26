@@ -7,7 +7,7 @@ namespace LL.UI.VisualStates.Effects
 {
     [AddComponentMenu("LL/UI/Visual States/Effects/Object Toggle Effect")]
     [HideMonoScript]
-    internal sealed class VisualObjectToggleEffect : VisualStateEffect
+    internal sealed class ObjectToggleEffect : VisualStateEffect
     {
         [Required]
         [ValidateInput(nameof(IsValidTarget), "Target cannot be this GameObject or one of its parents.")]

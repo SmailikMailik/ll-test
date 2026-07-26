@@ -6,9 +6,9 @@ using UnityEngine;
 namespace LL.UI.VisualStates.Drivers
 {
     [RequireComponent(typeof(InteractiveButton))]
-    [AddComponentMenu("LL/UI/Visual States/Drivers/Button Interaction Driver")]
+    [AddComponentMenu("LL/UI/Visual States/Drivers/Button State Driver")]
     [HideMonoScript]
-    internal sealed class ButtonInteractionStateDriver : MonoBehaviour
+    internal sealed class ButtonStateDriver : MonoBehaviour
     {
         [Required]
         [SerializeField] private VisualStateController _controller;
