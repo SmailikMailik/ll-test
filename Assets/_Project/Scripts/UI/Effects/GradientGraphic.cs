@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace LL.UI.Effects
 {
+    [RequireComponent(typeof(CanvasRenderer))]
     internal sealed class GradientGraphic : MaskableGraphic
     {
         [SerializeField] private Gradient _gradient = CreateDefaultGradient();
@@ -10,9 +11,22 @@ namespace LL.UI.Effects
         [SerializeField, Range(0f, 360f)] private float _angle;
         [SerializeField, Range(1, 32)] private int _resolution = 8;
 
+        private Texture2D _alphaTexture;
+        private bool _isAlphaTextureDirty = true;
+
+        public override Texture mainTexture
+        {
+            get
+            {
+                RebuildAlphaTextureIfNeeded();
+                return _alphaTexture;
+            }
+        }
+
         protected override void OnPopulateMesh(VertexHelper vertexHelper)
         {
             vertexHelper.Clear();
+            RebuildAlphaTextureIfNeeded();
 
             var rect = GetPixelAdjustedRect();
             var resolution = Mathf.Clamp(_resolution, 1, 32);
@@ -39,7 +53,12 @@ namespace LL.UI.Effects
                         maximumProjection,
                         center,
                         maximumRadius);
-                    var vertexColor = color * _gradient.Evaluate(gradientPosition);
+                    var gradientColor = _gradient.Evaluate(gradientPosition);
+                    var vertexColor = new Color(
+                        color.r * gradientColor.r,
+                        color.g * gradientColor.g,
+                        color.b * gradientColor.b,
+                        color.a);
 
                     vertexHelper.AddVert(position, vertexColor, normalizedPosition);
                 }
@@ -65,7 +84,97 @@ namespace LL.UI.Effects
         protected override void OnEnable()
         {
             _gradient ??= CreateDefaultGradient();
+            _isAlphaTextureDirty = true;
             base.OnEnable();
+        }
+
+        protected override void OnDisable()
+        {
+            ReleaseAlphaTexture();
+            base.OnDisable();
+        }
+
+        protected override void OnRectTransformDimensionsChange()
+        {
+            _isAlphaTextureDirty = true;
+            base.OnRectTransformDimensionsChange();
+        }
+
+        private void RebuildAlphaTextureIfNeeded()
+        {
+            if (_isAlphaTextureDirty is false && _alphaTexture != null)
+                return;
+
+            _gradient ??= CreateDefaultGradient();
+
+            var resolution = Mathf.Clamp(_resolution, 1, 32);
+            var textureSize = resolution + 1;
+
+            if (_alphaTexture == null ||
+                _alphaTexture.width != textureSize ||
+                _alphaTexture.height != textureSize)
+            {
+                ReleaseAlphaTexture();
+                _alphaTexture = new Texture2D(
+                    textureSize,
+                    textureSize,
+                    TextureFormat.RGBA32,
+                    false)
+                {
+                    name = $"{nameof(GradientGraphic)} Alpha",
+                    hideFlags = HideFlags.HideAndDontSave,
+                    filterMode = FilterMode.Bilinear,
+                    wrapMode = TextureWrapMode.Clamp
+                };
+            }
+
+            var rect = GetPixelAdjustedRect();
+            var direction = GetDirection();
+            var minimumProjection = GetMinimumProjection(rect, direction);
+            var maximumProjection = GetMaximumProjection(rect, direction);
+            var center = rect.center;
+            var maximumRadius = Vector2.Distance(center, new Vector2(rect.xMax, rect.yMax));
+            var pixels = new Color32[textureSize * textureSize];
+
+            for (var y = 0; y < textureSize; y++)
+            {
+                for (var x = 0; x < textureSize; x++)
+                {
+                    var normalizedPosition = new Vector2(
+                        (float)x / resolution,
+                        (float)y / resolution);
+                    var position = new Vector2(
+                        Mathf.Lerp(rect.xMin, rect.xMax, normalizedPosition.x),
+                        Mathf.Lerp(rect.yMin, rect.yMax, normalizedPosition.y));
+                    var gradientPosition = GetGradientPosition(
+                        position,
+                        direction,
+                        minimumProjection,
+                        maximumProjection,
+                        center,
+                        maximumRadius);
+                    var alpha = _gradient.Evaluate(gradientPosition).a;
+
+                    pixels[y * textureSize + x] = new Color(1f, 1f, 1f, alpha);
+                }
+            }
+
+            _alphaTexture.SetPixels32(pixels);
+            _alphaTexture.Apply(false, false);
+            _isAlphaTextureDirty = false;
+        }
+
+        private void ReleaseAlphaTexture()
+        {
+            if (_alphaTexture == null)
+                return;
+
+            if (Application.isPlaying)
+                Destroy(_alphaTexture);
+            else
+                DestroyImmediate(_alphaTexture);
+
+            _alphaTexture = null;
         }
 
         private float GetGradientPosition(
@@ -78,12 +187,8 @@ namespace LL.UI.Effects
         {
             return _type switch
             {
-                GradientType.Radial when maximumRadius > 0f =>
-                    Vector2.Distance(center, position) / maximumRadius,
-                _ => Mathf.InverseLerp(
-                    minimumProjection,
-                    maximumProjection,
-                    Vector2.Dot(position, direction))
+                GradientType.Radial when maximumRadius > 0f => Vector2.Distance(center, position) / maximumRadius,
+                _ => Mathf.InverseLerp(minimumProjection, maximumProjection, Vector2.Dot(position, direction))
             };
         }
 
@@ -124,12 +229,12 @@ namespace LL.UI.Effects
                 new[]
                 {
                     new GradientColorKey(Color.white, 0f),
-                    new GradientColorKey(new Color(1f, 0.92f, 0.65f), 1f)
+                    new GradientColorKey(Color.white, 1f)
                 },
                 new[]
                 {
-                    new GradientAlphaKey(0f, 0f),
-                    new GradientAlphaKey(1f, 1f)
+                    new GradientAlphaKey(1f, 0f),
+                    new GradientAlphaKey(0f, 1f)
                 });
 
             return gradient;
@@ -141,7 +246,9 @@ namespace LL.UI.Effects
             base.OnValidate();
             _gradient ??= CreateDefaultGradient();
             _resolution = Mathf.Clamp(_resolution, 1, 32);
+            _isAlphaTextureDirty = true;
             SetVerticesDirty();
+            SetMaterialDirty();
         }
 #endif
     }

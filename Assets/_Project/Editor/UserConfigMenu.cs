@@ -12,6 +12,5 @@ namespace LLEditor
         {
             ConfigurationAssetMenu.Select<UserDefaultsConfig>(UserDefaultsConfig.CreationPath);
         }
-
     }
 }
