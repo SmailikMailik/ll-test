@@ -1,7 +1,8 @@
 using LL.UI.VisualStates.Core;
+using LLEditor.Configuration;
 using UnityEditor;
 
-namespace LLEditor
+namespace LLEditor.UI.VisualStates
 {
     internal static class VisualStateConfigMenu
     {

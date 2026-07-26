@@ -1,7 +1,8 @@
 using LL.User.Configuration;
+using LLEditor.Configuration;
 using UnityEditor;
 
-namespace LLEditor
+namespace LLEditor.User
 {
     internal static class UserConfigMenu
     {

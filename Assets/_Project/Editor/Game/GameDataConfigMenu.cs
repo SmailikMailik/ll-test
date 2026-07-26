@@ -1,7 +1,8 @@
 using LL.Game.Configuration;
+using LLEditor.Configuration;
 using UnityEditor;
 
-namespace LLEditor
+namespace LLEditor.Game
 {
     internal static class GameDataConfigMenu
     {

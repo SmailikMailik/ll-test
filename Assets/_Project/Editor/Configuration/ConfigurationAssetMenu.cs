@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace LLEditor
+namespace LLEditor.Configuration
 {
     internal static class ConfigurationAssetMenu
     {

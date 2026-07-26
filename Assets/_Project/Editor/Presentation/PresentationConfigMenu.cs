@@ -1,7 +1,8 @@
 using LL.Presentation.Configuration;
+using LLEditor.Configuration;
 using UnityEditor;
 
-namespace LLEditor
+namespace LLEditor.Presentation
 {
     internal static class PresentationConfigMenu
     {

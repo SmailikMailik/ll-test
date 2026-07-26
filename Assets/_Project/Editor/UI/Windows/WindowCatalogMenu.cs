@@ -1,7 +1,8 @@
 using LL.UI.Windows.Configuration;
+using LLEditor.Configuration;
 using UnityEditor;
 
-namespace LLEditor
+namespace LLEditor.UI.Windows
 {
     internal static class WindowCatalogMenu
     {
