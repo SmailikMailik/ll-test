@@ -11,7 +11,7 @@ namespace LL.UI.Windows.Views
     internal sealed class RewardWindow : Window<RewardWindowParameters>
     {
         [SerializeField] private RewardsContainer _container;
-        [SerializeField] private CommonButton _continueButton;
+        [SerializeField] private InteractiveButton _continueButton;
 
         private void Start()
         {

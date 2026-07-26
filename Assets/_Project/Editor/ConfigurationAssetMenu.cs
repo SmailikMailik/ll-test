@@ -32,5 +32,29 @@ namespace LLEditor
             Selection.activeObject = asset;
             EditorGUIUtility.PingObject(asset);
         }
+
+        internal static void SelectAll<TAsset>(string creationPath) where TAsset : Object
+        {
+            var assetGuids = AssetDatabase.FindAssets($"t:{typeof(TAsset).Name}");
+
+            if (assetGuids.Length == 0)
+            {
+                Debug.LogWarning(
+                    $"{typeof(TAsset).Name} assets were not found. " +
+                    $"Create them via Assets/Create/{creationPath}");
+                return;
+            }
+
+            var assets = new Object[assetGuids.Length];
+
+            for (var index = 0; index < assetGuids.Length; index++)
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuids[index]);
+                assets[index] = AssetDatabase.LoadAssetAtPath<TAsset>(assetPath);
+            }
+
+            Selection.objects = assets;
+            EditorGUIUtility.PingObject(assets[0]);
+        }
     }
 }

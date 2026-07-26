@@ -1,19 +1,16 @@
 using System;
-using System.Collections.Generic;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace LL.UI.VisualStates
 {
-    [AddComponentMenu("LL/UI/Visual States/Controller")]
+    [AddComponentMenu("LL/UI/Visual States/State Controller")]
     [HideMonoScript]
     internal sealed class VisualStateController : MonoBehaviour
     {
         [Required]
         [SerializeField] private VisualStateSet _stateSet;
-
-        [ValueDropdown(nameof(GetStateOptions))]
         [SerializeField] private VisualStateId _initialState;
 
         internal VisualStateSet StateSet => _stateSet;
@@ -80,18 +77,6 @@ namespace LL.UI.VisualStates
             CurrentState = _stateSet.Contains(_initialState)
                 ? _initialState
                 : _stateSet.DefaultState;
-        }
-
-        private IEnumerable<ValueDropdownItem<VisualStateId>> GetStateOptions()
-        {
-            if (_stateSet == null)
-                yield break;
-
-            foreach (var state in _stateSet.States)
-            {
-                if (state != null)
-                    yield return new ValueDropdownItem<VisualStateId>(state.Name, state.Id);
-            }
         }
 
 #if UNITY_EDITOR

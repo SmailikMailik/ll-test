@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LL.UI.VisualStates.Effects
 {
-    [AddComponentMenu("LL/UI/Visual States/Effects/Object Toggle")]
+    [AddComponentMenu("LL/UI/Visual States/Effects/Object Toggle Effect")]
     [HideMonoScript]
     internal sealed class VisualObjectToggleEffect : VisualStateEffect
     {

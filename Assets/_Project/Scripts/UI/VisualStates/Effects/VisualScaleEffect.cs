@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LL.UI.VisualStates.Effects
 {
-    [AddComponentMenu("LL/UI/Visual States/Effects/Scale")]
+    [AddComponentMenu("LL/UI/Visual States/Effects/Scale Effect")]
     [HideMonoScript]
     internal sealed class VisualScaleEffect : VisualStateEffect
     {
@@ -50,7 +50,8 @@ namespace LL.UI.VisualStates.Effects
             _transition = _target
                 .DOScale(targetScale, _transitionSeconds)
                 .SetEase(_ease)
-                .SetUpdate(true);
+                .SetUpdate(true)
+                .Play();
         }
 
         protected override void StopTransition()

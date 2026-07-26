@@ -1,10 +1,13 @@
 using R3;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace LL.UI.Controls.Buttons
 {
-    internal sealed class CommonButton :
+    [AddComponentMenu("LL/UI/Controls/Interactive Button")]
+    [HideMonoScript]
+    internal sealed class InteractiveButton :
         MonoBehaviour,
         IPointerClickHandler,
         IPointerDownHandler,

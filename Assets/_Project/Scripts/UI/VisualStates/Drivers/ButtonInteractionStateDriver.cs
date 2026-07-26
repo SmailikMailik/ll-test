@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using LL.UI.Controls.Buttons;
 using R3;
 using Sirenix.OdinInspector;
@@ -6,27 +5,24 @@ using UnityEngine;
 
 namespace LL.UI.VisualStates.Drivers
 {
-    [RequireComponent(typeof(CommonButton))]
-    [AddComponentMenu("LL/UI/Visual States/Drivers/Button Interaction")]
+    [RequireComponent(typeof(InteractiveButton))]
+    [AddComponentMenu("LL/UI/Visual States/Drivers/Button Interaction Driver")]
     [HideMonoScript]
     internal sealed class ButtonInteractionStateDriver : MonoBehaviour
     {
         [Required]
         [SerializeField] private VisualStateController _controller;
 
-        [ValueDropdown(nameof(GetStateOptions))]
         [ValidateInput(nameof(IsValidState), "Choose a state from the assigned controller.")]
         [SerializeField] private VisualStateId _normalState;
 
-        [ValueDropdown(nameof(GetStateOptions))]
         [ValidateInput(nameof(IsValidState), "Choose a state from the assigned controller.")]
         [SerializeField] private VisualStateId _pressedState;
 
-        [ValueDropdown(nameof(GetStateOptions))]
         [ValidateInput(nameof(IsValidState), "Choose a state from the assigned controller.")]
         [SerializeField] private VisualStateId _disabledState;
 
-        private CommonButton _button;
+        private InteractiveButton _button;
 
         private bool _isPressed;
         private bool _isInteractable;
@@ -34,7 +30,7 @@ namespace LL.UI.VisualStates.Drivers
 
         private void Awake()
         {
-            _button = GetComponent<CommonButton>();
+            _button = GetComponent<InteractiveButton>();
         }
 
         private void Start()
@@ -96,18 +92,6 @@ namespace LL.UI.VisualStates.Drivers
                 return _pressedState;
 
             return _normalState;
-        }
-
-        private IEnumerable<ValueDropdownItem<VisualStateId>> GetStateOptions()
-        {
-            if (_controller == null || _controller.StateSet == null)
-                yield break;
-
-            foreach (var state in _controller.StateSet.States)
-            {
-                if (state != null)
-                    yield return new ValueDropdownItem<VisualStateId>(state.Name, state.Id);
-            }
         }
 
         private bool IsValidState(VisualStateId state) =>

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace LL.UI.VisualStates.Effects
 {
-    [AddComponentMenu("LL/UI/Visual States/Effects/Graphic Alpha")]
+    [AddComponentMenu("LL/UI/Visual States/Effects/Graphic Alpha Effect")]
     [HideMonoScript]
     internal sealed class VisualGraphicAlphaEffect : VisualStateEffect
     {
@@ -51,7 +51,8 @@ namespace LL.UI.VisualStates.Effects
             _transition = _target
                 .DOFade(targetAlpha, _transitionSeconds)
                 .SetEase(_ease)
-                .SetUpdate(true);
+                .SetUpdate(true)
+                .Play();
         }
 
         protected override void StopTransition()

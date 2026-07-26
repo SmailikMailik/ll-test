@@ -4,6 +4,7 @@ using UnityEngine.UI;
 namespace LL.UI.Effects
 {
     [RequireComponent(typeof(CanvasRenderer))]
+    [AddComponentMenu("LL/UI/Effects/Border")]
     internal sealed class BorderGraphic : MaskableGraphic
     {
         [SerializeField, Min(0f)] private float _thickness = 4f;

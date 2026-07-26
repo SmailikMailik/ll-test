@@ -13,9 +13,9 @@ namespace LL.UI.Windows.Views
         [SerializeField] private TMP_Text _positiveLabel;
         [SerializeField] private TMP_Text _negativeLabel;
 
-        [SerializeField] private CommonButton _positiveButton;
-        [SerializeField] private CommonButton _negativeButton;
-        [SerializeField] private CommonButton _closeButton;
+        [SerializeField] private InteractiveButton _positiveButton;
+        [SerializeField] private InteractiveButton _negativeButton;
+        [SerializeField] private InteractiveButton _closeButton;
 
         internal override bool CanClose => Parameters.CanClose;
 

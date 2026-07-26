@@ -13,8 +13,8 @@ namespace LL.UI
 {
     internal sealed class HeaderView : MonoBehaviour
     {
-        [SerializeField] private CommonButton _backButton;
-        [SerializeField] private CommonButton _homeButton;
+        [SerializeField] private InteractiveButton _backButton;
+        [SerializeField] private InteractiveButton _homeButton;
 
         [SerializeField] private TMP_Text _userLabel;
         [SerializeField] private TMP_Text _softLabel;
