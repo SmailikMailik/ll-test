@@ -32,11 +32,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440974
-    m_Localized: "To unlock promotion with credits:"
+    m_Localized: "To <style=\"Accent\">unlock</style> promotion with credits:"
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440975
-    m_Localized: Get {count} headshot kills while playing as {hero}
+    m_Localized: Get <style="Accent">{count}</style> headshot kills while playing as {hero}
     m_Metadata:
       m_Items:
       - id: 0
