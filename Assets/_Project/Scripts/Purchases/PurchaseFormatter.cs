@@ -1,4 +1,4 @@
-using LL.Helpers;
+using LL.UI.Formatting;
 
 namespace LL.Purchases
 {
@@ -6,6 +6,6 @@ namespace LL.Purchases
     {
         internal static string GetPriceText(IPurchase purchase) => purchase == null
             ? string.Empty
-            : $"{purchase.Price} {TextAtlasHelper.GetCurrencyIcon(purchase.CurrencyId)}";
+            : $"{purchase.Price} {TextFormatter.CurrencySprite(purchase.CurrencyId)}";
     }
 }

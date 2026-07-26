@@ -1,5 +1,5 @@
-using LL.Extensions;
 using LL.Game.Ranks;
+using LL.UI.Formatting;
 using LL.User.Core.Progress;
 using TMPro;
 using UnityEngine;
@@ -49,19 +49,13 @@ namespace LL.UI.Windows.Views.Upgrade
 
             _rankLabel.text = progress.Rank.ToString();
             _expLabel.text = progress.HasNextRank
-                ? $"{progress.TotalExperience.ToNumber()}/{progress.NextRankExperience.ToNumber()}"
-                : progress.TotalExperience.ToNumber();
+                ? TextFormatter.Progress(progress.TotalExperience, progress.NextRankExperience)
+                : TextFormatter.Number(progress.TotalExperience);
             _addLabel.text = _pendingExperience > 0
-                ? $"+ {_pendingExperience.ToNumber()}"
+                ? $"+ {TextFormatter.Number(_pendingExperience)}"
                 : string.Empty;
 
-            var currentProgress = progress.HasNextRank
-                ? Mathf.Clamp01(
-                    (float)(_appliedExperience - progress.CurrentRankExperience) /
-                    progress.ExperienceBetweenRanks)
-                : 1f;
-
-            _bar.SetProgress(currentProgress, progress.NormalizedExperience);
+            _bar.SetProgress(progress.GetNormalizedExperience(_appliedExperience), progress.NormalizedExperience);
         }
 
         private void AddPendingExperience(int amount)

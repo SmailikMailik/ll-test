@@ -1,4 +1,4 @@
-using LL.Helpers;
+using LL.UI.Formatting;
 using UnityEngine;
 
 namespace LL.Rewards
@@ -9,7 +9,7 @@ namespace LL.Rewards
 
         internal static string GetText(IReward reward) => reward switch
         {
-            CurrencyReward currency => $"{currency.Amount} {TextAtlasHelper.GetCurrencyIcon(currency.CurrencyId)}",
+            CurrencyReward currency => $"{currency.Amount} {TextFormatter.CurrencySprite(currency.CurrencyId)}",
             ExperienceReward experience => $"{experience.Amount} XP",
             _ => string.Empty
         };

@@ -149,8 +149,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 3426061489
-  m_fontColor: {r: 0.69411767, g: 0.54901963, b: 0.20784314, a: 0.8}
+    rgba: 4281699505
+  m_fontColor: {r: 0.69411767, g: 0.54901963, b: 0.20784314, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

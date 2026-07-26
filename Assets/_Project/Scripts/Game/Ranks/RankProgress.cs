@@ -1,3 +1,5 @@
+using System;
+
 namespace LL.Game.Ranks
 {
     internal readonly struct RankProgress
@@ -33,9 +35,33 @@ namespace LL.Game.Ranks
                 : 0;
 
             HasNextRank = hasNextRank;
-            NormalizedExperience = hasNextRank
-                ? (float)ExperienceInCurrentRank / ExperienceBetweenRanks
-                : 1f;
+            NormalizedExperience = CalculateNormalizedExperience(
+                totalExperience,
+                currentRankExperience,
+                ExperienceBetweenRanks,
+                hasNextRank);
+        }
+
+        internal float GetNormalizedExperience(int totalExperience)
+        {
+            return CalculateNormalizedExperience(
+                totalExperience,
+                CurrentRankExperience,
+                ExperienceBetweenRanks,
+                HasNextRank);
+        }
+
+        private static float CalculateNormalizedExperience(
+            int totalExperience,
+            int currentRankExperience,
+            int experienceBetweenRanks,
+            bool hasNextRank)
+        {
+            if (hasNextRank is false)
+                return 1f;
+
+            var experience = Math.Max(0, totalExperience - currentRankExperience);
+            return (float)Math.Min(experience, experienceBetweenRanks) / experienceBetweenRanks;
         }
     }
 }
