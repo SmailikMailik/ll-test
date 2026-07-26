@@ -15,10 +15,7 @@ MonoBehaviour:
   _cards:
   - _id: card_1
     _experienceAmount: 100
-    _maxAmount: 99999
   - _id: card_2
     _experienceAmount: 500
-    _maxAmount: 999
   - _id: card_3
     _experienceAmount: 2000
-    _maxAmount: 99

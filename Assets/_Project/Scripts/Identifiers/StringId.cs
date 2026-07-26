@@ -12,34 +12,18 @@ namespace LL.Identifiers
             Value = value?.Trim().ToLowerInvariant() ?? string.Empty;
         }
 
-        public bool Equals(StringId other)
-        {
-            return string.Equals(
-                Value ?? string.Empty,
-                other.Value ?? string.Empty,
-                StringComparison.Ordinal);
-        }
+        public bool Equals(StringId other) => string.Equals
+        (
+            Value ?? string.Empty,
+            other.Value ?? string.Empty,
+            StringComparison.Ordinal
+        );
 
-        public override bool Equals(object obj)
-        {
-            return obj is StringId other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
-        }
-
+        public override bool Equals(object obj) => obj is StringId other && Equals(other);
+        public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Value ?? string.Empty);
         public override string ToString() => Value ?? string.Empty;
 
-        public static bool operator ==(StringId left, StringId right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(StringId left, StringId right)
-        {
-            return left.Equals(right) is false;
-        }
+        public static bool operator ==(StringId left, StringId right) => left.Equals(right);
+        public static bool operator !=(StringId left, StringId right) => left.Equals(right) is false;
     }
 }

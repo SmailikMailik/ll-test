@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using LL.Game.ExperienceCards;
+using LL.Identifiers;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LL.Game.Configuration
 {
@@ -14,6 +13,7 @@ namespace LL.Game.Configuration
     {
         internal const string CreationPath = "LL/Game Data/Experience Card Catalog";
 
+        [ValidateInput(nameof(HasValidCardIds), "Card IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ExperienceCardDefinitionEntry[] _cards;
 
@@ -27,30 +27,17 @@ namespace LL.Game.Configuration
             if (_cards == null)
                 return;
 
-            var usedIds = new HashSet<string>(StringComparer.Ordinal);
-
             for (var index = 0; index < _cards.Length; index++)
             {
-                var fallbackId = $"card_{index + 1}";
-                var entry = _cards[index] ?? new ExperienceCardDefinitionEntry(
-                    fallbackId,
-                    1,
-                    0);
-
-                var baseId = new ExperienceCardId(entry.Id);
-
-                if (baseId.IsEmpty)
-                    baseId = new ExperienceCardId(fallbackId);
-
-                var uniqueId = baseId.Value;
-                var suffix = 2;
-
-                while (usedIds.Add(uniqueId) is false)
-                    uniqueId = $"{baseId.Value}_{suffix++}";
-
-                entry.Normalize(uniqueId);
+                var entry = _cards[index] ?? new ExperienceCardDefinitionEntry(string.Empty, 1);
+                entry.Normalize();
                 _cards[index] = entry;
             }
+        }
+
+        private static bool HasValidCardIds(ExperienceCardDefinitionEntry[] cards)
+        {
+            return IdentifierCatalogValidator.HasValidIds(cards, card => new ExperienceCardId(card.Id));
         }
     }
 
@@ -65,36 +52,23 @@ namespace LL.Game.Configuration
         [MinValue(1)]
         [SerializeField] private int _experienceAmount;
 
-        [LabelText("Max Amount")]
-        [MinValue(0)]
-        [FormerlySerializedAs("_capacity")]
-        [SerializeField] private int _maxAmount;
-
         internal string Id => _id;
 
-        internal ExperienceCardDefinitionEntry(
-            string id,
-            int experienceAmount,
-            int maxAmount)
+        internal ExperienceCardDefinitionEntry(string id, int experienceAmount)
         {
             _id = id;
             _experienceAmount = experienceAmount;
-            _maxAmount = maxAmount;
         }
 
-        internal IExperienceCard ToCard()
-        {
-            return new ExperienceCard(
-                new ExperienceCardId(_id),
-                _experienceAmount,
-                _maxAmount);
-        }
+        internal IExperienceCard ToCard() => new ExperienceCard
+        (
+            new ExperienceCardId(_id),
+            _experienceAmount
+        );
 
-        internal void Normalize(string id)
+        internal void Normalize()
         {
-            _id = id;
             _experienceAmount = Math.Max(1, _experienceAmount);
-            _maxAmount = Math.Max(0, _maxAmount);
         }
     }
 }

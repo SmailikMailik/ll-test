@@ -4,6 +4,5 @@ namespace LL.Game.ExperienceCards
     {
         ExperienceCardId Id { get; }
         int ExperienceAmount { get; }
-        int MaxAmount { get; }
     }
 }

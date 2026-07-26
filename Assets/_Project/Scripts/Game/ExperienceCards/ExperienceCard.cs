@@ -6,16 +6,11 @@ namespace LL.Game.ExperienceCards
     {
         public ExperienceCardId Id { get; }
         public int ExperienceAmount { get; }
-        public int MaxAmount { get; }
 
-        internal ExperienceCard(
-            ExperienceCardId id,
-            int experienceAmount,
-            int maxAmount)
+        internal ExperienceCard(ExperienceCardId id, int experienceAmount)
         {
             Id = id;
             ExperienceAmount = Math.Max(1, experienceAmount);
-            MaxAmount = Math.Max(0, maxAmount);
         }
     }
 }

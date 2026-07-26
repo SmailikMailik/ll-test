@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using LL.Game.Currencies;
 using LL.Game.ExperienceCards;
+using LL.Identifiers;
 using LL.User.Core;
 using LL.User.Core.ExperienceCards;
 using LL.User.Core.Identity;
@@ -27,6 +28,7 @@ namespace LL.User.Configuration
         [SerializeField] private string _userId;
 
         [BoxGroup("Wallet")]
+        [ValidateInput(nameof(HasValidCurrencyIds), "Currency IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private CurrencyBalanceEntry[] _currencies;
 
@@ -37,49 +39,68 @@ namespace LL.User.Configuration
         [SerializeField] private int _totalExperience;
 
         [BoxGroup("Experience Cards")]
+        [ValidateInput(nameof(HasValidExperienceCardIds), "Experience card IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ExperienceCardAmountEntry[] _experienceCards;
 
-        UserInitialData IDataLoader<UserInitialData>.Load() => new
-        (
-            new UserIdentity(_regionCode, _userId),
-            new WalletInitialData(_currencies?.Select(currency => currency?.ToData())),
-            new ProgressInitialData(_totalExperience),
-            new ExperienceCardsInitialData(_experienceCards?.Select(card => card?.ToData()))
-        );
+        UserInitialData IDataLoader<UserInitialData>.Load()
+        {
+            IdentifierCatalogValidator.EnsureValidIds(
+                _currencies,
+                entry => entry.Id,
+                "Default currency balances",
+                nameof(_currencies));
+            IdentifierCatalogValidator.EnsureValidIds(
+                _experienceCards,
+                entry => entry.Id,
+                "Default experience card amounts",
+                nameof(_experienceCards));
+
+            return new UserInitialData(
+                new UserIdentity(_regionCode, _userId),
+                new WalletInitialData(_currencies?.Select(currency => currency.ToData())),
+                new ProgressInitialData(_totalExperience),
+                new ExperienceCardsInitialData(_experienceCards?.Select(card => card.ToData())));
+        }
+
+        private static bool HasValidCurrencyIds(CurrencyBalanceEntry[] entries)
+        {
+            return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
+        }
+
+        private static bool HasValidExperienceCardIds(ExperienceCardAmountEntry[] entries)
+        {
+            return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
+        }
     }
 
     [Serializable]
     internal sealed class CurrencyBalanceEntry
     {
-        [LabelText("Currency ID")] [SerializeField]
-        private string _id;
+        [LabelText("Currency ID")]
+        [SerializeField] private string _id;
 
-        [LabelText("Amount")] [MinValue(0)] [SerializeField]
-        private int _amount;
+        [LabelText("Amount")]
+        [MinValue(0)]
+        [SerializeField] private int _amount;
 
-        internal CurrencyBalance ToData()
-        {
-            return new CurrencyBalance(
-                new CurrencyId(_id),
-                _amount);
-        }
+        internal CurrencyId Id => new(_id);
+
+        internal CurrencyBalance ToData() => new(Id, _amount);
     }
 
     [Serializable]
     internal sealed class ExperienceCardAmountEntry
     {
-        [LabelText("Card ID")] [SerializeField]
-        private string _id;
+        [LabelText("Card ID")]
+        [SerializeField] private string _id;
 
-        [LabelText("Amount")] [MinValue(0)] [SerializeField]
-        private int _amount;
+        [LabelText("Amount")]
+        [MinValue(0)]
+        [SerializeField] private int _amount;
 
-        internal ExperienceCardStack ToData()
-        {
-            return new ExperienceCardStack(
-                new ExperienceCardId(_id),
-                _amount);
-        }
+        internal ExperienceCardId Id => new(_id);
+
+        internal ExperienceCardStack ToData() => new(Id, _amount);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Identifiers;
 
 namespace LL.Game.ExperienceCards
 {
@@ -8,17 +9,14 @@ namespace LL.Game.ExperienceCards
     {
         internal IReadOnlyList<IExperienceCard> Cards { get; }
 
-        internal ExperienceCardCatalog(
-            IEnumerable<IExperienceCard> cards)
+        internal ExperienceCardCatalog(IEnumerable<IExperienceCard> cards)
         {
-            var uniqueIds = new HashSet<ExperienceCardId>();
-            var copy = cards?
-                .Where(card =>
-                    card != null &&
-                    card.Id.IsEmpty is false &&
-                    uniqueIds.Add(card.Id))
-                .ToArray()
-                ?? Array.Empty<IExperienceCard>();
+            var copy = cards?.ToArray() ?? Array.Empty<IExperienceCard>();
+            IdentifierCatalogValidator.EnsureValidIds(
+                copy,
+                card => card.Id,
+                nameof(ExperienceCardCatalog),
+                nameof(cards));
 
             Cards = Array.AsReadOnly(copy);
         }

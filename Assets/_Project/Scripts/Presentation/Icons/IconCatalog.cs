@@ -1,28 +1,38 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using LL.Identifiers;
 using UnityEngine;
 
 namespace LL.Presentation.Icons
 {
-    internal sealed class IconCatalog<TId> : IIconProvider<TId> where TId : struct
+    internal sealed class IconCatalog<TId> : IIconProvider<TId>
+        where TId : struct, IIdentifier
     {
         private readonly IReadOnlyDictionary<TId, Sprite> _icons;
 
         internal IconCatalog(IEnumerable<KeyValuePair<TId, Sprite>> icons)
         {
-            var uniqueIcons = new Dictionary<TId, Sprite>();
+            var copy = icons?.ToArray()
+                ?? Array.Empty<KeyValuePair<TId, Sprite>>();
 
-            if (icons != null)
+            IdentifierCatalogValidator.EnsureValidIds(
+                copy,
+                icon => icon.Key,
+                $"{typeof(TId).Name} icon catalog",
+                nameof(icons));
+
+            foreach (var icon in copy)
             {
-                foreach (var icon in icons)
+                if (icon.Value == null)
                 {
-                    if (icon.Value == null || uniqueIcons.ContainsKey(icon.Key))
-                        continue;
-
-                    uniqueIcons.Add(icon.Key, icon.Value);
+                    throw new ArgumentException(
+                        $"Icon catalog contains a missing icon for ID: {icon.Key}.",
+                        nameof(icons));
                 }
             }
 
-            _icons = uniqueIcons;
+            _icons = copy.ToDictionary(icon => icon.Key, icon => icon.Value);
         }
 
         public bool TryGetIcon(TId id, out Sprite icon)
