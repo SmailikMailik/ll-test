@@ -19,8 +19,29 @@ namespace LL.Game.Ranks
 
         public int GetRank(int totalExperience)
         {
-            var experience = Math.Max(0, totalExperience);
+            return CalculateRank(Math.Max(0, totalExperience));
+        }
 
+        public RankProgress GetProgress(int totalExperience)
+        {
+            var experience = Math.Max(0, totalExperience);
+            var rank = CalculateRank(experience);
+            var currentThreshold = _experienceThresholds[rank - 1];
+            var hasNextRank = rank < _experienceThresholds.Count;
+            var nextThreshold = hasNextRank
+                ? _experienceThresholds[rank]
+                : 0;
+
+            return new RankProgress(
+                rank,
+                experience,
+                currentThreshold,
+                nextThreshold,
+                hasNextRank);
+        }
+
+        private int CalculateRank(int experience)
+        {
             for (var index = 1; index < _experienceThresholds.Count; index++)
             {
                 if (experience < _experienceThresholds[index])

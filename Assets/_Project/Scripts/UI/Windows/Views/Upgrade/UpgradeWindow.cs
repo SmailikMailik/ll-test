@@ -28,11 +28,13 @@ namespace LL.UI.Windows.Views.Upgrade
 
         protected override void OnShow()
         {
-            var totalExperience = _userProgress.CurrentTotalExperience;
+            var progress = _rankProgression.GetProgress(_userProgress.CurrentTotalExperience);
 
-            _rankLabel.text = _rankProgression.GetRank(totalExperience).ToString();
-            _expLabel.text = $"{totalExperience.ToNumber()}/{15000.ToNumber()}";
-            _barImage.fillAmount = totalExperience / 15000f;
+            _rankLabel.text = progress.Rank.ToString();
+            _expLabel.text = progress.HasNextRank
+                ? $"{progress.TotalExperience.ToNumber()}/{progress.NextRankExperience.ToNumber()}"
+                : progress.TotalExperience.ToNumber();
+            _barImage.fillAmount = progress.NormalizedExperience;
         }
     }
 
