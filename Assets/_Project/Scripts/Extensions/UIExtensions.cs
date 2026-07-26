@@ -8,7 +8,7 @@ namespace LL.Extensions
     {
         private static readonly NumberFormatInfo _numberFormat = new()
         {
-            NumberGroupSeparator = "\u202F", // узкий неразрывный пробел
+            NumberGroupSeparator = "\u00A0", // неразрывный пробел
             NumberDecimalDigits = 0
         };
 
