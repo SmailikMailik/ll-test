@@ -17,8 +17,7 @@ namespace LL.UI.VisualStates.Effects
 
         private Tween _transition;
 
-        protected bool ShouldApplyImmediately(bool instantly) =>
-            instantly || _transitionSeconds <= 0f;
+        protected bool ShouldApplyImmediately(bool instantly) => instantly || _transitionSeconds <= 0f;
 
         protected void PlayTransition(Tween transition)
         {

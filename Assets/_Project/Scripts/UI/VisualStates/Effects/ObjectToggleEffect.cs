@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.UI.VisualStates.Core;
+using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace LL.UI.VisualStates.Effects
                 return;
 
             var active = TryGetStateValue(_states, state, out var stateValue)
-                ? stateValue.Active
+                ? stateValue.Value
                 : _initialActive;
 
             _target.SetActive(active);
@@ -54,9 +55,7 @@ namespace LL.UI.VisualStates.Effects
         {
             _states ??= new List<ActiveStateValue>();
             var defaultActive = _target != null && _target.activeSelf;
-            SynchronizeStateValues(
-                _states,
-                state => new ActiveStateValue(state, defaultActive));
+            SynchronizeStateValues(_states, state => new ActiveStateValue(state, defaultActive));
         }
 #endif
 
@@ -65,20 +64,9 @@ namespace LL.UI.VisualStates.Effects
             target != gameObject && transform.IsChildOf(target.transform) is false;
 
         [Serializable]
-        private sealed class ActiveStateValue : StateValue
+        private sealed class ActiveStateValue : StateValue<bool>
         {
-            [HideLabel]
-            [SerializeField] private bool _active;
-
-            internal bool Active => _active;
-
-            internal ActiveStateValue(
-                VisualStateSet.StateDefinition state,
-                bool active)
-                : base(state)
-            {
-                _active = active;
-            }
+            internal ActiveStateValue(VisualStateSet.StateDefinition state, bool active) : base(state, active) { }
         }
     }
 }

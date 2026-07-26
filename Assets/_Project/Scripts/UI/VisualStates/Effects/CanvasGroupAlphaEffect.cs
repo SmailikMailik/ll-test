@@ -4,16 +4,15 @@ using LL.UI.VisualStates.Core;
 using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace LL.UI.VisualStates.Effects
 {
-    [AddComponentMenu("LL/UI/Visual States/Effects/Graphic Alpha Effect")]
+    [AddComponentMenu("LL/UI/Visual States/Effects/Canvas Group Alpha Effect")]
     [HideMonoScript]
-    internal sealed class GraphicAlphaEffect : TweenStateEffect
+    internal sealed class CanvasGroupAlphaEffect : TweenStateEffect
     {
         [Required]
-        [SerializeField] private Graphic _target;
+        [SerializeField] private CanvasGroup _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<AlphaStateValue> _states = new();
@@ -23,7 +22,7 @@ namespace LL.UI.VisualStates.Effects
         protected override void CaptureInitialValue()
         {
             if (_target != null)
-                _initialAlpha = _target.color.a;
+                _initialAlpha = _target.alpha;
         }
 
         protected override void ApplyState(VisualStateId state, bool instantly)
@@ -38,7 +37,7 @@ namespace LL.UI.VisualStates.Effects
             if (ShouldApplyImmediately(instantly))
             {
                 StopTransition();
-                SetAlpha(targetAlpha);
+                _target.alpha = targetAlpha;
                 return;
             }
 
@@ -48,21 +47,14 @@ namespace LL.UI.VisualStates.Effects
         protected override void RestoreInitialValue()
         {
             if (_target != null)
-                SetAlpha(_initialAlpha);
-        }
-
-        private void SetAlpha(float alpha)
-        {
-            var color = _target.color;
-            color.a = alpha;
-            _target.color = color;
+                _target.alpha = _initialAlpha;
         }
 
 #if UNITY_EDITOR
         protected override void Reset()
         {
             base.Reset();
-            _target = GetComponent<Graphic>();
+            _target = GetComponent<CanvasGroup>();
             SynchronizeValues();
         }
 
@@ -75,13 +67,12 @@ namespace LL.UI.VisualStates.Effects
         private void SynchronizeValues()
         {
             _states ??= new List<AlphaStateValue>();
-            var defaultAlpha = _target == null ? 1f : _target.color.a;
+            var defaultAlpha = _target == null ? 1f : _target.alpha;
             SynchronizeStateValues(_states, state => new AlphaStateValue(state, defaultAlpha));
 
             foreach (var state in _states)
                 state.Clamp();
         }
 #endif
-
     }
 }

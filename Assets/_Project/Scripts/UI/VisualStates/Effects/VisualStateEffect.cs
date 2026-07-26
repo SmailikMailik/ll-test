@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.UI.VisualStates.Core;
+using LL.UI.VisualStates.Effects.Values;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -131,29 +132,5 @@ namespace LL.UI.VisualStates.Effects
                 _controller = controllers[0];
         }
 #endif
-
-        [Serializable]
-        internal abstract class StateValue
-        {
-            [HideInInspector]
-            [SerializeField] private VisualStateId _state;
-
-            [ReadOnly]
-            [TableColumnWidth(160)]
-            [SerializeField] private string _stateName;
-
-            internal VisualStateId State => _state;
-
-            protected StateValue(VisualStateSet.StateDefinition state)
-            {
-                _state = state.Id;
-                _stateName = state.Name;
-            }
-
-            internal void UpdateName(string stateName)
-            {
-                _stateName = stateName;
-            }
-        }
     }
 }

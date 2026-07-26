@@ -156,7 +156,7 @@ GameObject:
   - component: {fileID: 5696204089413291922}
   - component: {fileID: 797818022937499136}
   m_Layer: 5
-  m_Name: P_Bar
+  m_Name: P_Bar_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

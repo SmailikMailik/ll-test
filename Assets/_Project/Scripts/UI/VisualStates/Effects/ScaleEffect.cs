@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using LL.UI.VisualStates.Core;
+using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace LL.UI.VisualStates.Effects
                 return;
 
             var targetScale = TryGetStateValue(_states, state, out var stateValue)
-                ? stateValue.Scale
+                ? stateValue.Value
                 : _initialScale;
 
             if (ShouldApplyImmediately(instantly))
@@ -68,27 +69,14 @@ namespace LL.UI.VisualStates.Effects
         {
             _states ??= new List<ScaleStateValue>();
             var defaultScale = _target == null ? Vector3.one : _target.localScale;
-            SynchronizeStateValues(
-                _states,
-                state => new ScaleStateValue(state, defaultScale));
+            SynchronizeStateValues(_states, state => new ScaleStateValue(state, defaultScale));
         }
 #endif
 
         [Serializable]
-        private sealed class ScaleStateValue : StateValue
+        private sealed class ScaleStateValue : StateValue<Vector3>
         {
-            [HideLabel]
-            [SerializeField] private Vector3 _scale;
-
-            internal Vector3 Scale => _scale;
-
-            internal ScaleStateValue(
-                VisualStateSet.StateDefinition state,
-                Vector3 scale)
-                : base(state)
-            {
-                _scale = scale;
-            }
+            internal ScaleStateValue(VisualStateSet.StateDefinition state, Vector3 scale) : base(state, scale) { }
         }
     }
 }
