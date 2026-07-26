@@ -1,8 +1,8 @@
-using LL.UI.VisualStates;
+using LL.UI.VisualStates.Core;
 using UnityEditor;
 using UnityEngine;
 
-namespace LLEditor.UI.VisualStates
+namespace LLEditor.UI.VisualStates.Drawers
 {
     [CustomPropertyDrawer(typeof(VisualStateId))]
     internal sealed class VisualStateIdDrawer : PropertyDrawer

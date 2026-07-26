@@ -2,7 +2,7 @@ using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.UI.VisualStates
+namespace LL.UI.VisualStates.Effects
 {
     internal abstract class TweenStateEffect : VisualStateEffect
     {

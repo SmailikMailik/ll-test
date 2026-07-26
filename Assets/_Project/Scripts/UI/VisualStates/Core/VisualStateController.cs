@@ -1,9 +1,8 @@
-using System;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.UI.VisualStates
+namespace LL.UI.VisualStates.Core
 {
     [AddComponentMenu("LL/UI/Visual States/State Controller")]
     [HideMonoScript]

@@ -1,4 +1,4 @@
-using LL.UI.VisualStates;
+using LL.UI.VisualStates.Core;
 using UnityEditor;
 
 namespace LLEditor

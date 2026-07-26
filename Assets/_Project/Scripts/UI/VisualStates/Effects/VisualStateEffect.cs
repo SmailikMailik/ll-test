@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using LL.UI.VisualStates.Core;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.UI.VisualStates
+namespace LL.UI.VisualStates.Effects
 {
     internal abstract class VisualStateEffect : MonoBehaviour
     {

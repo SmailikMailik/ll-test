@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LL.UI.VisualStates
+namespace LL.UI.VisualStates.Core
 {
     [Serializable]
     internal struct VisualStateId : IEquatable<VisualStateId>

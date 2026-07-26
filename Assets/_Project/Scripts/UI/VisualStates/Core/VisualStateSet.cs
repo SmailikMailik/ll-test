@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.UI.VisualStates
+namespace LL.UI.VisualStates.Core
 {
     [CreateAssetMenu(fileName = nameof(VisualStateSet), menuName = CreationPath)]
     [HideMonoScript]

@@ -1,10 +1,10 @@
-using LL.UI.VisualStates;
+using LL.UI.VisualStates.Core;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace LLEditor.UI.VisualStates
+namespace LLEditor.UI.VisualStates.Inspectors
 {
     [CustomEditor(typeof(VisualStateController))]
     internal sealed class VisualStateControllerEditor : OdinEditor
