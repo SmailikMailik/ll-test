@@ -3,15 +3,13 @@ using LL.Game.Ranks;
 using LL.User.Core.Progress;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using VContainer;
 
 namespace LL.UI.Windows.Views.Upgrade
 {
     internal sealed class UpgradeWindow : Window<UpgradeWindowParameters>
     {
-        [SerializeField] private Image _currentImage;
-        [SerializeField] private Image _predictImage;
+        [SerializeField] private PredictedProgressBar _bar;
         [SerializeField] private TMP_Text _rankLabel;
         [SerializeField] private TMP_Text _expLabel;
         [SerializeField] private TMP_Text _addLabel;
@@ -57,12 +55,13 @@ namespace LL.UI.Windows.Views.Upgrade
                 ? $"+ {_pendingExperience.ToNumber()}"
                 : string.Empty;
 
-            _currentImage.fillAmount = progress.HasNextRank
+            var currentProgress = progress.HasNextRank
                 ? Mathf.Clamp01(
                     (float)(_appliedExperience - progress.CurrentRankExperience) /
                     progress.ExperienceBetweenRanks)
                 : 1f;
-            _predictImage.fillAmount = progress.NormalizedExperience;
+
+            _bar.SetProgress(currentProgress, progress.NormalizedExperience);
         }
 
         private void AddPendingExperience(int amount)

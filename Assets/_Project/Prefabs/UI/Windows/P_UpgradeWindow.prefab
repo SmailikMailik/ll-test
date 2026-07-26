@@ -55,8 +55,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Material: {fileID: 0}
   m_Color: {r: 0.69411767, g: 0.54901963, b: 0.20784314, a: 1}
   m_RaycastTarget: 1
@@ -1421,8 +1421,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dea8290e1ded4bd99896e6f25f7c42f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentImage: {fileID: 5992475073376471791}
-  _predictImage: {fileID: 8367891064430617021}
+  _bar: {fileID: 155612036910981120}
   _rankLabel: {fileID: 2233690373681334854}
   _expLabel: {fileID: 4271382970874411002}
   _addLabel: {fileID: 1815875750463363878}
@@ -2120,10 +2119,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7579337740174270689, guid: 451b6f692b931fb40bc5686bf360e512, type: 3}
-      propertyPath: m_FillAmount
-      value: 0.33
-      objectReference: {fileID: 0}
     - target: {fileID: 7821954475830310946, guid: 451b6f692b931fb40bc5686bf360e512, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2180,3 +2175,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &155612036910981120 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 797818022937499136, guid: 451b6f692b931fb40bc5686bf360e512, type: 3}
+  m_PrefabInstance: {fileID: 4181235810016717326}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b5dce1419eb4957a2551b68f6cbafd0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
