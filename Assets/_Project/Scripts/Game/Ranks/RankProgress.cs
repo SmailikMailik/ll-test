@@ -34,7 +34,7 @@ namespace LL.Game.Ranks
 
             HasNextRank = hasNextRank;
             NormalizedExperience = hasNextRank
-                ? (float)totalExperience / nextRankExperience
+                ? (float)ExperienceInCurrentRank / ExperienceBetweenRanks
                 : 1f;
         }
     }

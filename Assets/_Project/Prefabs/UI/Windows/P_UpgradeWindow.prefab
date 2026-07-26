@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 6464176420608701484}
   - component: {fileID: 1815875750463363878}
   m_Layer: 5
-  m_Name: Label_Plus
+  m_Name: Label_Add
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1421,9 +1421,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dea8290e1ded4bd99896e6f25f7c42f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _barImage: {fileID: 5992475073376471791}
+  _currentImage: {fileID: 5992475073376471791}
+  _predictImage: {fileID: 8367891064430617021}
   _rankLabel: {fileID: 2233690373681334854}
   _expLabel: {fileID: 4271382970874411002}
+  _addLabel: {fileID: 1815875750463363878}
 --- !u!1001 &3727817241996550113
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2159,6 +2161,17 @@ RectTransform:
 --- !u!114 &5992475073376471791 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7579337740174270689, guid: 451b6f692b931fb40bc5686bf360e512, type: 3}
+  m_PrefabInstance: {fileID: 4181235810016717326}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8367891064430617021 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5631191984946088883, guid: 451b6f692b931fb40bc5686bf360e512, type: 3}
   m_PrefabInstance: {fileID: 4181235810016717326}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
