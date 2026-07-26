@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Currencies;
 using LL.Saving;
-using LL.User.Core.ExperienceCards;
+using LL.User.Core.Cards;
 using LL.User.Core.Identity;
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
@@ -19,7 +19,7 @@ namespace LL.User.Persistence
         private readonly IUserWallet _wallet;
         private readonly IUserProgress _progress;
         private readonly ISaveService _saveService;
-        private readonly ExperienceCardsInitialData _experienceCards;
+        private readonly CardsInitialData _cards;
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<CurrencyId, int> _currencyAmounts;
@@ -30,7 +30,7 @@ namespace LL.User.Persistence
             UserIdentity identity,
             WalletInitialData walletInitialData,
             ProgressInitialData progressInitialData,
-            ExperienceCardsInitialData experienceCards,
+            CardsInitialData cards,
             IUserWallet wallet,
             IUserProgress progress,
             ISaveService saveService)
@@ -43,9 +43,7 @@ namespace LL.User.Persistence
             if (progressInitialData == null)
                 throw new ArgumentNullException(nameof(progressInitialData));
 
-            _experienceCards = experienceCards
-                ?? throw new ArgumentNullException(nameof(experienceCards));
-
+            _cards = cards ?? throw new ArgumentNullException(nameof(cards));
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
@@ -100,10 +98,9 @@ namespace LL.User.Persistence
         {
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
-                _currencyAmounts.Select(pair =>
-                    new CurrencyBalance(pair.Key, pair.Value)),
+                _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)),
                 _totalExperience,
-                _experienceCards);
+                _cards);
 
             _saveService.TrySave(UserInitialDataLoader.SaveKey, data);
         }

@@ -22,7 +22,7 @@ MonoBehaviour:
   - _id: master_point
     _amount: 33333
   _totalExperience: 12861
-  _experienceCards:
+  _cards:
   - _id: card_1
     _amount: 99
   - _id: card_2

@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using LL.Game.Currencies;
-using LL.Game.ExperienceCards;
+using LL.Game.Cards;
 using LL.Identifiers;
 using LL.User.Core;
-using LL.User.Core.ExperienceCards;
+using LL.User.Core.Cards;
 using LL.User.Core.Identity;
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
@@ -38,10 +38,10 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _totalExperience;
 
-        [BoxGroup("Experience Cards")]
-        [ValidateInput(nameof(HasValidExperienceCardIds), "Experience card IDs must be non-empty and unique.")]
+        [BoxGroup("Cards")]
+        [ValidateInput(nameof(HasValidCardIds), "Card IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
-        [SerializeField] private ExperienceCardAmountEntry[] _experienceCards;
+        [SerializeField] private CardAmountEntry[] _cards;
 
         UserInitialData IDataLoader<UserInitialData>.Load()
         {
@@ -51,16 +51,16 @@ namespace LL.User.Configuration
                 "Default currency balances",
                 nameof(_currencies));
             IdentifierCatalogValidator.EnsureValidIds(
-                _experienceCards,
+                _cards,
                 entry => entry.Id,
-                "Default experience card amounts",
-                nameof(_experienceCards));
+                "Default card amounts",
+                nameof(_cards));
 
             return new UserInitialData(
                 new UserIdentity(_regionCode, _userId),
                 new WalletInitialData(_currencies?.Select(currency => currency.ToData())),
                 new ProgressInitialData(_totalExperience),
-                new ExperienceCardsInitialData(_experienceCards?.Select(card => card.ToData())));
+                new CardsInitialData(_cards?.Select(card => card.ToData())));
         }
 
         private static bool HasValidCurrencyIds(CurrencyBalanceEntry[] entries)
@@ -68,7 +68,7 @@ namespace LL.User.Configuration
             return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
         }
 
-        private static bool HasValidExperienceCardIds(ExperienceCardAmountEntry[] entries)
+        private static bool HasValidCardIds(CardAmountEntry[] entries)
         {
             return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
         }
@@ -90,7 +90,7 @@ namespace LL.User.Configuration
     }
 
     [Serializable]
-    internal sealed class ExperienceCardAmountEntry
+    internal sealed class CardAmountEntry
     {
         [LabelText("Card ID")]
         [SerializeField] private string _id;
@@ -99,8 +99,8 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _amount;
 
-        internal ExperienceCardId Id => new(_id);
+        internal CardId Id => new(_id);
 
-        internal ExperienceCardStack ToData() => new(Id, _amount);
+        internal CardStack ToData() => new(Id, _amount);
     }
 }

@@ -13,10 +13,10 @@ namespace LLEditor
             ConfigurationAssetMenu.Select<CurrencyIconCatalogConfig>(CurrencyIconCatalogConfig.CreationPath);
         }
 
-        [MenuItem(MenuPath + "Experience Card Icon Catalog")]
-        private static void SelectExperienceCardIconCatalog()
+        [MenuItem(MenuPath + "Card Icon Catalog")]
+        private static void SelectCardIconCatalog()
         {
-            ConfigurationAssetMenu.Select<ExperienceCardIconCatalogConfig>(ExperienceCardIconCatalogConfig
+            ConfigurationAssetMenu.Select<CardIconCatalogConfig>(CardIconCatalogConfig
                 .CreationPath);
         }
     }

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6297905a6852452d943c41c3bfd69747, type: 3}
-  m_Name: ExperienceCardIconCatalogConfig
+  m_Name: CardIconCatalogConfig
   m_EditorClassIdentifier: 
   _icons:
   - _id: card_1

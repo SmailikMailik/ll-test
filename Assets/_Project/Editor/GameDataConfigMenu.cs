@@ -13,10 +13,10 @@ namespace LLEditor
             ConfigurationAssetMenu.Select<RankCatalogConfig>(RankCatalogConfig.CreationPath);
         }
 
-        [MenuItem(MenuPath + "Experience Card Catalog")]
-        private static void SelectExperienceCardCatalog()
+        [MenuItem(MenuPath + "Card Catalog")]
+        private static void SelectCardCatalog()
         {
-            ConfigurationAssetMenu.Select<ExperienceCardCatalogConfig>(ExperienceCardCatalogConfig.CreationPath);
+            ConfigurationAssetMenu.Select<CardCatalogConfig>(CardCatalogConfig.CreationPath);
         }
     }
 }

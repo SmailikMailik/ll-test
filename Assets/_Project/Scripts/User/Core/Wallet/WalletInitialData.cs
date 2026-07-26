@@ -21,18 +21,11 @@ namespace LL.User.Core.Wallet
                         continue;
 
                     amounts.TryGetValue(balance.Id, out var current);
-                    amounts[balance.Id] = Math.Min(
-                        current + balance.Amount,
-                        int.MaxValue);
+                    amounts[balance.Id] = Math.Min(current + balance.Amount, int.MaxValue);
                 }
             }
 
-            var copy = amounts
-                .Select(pair => new CurrencyBalance(
-                    pair.Key,
-                    (int)pair.Value))
-                .ToArray();
-
+            var copy = amounts.Select(pair => new CurrencyBalance(pair.Key, (int)pair.Value)).ToArray();
             Balances = Array.AsReadOnly(copy);
         }
     }

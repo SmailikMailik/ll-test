@@ -13,17 +13,15 @@ namespace LL.User.Persistence
         [JsonProperty] private string _regionCode;
         [JsonProperty] private string _userId;
         [JsonProperty] private CurrencySaveData[] _currencies;
+        [JsonProperty] private CardSaveData[] _cards;
         [JsonProperty] private int _totalExperience;
-        [JsonProperty] private ExperienceCardSaveData[] _experienceCards;
 
         internal bool IsSupported => _version == CurrentVersion;
         internal string RegionCode => _regionCode;
         internal string UserId => _userId;
-        internal IReadOnlyList<CurrencySaveData> Currencies =>
-            _currencies ?? Array.Empty<CurrencySaveData>();
+        internal IReadOnlyList<CurrencySaveData> Currencies => _currencies ?? Array.Empty<CurrencySaveData>();
+        internal IReadOnlyList<CardSaveData> Cards => _cards ?? Array.Empty<CardSaveData>();
         internal int TotalExperience => _totalExperience;
-        internal IReadOnlyList<ExperienceCardSaveData> ExperienceCards =>
-            _experienceCards ?? Array.Empty<ExperienceCardSaveData>();
 
         [JsonConstructor]
         private UserSaveData() { }
@@ -32,15 +30,15 @@ namespace LL.User.Persistence
             string regionCode,
             string userId,
             CurrencySaveData[] currencies,
-            int totalExperience,
-            ExperienceCardSaveData[] experienceCards)
+            CardSaveData[] cards,
+            int totalExperience)
         {
             _version = CurrentVersion;
             _regionCode = regionCode;
             _userId = userId;
             _currencies = currencies ?? Array.Empty<CurrencySaveData>();
+            _cards = cards ?? Array.Empty<CardSaveData>();
             _totalExperience = totalExperience;
-            _experienceCards = experienceCards ?? Array.Empty<ExperienceCardSaveData>();
         }
     }
 
@@ -64,7 +62,7 @@ namespace LL.User.Persistence
     }
 
     [JsonObject(MemberSerialization.OptIn)]
-    internal sealed class ExperienceCardSaveData
+    internal sealed class CardSaveData
     {
         [JsonProperty] private string _id;
         [JsonProperty] private int _amount;
@@ -73,9 +71,9 @@ namespace LL.User.Persistence
         internal int Amount => _amount;
 
         [JsonConstructor]
-        private ExperienceCardSaveData() { }
+        private CardSaveData() { }
 
-        internal ExperienceCardSaveData(string id, int amount)
+        internal CardSaveData(string id, int amount)
         {
             _id = id;
             _amount = amount;
