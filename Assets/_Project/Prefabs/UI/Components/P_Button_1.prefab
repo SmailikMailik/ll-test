@@ -85,8 +85,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7358197253307477832}
   - component: {fileID: 6924140768945000809}
-  - component: {fileID: 8675364485303669910}
-  - component: {fileID: 3398561826248851779}
   m_Layer: 5
   m_Name: P_Button_1
   m_TagString: Untagged
@@ -126,29 +124,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13a5df11b5cd49bd90028e5ee77d64b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _clickHandler: {fileID: 8675364485303669910}
-  _pressHandler: {fileID: 3398561826248851779}
---- !u!114 &8675364485303669910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2723066229655186564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23856a770bfe4fc393448313339bb522, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &3398561826248851779
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2723066229655186564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3252f1e6bb0d43d7aa0765910672509f, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:

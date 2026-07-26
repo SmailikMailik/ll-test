@@ -17,8 +17,7 @@ namespace LL.UI.VisualStates
         [SerializeField] private List<StateDefinition> _states = new();
 
         internal IReadOnlyList<StateDefinition> States => _states;
-        internal VisualStateId DefaultState =>
-            _states is { Count: > 0 } ? _states[0].Id : default;
+        internal VisualStateId DefaultState => _states is { Count: > 0 } ? _states[0].Id : default;
 
         internal bool Contains(VisualStateId state)
         {

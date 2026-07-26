@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LL.UI.Controls.Buttons;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -6,33 +7,29 @@ using UnityEngine;
 namespace LL.UI.VisualStates.Drivers
 {
     [RequireComponent(typeof(CommonButton))]
-    [AddComponentMenu("LL/UI/Visual States/Drivers/Button")]
+    [AddComponentMenu("LL/UI/Visual States/Drivers/Button Interaction")]
     [HideMonoScript]
-    internal sealed class ButtonVisualStateDriver : MonoBehaviour
+    internal sealed class ButtonInteractionStateDriver : MonoBehaviour
     {
         [Required]
         [SerializeField] private VisualStateController _controller;
 
         [ValueDropdown(nameof(GetStateOptions))]
-        [ValidateInput(nameof(IsValidState), "Select a state from the assigned controller.")]
+        [ValidateInput(nameof(IsValidState), "Choose a state from the assigned controller.")]
         [SerializeField] private VisualStateId _normalState;
 
         [ValueDropdown(nameof(GetStateOptions))]
-        [ValidateInput(nameof(IsValidState), "Select a state from the assigned controller.")]
+        [ValidateInput(nameof(IsValidState), "Choose a state from the assigned controller.")]
         [SerializeField] private VisualStateId _pressedState;
 
         [ValueDropdown(nameof(GetStateOptions))]
-        [ValidateInput(nameof(IsValidState), "Select a state from the assigned controller.")]
-        [SerializeField] private VisualStateId _selectedState;
-
-        [ValueDropdown(nameof(GetStateOptions))]
-        [ValidateInput(nameof(IsValidState), "Select a state from the assigned controller.")]
+        [ValidateInput(nameof(IsValidState), "Choose a state from the assigned controller.")]
         [SerializeField] private VisualStateId _disabledState;
 
         private CommonButton _button;
+
         private bool _isPressed;
         private bool _isInteractable;
-        private bool _isSelected;
         private bool _isStarted;
 
         private void Awake()
@@ -44,13 +41,12 @@ namespace LL.UI.VisualStates.Drivers
         {
             _isPressed = _button.IsPressed;
             _isInteractable = _button.IsInteractable;
-            _isSelected = _button.IsSelected;
             _isStarted = true;
+
             ApplyState(true);
 
             _button.Pressed.Subscribe(OnPressedChanged).AddTo(this);
             _button.Interactable.Subscribe(OnInteractableChanged).AddTo(this);
-            _button.Selected.Subscribe(OnSelectedChanged).AddTo(this);
         }
 
         private void OnEnable()
@@ -77,15 +73,6 @@ namespace LL.UI.VisualStates.Drivers
             ApplyStateIfActive();
         }
 
-        private void OnSelectedChanged(bool isSelected)
-        {
-            if (_isSelected == isSelected)
-                return;
-
-            _isSelected = isSelected;
-            ApplyStateIfActive();
-        }
-
         private void ApplyStateIfActive()
         {
             if (isActiveAndEnabled)
@@ -97,15 +84,18 @@ namespace LL.UI.VisualStates.Drivers
             if (_controller == null)
                 return;
 
-            var state = _isInteractable is false
-                ? _disabledState
-                : _isPressed
-                    ? _pressedState
-                    : _isSelected
-                        ? _selectedState
-                        : _normalState;
+            _controller.SetState(ResolveState(), instantly);
+        }
 
-            _controller.SetState(state, instantly);
+        private VisualStateId ResolveState()
+        {
+            if (_isInteractable is false)
+                return _disabledState;
+
+            if (_isPressed)
+                return _pressedState;
+
+            return _normalState;
         }
 
         private IEnumerable<ValueDropdownItem<VisualStateId>> GetStateOptions()

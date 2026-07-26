@@ -102,8 +102,8 @@ namespace LL.UI.VisualStates
 
             foreach (var value in values)
             {
-                if (value != null && existingValues.ContainsKey(value.State) is false)
-                    existingValues.Add(value.State, value);
+                if (value != null)
+                    existingValues.TryAdd(value.State, value);
             }
 
             values.Clear();
@@ -136,12 +136,10 @@ namespace LL.UI.VisualStates
         [Serializable]
         internal abstract class StateValue
         {
-            [HideInInspector]
-            [SerializeField] private VisualStateId _state;
+            [HideInInspector] [SerializeField] private VisualStateId _state;
 
-            [ReadOnly]
-            [TableColumnWidth(160)]
-            [SerializeField] private string _stateName;
+            [ReadOnly] [TableColumnWidth(160)] [SerializeField]
+            private string _stateName;
 
             internal VisualStateId State => _state;
 

@@ -27,8 +27,7 @@ namespace LL.UI.VisualStates
         [ReadOnly]
         [ShowIf(nameof(IsPlaying))]
         [LabelText("Current State")]
-        private string CurrentStateName =>
-            _stateSet == null ? string.Empty : _stateSet.GetName(CurrentState);
+        private string CurrentStateName => _stateSet == null ? string.Empty : _stateSet.GetName(CurrentState);
 
         private bool IsPlaying => Application.isPlaying;
 
