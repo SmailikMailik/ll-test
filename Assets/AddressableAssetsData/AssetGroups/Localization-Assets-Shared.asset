@@ -18,7 +18,22 @@ MonoBehaviour:
   m_GUID: 0f10db5ec86432e4ba52ec624a07379a
   m_SerializeEntries:
   - m_GUID: b1c9e60686216f94a83e652c2c808fca
-    m_Address: Assets/_Project/Localization/Main Shared Data.asset
+    m_Address: Assets/_Project/Localization/Common Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 46db0b9099fa42fbaa83454fdb7f7191
+    m_Address: Assets/_Project/Localization/Game Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8733600427614121adc422604016f521
+    m_Address: Assets/_Project/Localization/Upgrade Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5785692cbd9a48d78f1f879c78edbe3c
+    m_Address: Assets/_Project/Localization/RankUp Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

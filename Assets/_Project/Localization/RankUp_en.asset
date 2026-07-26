@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
-  m_Name: Main_en
-  m_EditorClassIdentifier: 
+  m_Name: RankUp_en
+  m_EditorClassIdentifier:
   m_LocaleId:
     m_Code: en
-  m_SharedData: {fileID: 11400000, guid: b1c9e60686216f94a83e652c2c808fca, type: 2}
+  m_SharedData: {fileID: 11400000, guid: 5785692cbd9a48d78f1f879c78edbe3c, type: 2}
   m_Metadata:
     m_Items: []
   m_TableData:
-  - m_Id: 20298698752
-    m_Localized: Rank
+  - m_Id: 352062502440976
+    m_Localized: Rank Up!
     m_Metadata:
       m_Items: []
-  - m_Id: 352062502440960
-    m_Localized: Upgrade
+  - m_Id: 352062502440977
+    m_Localized: You Received
     m_Metadata:
       m_Items: []
   references:

@@ -10,17 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
-  m_Name: Main Shared Data
-  m_EditorClassIdentifier: 
-  m_TableCollectionName: Main
-  m_TableCollectionNameGuidString: b1c9e60686216f94a83e652c2c808fca
+  m_Name: Upgrade Shared Data
+  m_EditorClassIdentifier:
+  m_TableCollectionName: Upgrade
+  m_TableCollectionNameGuidString: 8733600427614121adc422604016f521
   m_Entries:
-  - m_Id: 20298698752
-    m_Key: main.rank
+  - m_Id: 352062502440971
+    m_Key: titles.rank_promotion
     m_Metadata:
       m_Items: []
-  - m_Id: 352062502440960
-    m_Key: main.upgrade
+  - m_Id: 352062502440972
+    m_Key: labels.rewards_at_rank
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440973
+    m_Key: prompts.select_experience_cards
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440974
+    m_Key: messages.unlock_promotion_with_credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440975
+    m_Key: messages.headshot_requirement
     m_Metadata:
       m_Items: []
   m_Metadata:

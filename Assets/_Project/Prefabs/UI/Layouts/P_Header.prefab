@@ -126,8 +126,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6176704270360347780}
   - {fileID: 1211526695285566120}
+  - {fileID: 6176704270360347780}
   m_Father: {fileID: 8749824599679675093}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -160,7 +160,7 @@ MonoBehaviour:
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
-  m_ReverseArrangement: 1
+  m_ReverseArrangement: 0
 --- !u!114 &7837307597223617831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -808,7 +808,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2723066229655186564, guid: 11dcd0c3ddf8231478bce09a10773269, type: 3}
       propertyPath: m_Name
-      value: P_Button_Back
+      value: Button_Back
       objectReference: {fileID: 0}
     - target: {fileID: 2723066229655186564, guid: 11dcd0c3ddf8231478bce09a10773269, type: 3}
       propertyPath: m_IsActive
@@ -1315,7 +1315,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2723066229655186564, guid: 11dcd0c3ddf8231478bce09a10773269, type: 3}
       propertyPath: m_Name
-      value: P_Button_Home
+      value: Button_Home
       objectReference: {fileID: 0}
     - target: {fileID: 2723066229655186564, guid: 11dcd0c3ddf8231478bce09a10773269, type: 3}
       propertyPath: m_IsActive
