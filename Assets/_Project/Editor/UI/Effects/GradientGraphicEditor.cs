@@ -47,9 +47,7 @@ namespace LLEditor.UI.Effects
             if (changed)
             {
                 foreach (var inspectedTarget in targets)
-                {
                     ((GradientGraphic)inspectedTarget).SetVerticesDirty();
-                }
             }
         }
 
@@ -124,7 +122,8 @@ namespace LLEditor.UI.Effects
 
         private bool IsLinear()
         {
-            return _type.hasMultipleDifferentValues || _type.enumValueIndex == (int)GradientType.Linear;
+            return _type.hasMultipleDifferentValues ||
+                   _type.enumValueIndex == (int)GradientGraphic.GradientType.Linear;
         }
 
         private void FindProperties()

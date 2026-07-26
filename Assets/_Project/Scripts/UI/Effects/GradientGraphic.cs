@@ -11,6 +11,12 @@ namespace LL.UI.Effects
         [SerializeField, Range(0f, 360f)] private float _angle;
         [SerializeField, Range(1, 32)] private int _resolution = 8;
 
+        internal enum GradientType : byte
+        {
+            Linear = 0,
+            Radial = 1
+        }
+
         private Texture2D _alphaTexture;
         private bool _isAlphaTextureDirty = true;
 
@@ -241,6 +247,12 @@ namespace LL.UI.Effects
         }
 
 #if UNITY_EDITOR
+        protected override void Reset()
+        {
+            base.Reset();
+            raycastTarget = false;
+        }
+
         protected override void OnValidate()
         {
             base.OnValidate();
