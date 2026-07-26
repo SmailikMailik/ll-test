@@ -53,9 +53,8 @@ namespace LL.UI.VisualStates
             if (CurrentState == state)
                 return;
 
-            var previousState = CurrentState;
             CurrentState = state;
-            _stateChanged.OnNext(new StateChange(previousState, state, instantly));
+            _stateChanged.OnNext(new StateChange(state, instantly));
         }
 
         private void Initialize()
@@ -95,17 +94,14 @@ namespace LL.UI.VisualStates
 
         internal readonly struct StateChange
         {
-            internal VisualStateId PreviousState { get; }
-            internal VisualStateId CurrentState { get; }
+            internal VisualStateId State { get; }
             internal bool Instantly { get; }
 
             internal StateChange(
-                VisualStateId previousState,
-                VisualStateId currentState,
+                VisualStateId state,
                 bool instantly)
             {
-                PreviousState = previousState;
-                CurrentState = currentState;
+                State = state;
                 Instantly = instantly;
             }
         }

@@ -19,33 +19,9 @@ namespace LL.UI.VisualStates
         internal IReadOnlyList<StateDefinition> States => _states;
         internal VisualStateId DefaultState => _states is { Count: > 0 } ? _states[0].Id : default;
 
-        internal bool Contains(VisualStateId state)
-        {
-            if (state.IsEmpty || _states == null)
-                return false;
+        internal bool Contains(VisualStateId state) => Find(state) != null;
 
-            foreach (var definition in _states)
-            {
-                if (definition != null && definition.Id == state)
-                    return true;
-            }
-
-            return false;
-        }
-
-        internal string GetName(VisualStateId state)
-        {
-            if (_states == null)
-                return string.Empty;
-
-            foreach (var definition in _states)
-            {
-                if (definition != null && definition.Id == state)
-                    return definition.Name;
-            }
-
-            return string.Empty;
-        }
+        internal string GetName(VisualStateId state) => Find(state)?.Name ?? string.Empty;
 
         private void OnValidate()
         {
@@ -79,6 +55,20 @@ namespace LL.UI.VisualStates
             }
 
             return true;
+        }
+
+        private StateDefinition Find(VisualStateId state)
+        {
+            if (state.IsEmpty || _states == null)
+                return null;
+
+            foreach (var definition in _states)
+            {
+                if (definition != null && definition.Id == state)
+                    return definition;
+            }
+
+            return null;
         }
 
         [Serializable]

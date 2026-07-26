@@ -10,7 +10,7 @@ namespace LL.UI.VisualStates.Effects
     internal sealed class VisualObjectToggleEffect : VisualStateEffect
     {
         [Required]
-        [ValidateInput(nameof(IsValidTarget), "The effect cannot toggle its own GameObject.")]
+        [ValidateInput(nameof(IsValidTarget), "Target cannot be this GameObject or one of its parents.")]
         [SerializeField] private GameObject _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
@@ -26,7 +26,7 @@ namespace LL.UI.VisualStates.Effects
 
         protected override void ApplyState(VisualStateId state, bool instantly)
         {
-            if (_target == null || _target == gameObject)
+            if (_target == null || IsValidTarget(_target) is false)
                 return;
 
             var active = TryGetStateValue(_states, state, out var stateValue)
@@ -36,11 +36,9 @@ namespace LL.UI.VisualStates.Effects
             _target.SetActive(active);
         }
 
-        protected override void StopTransition() { }
-
         protected override void RestoreInitialValue()
         {
-            if (_target != null && _target != gameObject)
+            if (_target != null && IsValidTarget(_target))
                 _target.SetActive(_initialActive);
         }
 
@@ -63,8 +61,7 @@ namespace LL.UI.VisualStates.Effects
 
         private bool IsValidTarget(GameObject target) =>
             target == null ||
-            target != gameObject &&
-            transform.IsChildOf(target.transform) is false;
+            target != gameObject && transform.IsChildOf(target.transform) is false;
 
         [Serializable]
         private sealed class ActiveStateValue : StateValue

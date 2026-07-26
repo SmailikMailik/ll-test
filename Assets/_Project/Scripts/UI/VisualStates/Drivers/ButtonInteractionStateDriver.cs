@@ -23,9 +23,6 @@ namespace LL.UI.VisualStates.Drivers
         [SerializeField] private VisualStateId _disabledState;
 
         private InteractiveButton _button;
-
-        private bool _isPressed;
-        private bool _isInteractable;
         private bool _isStarted;
 
         private void Awake()
@@ -35,14 +32,11 @@ namespace LL.UI.VisualStates.Drivers
 
         private void Start()
         {
-            _isPressed = _button.IsPressed;
-            _isInteractable = _button.IsInteractable;
             _isStarted = true;
-
             ApplyState(true);
 
-            _button.Pressed.Subscribe(OnPressedChanged).AddTo(this);
-            _button.Interactable.Subscribe(OnInteractableChanged).AddTo(this);
+            _button.Pressed.Subscribe(OnInteractionChanged).AddTo(this);
+            _button.Interactable.Subscribe(OnInteractionChanged).AddTo(this);
         }
 
         private void OnEnable()
@@ -51,21 +45,8 @@ namespace LL.UI.VisualStates.Drivers
                 ApplyState(true);
         }
 
-        private void OnPressedChanged(bool isPressed)
+        private void OnInteractionChanged(bool _)
         {
-            if (_isPressed == isPressed)
-                return;
-
-            _isPressed = isPressed;
-            ApplyStateIfActive();
-        }
-
-        private void OnInteractableChanged(bool isInteractable)
-        {
-            if (_isInteractable == isInteractable)
-                return;
-
-            _isInteractable = isInteractable;
             ApplyStateIfActive();
         }
 
@@ -85,10 +66,10 @@ namespace LL.UI.VisualStates.Drivers
 
         private VisualStateId ResolveState()
         {
-            if (_isInteractable is false)
+            if (_button.IsInteractable is false)
                 return _disabledState;
 
-            if (_isPressed)
+            if (_button.IsPressed)
                 return _pressedState;
 
             return _normalState;

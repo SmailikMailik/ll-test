@@ -8,6 +8,7 @@ namespace LLEditor.UI.VisualStates
     internal sealed class VisualStateIdDrawer : PropertyDrawer
     {
         private const string EmptyOption = "Choose State...";
+        private static readonly GUIContent[] _emptyOptions = { new(EmptyOption) };
 
         public override void OnGUI(
             Rect position,
@@ -22,14 +23,13 @@ namespace LLEditor.UI.VisualStates
             if (valueProperty == null || stateSet == null || stateSet.States.Count == 0)
             {
                 using (new EditorGUI.DisabledScope(true))
-                    EditorGUI.Popup(position, label, 0, new[] { new GUIContent(EmptyOption) });
+                    EditorGUI.Popup(position, label, 0, _emptyOptions);
 
                 EditorGUI.EndProperty();
                 return;
             }
 
             var options = new GUIContent[stateSet.States.Count + 1];
-            var identifiers = new VisualStateId[options.Length];
             var selectedIndex = 0;
 
             options[0] = new GUIContent(EmptyOption);
@@ -40,7 +40,6 @@ namespace LLEditor.UI.VisualStates
                 var optionIndex = index + 1;
 
                 options[optionIndex] = new GUIContent(state.Name);
-                identifiers[optionIndex] = state.Id;
 
                 if (state.Id.ToString() == valueProperty.stringValue)
                     selectedIndex = optionIndex;
@@ -52,15 +51,17 @@ namespace LLEditor.UI.VisualStates
             var nextIndex = EditorGUI.Popup(position, label, selectedIndex, options);
 
             if (EditorGUI.EndChangeCheck())
-                valueProperty.stringValue = identifiers[nextIndex].ToString();
+            {
+                valueProperty.stringValue = nextIndex == 0
+                    ? string.Empty
+                    : stateSet.States[nextIndex - 1].Id.ToString();
+            }
 
             EditorGUI.showMixedValue = false;
             EditorGUI.EndProperty();
         }
 
-        public override float GetPropertyHeight(
-            SerializedProperty property,
-            GUIContent label) =>
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) =>
             EditorGUIUtility.singleLineHeight;
 
         private static VisualStateSet ResolveStateSet(SerializedObject serializedObject)

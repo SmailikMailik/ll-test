@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace LL.UI.Controls.Buttons
 {
+    [DisallowMultipleComponent]
     [AddComponentMenu("LL/UI/Controls/Interactive Button")]
     [HideMonoScript]
     internal sealed class InteractiveButton :

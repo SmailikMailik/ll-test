@@ -11,8 +11,6 @@ namespace LL.UI.VisualStates
         [Required]
         [SerializeField] private VisualStateController _controller;
 
-        protected VisualStateController Controller => _controller;
-
         private bool _isStarted;
 
         private void Start()
@@ -49,12 +47,12 @@ namespace LL.UI.VisualStates
             if (isActiveAndEnabled is false)
                 return;
 
-            ApplyState(stateChange.CurrentState, stateChange.Instantly);
+            ApplyState(stateChange.State, stateChange.Instantly);
         }
 
         protected abstract void CaptureInitialValue();
         protected abstract void ApplyState(VisualStateId state, bool instantly);
-        protected abstract void StopTransition();
+        protected virtual void StopTransition() { }
         protected abstract void RestoreInitialValue();
 
         protected bool TryGetStateValue<TValue>(
@@ -126,7 +124,7 @@ namespace LL.UI.VisualStates
             if (_controller != null)
                 return;
 
-            var controllers = GetComponents<VisualStateController>();
+            var controllers = GetComponentsInParent<VisualStateController>(true);
 
             if (controllers.Length == 1)
                 _controller = controllers[0];
@@ -136,10 +134,12 @@ namespace LL.UI.VisualStates
         [Serializable]
         internal abstract class StateValue
         {
-            [HideInInspector] [SerializeField] private VisualStateId _state;
+            [HideInInspector]
+            [SerializeField] private VisualStateId _state;
 
-            [ReadOnly] [TableColumnWidth(160)] [SerializeField]
-            private string _stateName;
+            [ReadOnly]
+            [TableColumnWidth(160)]
+            [SerializeField] private string _stateName;
 
             internal VisualStateId State => _state;
 
