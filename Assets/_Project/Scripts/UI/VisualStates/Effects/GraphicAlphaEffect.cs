@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using DG.Tweening;
-using LL.UI.VisualStates.Core;
 using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -26,7 +25,7 @@ namespace LL.UI.VisualStates.Effects
                 _initialAlpha = _target.color.a;
         }
 
-        protected override void ApplyState(VisualStateId state, bool instantly)
+        protected override void ApplyState(int state, bool instantly)
         {
             if (_target == null)
                 return;
@@ -76,7 +75,9 @@ namespace LL.UI.VisualStates.Effects
         {
             _states ??= new List<AlphaStateValue>();
             var defaultAlpha = _target == null ? 1f : _target.color.a;
-            SynchronizeStateValues(_states, state => new AlphaStateValue(state, defaultAlpha));
+            SynchronizeStateValues(
+                _states,
+                (state, stateName) => new AlphaStateValue(state, stateName, defaultAlpha));
 
             foreach (var state in _states)
                 state.Clamp();

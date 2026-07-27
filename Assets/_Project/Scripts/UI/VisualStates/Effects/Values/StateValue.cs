@@ -1,5 +1,4 @@
 using System;
-using LL.UI.VisualStates.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -9,18 +8,18 @@ namespace LL.UI.VisualStates.Effects.Values
     internal abstract class StateValue
     {
         [HideInInspector]
-        [SerializeField] private VisualStateId _state;
+        [SerializeField] private int _state;
 
         [ReadOnly]
         [TableColumnWidth(160)]
         [SerializeField] private string _stateName;
 
-        internal VisualStateId State => _state;
+        internal int State => _state;
 
-        protected StateValue(VisualStateSet.StateDefinition state)
+        protected StateValue(int state, string stateName)
         {
-            _state = state.Id;
-            _stateName = state.Name;
+            _state = state;
+            _stateName = stateName;
         }
 
         internal void UpdateName(string stateName)
@@ -37,7 +36,7 @@ namespace LL.UI.VisualStates.Effects.Values
 
         internal T Value => _value;
 
-        protected StateValue(VisualStateSet.StateDefinition state, T value) : base(state)
+        protected StateValue(int state, string stateName, T value) : base(state, stateName)
         {
             _value = value;
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Cards;
 using LL.Game.Currencies;
 using LL.Saving;
 using LL.User.Core.Cards;
@@ -19,10 +20,11 @@ namespace LL.User.Persistence
         private readonly IUserWallet _wallet;
         private readonly IUserProgress _progress;
         private readonly ISaveService _saveService;
-        private readonly CardsInitialData _cards;
+        private readonly IUserCards _cards;
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<CurrencyId, int> _currencyAmounts;
+        private readonly Dictionary<CardId, int> _cardAmounts;
         private int _totalExperience;
 
         [Inject]
@@ -32,6 +34,7 @@ namespace LL.User.Persistence
             ProgressInitialData progressInitialData,
             CardsInitialData cards,
             IUserWallet wallet,
+            IUserCards userCards,
             IUserProgress progress,
             ISaveService saveService)
         {
@@ -43,14 +46,20 @@ namespace LL.User.Persistence
             if (progressInitialData == null)
                 throw new ArgumentNullException(nameof(progressInitialData));
 
-            _cards = cards ?? throw new ArgumentNullException(nameof(cards));
+            if (cards == null)
+                throw new ArgumentNullException(nameof(cards));
+
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
+            _cards = userCards ?? throw new ArgumentNullException(nameof(userCards));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
 
             _currencyAmounts = walletInitialData.Balances.ToDictionary(
                 balance => balance.Id,
                 balance => balance.Amount);
+            _cardAmounts = cards.Stacks.ToDictionary(
+                stack => stack.Id,
+                stack => stack.Amount);
             _totalExperience = progressInitialData.TotalExperience;
         }
 
@@ -62,6 +71,14 @@ namespace LL.User.Persistence
                 _subscriptions.Add(_wallet
                     .ObserveAmount(currencyId)
                     .Subscribe(value => UpdateCurrencyAndSave(currencyId, value)));
+            }
+
+            foreach (var id in _cardAmounts.Keys.ToArray())
+            {
+                var cardId = id;
+                _subscriptions.Add(_cards
+                    .ObserveAmount(cardId)
+                    .Subscribe(value => UpdateCardAndSave(cardId, value)));
             }
 
             _subscriptions.Add(_progress.TotalExperience
@@ -94,13 +111,22 @@ namespace LL.User.Persistence
             Save();
         }
 
+        private void UpdateCardAndSave(CardId id, int value)
+        {
+            if (_cardAmounts[id] == value)
+                return;
+
+            _cardAmounts[id] = value;
+            Save();
+        }
+
         private void Save()
         {
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
                 _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)),
                 _totalExperience,
-                _cards);
+                _cardAmounts.Select(pair => new CardStack(pair.Key, pair.Value)));
 
             _saveService.TrySave(UserInitialDataLoader.SaveKey, data);
         }

@@ -11,6 +11,7 @@ using LL.UI.Windows;
 using LL.UI.Windows.Configuration;
 using LL.User.Configuration;
 using LL.User.Core;
+using LL.User.Core.Cards;
 using LL.User.Core.Progress;
 using LL.User.Core.Wallet;
 using LL.User.Persistence;
@@ -76,6 +77,7 @@ namespace LL.DI
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Cards, Lifetime.Singleton);
 
             builder.Register<UserWallet>(Lifetime.Singleton).As<IUserWallet>();
+            builder.Register<UserCards>(Lifetime.Singleton).As<IUserCards>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();

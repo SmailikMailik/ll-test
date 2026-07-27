@@ -1,3 +1,4 @@
+using LL.UI.VisualStates.Sources;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -15,63 +16,51 @@ namespace LL.UI.Controls.Buttons
         IPointerUpHandler,
         IPointerExitHandler
     {
-        internal Observable<Unit> Clicked => _clicked;
-        internal Observable<bool> Pressed => _pressed;
-        internal Observable<bool> Interactable => _interactable;
+        [Required]
+        [SerializeField] private InteractiveStateSource _stateSource;
 
-        internal bool IsPressed => _pressed.Value;
-        internal bool IsInteractable => _interactable.Value;
+        internal Observable<Unit> Clicked => _clicked;
 
         private readonly Subject<Unit> _clicked = new();
-        private readonly ReactiveProperty<bool> _pressed = new();
-        private readonly ReactiveProperty<bool> _interactable = new(true);
 
-        public void OnPointerClick(PointerEventData eventData)
+        public void OnPointerClick(PointerEventData _)
         {
-            if (CanInteract(eventData))
+            if (CanInteract())
                 _clicked.OnNext(Unit.Default);
         }
 
-        public void OnPointerDown(PointerEventData eventData)
+        public void OnPointerDown(PointerEventData _)
         {
-            if (CanInteract(eventData))
-                _pressed.Value = true;
+            if (CanInteract())
+                _stateSource.Press();
         }
 
-        public void OnPointerUp(PointerEventData eventData)
+        public void OnPointerUp(PointerEventData _)
         {
-            if (eventData.button == PointerEventData.InputButton.Left)
-                _pressed.Value = false;
+            _stateSource.Release();
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        public void OnPointerExit(PointerEventData _)
         {
-            _pressed.Value = false;
+            _stateSource.Release();
         }
 
         private void OnDisable()
         {
-            _pressed.Value = false;
+            _stateSource.Release();
         }
 
         private void OnDestroy()
         {
             _clicked.Dispose();
-            _pressed.Dispose();
-            _interactable.Dispose();
         }
 
         internal void SetInteractable(bool isInteractable)
         {
-            _interactable.Value = isInteractable;
-
-            if (isInteractable is false)
-                _pressed.Value = false;
+            _stateSource.SetInteractable(isInteractable);
         }
 
-        private bool CanInteract(PointerEventData eventData) =>
-            eventData.button == PointerEventData.InputButton.Left &&
-            isActiveAndEnabled &&
-            _interactable.Value;
+        private bool CanInteract() =>
+            isActiveAndEnabled && _stateSource.IsInteractable;
     }
 }

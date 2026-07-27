@@ -183,8 +183,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7358197253307477832}
   - component: {fileID: 6851943331318094373}
-  - component: {fileID: 309079728650118920}
-  - component: {fileID: 7658717994411403096}
+  - component: {fileID: 8428503926411970011}
   m_Layer: 5
   m_Name: P_Button_03
   m_TagString: Untagged
@@ -224,7 +223,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13a5df11b5cd49bd90028e5ee77d64b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &309079728650118920
+  _stateSource: {fileID: 8428503926411970011}
+--- !u!114 &8428503926411970011
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -233,31 +233,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2723066229655186564}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74f08adb8a554dbca000278264bd21a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _controller: {fileID: 7658717994411403096}
-  _normalState:
-    _value: 114157eea9574bc380ddfa1ee1957266
-  _pressedState:
-    _value: b64e6e353cda4e8ab517ca12c0c3ceb9
-  _disabledState:
-    _value: f89281626c6045b7acdc5415a2c8e9cd
---- !u!114 &7658717994411403096
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2723066229655186564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1256303c75b44b8680d6dd7abd57af46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateSet: {fileID: 11400000, guid: d3768b531c6e28a4ea8540effeae94cf, type: 2}
-  _initialState:
-    _value: 114157eea9574bc380ddfa1ee1957266
+  m_Script: {fileID: 11500000, guid: ad43ca90c2434655a2f97bfd6680ae4c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &4120674758110926611
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,21 +370,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37d0e63950aa4ee6b35318695b2ca082, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _controller: {fileID: 7658717994411403096}
+  _source: {fileID: 8428503926411970011}
   _transitionSeconds: 0.08
   _ease: 6
   _target: {fileID: 2231653752593881111}
   _states:
-  - _state:
-      _value: 114157eea9574bc380ddfa1ee1957266
+  - _state: 0
     _stateName: Normal
     _value: {x: 1, y: 1, z: 1}
-  - _state:
-      _value: b64e6e353cda4e8ab517ca12c0c3ceb9
+  - _state: 1
     _stateName: Pressed
     _value: {x: 1.05, y: 1.05, z: 1.05}
-  - _state:
-      _value: f89281626c6045b7acdc5415a2c8e9cd
+  - _state: 2
     _stateName: Disabled
     _value: {x: 1, y: 1, z: 1}
 --- !u!114 &3931049387857354584
@@ -421,21 +396,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6030510d6b4b4ca284258642ecff50df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _controller: {fileID: 7658717994411403096}
+  _source: {fileID: 8428503926411970011}
   _transitionSeconds: 0.08
   _ease: 6
   _target: {fileID: 7037813788205195304}
   _states:
-  - _state:
-      _value: 114157eea9574bc380ddfa1ee1957266
+  - _state: 0
     _stateName: Normal
     _value: 1
-  - _state:
-      _value: b64e6e353cda4e8ab517ca12c0c3ceb9
+  - _state: 1
     _stateName: Pressed
     _value: 1
-  - _state:
-      _value: f89281626c6045b7acdc5415a2c8e9cd
+  - _state: 2
     _stateName: Disabled
     _value: 0.5
 --- !u!114 &4664974932589829248
@@ -450,19 +422,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c651c7418b3a4138b983a20a111b855f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _controller: {fileID: 7658717994411403096}
+  _source: {fileID: 8428503926411970011}
   _target: {fileID: 2600983914219750658}
   _states:
-  - _state:
-      _value: 114157eea9574bc380ddfa1ee1957266
+  - _state: 0
     _stateName: Normal
     _value: 0
-  - _state:
-      _value: b64e6e353cda4e8ab517ca12c0c3ceb9
+  - _state: 1
     _stateName: Pressed
     _value: 0
-  - _state:
-      _value: f89281626c6045b7acdc5415a2c8e9cd
+  - _state: 2
     _stateName: Disabled
     _value: 1
 --- !u!1 &5167905191529593985

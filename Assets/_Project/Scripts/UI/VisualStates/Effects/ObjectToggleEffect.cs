@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using LL.UI.VisualStates.Core;
 using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -26,7 +25,7 @@ namespace LL.UI.VisualStates.Effects
                 _initialActive = _target.activeSelf;
         }
 
-        protected override void ApplyState(VisualStateId state, bool instantly)
+        protected override void ApplyState(int state, bool instantly)
         {
             if (_target == null || IsValidTarget(_target) is false)
                 return;
@@ -55,7 +54,9 @@ namespace LL.UI.VisualStates.Effects
         {
             _states ??= new List<ActiveStateValue>();
             var defaultActive = _target != null && _target.activeSelf;
-            SynchronizeStateValues(_states, state => new ActiveStateValue(state, defaultActive));
+            SynchronizeStateValues(
+                _states,
+                (state, stateName) => new ActiveStateValue(state, stateName, defaultActive));
         }
 #endif
 
@@ -66,7 +67,11 @@ namespace LL.UI.VisualStates.Effects
         [Serializable]
         private sealed class ActiveStateValue : StateValue<bool>
         {
-            internal ActiveStateValue(VisualStateSet.StateDefinition state, bool active) : base(state, active) { }
+            internal ActiveStateValue(
+                int state,
+                string stateName,
+                bool active) :
+                base(state, stateName, active) { }
         }
     }
 }

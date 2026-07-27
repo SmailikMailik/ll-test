@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using LL.UI.VisualStates.Core;
 using LL.UI.VisualStates.Effects.Values;
+using LL.UI.VisualStates.Sources;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -11,28 +11,41 @@ namespace LL.UI.VisualStates.Effects
     internal abstract class VisualStateEffect : MonoBehaviour
     {
         [Required]
-        [SerializeField] private VisualStateController _controller;
+        [SerializeField] private VisualStateSource _source;
 
         private bool _isStarted;
 
         private void Start()
         {
-            if (_controller == null)
+            if (_source == null)
             {
+                Debug.LogError(
+                    $"{GetType().Name} requires a {nameof(VisualStateSource)}.",
+                    this);
                 enabled = false;
                 return;
             }
 
             CaptureInitialValue();
             _isStarted = true;
-            ApplyState(_controller.CurrentState, true);
-            _controller.StateChanged.Subscribe(OnStateChanged).AddTo(this);
+
+            var applyInstantly = true;
+
+            _source.State
+                .Subscribe(state =>
+                {
+                    if (isActiveAndEnabled)
+                        ApplyState(state, applyInstantly);
+
+                    applyInstantly = false;
+                })
+                .AddTo(this);
         }
 
         private void OnEnable()
         {
             if (_isStarted)
-                ApplyState(_controller.CurrentState, true);
+                ApplyState(_source.State.Value, true);
         }
 
         private void OnDisable()
@@ -44,22 +57,14 @@ namespace LL.UI.VisualStates.Effects
             RestoreInitialValue();
         }
 
-        private void OnStateChanged(VisualStateController.StateChange stateChange)
-        {
-            if (isActiveAndEnabled is false)
-                return;
-
-            ApplyState(stateChange.State, stateChange.Instantly);
-        }
-
         protected abstract void CaptureInitialValue();
-        protected abstract void ApplyState(VisualStateId state, bool instantly);
+        protected abstract void ApplyState(int state, bool instantly);
         protected virtual void StopTransition() { }
         protected abstract void RestoreInitialValue();
 
         protected bool TryGetStateValue<TValue>(
             IReadOnlyList<TValue> values,
-            VisualStateId state,
+            int state,
             out TValue stateValue)
             where TValue : StateValue
         {
@@ -82,23 +87,28 @@ namespace LL.UI.VisualStates.Effects
 #if UNITY_EDITOR
         protected virtual void Reset()
         {
-            TryAssignController();
+            TryAssignSource();
         }
 
         protected virtual void OnValidate()
         {
-            TryAssignController();
+            TryAssignSource();
         }
 
         protected void SynchronizeStateValues<TValue>(
             List<TValue> values,
-            Func<VisualStateSet.StateDefinition, TValue> createValue)
+            Func<int, string, TValue> createValue)
             where TValue : StateValue
         {
-            if (_controller == null || _controller.StateSet == null || values == null)
+            if (_source == null || values == null)
                 return;
 
-            var existingValues = new Dictionary<VisualStateId, TValue>();
+            var stateType = _source.StateType;
+
+            if (stateType == null || stateType.IsEnum is false)
+                return;
+
+            var existingValues = new Dictionary<int, TValue>();
 
             foreach (var value in values)
             {
@@ -108,28 +118,28 @@ namespace LL.UI.VisualStates.Effects
 
             values.Clear();
 
-            foreach (var state in _controller.StateSet.States)
+            foreach (var value in Enum.GetValues(stateType))
             {
-                if (state == null)
-                    continue;
+                var state = Convert.ToInt32(value);
+                var stateName = Enum.GetName(stateType, value) ?? state.ToString();
 
-                if (existingValues.TryGetValue(state.Id, out var value) is false)
-                    value = createValue(state);
+                if (existingValues.TryGetValue(state, out var stateValue) is false)
+                    stateValue = createValue(state, stateName);
 
-                value.UpdateName(state.Name);
-                values.Add(value);
+                stateValue.UpdateName(stateName);
+                values.Add(stateValue);
             }
         }
 
-        private void TryAssignController()
+        private void TryAssignSource()
         {
-            if (_controller != null)
+            if (_source != null)
                 return;
 
-            var controllers = GetComponentsInParent<VisualStateController>(true);
+            var sources = GetComponentsInParent<VisualStateSource>(true);
 
-            if (controllers.Length == 1)
-                _controller = controllers[0];
+            if (sources.Length == 1)
+                _source = sources[0];
         }
 #endif
     }

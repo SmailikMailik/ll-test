@@ -38,14 +38,14 @@ namespace LL.User.Persistence
                 data.Identity,
                 data.Wallet.Balances,
                 data.Progress.TotalExperience,
-                data.Cards);
+                data.Cards.Stacks);
         }
 
         internal static UserSaveData ToSaveData(
             UserIdentity identity,
             IEnumerable<CurrencyBalance> balances,
             int totalExperience,
-            CardsInitialData cards)
+            IEnumerable<CardStack> cards)
         {
             if (identity == null)
                 throw new ArgumentNullException(nameof(identity));
@@ -63,7 +63,8 @@ namespace LL.User.Persistence
                     .Where(balance => balance != null)
                     .Select(balance => new CurrencySaveData(balance.Id.Value, balance.Amount))
                     .ToArray(),
-                cards.Stacks
+                cards
+                    .Where(stack => stack != null)
                     .Select(stack => new CardSaveData(stack.Id.Value, stack.Amount))
                     .ToArray(),
                 totalExperience);

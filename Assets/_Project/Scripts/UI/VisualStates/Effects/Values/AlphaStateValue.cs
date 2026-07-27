@@ -1,5 +1,4 @@
 using System;
-using LL.UI.VisualStates.Core;
 using UnityEngine;
 
 namespace LL.UI.VisualStates.Effects.Values
@@ -7,7 +6,8 @@ namespace LL.UI.VisualStates.Effects.Values
     [Serializable]
     internal sealed class AlphaStateValue : StateValue<float>
     {
-        internal AlphaStateValue(VisualStateSet.StateDefinition state, float alpha) : base(state, alpha) { }
+        internal AlphaStateValue(int state, string stateName, float alpha) :
+            base(state, stateName, alpha) { }
 
         internal void Clamp()
         {
