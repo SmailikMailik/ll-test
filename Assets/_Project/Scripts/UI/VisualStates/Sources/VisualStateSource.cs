@@ -1,6 +1,10 @@
 using System;
 using R3;
 using UnityEngine;
+#if UNITY_EDITOR
+using Sirenix.OdinInspector;
+using UnityEditor;
+#endif
 
 namespace LL.UI.VisualStates.Sources
 {
@@ -20,5 +24,36 @@ namespace LL.UI.VisualStates.Sources
         {
             State.Dispose();
         }
+
+#if UNITY_EDITOR
+        [OnInspectorGUI]
+        private void DrawTestButtons()
+        {
+            var isPlaying = Application.isPlaying;
+
+            if (isPlaying is false)
+            {
+                EditorGUILayout.HelpBox(
+                    "State testing is available only in Play Mode.",
+                    MessageType.Info);
+            }
+
+            using (new EditorGUI.DisabledScope(isPlaying is false))
+            {
+                GUILayout.BeginHorizontal();
+
+                foreach (var state in Enum.GetValues(StateType))
+                {
+                    var stateValue = Convert.ToInt32(state);
+                    var stateName = Enum.GetName(StateType, state) ?? stateValue.ToString();
+
+                    if (GUILayout.Button(stateName))
+                        State.Value = stateValue;
+                }
+
+                GUILayout.EndHorizontal();
+            }
+        }
+#endif
     }
 }
