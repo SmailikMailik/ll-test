@@ -6,3 +6,4 @@
 - Place each C# attribute on its own line; keep `[SerializeField]` inline with the field declaration.
 - Declare serialized fields first in a type, without `[Required]` by default; place constants immediately after them.
 - C# namespaces must mirror the folder structure within their containing assembly.
+- Write commit messages in concise English imperative form, starting with a capital letter, without conventional prefixes such as `feat:` or `refactor:`, and without a trailing period.

@@ -13,10 +13,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VContainer;
 
-namespace LL.UI.Items
+namespace LL.UI.Windows.Views.Upgrade.Cards
 {
     [DisallowMultipleComponent]
-    internal sealed class CardView : MonoBehaviour, IPointerClickHandler
+    internal sealed class UpgradeCardView : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private SelectionStateSource _stateSource;
 
@@ -30,17 +30,16 @@ namespace LL.UI.Items
         internal CardId Id { get; private set; }
         internal int AvailableAmount { get; private set; }
 
-        private IUserCards _userCards;
-        private IIconProvider<CardId> _iconProvider;
+        internal Observable<Unit> Clicked => _clicked;
+        internal Observable<int> AvailableAmountChanged => _availableAmountChanged;
 
         private readonly Subject<Unit> _clicked = new();
         private readonly Subject<int> _availableAmountChanged = new();
 
+        private IUserCards _userCards;
+        private IIconProvider<CardId> _iconProvider;
         private int _plannedAmount;
         private bool _isInitialized;
-
-        internal Observable<Unit> Clicked => _clicked;
-        internal Observable<int> AvailableAmountChanged => _availableAmountChanged;
 
         [Inject]
         private void Construct(
@@ -54,7 +53,7 @@ namespace LL.UI.Items
         internal void Initialize(CardId id)
         {
             if (_isInitialized)
-                throw new InvalidOperationException($"{nameof(CardView)} is already initialized.");
+                throw new InvalidOperationException($"{nameof(UpgradeCardView)} is already initialized.");
 
             if (id.IsEmpty)
                 throw new ArgumentException("Card Id cannot be empty.", nameof(id));

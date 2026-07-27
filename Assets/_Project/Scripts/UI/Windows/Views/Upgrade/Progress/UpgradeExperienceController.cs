@@ -2,24 +2,20 @@ using System;
 using LL.Game.Ranks;
 using LL.UI.Formatting;
 using LL.User.Core.Progress;
-using TMPro;
 using UnityEngine;
 using VContainer;
 
-namespace LL.UI.Windows.Views.Upgrade
+namespace LL.UI.Windows.Views.Upgrade.Progress
 {
     [DisallowMultipleComponent]
-    internal sealed class UpgradeProgressView : MonoBehaviour
+    internal sealed class UpgradeExperienceController : MonoBehaviour
     {
-        [SerializeField] private PredictedProgressBar _bar;
-        [SerializeField] private TMP_Text _rankLabel;
-        [SerializeField] private TMP_Text _experienceLabel;
-        [SerializeField] private TMP_Text _addedExperienceLabel;
+        [SerializeField] private UpgradeExperienceView _view;
 
         private const int MinimumAmount = 0;
 
         internal bool CanApplyPendingExperience =>
-            _pendingExperience > 0 &&
+            _pendingExperience > MinimumAmount &&
             _userProgress.CurrentTotalExperience <= int.MaxValue - _pendingExperience;
 
         private IUserProgress _userProgress;
@@ -65,13 +61,13 @@ namespace LL.UI.Windows.Views.Upgrade
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
             _pendingExperience = (int)pendingExperience;
-            Refresh();
+            RefreshView();
         }
 
         internal void ClearPreview()
         {
-            _pendingExperience = 0;
-            Refresh();
+            _pendingExperience = MinimumAmount;
+            RefreshView();
         }
 
         internal bool TryApplyPendingExperience()
@@ -86,20 +82,21 @@ namespace LL.UI.Windows.Views.Upgrade
             return true;
         }
 
-        private void Refresh()
+        private void RefreshView()
         {
             var previewExperience = _baseExperience + _pendingExperience;
             var progress = _rankProgression.GetProgress(previewExperience);
-
-            _rankLabel.text = progress.Rank.ToString();
-            _experienceLabel.text = progress.HasNextRank
+            var experience = progress.HasNextRank
                 ? TextFormatter.Progress(progress.TotalExperience, progress.NextRankExperience)
                 : TextFormatter.Number(progress.TotalExperience);
-            _addedExperienceLabel.text = _pendingExperience > 0
+            var addedExperience = _pendingExperience > MinimumAmount
                 ? $"+ {TextFormatter.Number(_pendingExperience)}"
                 : string.Empty;
 
-            _bar.SetProgress(
+            _view.Show(
+                progress.Rank.ToString(),
+                experience,
+                addedExperience,
                 progress.GetNormalizedExperience(_baseExperience),
                 progress.NormalizedExperience);
         }

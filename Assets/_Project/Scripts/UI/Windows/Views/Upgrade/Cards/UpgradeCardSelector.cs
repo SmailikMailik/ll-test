@@ -1,11 +1,10 @@
 using System;
 using LL.Game.Cards;
-using LL.UI.Items;
 using R3;
 using UnityEngine;
 using VContainer;
 
-namespace LL.UI.Windows.Views.Upgrade
+namespace LL.UI.Windows.Views.Upgrade.Cards
 {
     [DisallowMultipleComponent]
     internal sealed class UpgradeCardSelector : MonoBehaviour
@@ -25,7 +24,7 @@ namespace LL.UI.Windows.Views.Upgrade
         private readonly Subject<Unit> _selectionChanged = new();
         private readonly Subject<int> _selectedAmountChanged = new();
         private CardCatalog _cardCatalog;
-        private CardView _selectedView;
+        private UpgradeCardView _selectedView;
         private bool _isInitialized;
 
         [Inject]
@@ -87,7 +86,7 @@ namespace LL.UI.Windows.Views.Upgrade
             _selectedView?.SetPlannedAmount(amount);
         }
 
-        private void Select(CardView card)
+        private void Select(UpgradeCardView card)
         {
             if (card.AvailableAmount <= MinimumAmount ||
                 _cardCatalog.TryGetCard(card.Id, out var cardData) is false)
@@ -107,7 +106,7 @@ namespace LL.UI.Windows.Views.Upgrade
             _selectionChanged.OnNext(Unit.Default);
         }
 
-        private void OnAmountChanged(CardView card)
+        private void OnAmountChanged(UpgradeCardView card)
         {
             if (card != _selectedView)
                 return;
@@ -128,10 +127,10 @@ namespace LL.UI.Windows.Views.Upgrade
     [Serializable]
     internal sealed class UpgradeCardSlot
     {
-        [SerializeField] private CardView _view;
+        [SerializeField] private UpgradeCardView _view;
         [SerializeField] private string _cardId;
 
-        internal CardView View => _view;
+        internal UpgradeCardView View => _view;
         internal CardId Id => new(_cardId);
     }
 }

@@ -219,6 +219,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7057803601394395058}
   - component: {fileID: 992138905137388495}
+  - component: {fileID: 867200000000000001}
   m_Layer: 5
   m_Name: Container_Progress
   m_TagString: Untagged
@@ -266,6 +267,19 @@ MonoBehaviour:
   _rankLabel: {fileID: 2233690373681334854}
   _experienceLabel: {fileID: 4271382970874411002}
   _addedExperienceLabel: {fileID: 1815875750463363878}
+--- !u!114 &867200000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 617808988016232607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f62d4be085694e3fa7c1289d4b7632ce, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  _view: {fileID: 992138905137388495}
 --- !u!1 &955801753724341750
 GameObject:
   m_ObjectHideFlags: 0
@@ -2023,10 +2037,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dea8290e1ded4bd99896e6f25f7c42f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _progressView: {fileID: 992138905137388495}
+  _experienceController: {fileID: 867200000000000001}
   _cardSelector: {fileID: 7412463965733997236}
   _amountStepper: {fileID: 1788652015322902590}
   _useButton: {fileID: 9106313432551566551}
+  _resetButton: {fileID: 866100000000000001}
 --- !u!1001 &2411363113502308082
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3722,3 +3737,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &866100000000000001 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6851943331318094373, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
+  m_PrefabInstance: {fileID: 3913345903794511139}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13a5df11b5cd49bd90028e5ee77d64b0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

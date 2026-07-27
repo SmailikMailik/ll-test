@@ -1,5 +1,8 @@
 using System;
 using LL.UI.Controls.Buttons;
+using LL.UI.Controls.Steppers;
+using LL.UI.Windows.Views.Upgrade.Cards;
+using LL.UI.Windows.Views.Upgrade.Progress;
 using LL.User.Core.Cards;
 using R3;
 using UnityEngine;
@@ -9,10 +12,11 @@ namespace LL.UI.Windows.Views.Upgrade
 {
     internal sealed class UpgradeWindow : Window<UpgradeWindowParameters>
     {
-        [SerializeField] private UpgradeProgressView _progressView;
+        [SerializeField] private UpgradeExperienceController _experienceController;
         [SerializeField] private UpgradeCardSelector _cardSelector;
-        [SerializeField] private UpgradeAmountStepper _amountStepper;
+        [SerializeField] private AmountStepper _amountStepper;
         [SerializeField] private InteractiveButton _useButton;
+        [SerializeField] private InteractiveButton _resetButton;
 
         private const int AmountDelta = 1;
         private const int MinimumAmount = 0;
@@ -30,17 +34,15 @@ namespace LL.UI.Windows.Views.Upgrade
         protected override void OnShow()
         {
             InitializeComponents();
-            _progressView.ResetPreview();
-            _amountStepper.ResetValue();
-            _cardSelector.ResetSelection();
-            RefreshUseButton();
+            _experienceController.ResetPreview();
+            ResetPendingChanges();
         }
 
         protected override void OnHide()
         {
             _cardSelector.SetPlannedAmount(MinimumAmount);
             _amountStepper.ResetValue();
-            _progressView.ClearPreview();
+            _experienceController.ClearPreview();
         }
 
         private void InitializeComponents()
@@ -64,6 +66,17 @@ namespace LL.UI.Windows.Views.Upgrade
             _useButton.Clicked
                 .Subscribe(_ => ApplyCards())
                 .AddTo(this);
+            _resetButton.Clicked
+                .Subscribe(_ => ResetPendingChanges())
+                .AddTo(this);
+        }
+
+        private void ResetPendingChanges()
+        {
+            _experienceController.ClearPreview();
+            _amountStepper.ResetValue();
+            _cardSelector.ResetSelection();
+            RefreshUseButton();
         }
 
         private void OnSelectionChanged()
@@ -72,7 +85,7 @@ namespace LL.UI.Windows.Views.Upgrade
                 return;
 
             _cardSelector.SetPlannedAmount(MinimumAmount);
-            _progressView.ClearPreview();
+            _experienceController.ClearPreview();
             _amountStepper.ResetValue(GetMaximumAmount());
             RefreshUseButton();
         }
@@ -92,13 +105,13 @@ namespace LL.UI.Windows.Views.Upgrade
 
             if (_cardSelector.HasSelection)
             {
-                _progressView.SetPendingItems(
+                _experienceController.SetPendingItems(
                     amount,
                     _cardSelector.SelectedCard.ExperienceAmount);
             }
             else
             {
-                _progressView.ClearPreview();
+                _experienceController.ClearPreview();
             }
 
             RefreshUseButton();
@@ -121,7 +134,7 @@ namespace LL.UI.Windows.Views.Upgrade
                 return;
             }
 
-            if (_progressView.TryApplyPendingExperience() is false)
+            if (_experienceController.TryApplyPendingExperience() is false)
                 _userCards.TryAdd(cardId, amount);
 
             _isApplying = false;
@@ -132,7 +145,7 @@ namespace LL.UI.Windows.Views.Upgrade
         {
             _cardSelector.SetPlannedAmount(MinimumAmount);
             _amountStepper.ResetValue(GetMaximumAmount());
-            _progressView.ClearPreview();
+            _experienceController.ClearPreview();
             RefreshUseButton();
         }
 
@@ -143,7 +156,8 @@ namespace LL.UI.Windows.Views.Upgrade
 
             return Math.Min(
                 _cardSelector.SelectedAmount,
-                _progressView.GetMaximumApplicableAmount(_cardSelector.SelectedCard.ExperienceAmount));
+                _experienceController.GetMaximumApplicableAmount(
+                    _cardSelector.SelectedCard.ExperienceAmount));
         }
 
         private void RefreshUseButton()
@@ -155,7 +169,7 @@ namespace LL.UI.Windows.Views.Upgrade
             _cardSelector.HasSelection &&
             _amountStepper.Value > MinimumAmount &&
             _amountStepper.Value <= _cardSelector.SelectedAmount &&
-            _progressView.CanApplyPendingExperience;
+            _experienceController.CanApplyPendingExperience;
     }
 
     internal sealed class UpgradeWindowParameters : IWindowParameters { }

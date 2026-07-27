@@ -5,10 +5,10 @@ using R3;
 using TMPro;
 using UnityEngine;
 
-namespace LL.UI.Windows.Views.Upgrade
+namespace LL.UI.Controls.Steppers
 {
     [DisallowMultipleComponent]
-    internal sealed class UpgradeAmountStepper : MonoBehaviour
+    internal sealed class AmountStepper : MonoBehaviour
     {
         [SerializeField] private InteractiveButton _decreaseButton;
         [SerializeField] private TMP_Text _decreaseButtonLabel;
@@ -18,7 +18,7 @@ namespace LL.UI.Windows.Views.Upgrade
 
         [SerializeField] private TMP_Text _valueLabel;
 
-        private const int MinimumAmount = 0;
+        private const int Minimum = 0;
 
         internal int Value { get; private set; }
         internal Observable<int> ValueChanged => _valueChanged;
@@ -31,7 +31,7 @@ namespace LL.UI.Windows.Views.Upgrade
         internal void Initialize(int delta)
         {
             if (_isInitialized)
-                throw new InvalidOperationException($"{nameof(UpgradeAmountStepper)} is already initialized.");
+                throw new InvalidOperationException($"{nameof(AmountStepper)} is already initialized.");
 
             if (delta <= 0)
                 throw new ArgumentOutOfRangeException(nameof(delta));
@@ -49,16 +49,16 @@ namespace LL.UI.Windows.Views.Upgrade
             _valueChanged.Dispose();
         }
 
-        internal void ResetValue(int maximum = MinimumAmount)
+        internal void ResetValue(int maximum = Minimum)
         {
-            _maximum = Math.Max(MinimumAmount, maximum);
-            SetValue(MinimumAmount);
+            _maximum = Math.Max(Minimum, maximum);
+            SetValue(Minimum);
         }
 
         internal void SetMaximum(int maximum)
         {
-            _maximum = Math.Max(MinimumAmount, maximum);
-            SetValue(Math.Clamp(Value, MinimumAmount, _maximum));
+            _maximum = Math.Max(Minimum, maximum);
+            SetValue(Math.Clamp(Value, Minimum, _maximum));
         }
 
         private void InitializeButton(
@@ -103,7 +103,7 @@ namespace LL.UI.Windows.Views.Upgrade
         private bool CanChangeValue(int delta) => delta switch
         {
             > 0 => Value <= _maximum - delta,
-            < 0 => Value >= MinimumAmount - delta,
+            < 0 => Value >= Minimum - delta,
             _ => false
         };
     }
