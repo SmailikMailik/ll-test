@@ -9,9 +9,9 @@ namespace LL.UI.Formatting
     {
         private static readonly Dictionary<CurrencyId, string> _currencySprites = new()
         {
-            [CurrencyIds.Soft] = TextSprites.SoftCurrency,
-            [CurrencyIds.Hard] = TextSprites.HardCurrency,
-            [CurrencyIds.MasterPoint] = TextSprites.MasterPoint
+            [CurrencyIds.Soft] = TextSprites.Cash,
+            [CurrencyIds.Hard] = TextSprites.Gold,
+            [CurrencyIds.MasterPoint] = TextSprites.MasterPoints
         };
 
         private static readonly NumberFormatInfo _numberFormat = new()
