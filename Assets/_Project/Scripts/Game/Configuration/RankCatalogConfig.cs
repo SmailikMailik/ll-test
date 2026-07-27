@@ -12,7 +12,7 @@ namespace LL.Game.Configuration
     {
         internal const string CreationPath = "LL/Game Data/Rank Catalog";
 
-        [InfoBox("Total accumulated experience required to reach each rank.")]
+        [InfoBox("Total accumulated experience required to unlock promotion to each rank.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private RankThresholdEntry[] _rankThresholds;
 

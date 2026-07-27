@@ -1,4 +1,5 @@
 using System;
+using LL.Game.Ranks;
 using LL.Saving;
 using LL.User.Core;
 using VContainer;
@@ -11,14 +12,17 @@ namespace LL.User.Persistence
 
         private readonly IDefaultDataLoader<UserInitialData> _defaults;
         private readonly ISaveService _saveService;
+        private readonly IRankProgression _rankProgression;
 
         [Inject]
         internal UserInitialDataLoader(
             IDefaultDataLoader<UserInitialData> defaults,
-            ISaveService saveService)
+            ISaveService saveService,
+            IRankProgression rankProgression)
         {
             _defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
+            _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
         }
 
         public UserInitialData Load()
@@ -27,7 +31,8 @@ namespace LL.User.Persistence
                 return UserSaveDataMapper.ToInitialData(savedData);
 
             var defaultData = _defaults.Load();
-            _saveService.TrySave(SaveKey, UserSaveDataMapper.ToSaveData(defaultData));
+            var initialRank = defaultData.Progress.ResolveRank(_rankProgression);
+            _saveService.TrySave(SaveKey, UserSaveDataMapper.ToSaveData(defaultData, initialRank));
             return defaultData;
         }
     }

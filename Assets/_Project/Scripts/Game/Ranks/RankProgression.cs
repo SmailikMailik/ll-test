@@ -17,11 +17,11 @@ namespace LL.Game.Ranks
             _experienceThresholds = Normalize(loader.Load()?.ExperienceThresholds);
         }
 
-        public RankProgress GetProgress(int totalExperience)
+        public RankProgress GetProgress(int rank, int totalExperience)
         {
+            rank = Math.Clamp(rank, 1, _experienceThresholds.Count);
             totalExperience = Math.Max(0, totalExperience);
 
-            var rank = CalculateRank(totalExperience);
             var currentRankExperience = _experienceThresholds[rank - 1];
             var hasNextRank = rank < _experienceThresholds.Count;
             var nextRankExperience = hasNextRank
@@ -36,8 +36,10 @@ namespace LL.Game.Ranks
                 hasNextRank);
         }
 
-        private int CalculateRank(int totalExperience)
+        public int GetRank(int totalExperience)
         {
+            totalExperience = Math.Max(0, totalExperience);
+
             for (var index = 1; index < _experienceThresholds.Count; index++)
             {
                 if (totalExperience < _experienceThresholds[index])
@@ -45,6 +47,14 @@ namespace LL.Game.Ranks
             }
 
             return _experienceThresholds.Count;
+        }
+
+        public bool CanPromote(int rank, int totalExperience)
+        {
+            var progress = GetProgress(rank, totalExperience);
+
+            return progress.HasNextRank &&
+                   totalExperience >= progress.NextRankExperience;
         }
 
         private static IReadOnlyList<int> Normalize(IReadOnlyList<int> thresholds)

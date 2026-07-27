@@ -7,13 +7,14 @@ namespace LL.User.Persistence
     [JsonObject(MemberSerialization.OptIn)]
     internal sealed class UserSaveData
     {
-        private const int CurrentVersion = 1;
+        private const int CurrentVersion = 2;
 
         [JsonProperty] private int _version;
         [JsonProperty] private string _regionCode;
         [JsonProperty] private string _userId;
         [JsonProperty] private CurrencySaveData[] _currencies;
         [JsonProperty] private CardSaveData[] _cards;
+        [JsonProperty] private int _rank;
         [JsonProperty] private int _totalExperience;
 
         internal bool IsSupported => _version == CurrentVersion;
@@ -21,6 +22,7 @@ namespace LL.User.Persistence
         internal string UserId => _userId;
         internal IReadOnlyList<CurrencySaveData> Currencies => _currencies ?? Array.Empty<CurrencySaveData>();
         internal IReadOnlyList<CardSaveData> Cards => _cards ?? Array.Empty<CardSaveData>();
+        internal int Rank => _rank;
         internal int TotalExperience => _totalExperience;
 
         [JsonConstructor]
@@ -31,6 +33,7 @@ namespace LL.User.Persistence
             string userId,
             CurrencySaveData[] currencies,
             CardSaveData[] cards,
+            int rank,
             int totalExperience)
         {
             _version = CurrentVersion;
@@ -38,6 +41,7 @@ namespace LL.User.Persistence
             _userId = userId;
             _currencies = currencies ?? Array.Empty<CurrencySaveData>();
             _cards = cards ?? Array.Empty<CardSaveData>();
+            _rank = rank;
             _totalExperience = totalExperience;
         }
     }

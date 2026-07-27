@@ -25,13 +25,13 @@ namespace LL.User.Persistence
 
         private readonly Dictionary<CurrencyId, int> _currencyAmounts;
         private readonly Dictionary<CardId, int> _cardAmounts;
+        private int _rank;
         private int _totalExperience;
 
         [Inject]
         internal UserSaveController(
             UserIdentity identity,
             WalletInitialData walletInitialData,
-            ProgressInitialData progressInitialData,
             CardsInitialData cards,
             IUserWallet wallet,
             IUserCards userCards,
@@ -42,9 +42,6 @@ namespace LL.User.Persistence
 
             if (walletInitialData == null)
                 throw new ArgumentNullException(nameof(walletInitialData));
-
-            if (progressInitialData == null)
-                throw new ArgumentNullException(nameof(progressInitialData));
 
             if (cards == null)
                 throw new ArgumentNullException(nameof(cards));
@@ -60,7 +57,8 @@ namespace LL.User.Persistence
             _cardAmounts = cards.Stacks.ToDictionary(
                 stack => stack.Id,
                 stack => stack.Amount);
-            _totalExperience = progressInitialData.TotalExperience;
+            _rank = progress.Rank;
+            _totalExperience = progress.TotalExperience;
         }
 
         public void Initialize()
@@ -81,6 +79,8 @@ namespace LL.User.Persistence
                     .Subscribe(value => UpdateCardAndSave(cardId, value)));
             }
 
+            _subscriptions.Add(_progress.RankChanged
+                .Subscribe(value => UpdateAndSave(ref _rank, value)));
             _subscriptions.Add(_progress.TotalExperienceChanged
                 .Subscribe(value => UpdateAndSave(ref _totalExperience, value)));
         }
@@ -125,6 +125,7 @@ namespace LL.User.Persistence
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
                 _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)),
+                _rank,
                 _totalExperience,
                 _cardAmounts.Select(pair => new CardStack(pair.Key, pair.Value)));
 
