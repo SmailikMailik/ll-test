@@ -124,10 +124,9 @@ namespace LL.User.Persistence
         {
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
-                _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)),
-                _rank,
-                _totalExperience,
-                _cardAmounts.Select(pair => new CardStack(pair.Key, pair.Value)));
+                new ProgressSaveData(_rank, _totalExperience),
+                _cardAmounts.Select(pair => new CardStack(pair.Key, pair.Value)),
+                _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)));
 
             _saveService.TrySave(UserInitialDataLoader.SaveKey, data);
         }
