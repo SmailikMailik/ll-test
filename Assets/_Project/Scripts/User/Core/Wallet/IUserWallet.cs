@@ -7,6 +7,7 @@ namespace LL.User.Core.Wallet
     {
         Observable<int> ObserveAmount(CurrencyId id);
 
+        bool CanAdd(CurrencyId id, int amount);
         bool TryAdd(CurrencyId id, int amount);
         bool TrySpend(CurrencyId id, int amount);
     }

@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Currencies;
+using LL.Game.Items;
+using LL.Rewards;
 using LL.Saving;
 using LL.User.Core.Cards;
 using LL.User.Core.Identity;
+using LL.User.Core.Items;
 using LL.User.Core.Progress;
+using LL.User.Core.Rewards;
 using LL.User.Core.Wallet;
 using R3;
 using VContainer;
@@ -21,10 +25,14 @@ namespace LL.User.Persistence
         private readonly IUserProgress _progress;
         private readonly ISaveService _saveService;
         private readonly IUserCards _cards;
+        private readonly IUserItems _items;
+        private readonly IUserRewardClaims _rewardClaims;
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<CurrencyId, int> _currencyAmounts;
         private readonly Dictionary<CardId, int> _cardAmounts;
+        private readonly Dictionary<ItemId, int> _itemAmounts;
+        private readonly HashSet<RewardBundleId> _claimedRewardIds;
         private int _rank;
         private int _totalExperience;
 
@@ -33,8 +41,11 @@ namespace LL.User.Persistence
             UserIdentity identity,
             WalletInitialData walletInitialData,
             CardsInitialData cards,
+            ItemsInitialData items,
             IUserWallet wallet,
             IUserCards userCards,
+            IUserItems userItems,
+            IUserRewardClaims rewardClaims,
             IUserProgress progress,
             ISaveService saveService)
         {
@@ -46,8 +57,13 @@ namespace LL.User.Persistence
             if (cards == null)
                 throw new ArgumentNullException(nameof(cards));
 
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+
             _wallet = wallet ?? throw new ArgumentNullException(nameof(wallet));
             _cards = userCards ?? throw new ArgumentNullException(nameof(userCards));
+            _items = userItems ?? throw new ArgumentNullException(nameof(userItems));
+            _rewardClaims = rewardClaims ?? throw new ArgumentNullException(nameof(rewardClaims));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
 
@@ -57,6 +73,10 @@ namespace LL.User.Persistence
             _cardAmounts = cards.Stacks.ToDictionary(
                 stack => stack.Id,
                 stack => stack.Amount);
+            _itemAmounts = items.Stacks.ToDictionary(
+                stack => stack.Id,
+                stack => stack.Amount);
+            _claimedRewardIds = new HashSet<RewardBundleId>(rewardClaims.ClaimedIds);
             _rank = progress.Rank;
             _totalExperience = progress.TotalExperience;
         }
@@ -79,10 +99,19 @@ namespace LL.User.Persistence
                     .Subscribe(value => UpdateCardAndSave(cardId, value)));
             }
 
+            foreach (var id in _itemAmounts.Keys.ToArray())
+            {
+                var itemId = id;
+                _subscriptions.Add(_items
+                    .ObserveAmount(itemId)
+                    .Subscribe(value => UpdateItemAndSave(itemId, value)));
+            }
+
             _subscriptions.Add(_progress.RankChanged
                 .Subscribe(value => UpdateAndSave(ref _rank, value)));
             _subscriptions.Add(_progress.TotalExperienceChanged
                 .Subscribe(value => UpdateAndSave(ref _totalExperience, value)));
+            _subscriptions.Add(_rewardClaims.RewardClaimed.Subscribe(AddClaimAndSave));
         }
 
         public void Dispose()
@@ -120,13 +149,30 @@ namespace LL.User.Persistence
             Save();
         }
 
+        private void UpdateItemAndSave(ItemId id, int value)
+        {
+            if (_itemAmounts[id] == value)
+                return;
+
+            _itemAmounts[id] = value;
+            Save();
+        }
+
+        private void AddClaimAndSave(RewardBundleId id)
+        {
+            if (_claimedRewardIds.Add(id))
+                Save();
+        }
+
         private void Save()
         {
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
                 new ProgressSaveData(_rank, _totalExperience),
                 _cardAmounts.Select(pair => new CardStack(pair.Key, pair.Value)),
-                _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)));
+                _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)),
+                _itemAmounts.Select(pair => new ItemStack(pair.Key, pair.Value)),
+                _claimedRewardIds);
 
             _saveService.TrySave(UserInitialDataLoader.SaveKey, data);
         }

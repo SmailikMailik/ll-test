@@ -1,4 +1,6 @@
 using LL.Game.Configuration;
+using LL.Rewards.Configuration;
+using LL.Rewards.Ranks;
 using LLEditor.Configuration;
 using UnityEditor;
 
@@ -24,6 +26,18 @@ namespace LLEditor.Game
         private static void SelectPurchaseCatalog()
         {
             ConfigurationAssetMenu.Select<PurchaseCatalogConfig>(PurchaseCatalogConfig.CreationPath);
+        }
+
+        [MenuItem(MenuPath + "Reward Bundle Catalog")]
+        private static void SelectRewardBundleCatalog()
+        {
+            ConfigurationAssetMenu.Select<RewardBundleCatalogConfig>(RewardBundleCatalogConfig.CreationPath);
+        }
+
+        [MenuItem(MenuPath + "Rank Reward Catalog")]
+        private static void SelectRankRewardCatalog()
+        {
+            ConfigurationAssetMenu.Select<RankRewardCatalogConfig>(RankRewardCatalogConfig.CreationPath);
         }
     }
 }

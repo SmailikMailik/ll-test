@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LL.Game.Cards;
+using LL.Game.Items;
 using R3;
 using VContainer;
 
-namespace LL.User.Core.Cards
+namespace LL.User.Core.Items
 {
-    internal sealed class UserCards : IUserCards, IDisposable
+    internal sealed class UserItems : IUserItems, IDisposable
     {
-        private readonly IReadOnlyDictionary<CardId, ReactiveProperty<int>> _amounts;
+        private readonly IReadOnlyDictionary<ItemId, ReactiveProperty<int>> _amounts;
 
         [Inject]
-        internal UserCards(CardsInitialData initialData)
+        internal UserItems(ItemsInitialData initialData)
         {
             if (initialData == null)
                 throw new ArgumentNullException(nameof(initialData));
@@ -22,22 +22,22 @@ namespace LL.User.Core.Cards
                 stack => new ReactiveProperty<int>(stack.Amount));
         }
 
-        public Observable<int> ObserveAmount(CardId id)
+        public Observable<int> ObserveAmount(ItemId id)
         {
             if (TryGetAmount(id, out var amount))
                 return amount;
 
-            throw new KeyNotFoundException($"Unknown card ID: {id}");
+            throw new KeyNotFoundException($"Unknown item ID: {id}");
         }
 
-        public bool CanAdd(CardId id, int amount)
+        public bool CanAdd(ItemId id, int amount)
         {
             return TryGetAmount(id, out var currentAmount) &&
                    amount > 0 &&
                    currentAmount.Value <= int.MaxValue - amount;
         }
 
-        public bool TryAdd(CardId id, int amount)
+        public bool TryAdd(ItemId id, int amount)
         {
             if (CanAdd(id, amount) is false)
                 return false;
@@ -47,7 +47,7 @@ namespace LL.User.Core.Cards
             return true;
         }
 
-        public bool TrySpend(CardId id, int amount)
+        public bool TrySpend(ItemId id, int amount)
         {
             if (amount <= 0 ||
                 TryGetAmount(id, out var currentAmount) is false ||
@@ -66,7 +66,7 @@ namespace LL.User.Core.Cards
                 amount.Dispose();
         }
 
-        private bool TryGetAmount(CardId id, out ReactiveProperty<int> amount)
+        private bool TryGetAmount(ItemId id, out ReactiveProperty<int> amount)
         {
             if (id.IsEmpty)
             {

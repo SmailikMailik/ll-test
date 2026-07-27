@@ -9,6 +9,8 @@ using LL.Presentation.Configuration;
 using LL.Presentation.Icons;
 using LL.Presentation.Localization;
 using LL.Rewards;
+using LL.Rewards.Configuration;
+using LL.Rewards.Ranks;
 using LL.Saving;
 using LL.Upgrades;
 using LL.UI.Windows;
@@ -16,7 +18,9 @@ using LL.UI.Windows.Configuration;
 using LL.User.Configuration;
 using LL.User.Core;
 using LL.User.Core.Cards;
+using LL.User.Core.Items;
 using LL.User.Core.Progress;
+using LL.User.Core.Rewards;
 using LL.User.Core.Wallet;
 using LL.User.Persistence;
 using UnityEngine;
@@ -35,6 +39,10 @@ namespace LL.DI
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private CardCatalogConfig _cardCatalogConfig;
         [SerializeField] private PurchaseCatalogConfig _purchaseCatalogConfig;
+
+        [Header("Rewards")]
+        [SerializeField] private RewardBundleCatalogConfig _rewardBundleCatalogConfig;
+        [SerializeField] private RankRewardCatalogConfig _rankRewardCatalogConfig;
 
         [Header("Presentation")]
         [SerializeField] private CurrencyIconCatalogConfig _currencyIconCatalogConfig;
@@ -55,6 +63,8 @@ namespace LL.DI
             builder.RegisterInstance<IDataLoader<RankCatalog>>(_rankCatalogConfig);
             builder.RegisterInstance<IDataLoader<CardCatalog>>(_cardCatalogConfig);
             builder.RegisterInstance<IDataLoader<PurchaseCatalog>>(_purchaseCatalogConfig);
+            builder.RegisterInstance<IDataLoader<RewardBundleCatalog>>(_rewardBundleCatalogConfig);
+            builder.RegisterInstance<IDataLoader<RankRewardCatalog>>(_rankRewardCatalogConfig);
             builder.RegisterInstance<IDataLoader<IconCatalog<CurrencyId>>>(_currencyIconCatalogConfig);
             builder.RegisterInstance<IDataLoader<IconCatalog<CardId>>>(
                 _cardIconCatalogConfig);
@@ -66,6 +76,12 @@ namespace LL.DI
                 Lifetime.Singleton);
             builder.Register(
                 resolver => resolver.Resolve<IDataLoader<PurchaseCatalog>>().Load(),
+                Lifetime.Singleton);
+            builder.Register(
+                resolver => resolver.Resolve<IDataLoader<RewardBundleCatalog>>().Load(),
+                Lifetime.Singleton);
+            builder.Register(
+                resolver => resolver.Resolve<IDataLoader<RankRewardCatalog>>().Load(),
                 Lifetime.Singleton);
             builder
                 .Register(
@@ -97,16 +113,22 @@ namespace LL.DI
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Wallet, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Progress, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Cards, Lifetime.Singleton);
+            builder.Register(resolver => resolver.Resolve<UserInitialData>().Items, Lifetime.Singleton);
+            builder.Register(resolver => resolver.Resolve<UserInitialData>().RewardClaims, Lifetime.Singleton);
 
             builder.Register<UserWallet>(Lifetime.Singleton).As<IUserWallet>();
             builder.Register<UserCards>(Lifetime.Singleton).As<IUserCards>();
+            builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
+            builder.Register<UserRewardClaims>(Lifetime.Singleton).As<IUserRewardClaims>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
+            builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();
             builder.Register<RewardIconProvider>(Lifetime.Singleton);
 
             builder.RegisterEntryPoint<UserSaveController>();
+            builder.RegisterEntryPoint<RankRewardGranter>();
         }
     }
 }

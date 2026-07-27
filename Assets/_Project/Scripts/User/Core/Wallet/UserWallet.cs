@@ -24,9 +24,19 @@ namespace LL.User.Core.Wallet
 
         public Observable<int> ObserveAmount(CurrencyId id) => GetBalance(id);
 
+        public bool CanAdd(CurrencyId id, int amount)
+        {
+            return TryGetBalance(id, out var balance) &&
+                   amount > 0 &&
+                   balance.Value <= int.MaxValue - amount;
+        }
+
         public bool TryAdd(CurrencyId id, int amount)
         {
-            return TryGetBalance(id, out var balance) && TryAdd(balance, amount);
+            if (CanAdd(id, amount) is false)
+                return false;
+
+            return TryAdd(GetBalance(id), amount);
         }
 
         public bool TrySpend(CurrencyId id, int amount)

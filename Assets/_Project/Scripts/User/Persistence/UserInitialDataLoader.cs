@@ -30,7 +30,24 @@ namespace LL.User.Persistence
         public UserInitialData Load()
         {
             if (_saveService.TryLoad<UserSaveData>(SaveKey, out var savedData) && savedData.IsSupported)
-                return UserSaveDataMapper.ToInitialData(savedData);
+            {
+                var initialData = UserSaveDataMapper.ToInitialData(savedData);
+
+                if (savedData.NeedsMigration is false)
+                    return initialData;
+
+                var defaults = _defaults.GetDefaults();
+                var migratedData = new UserInitialData(
+                    initialData.Identity,
+                    initialData.Wallet,
+                    initialData.Progress,
+                    initialData.Cards,
+                    defaults.Items,
+                    initialData.RewardClaims);
+                var migratedRank = migratedData.Progress.ResolveRank(_rankProgression);
+                _saveService.TrySave(SaveKey, UserSaveDataMapper.ToSaveData(migratedData, migratedRank));
+                return migratedData;
+            }
 
             var defaultData = _defaults.GetDefaults();
             var initialRank = defaultData.Progress.ResolveRank(_rankProgression);

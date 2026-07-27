@@ -7,20 +7,33 @@ namespace LL.User.Persistence
     [JsonObject(MemberSerialization.OptIn)]
     internal sealed class UserSaveData
     {
-        private const int CurrentVersion = 3;
+        [JsonProperty]
+        private int _version;
+        [JsonProperty]
+        private IdentitySaveData _identity;
+        [JsonProperty]
+        private ProgressSaveData _progress;
+        [JsonProperty]
+        private CardSaveData[] _cards;
+        [JsonProperty]
+        private CurrencySaveData[] _currencies;
+        [JsonProperty]
+        private ItemSaveData[] _items;
+        [JsonProperty]
+        private string[] _claimedRewardIds;
 
-        [JsonProperty] private int _version;
-        [JsonProperty] private IdentitySaveData _identity;
-        [JsonProperty] private ProgressSaveData _progress;
-        [JsonProperty] private CardSaveData[] _cards;
-        [JsonProperty] private CurrencySaveData[] _currencies;
+        private const int CurrentVersion = 4;
+        private const int MinimumSupportedVersion = 3;
 
-        internal bool IsSupported => _version == CurrentVersion;
+        internal bool IsSupported => _version >= MinimumSupportedVersion && _version <= CurrentVersion;
+        internal bool NeedsMigration => _version < CurrentVersion;
 
         internal IdentitySaveData Identity => _identity;
         internal ProgressSaveData Progress => _progress;
         internal IReadOnlyList<CardSaveData> Cards => _cards ?? Array.Empty<CardSaveData>();
         internal IReadOnlyList<CurrencySaveData> Currencies => _currencies ?? Array.Empty<CurrencySaveData>();
+        internal IReadOnlyList<ItemSaveData> Items => _items ?? Array.Empty<ItemSaveData>();
+        internal IReadOnlyList<string> ClaimedRewardIds => _claimedRewardIds ?? Array.Empty<string>();
 
         [JsonConstructor]
         private UserSaveData() { }
@@ -29,21 +42,27 @@ namespace LL.User.Persistence
             IdentitySaveData identity,
             ProgressSaveData progress,
             CardSaveData[] cards,
-            CurrencySaveData[] currencies)
+            CurrencySaveData[] currencies,
+            ItemSaveData[] items,
+            string[] claimedRewardIds)
         {
             _version = CurrentVersion;
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _cards = cards ?? Array.Empty<CardSaveData>();
             _currencies = currencies ?? Array.Empty<CurrencySaveData>();
+            _items = items ?? Array.Empty<ItemSaveData>();
+            _claimedRewardIds = claimedRewardIds ?? Array.Empty<string>();
         }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
     internal sealed class IdentitySaveData
     {
-        [JsonProperty] private string _regionCode;
-        [JsonProperty] private string _userId;
+        [JsonProperty]
+        private string _regionCode;
+        [JsonProperty]
+        private string _userId;
 
         internal string RegionCode => _regionCode;
         internal string UserId => _userId;
@@ -61,8 +80,10 @@ namespace LL.User.Persistence
     [JsonObject(MemberSerialization.OptIn)]
     internal sealed class ProgressSaveData
     {
-        [JsonProperty] private int _rank;
-        [JsonProperty] private int _totalExperience;
+        [JsonProperty]
+        private int _rank;
+        [JsonProperty]
+        private int _totalExperience;
 
         internal int Rank => _rank;
         internal int TotalExperience => _totalExperience;
@@ -80,8 +101,10 @@ namespace LL.User.Persistence
     [JsonObject(MemberSerialization.OptIn)]
     internal sealed class CardSaveData
     {
-        [JsonProperty] private string _id;
-        [JsonProperty] private int _amount;
+        [JsonProperty]
+        private string _id;
+        [JsonProperty]
+        private int _amount;
 
         internal string Id => _id;
         internal int Amount => _amount;
@@ -99,8 +122,10 @@ namespace LL.User.Persistence
     [JsonObject(MemberSerialization.OptIn)]
     internal sealed class CurrencySaveData
     {
-        [JsonProperty] private string _id;
-        [JsonProperty] private int _amount;
+        [JsonProperty]
+        private string _id;
+        [JsonProperty]
+        private int _amount;
 
         internal string Id => _id;
         internal int Amount => _amount;
@@ -109,6 +134,27 @@ namespace LL.User.Persistence
         private CurrencySaveData() { }
 
         internal CurrencySaveData(string id, int amount)
+        {
+            _id = id;
+            _amount = amount;
+        }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    internal sealed class ItemSaveData
+    {
+        [JsonProperty]
+        private string _id;
+        [JsonProperty]
+        private int _amount;
+
+        internal string Id => _id;
+        internal int Amount => _amount;
+
+        [JsonConstructor]
+        private ItemSaveData() { }
+
+        internal ItemSaveData(string id, int amount)
         {
             _id = id;
             _amount = amount;
