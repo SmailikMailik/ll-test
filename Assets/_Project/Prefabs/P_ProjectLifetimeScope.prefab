@@ -51,6 +51,7 @@ MonoBehaviour:
   _windowCatalog: {fileID: 11400000, guid: eb1646ea480b2cc4fb2985ea08cc1104, type: 2}
   _rankCatalogConfig: {fileID: 11400000, guid: 245c77e9974bb8144995a9d3f3f0ba73, type: 2}
   _cardCatalogConfig: {fileID: 11400000, guid: 3f842080888c4b8da27d1418c074ad9b, type: 2}
+  _purchaseCatalogConfig: {fileID: 11400000, guid: 77dd710842f447d2b9ba7281d3570858, type: 2}
   _currencyIconCatalogConfig: {fileID: 11400000, guid: a0f86a11d13b4dc3b7ea62ec0e009846, type: 2}
   _cardIconCatalogConfig: {fileID: 11400000, guid: b0d176f1182a45dc98a9eb624bd41b82, type: 2}
   _userDefaultsConfig: {fileID: 11400000, guid: 08915e9948d847e18fc2884bf8f88076, type: 2}

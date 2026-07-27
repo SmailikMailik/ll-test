@@ -1,10 +1,10 @@
 using LL.Game.Cards;
 using LL.Game.Configuration;
 using LL.Game.Currencies;
+using LL.Game.Purchases;
 using LL.Game.Ranks;
 using LL.Presentation.Configuration;
 using LL.Presentation.Icons;
-using LL.Purchases;
 using LL.Rewards;
 using LL.Saving;
 using LL.Upgrades;
@@ -31,6 +31,7 @@ namespace LL.DI
         [FormerlySerializedAs("_rankProgressionConfig")]
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private CardCatalogConfig _cardCatalogConfig;
+        [SerializeField] private PurchaseCatalogConfig _purchaseCatalogConfig;
 
         [Header("Presentation")]
         [SerializeField] private CurrencyIconCatalogConfig _currencyIconCatalogConfig;
@@ -48,6 +49,7 @@ namespace LL.DI
 
             builder.RegisterInstance<IDataLoader<RankCatalog>>(_rankCatalogConfig);
             builder.RegisterInstance<IDataLoader<CardCatalog>>(_cardCatalogConfig);
+            builder.RegisterInstance<IDataLoader<PurchaseCatalog>>(_purchaseCatalogConfig);
             builder.RegisterInstance<IDataLoader<IconCatalog<CurrencyId>>>(_currencyIconCatalogConfig);
             builder.RegisterInstance<IDataLoader<IconCatalog<CardId>>>(
                 _cardIconCatalogConfig);
@@ -55,6 +57,9 @@ namespace LL.DI
 
             builder.Register(
                 resolver => resolver.Resolve<IDataLoader<CardCatalog>>().Load(),
+                Lifetime.Singleton);
+            builder.Register(
+                resolver => resolver.Resolve<IDataLoader<PurchaseCatalog>>().Load(),
                 Lifetime.Singleton);
             builder
                 .Register(
@@ -86,7 +91,6 @@ namespace LL.DI
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
-            builder.Register<PurchaseService>(Lifetime.Singleton).As<IPurchaseService>();
 
             builder.RegisterEntryPoint<UserSaveController>();
         }

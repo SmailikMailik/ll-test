@@ -1,7 +1,7 @@
 using System;
-using LL.Game.Currencies;
+using LL.Game.Purchases;
 using LL.Game.Ranks;
-using LL.Purchases;
+using LL.Purchasing;
 using LL.UI.Controls.Buttons;
 using LL.UI.Typography;
 using LL.User.Core.Progress;
@@ -16,18 +16,12 @@ namespace LL.UI.Windows.Views
     {
         [SerializeField] private TMP_Text _currentRankLabel;
         [SerializeField] private TMP_Text _nextRankLabel;
-        [SerializeField] private InteractiveButton _softButton;
+
         [SerializeField] private TMP_Text _softPriceLabel;
-        [SerializeField] private InteractiveButton _hardButton;
+        [SerializeField] private InteractiveButton _softButton;
+
         [SerializeField] private TMP_Text _hardPriceLabel;
-
-        private const int SoftPrice = 99_900;
-        private const int HardPrice = 999;
-        private const int SoftPurchaseId = 0;
-        private const int HardPurchaseId = 1;
-
-        private static readonly IPurchase _softPurchase = new Purchase(SoftPurchaseId, CurrencyIds.Soft, SoftPrice);
-        private static readonly IPurchase _hardPurchase = new Purchase(HardPurchaseId, CurrencyIds.Hard, HardPrice);
+        [SerializeField] private InteractiveButton _hardButton;
 
         private IUserProgress _userProgress;
         private IRankProgression _rankProgression;
@@ -47,10 +41,10 @@ namespace LL.UI.Windows.Views
         private void Start()
         {
             _softButton.Clicked
-                .Subscribe(_ => TryPurchasePromotion(_softPurchase))
+                .Subscribe(_ => PurchasePromotion(PurchaseIds.RankPromotion))
                 .AddTo(this);
             _hardButton.Clicked
-                .Subscribe(_ => TryPurchasePromotion(_hardPurchase))
+                .Subscribe(_ => PurchasePromotion(PurchaseIds.InstantRankPromotion))
                 .AddTo(this);
         }
 
@@ -63,20 +57,46 @@ namespace LL.UI.Windows.Views
             _currentRankLabel.text = TextFormatter.Number(rank);
             _nextRankLabel.text = TextFormatter.Number(nextRank);
 
-            _softPriceLabel.text = TextFormatter.CurrencyAmount(CurrencyIds.Soft, SoftPrice);
-            _hardPriceLabel.text = TextFormatter.CurrencyAmount(CurrencyIds.Hard, HardPrice);
+            SetPrice(_softPriceLabel, PurchaseIds.RankPromotion);
+            SetPrice(_hardPriceLabel, PurchaseIds.InstantRankPromotion);
 
-            _softButton.SetInteractable(false);
-            _hardButton.SetInteractable(_userProgress.CanPromoteRank);
+            RefreshActions();
         }
 
-        private void TryPurchasePromotion(IPurchase purchase)
+        private void SetPrice(TMP_Text label, PurchaseId id)
         {
-            if (_userProgress.CanPromoteRank is false || _purchaseService.TryPurchase(purchase) is false)
+            if (_purchaseService.TryGetPurchase(id, out var purchase))
+            {
+                label.text = PurchaseFormatter.GetPriceText(purchase);
+                return;
+            }
+
+            label.text = string.Empty;
+        }
+
+        private void PurchasePromotion(PurchaseId id)
+        {
+            if (_userProgress.CanPromoteRank is false)
                 return;
 
+            _purchaseService.Purchase(
+                id,
+                CompletePromotion,
+                RefreshActions);
+        }
+
+        private void CompletePromotion()
+        {
             if (_userProgress.TryPromoteRank())
                 TryClose();
+        }
+
+        private void RefreshActions()
+        {
+            var hasHardPurchase = _purchaseService.TryGetPurchase(PurchaseIds.InstantRankPromotion, out _);
+
+            _softButton.SetInteractable(false);
+            _hardButton.SetInteractable(hasHardPurchase && _userProgress.CanPromoteRank);
         }
     }
 

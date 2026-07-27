@@ -1,6 +1,6 @@
-using LL.UI.Typography;
+using LL.Game.Purchases;
 
-namespace LL.Purchases
+namespace LL.UI.Typography
 {
     internal static class PurchaseFormatter
     {

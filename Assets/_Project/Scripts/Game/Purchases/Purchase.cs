@@ -1,23 +1,23 @@
 using LL.Game.Currencies;
 
-namespace LL.Purchases
+namespace LL.Game.Purchases
 {
     internal interface IPurchase
     {
-        int PurchaseId { get; }
+        PurchaseId Id { get; }
         CurrencyId CurrencyId { get; }
         int Price { get; }
     }
 
     internal sealed class Purchase : IPurchase
     {
-        public int PurchaseId { get; }
+        public PurchaseId Id { get; }
         public CurrencyId CurrencyId { get; }
         public int Price { get; }
 
-        internal Purchase(int purchaseId, CurrencyId currencyId, int price)
+        internal Purchase(PurchaseId id, CurrencyId currencyId, int price)
         {
-            PurchaseId = purchaseId;
+            Id = id;
             CurrencyId = currencyId;
             Price = price;
         }

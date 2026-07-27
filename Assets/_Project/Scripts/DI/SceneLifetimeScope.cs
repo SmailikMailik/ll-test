@@ -1,3 +1,5 @@
+using LL.Purchasing;
+using LL.UI.Purchasing;
 using LL.UI.Windows;
 using LL.UI.Windows.Views.Upgrade;
 using UnityEngine;
@@ -13,6 +15,8 @@ namespace LL.DI
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterComponent(_windowController);
+            builder.Register<DemoPurchaseConfirmation>(Lifetime.Scoped).As<IPurchaseConfirmation>();
+            builder.Register<PurchaseService>(Lifetime.Scoped).As<IPurchaseService>();
         }
 
         private void Start()
