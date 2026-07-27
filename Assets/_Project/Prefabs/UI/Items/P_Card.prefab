@@ -58,7 +58,6 @@ MonoBehaviour:
   _iconImage: {fileID: 3736454698003732823}
   _addButton: {fileID: 7502684135798462419}
   _progressLabel: {fileID: 1525261692928005945}
-  _cardId: 
 --- !u!114 &7419062748502947183
 MonoBehaviour:
   m_ObjectHideFlags: 0

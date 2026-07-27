@@ -19,11 +19,37 @@ namespace LL.UI.Windows.Views.Upgrade
 
         private IUserCards _userCards;
         private bool _isApplying;
+        private bool _isInitialized;
 
         [Inject]
         private void Construct(IUserCards userCards)
         {
             _userCards = userCards ?? throw new ArgumentNullException(nameof(userCards));
+        }
+
+        protected override void OnShow()
+        {
+            InitializeComponents();
+            _progressView.ResetPreview();
+            _amountStepper.ResetValue();
+            _cardSelector.ResetSelection();
+            RefreshUseButton();
+        }
+
+        protected override void OnHide()
+        {
+            _cardSelector.SetPlannedAmount(MinimumAmount);
+            _amountStepper.ResetValue();
+            _progressView.ClearPreview();
+        }
+
+        private void InitializeComponents()
+        {
+            if (_isInitialized)
+                return;
+
+            _isInitialized = true;
+            _cardSelector.Initialize();
             _amountStepper.Initialize(AmountDelta);
 
             _cardSelector.SelectionChanged
@@ -38,21 +64,6 @@ namespace LL.UI.Windows.Views.Upgrade
             _useButton.Clicked
                 .Subscribe(_ => ApplyCards())
                 .AddTo(this);
-        }
-
-        protected override void OnShow()
-        {
-            _progressView.ResetPreview();
-            _cardSelector.ResetSelection();
-            _amountStepper.ResetValue();
-            RefreshUseButton();
-        }
-
-        protected override void OnHide()
-        {
-            _cardSelector.SetPlannedAmount(MinimumAmount);
-            _amountStepper.ResetValue();
-            _progressView.ClearPreview();
         }
 
         private void OnSelectionChanged()

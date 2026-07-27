@@ -10,7 +10,7 @@ namespace LL.UI.Windows.Views.Upgrade
     [DisallowMultipleComponent]
     internal sealed class UpgradeCardSelector : MonoBehaviour
     {
-        [SerializeField] private CardView[] _cards;
+        [SerializeField] private UpgradeCardSlot[] _slots;
 
         private const int MinimumAmount = 0;
 
@@ -26,21 +26,31 @@ namespace LL.UI.Windows.Views.Upgrade
         private readonly Subject<int> _selectedAmountChanged = new();
         private CardCatalog _cardCatalog;
         private CardView _selectedView;
+        private bool _isInitialized;
 
         [Inject]
         private void Construct(CardCatalog cardCatalog)
         {
             _cardCatalog = cardCatalog ?? throw new ArgumentNullException(nameof(cardCatalog));
+        }
 
-            foreach (var card in _cards)
+        internal void Initialize()
+        {
+            if (_isInitialized)
+                throw new InvalidOperationException($"{nameof(UpgradeCardSelector)} is already initialized.");
+
+            _isInitialized = true;
+
+            foreach (var slot in _slots)
             {
-                var capturedCard = card;
-                capturedCard.Clicked
-                    .Subscribe(_ => Select(capturedCard))
+                var card = slot.View;
+                card.Clicked
+                    .Subscribe(_ => Select(card))
                     .AddTo(this);
-                capturedCard.AvailableAmountChanged
-                    .Subscribe(_ => OnAmountChanged(capturedCard))
+                card.AvailableAmountChanged
+                    .Subscribe(_ => OnAmountChanged(card))
                     .AddTo(this);
+                card.Initialize(slot.Id);
             }
         }
 
@@ -52,14 +62,23 @@ namespace LL.UI.Windows.Views.Upgrade
 
         internal void ResetSelection()
         {
-            foreach (var card in _cards)
+            foreach (var slot in _slots)
             {
-                card.SetSelected(false);
-                card.SetPlannedAmount(MinimumAmount);
+                slot.View.SetSelected(false);
+                slot.View.SetPlannedAmount(MinimumAmount);
             }
 
             _selectedView = null;
             SelectedCard = null;
+
+            foreach (var slot in _slots)
+            {
+                Select(slot.View);
+
+                if (HasSelection)
+                    return;
+            }
+
             _selectionChanged.OnNext(Unit.Default);
         }
 
@@ -76,8 +95,9 @@ namespace LL.UI.Windows.Views.Upgrade
                 return;
             }
 
-            foreach (var item in _cards)
+            foreach (var slot in _slots)
             {
+                var item = slot.View;
                 item.SetSelected(item == card);
                 item.SetPlannedAmount(MinimumAmount);
             }
@@ -103,5 +123,15 @@ namespace LL.UI.Windows.Views.Upgrade
 
             _selectedAmountChanged.OnNext(card.AvailableAmount);
         }
+    }
+
+    [Serializable]
+    internal sealed class UpgradeCardSlot
+    {
+        [SerializeField] private CardView _view;
+        [SerializeField] private string _cardId;
+
+        internal CardView View => _view;
+        internal CardId Id => new(_cardId);
     }
 }

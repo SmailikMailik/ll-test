@@ -1518,10 +1518,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3fa18b7e4604b19b2c8da3f50671234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cards:
-  - {fileID: 2795806637327932859}
-  - {fileID: 5392904877544822025}
-  - {fileID: 2762827200333028768}
+  _slots:
+  - _view: {fileID: 2795806637327932859}
+    _cardId: card_1
+  - _view: {fileID: 5392904877544822025}
+    _cardId: card_2
+  - _view: {fileID: 2762827200333028768}
+    _cardId: card_3
 --- !u!1 &8064055178422248739
 GameObject:
   m_ObjectHideFlags: 0
@@ -2128,6 +2131,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6718504372292656871}
   m_SourcePrefab: {fileID: 100100000, guid: c39be276abbb8134baf5bb985afc30b6, type: 3}
+--- !u!114 &3451800828707931789 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1049799861572071551, guid: c39be276abbb8134baf5bb985afc30b6, type: 3}
+  m_PrefabInstance: {fileID: 2411363113502308082}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7408130694423792243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &5146330777246325178 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7358197253307477832, guid: c39be276abbb8134baf5bb985afc30b6, type: 3}
@@ -2162,7 +2176,19 @@ MonoBehaviour:
   m_FormatArguments: []
   m_UpdateString:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3451800828707931789}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   references:
     version: 2
     RefIds: []
@@ -2272,10 +2298,6 @@ PrefabInstance:
     - target: {fileID: 2625412757655965793, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7225047986168113795, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
-      propertyPath: _cardId
-      value: card_2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2808,6 +2830,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3654799965989213474}
     m_Modifications:
+    - target: {fileID: 1049799861572071551, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
+      propertyPath: m_text
+      value: Reset
+      objectReference: {fileID: 0}
     - target: {fileID: 2723066229655186564, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
       propertyPath: m_Name
       value: P_Button_02
@@ -2895,13 +2921,72 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5167905191529593985, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7558177427160378346}
   m_SourcePrefab: {fileID: 100100000, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
+--- !u!114 &4098095568174656860 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1049799861572071551, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
+  m_PrefabInstance: {fileID: 3913345903794511139}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212007403875623330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &5788091128607896171 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7358197253307477832, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
   m_PrefabInstance: {fileID: 3913345903794511139}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8212007403875623330 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5167905191529593985, guid: 236652e421b5ce443a47b8faaa4a36c6, type: 3}
+  m_PrefabInstance: {fileID: 3913345903794511139}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7558177427160378346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8212007403875623330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:b1c9e60686216f94a83e652c2c808fca
+    m_TableEntryReference:
+      m_KeyId: 352062502440963
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4098095568174656860}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  references:
+    version: 2
+    RefIds: []
 --- !u!1001 &4181235810016717326
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3235,10 +3320,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7225047986168113795, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
-      propertyPath: _cardId
-      value: card_3
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3355,10 +3436,6 @@ PrefabInstance:
     - target: {fileID: 2625412757655965793, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7225047986168113795, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
-      propertyPath: _cardId
-      value: card_1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
