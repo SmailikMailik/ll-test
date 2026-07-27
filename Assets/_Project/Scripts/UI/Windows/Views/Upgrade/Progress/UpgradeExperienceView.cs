@@ -1,5 +1,5 @@
 using LL.Game.Ranks;
-using LL.UI.Formatting;
+using LL.UI.Typography;
 using TMPro;
 using UnityEngine;
 

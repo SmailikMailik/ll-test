@@ -1,6 +1,6 @@
 using LL.Game.Currencies;
 using LL.UI.Controls.Buttons;
-using LL.UI.Formatting;
+using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.User.Core.Identity;
 using LL.User.Core.Wallet;

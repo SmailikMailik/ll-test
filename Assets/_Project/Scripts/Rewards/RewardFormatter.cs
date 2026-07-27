@@ -1,4 +1,4 @@
-using LL.UI.Formatting;
+using LL.UI.Typography;
 using UnityEngine;
 
 namespace LL.Rewards

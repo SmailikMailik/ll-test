@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LL.Game.Cards;
 using LL.Presentation.Icons;
 using LL.UI.Controls.Buttons;
-using LL.UI.Formatting;
+using LL.UI.Typography;
 using LL.UI.VisualStates.Sources;
 using LL.User.Core.Cards;
 using R3;

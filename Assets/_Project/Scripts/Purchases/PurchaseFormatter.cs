@@ -1,4 +1,4 @@
-using LL.UI.Formatting;
+using LL.UI.Typography;
 
 namespace LL.Purchases
 {
