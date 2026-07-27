@@ -29,6 +29,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         internal CardId Id { get; private set; }
         internal int AvailableAmount { get; private set; }
+        internal int PlannedAmount { get; private set; }
 
         internal Observable<Unit> Clicked => _clicked;
         internal Observable<int> AvailableAmountChanged => _availableAmountChanged;
@@ -38,7 +39,6 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         private IUserCards _userCards;
         private IIconProvider<CardId> _iconProvider;
-        private int _plannedAmount;
         private bool _isInitialized;
 
         [Inject]
@@ -64,7 +64,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             _isInitialized = true;
 
             Id = id;
-            _plannedAmount = MinimumAmount;
+            PlannedAmount = MinimumAmount;
             _iconImage.sprite = icon;
 
             SetSelected(false);
@@ -93,8 +93,8 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         internal void SetPlannedAmount(int amount)
         {
-            _plannedAmount = Math.Clamp(amount, MinimumAmount, AvailableAmount);
-            _progressLabel.text = TextFormatter.Progress(_plannedAmount, AvailableAmount);
+            PlannedAmount = Math.Clamp(amount, MinimumAmount, AvailableAmount);
+            _progressLabel.text = TextFormatter.Progress(PlannedAmount, AvailableAmount);
         }
 
         internal void SetSelected(bool isSelected)
@@ -105,7 +105,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         private void UpdateProgress(int availableAmount)
         {
             AvailableAmount = Math.Max(MinimumAmount, availableAmount);
-            SetPlannedAmount(_plannedAmount);
+            SetPlannedAmount(PlannedAmount);
             _addButton.SetInteractable(AvailableAmount < int.MaxValue);
             _availableAmountChanged.OnNext(AvailableAmount);
         }

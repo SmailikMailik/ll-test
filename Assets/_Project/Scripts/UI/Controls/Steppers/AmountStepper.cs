@@ -20,12 +20,14 @@ namespace LL.UI.Controls.Steppers
 
         private const int Minimum = 0;
 
-        internal int Value { get; private set; }
         internal Observable<int> ValueChanged => _valueChanged;
 
         private readonly Subject<int> _valueChanged = new();
+
+        private int _value;
         private int _maximum;
         private int _delta;
+
         private bool _isInitialized;
 
         internal void Initialize(int delta)
@@ -37,34 +39,36 @@ namespace LL.UI.Controls.Steppers
                 throw new ArgumentOutOfRangeException(nameof(delta));
 
             _isInitialized = true;
+
             _delta = delta;
+            _valueChanged.AddTo(this);
 
             InitializeButton(_decreaseButton, _decreaseButtonLabel, -_delta);
             InitializeButton(_increaseButton, _increaseButtonLabel, _delta);
+
             Refresh();
         }
 
-        private void OnDestroy()
+        internal void SetValue(int value, int maximum)
         {
-            _valueChanged.Dispose();
+            var nextMaximum = Math.Max(Minimum, maximum);
+            var nextValue = Math.Clamp(value, Minimum, nextMaximum);
+
+            if (_value == nextValue && _maximum == nextMaximum)
+                return;
+
+            var valueChanged = _value != nextValue;
+
+            _value = nextValue;
+            _maximum = nextMaximum;
+
+            Refresh();
+
+            if (valueChanged)
+                _valueChanged.OnNext(_value);
         }
 
-        internal void ResetValue(int maximum = Minimum)
-        {
-            _maximum = Math.Max(Minimum, maximum);
-            SetValue(Minimum);
-        }
-
-        internal void SetMaximum(int maximum)
-        {
-            _maximum = Math.Max(Minimum, maximum);
-            SetValue(Math.Clamp(Value, Minimum, _maximum));
-        }
-
-        private void InitializeButton(
-            InteractiveButton button,
-            TMP_Text label,
-            int delta)
+        private void InitializeButton(InteractiveButton button, TMP_Text label, int delta)
         {
             if (delta == 0)
                 throw new ArgumentOutOfRangeException(nameof(delta));
@@ -80,30 +84,20 @@ namespace LL.UI.Controls.Steppers
         private void ChangeValue(int delta)
         {
             if (CanChangeValue(delta))
-                SetValue(Value + delta);
-        }
-
-        private void SetValue(int value)
-        {
-            var changed = Value != value;
-            Value = value;
-            Refresh();
-
-            if (changed)
-                _valueChanged.OnNext(Value);
+                SetValue(_value + delta, _maximum);
         }
 
         private void Refresh()
         {
-            _valueLabel.text = TextFormatter.Number(Value);
+            _valueLabel.text = TextFormatter.Number(_value);
             _decreaseButton.SetInteractable(CanChangeValue(-_delta));
             _increaseButton.SetInteractable(CanChangeValue(_delta));
         }
 
         private bool CanChangeValue(int delta) => delta switch
         {
-            > 0 => Value <= _maximum - delta,
-            < 0 => Value >= Minimum - delta,
+            > 0 => _value <= _maximum - delta,
+            < 0 => _value >= Minimum - delta,
             _ => false
         };
     }

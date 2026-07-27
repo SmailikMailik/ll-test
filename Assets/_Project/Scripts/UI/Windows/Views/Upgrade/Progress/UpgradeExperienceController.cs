@@ -39,29 +39,37 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             RefreshView();
         }
 
-        internal void SetPendingItems(int amount, int experiencePerItem)
+        internal void SetPendingExperience(int amount)
         {
             if (amount < MinimumAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            if (experiencePerItem <= 0)
-                throw new ArgumentOutOfRangeException(nameof(experiencePerItem));
-
-            var maximumApplicableAmount = GetMaximumApplicableAmount(experiencePerItem);
-
-            if (amount > maximumApplicableAmount)
+            if (amount > MinimumAmount &&
+                _userProgress.CanAddExperience(amount) is false)
+            {
                 throw new ArgumentOutOfRangeException(nameof(amount));
+            }
 
-            _pendingExperience = amount * experiencePerItem;
+            _pendingExperience = amount;
             RefreshView();
         }
 
-        internal int GetMaximumApplicableAmount(int experiencePerItem)
+        internal int GetMaximumApplicableAmount(
+            int experiencePerItem,
+            int reservedExperience)
         {
             if (experiencePerItem <= 0)
                 return MinimumAmount;
 
-            var availableExperience = int.MaxValue - _baseExperience;
+            if (reservedExperience < MinimumAmount)
+                throw new ArgumentOutOfRangeException(nameof(reservedExperience));
+
+            var totalAvailableExperience = int.MaxValue - _baseExperience;
+
+            if (reservedExperience >= totalAvailableExperience)
+                return MinimumAmount;
+
+            var availableExperience = totalAvailableExperience - reservedExperience;
             return availableExperience / experiencePerItem;
         }
 

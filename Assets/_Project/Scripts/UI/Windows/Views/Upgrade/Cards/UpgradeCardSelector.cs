@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LL.Game.Cards;
 using R3;
 using UnityEngine;
@@ -18,6 +19,32 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         internal int SelectedAmount => _selectedView == null
             ? MinimumAmount
             : _selectedView.AvailableAmount;
+        internal int SelectedPlannedAmount => _selectedView == null
+            ? MinimumAmount
+            : _selectedView.PlannedAmount;
+        internal int PlannedExperience
+        {
+            get
+            {
+                var experience = MinimumAmount;
+
+                foreach (var slot in _slots)
+                {
+                    var plannedAmount = slot.View.PlannedAmount;
+
+                    if (plannedAmount <= MinimumAmount ||
+                        _cardCatalog.TryGetCard(slot.Id, out var card) is false)
+                    {
+                        continue;
+                    }
+
+                    experience += plannedAmount * card.ExperienceAmount;
+                }
+
+                return experience;
+            }
+        }
+
         internal Observable<Unit> SelectionChanged => _selectionChanged;
         internal Observable<int> SelectedAmountChanged => _selectedAmountChanged;
 
@@ -86,6 +113,25 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             _selectedView?.SetPlannedAmount(amount);
         }
 
+        internal IReadOnlyList<PlannedCard> GetPlannedCards()
+        {
+            var plannedCards = new List<PlannedCard>(_slots.Length);
+
+            foreach (var slot in _slots)
+            {
+                if (slot.View.PlannedAmount > MinimumAmount)
+                    plannedCards.Add(new PlannedCard(slot.Id, slot.View.PlannedAmount));
+            }
+
+            return plannedCards;
+        }
+
+        internal void ClearPlannedAmounts()
+        {
+            foreach (var slot in _slots)
+                slot.View.SetPlannedAmount(MinimumAmount);
+        }
+
         private void Select(UpgradeCardView card)
         {
             if (card.AvailableAmount <= MinimumAmount ||
@@ -98,7 +144,6 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             {
                 var item = slot.View;
                 item.SetSelected(item == card);
-                item.SetPlannedAmount(MinimumAmount);
             }
 
             _selectedView = card;
@@ -132,5 +177,17 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         internal UpgradeCardView View => _view;
         internal CardId Id => new(_cardId);
+    }
+
+    internal readonly struct PlannedCard
+    {
+        internal CardId Id { get; }
+        internal int Amount { get; }
+
+        internal PlannedCard(CardId id, int amount)
+        {
+            Id = id;
+            Amount = amount;
+        }
     }
 }
