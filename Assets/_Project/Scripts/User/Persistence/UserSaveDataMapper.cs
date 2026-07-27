@@ -27,7 +27,7 @@ namespace LL.User.Persistence
                 new WalletInitialData(
                     data.Currencies.Select(currency =>
                         new CurrencyBalance(new CurrencyId(currency.Id), currency.Amount))),
-                new ProgressInitialData(data.Progress.Rank, data.Progress.TotalExperience),
+                new ProgressInitialData(data.Progress.Rank, data.Progress.Experience),
                 new CardsInitialData(
                     data.Cards.Select(card =>
                         new CardStack(new CardId(card.Id), card.Amount))),
@@ -38,14 +38,14 @@ namespace LL.User.Persistence
                     data.ClaimedRewardIds.Select(id => new RewardBundleId(id))));
         }
 
-        internal static UserSaveData ToSaveData(UserInitialData data, int rank)
+        internal static UserSaveData ToSaveData(UserInitialData data)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
             return ToSaveData(
                 data.Identity,
-                new ProgressSaveData(rank, data.Progress.TotalExperience),
+                new ProgressSaveData(data.Progress.Rank, data.Progress.Experience),
                 data.Cards.Stacks,
                 data.Wallet.Balances,
                 data.Items.Stacks,

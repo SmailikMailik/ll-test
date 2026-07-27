@@ -1,3 +1,4 @@
+using System;
 using LL.Game.Ranks;
 using LL.UI.Typography;
 using TMPro;
@@ -16,18 +17,20 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         internal void Show(RankProgress progress, int currentExperience, int addedExperience)
         {
-            var previewExperience = currentExperience + addedExperience;
+            var previewExperience = progress.HasNextRank
+                ? (int)Math.Min((long)currentExperience + addedExperience, progress.RequiredExperience)
+                : currentExperience;
 
             _rankLabel.text = progress.Rank.ToString();
             _experienceLabel.text = progress.HasNextRank
-                ? TextFormatter.Progress(previewExperience, progress.NextRankExperience)
+                ? TextFormatter.Progress(previewExperience, progress.RequiredExperience)
                 : TextFormatter.Number(previewExperience);
             _addedExperienceLabel.text = addedExperience > 0
                 ? $"+ {TextFormatter.Number(addedExperience)}"
                 : string.Empty;
             _maximumExperienceMarker.SetActive(
                 progress.HasNextRank is false ||
-                previewExperience >= progress.NextRankExperience);
+                previewExperience >= progress.RequiredExperience);
             _bar.SetProgress(
                 progress.GetNormalizedExperience(currentExperience),
                 progress.GetNormalizedExperience(previewExperience));

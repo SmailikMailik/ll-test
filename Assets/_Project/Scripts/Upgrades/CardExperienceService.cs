@@ -9,6 +9,7 @@ namespace LL.Upgrades
 {
     internal interface ICardExperienceService
     {
+        bool TryGetApplication(IReadOnlyList<CardStack> cards, out ExperienceApplication application);
         bool TryApply(IReadOnlyList<CardStack> cards);
     }
 
@@ -33,11 +34,8 @@ namespace LL.Upgrades
 
         public bool TryApply(IReadOnlyList<CardStack> cards)
         {
-            if (TryCalculateExperience(cards, out var experience) is false ||
-                _userProgress.CanAddExperience(experience) is false)
-            {
+            if (TryGetApplication(cards, out var application) is false)
                 return false;
-            }
 
             var spentCards = new List<CardStack>(cards.Count);
 
@@ -53,16 +51,30 @@ namespace LL.Upgrades
                 return false;
             }
 
-            if (_userProgress.TryAddExperience(experience))
+            if (_userProgress.TryAddExperience(application.GrantedExperience))
                 return true;
 
             RestoreCards(spentCards);
             return false;
         }
 
-        private bool TryCalculateExperience(
-            IReadOnlyList<CardStack> cards,
-            out int experience)
+        public bool TryGetApplication(IReadOnlyList<CardStack> cards, out ExperienceApplication application)
+        {
+            application = default;
+
+            if (TryCalculateExperience(cards, out var grantedExperience) is false)
+                return false;
+
+            var appliedExperience = _userProgress.GetApplicableExperience(grantedExperience);
+
+            if (appliedExperience <= MinimumAmount)
+                return false;
+
+            application = new ExperienceApplication(grantedExperience, appliedExperience);
+            return true;
+        }
+
+        private bool TryCalculateExperience(IReadOnlyList<CardStack> cards, out int experience)
         {
             experience = MinimumAmount;
 

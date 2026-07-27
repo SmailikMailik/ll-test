@@ -34,7 +34,7 @@ namespace LL.User.Persistence
         private readonly Dictionary<ItemId, int> _itemAmounts;
         private readonly HashSet<RewardBundleId> _claimedRewardIds;
         private int _rank;
-        private int _totalExperience;
+        private int _experience;
 
         [Inject]
         internal UserSaveController(
@@ -78,7 +78,7 @@ namespace LL.User.Persistence
                 stack => stack.Amount);
             _claimedRewardIds = new HashSet<RewardBundleId>(rewardClaims.ClaimedIds);
             _rank = progress.Rank;
-            _totalExperience = progress.TotalExperience;
+            _experience = progress.Experience;
         }
 
         public void Initialize()
@@ -109,8 +109,8 @@ namespace LL.User.Persistence
 
             _subscriptions.Add(_progress.RankChanged
                 .Subscribe(value => UpdateAndSave(ref _rank, value)));
-            _subscriptions.Add(_progress.TotalExperienceChanged
-                .Subscribe(value => UpdateAndSave(ref _totalExperience, value)));
+            _subscriptions.Add(_progress.ExperienceChanged
+                .Subscribe(value => UpdateAndSave(ref _experience, value)));
             _subscriptions.Add(_rewardClaims.RewardClaimed.Subscribe(AddClaimAndSave));
         }
 
@@ -168,7 +168,7 @@ namespace LL.User.Persistence
         {
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
-                new ProgressSaveData(_rank, _totalExperience),
+                new ProgressSaveData(_rank, _experience),
                 _cardAmounts.Select(pair => new CardStack(pair.Key, pair.Value)),
                 _currencyAmounts.Select(pair => new CurrencyBalance(pair.Key, pair.Value)),
                 _itemAmounts.Select(pair => new ItemStack(pair.Key, pair.Value)),

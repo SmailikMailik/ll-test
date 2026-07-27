@@ -6,12 +6,12 @@ namespace LL.Game.Ranks
 {
     internal sealed class RankCatalog
     {
-        internal IReadOnlyList<int> ExperienceThresholds { get; }
+        internal IReadOnlyList<int> ExperienceRequirements { get; }
 
-        internal RankCatalog(IEnumerable<int> experienceThresholds)
+        internal RankCatalog(IEnumerable<int> experienceRequirements)
         {
-            var copy = experienceThresholds?.ToArray() ?? Array.Empty<int>();
-            ExperienceThresholds = Array.AsReadOnly(copy);
+            var copy = experienceRequirements?.ToArray() ?? Array.Empty<int>();
+            ExperienceRequirements = Array.AsReadOnly(copy);
         }
     }
 }

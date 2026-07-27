@@ -51,7 +51,7 @@ namespace LL.UI.Windows.Views
         protected override void OnShow()
         {
             var rank = _userProgress.Rank;
-            var progress = _rankProgression.GetProgress(rank, _userProgress.TotalExperience);
+            var progress = _rankProgression.GetProgress(rank, _userProgress.Experience);
             var nextRank = progress.HasNextRank ? rank + 1 : rank;
 
             _currentRankLabel.text = TextFormatter.Number(rank);

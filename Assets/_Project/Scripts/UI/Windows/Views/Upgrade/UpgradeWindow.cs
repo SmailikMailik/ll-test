@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LL.Game.Ranks;
 using LL.Upgrades;
 using LL.UI.Controls.Buttons;
@@ -6,6 +7,7 @@ using LL.UI.Controls.Steppers;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;
+using LL.User.Core.Cards;
 using LL.User.Core.Progress;
 using R3;
 using UnityEngine;
@@ -28,6 +30,7 @@ namespace LL.UI.Windows.Views.Upgrade
 
         private IUserProgress _userProgress;
         private ICardExperienceService _cardExperienceService;
+        private IExperienceOverflowConfirmation _overflowConfirmation;
         private IRankProgression _rankProgression;
         private UpgradeFlow _upgradeFlow;
         private UpgradeExperienceController _experienceController;
@@ -39,11 +42,13 @@ namespace LL.UI.Windows.Views.Upgrade
         private void Construct(
             IUserProgress userProgress,
             ICardExperienceService cardExperienceService,
+            IExperienceOverflowConfirmation overflowConfirmation,
             IRankProgression rankProgression,
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _cardExperienceService = cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
+            _overflowConfirmation = overflowConfirmation ?? throw new ArgumentNullException(nameof(overflowConfirmation));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
@@ -128,12 +133,31 @@ namespace LL.UI.Windows.Views.Upgrade
             if (CanUse() is false)
                 return;
 
+            var plan = _cardSelector.GetPlan();
+
+            if (_cardExperienceService.TryGetApplication(plan, out var application) is false)
+                return;
+
+            if (application.HasLoss)
+            {
+                _overflowConfirmation.Confirm(
+                    application.LostExperience,
+                    () => ApplyCards(plan),
+                    RefreshActions);
+                return;
+            }
+
+            ApplyCards(plan);
+        }
+
+        private void ApplyCards(IReadOnlyList<CardStack> cards)
+        {
             _isApplying = true;
             bool applied;
 
             try
             {
-                applied = _cardExperienceService.TryApply(_cardSelector.GetPlan());
+                applied = _cardExperienceService.TryApply(cards);
             }
             finally
             {

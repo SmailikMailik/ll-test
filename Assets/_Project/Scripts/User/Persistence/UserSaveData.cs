@@ -22,11 +22,9 @@ namespace LL.User.Persistence
         [JsonProperty]
         private string[] _claimedRewardIds;
 
-        private const int CurrentVersion = 4;
-        private const int MinimumSupportedVersion = 3;
+        private const int CurrentVersion = 1;
 
-        internal bool IsSupported => _version >= MinimumSupportedVersion && _version <= CurrentVersion;
-        internal bool NeedsMigration => _version < CurrentVersion;
+        internal bool IsSupported => _version == CurrentVersion;
 
         internal IdentitySaveData Identity => _identity;
         internal ProgressSaveData Progress => _progress;
@@ -83,18 +81,18 @@ namespace LL.User.Persistence
         [JsonProperty]
         private int _rank;
         [JsonProperty]
-        private int _totalExperience;
+        private int _experience;
 
         internal int Rank => _rank;
-        internal int TotalExperience => _totalExperience;
+        internal int Experience => _experience;
 
         [JsonConstructor]
         private ProgressSaveData() { }
 
-        internal ProgressSaveData(int rank, int totalExperience)
+        internal ProgressSaveData(int rank, int experience)
         {
             _rank = rank;
-            _totalExperience = totalExperience;
+            _experience = experience;
         }
     }
 

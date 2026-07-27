@@ -11,79 +11,76 @@ namespace LL.Game.Configuration
     [HideMonoScript]
     internal sealed class RankCatalogConfig : ScriptableObject, IDataLoader<RankCatalog>
     {
-        internal const string CreationPath = "LL/Game Data/Rank Catalog";
-
-        [InfoBox("Total accumulated experience required to unlock promotion to each rank.")]
+        [InfoBox("Local experience required to reach each rank. Rank 1 always requires 0 XP.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
-        [SerializeField] private RankThresholdEntry[] _rankThresholds;
+        [SerializeField] private RankExperienceRequirementEntry[] _rankRequirements;
+
+        internal const string CreationPath = "LL/Game Data/Rank Catalog";
 
         public RankCatalog Load() => new
         (
-            _rankThresholds?.Select(threshold => threshold?.TotalExperience ?? 0)
+            _rankRequirements?.Select(requirement => requirement?.RequiredExperience ?? 0)
         );
 
         private void OnValidate()
         {
-            if (_rankThresholds == null || _rankThresholds.Length == 0)
+            if (_rankRequirements == null || _rankRequirements.Length == 0)
             {
-                _rankThresholds = new[] { new RankThresholdEntry(1, 0) };
+                _rankRequirements = new[] { new RankExperienceRequirementEntry(1, 0) };
                 return;
             }
 
-            var previousExperience = 0;
-
-            for (var index = 0; index < _rankThresholds.Length; index++)
+            for (var index = 0; index < _rankRequirements.Length; index++)
             {
                 var rank = index + 1;
                 var minimumExperience = index == 0
                     ? 0
-                    : previousExperience + 1;
+                    : 1;
 
-                var threshold = RankThresholdEntry.CreateOrNormalize(
-                    _rankThresholds[index],
+                var requirement = RankExperienceRequirementEntry.CreateOrNormalize(
+                    _rankRequirements[index],
                     rank,
                     minimumExperience);
 
-                _rankThresholds[index] = threshold;
-                previousExperience = threshold.TotalExperience;
+                _rankRequirements[index] = requirement;
             }
         }
     }
 
     [Serializable]
-    internal sealed class RankThresholdEntry
+    internal sealed class RankExperienceRequirementEntry
     {
         [ReadOnly]
         [LabelText("Rank")]
         [TableColumnWidth(60, Resizable = false)]
         [SerializeField] private int _rank;
 
-        [LabelText("Total Experience")]
+        [LabelText("Required Experience")]
         [SuffixLabel("XP", true)]
         [MinValue(0)]
-        [SerializeField] private int _totalExperience;
+        [SerializeField] private int _requiredExperience;
 
-        internal int TotalExperience => _totalExperience;
+        internal int RequiredExperience => _requiredExperience;
 
-        internal RankThresholdEntry(int rank, int totalExperience)
+        internal RankExperienceRequirementEntry(int rank, int requiredExperience)
         {
             _rank = rank;
-            _totalExperience = totalExperience;
+            _requiredExperience = requiredExperience;
         }
 
-        internal static RankThresholdEntry CreateOrNormalize(
-            RankThresholdEntry threshold,
+        internal static RankExperienceRequirementEntry CreateOrNormalize(
+            RankExperienceRequirementEntry requirement,
             int rank,
             int minimumExperience)
         {
-            threshold ??= new RankThresholdEntry(rank, minimumExperience);
+            requirement ??= new RankExperienceRequirementEntry(rank, minimumExperience);
 
-            threshold._rank = rank;
-            threshold._totalExperience = rank == 1
+            requirement._rank = rank;
+            requirement._requiredExperience = rank == 1
                 ? 0
-                : Math.Max(threshold._totalExperience, minimumExperience);
+                : Math.Max(requirement._requiredExperience, minimumExperience);
 
-            return threshold;
+            return requirement;
         }
     }
 }

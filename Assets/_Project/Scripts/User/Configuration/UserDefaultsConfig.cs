@@ -20,8 +20,6 @@ namespace LL.User.Configuration
     [HideMonoScript]
     internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsProvider
     {
-        internal const string CreationPath = "LL/User/User Defaults Config";
-
         [BoxGroup("Identity")]
         [LabelText("Region Code")]
         [SerializeField] private string _regionCode;
@@ -36,10 +34,15 @@ namespace LL.User.Configuration
         [SerializeField] private CurrencyBalanceEntry[] _currencies;
 
         [BoxGroup("Progress")]
-        [LabelText("Total Experience")]
+        [LabelText("Rank")]
+        [MinValue(1)]
+        [SerializeField] private int _rank = 1;
+
+        [BoxGroup("Progress")]
+        [LabelText("Experience")]
         [SuffixLabel("XP", true)]
         [MinValue(0)]
-        [SerializeField] private int _totalExperience;
+        [SerializeField] private int _experience;
 
         [BoxGroup("Cards")]
         [ValidateInput(nameof(HasValidCardIds), "Card IDs must be non-empty and unique.")]
@@ -50,6 +53,8 @@ namespace LL.User.Configuration
         [ValidateInput(nameof(HasValidItemIds), "Item IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ItemAmountEntry[] _items;
+
+        internal const string CreationPath = "LL/User/User Defaults Config";
 
         UserInitialData IUserDefaultsProvider.GetDefaults()
         {
@@ -72,7 +77,7 @@ namespace LL.User.Configuration
             return new UserInitialData(
                 new UserIdentity(_regionCode, _userId),
                 new WalletInitialData(_currencies?.Select(currency => currency.ToData())),
-                new ProgressInitialData(_totalExperience),
+                new ProgressInitialData(_rank, _experience),
                 new CardsInitialData(_cards?.Select(card => card.ToData())),
                 new ItemsInitialData(_items?.Select(item => item.ToData())),
                 new RewardClaimsInitialData(null));

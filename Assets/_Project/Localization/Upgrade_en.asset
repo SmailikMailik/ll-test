@@ -50,9 +50,18 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - id: 0
+  - m_Id: 352062502440982
+    m_Localized: Experience Will Be Lost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440983
+    m_Localized: Using these cards will waste {experience} Battle EXP. Continue?
+    m_Metadata:
+      m_Items:
+      - id: 0
   references:
     version: 1
     00000000:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
-        m_Entries: 0c9065f0324001000f9065f032400100139065f032400100149065f032400100
+        m_Entries: 0c9065f0324001000f9065f032400100139065f032400100149065f032400100179065f032400100

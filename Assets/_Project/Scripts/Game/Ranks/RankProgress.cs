@@ -5,63 +5,40 @@ namespace LL.Game.Ranks
     internal readonly struct RankProgress
     {
         internal int Rank { get; }
-        internal int TotalExperience { get; }
-
-        internal int CurrentRankExperience { get; }
-        internal int NextRankExperience { get; }
-
-        internal int ExperienceInCurrentRank { get; }
-        internal int ExperienceBetweenRanks { get; }
-
-        internal float NormalizedExperience { get; }
+        internal int Experience { get; }
+        internal int RequiredExperience { get; }
+        internal int RemainingExperience { get; }
         internal bool HasNextRank { get; }
 
         internal RankProgress(
             int rank,
-            int totalExperience,
-            int currentRankExperience,
-            int nextRankExperience,
+            int experience,
+            int requiredExperience,
             bool hasNextRank)
         {
             Rank = rank;
-            TotalExperience = totalExperience;
-
-            CurrentRankExperience = currentRankExperience;
-            NextRankExperience = nextRankExperience;
-
-            ExperienceInCurrentRank = totalExperience - currentRankExperience;
-            ExperienceBetweenRanks = hasNextRank
-                ? nextRankExperience - currentRankExperience
+            Experience = experience;
+            RequiredExperience = requiredExperience;
+            RemainingExperience = hasNextRank
+                ? Math.Max(0, requiredExperience - experience)
                 : 0;
-
             HasNextRank = hasNextRank;
-            NormalizedExperience = CalculateNormalizedExperience(
-                totalExperience,
-                currentRankExperience,
-                ExperienceBetweenRanks,
-                hasNextRank);
         }
 
-        internal float GetNormalizedExperience(int totalExperience)
+        internal float GetNormalizedExperience(int experience)
         {
-            return CalculateNormalizedExperience(
-                totalExperience,
-                CurrentRankExperience,
-                ExperienceBetweenRanks,
-                HasNextRank);
+            return CalculateNormalizedExperience(experience, RequiredExperience, HasNextRank);
         }
 
         private static float CalculateNormalizedExperience(
-            int totalExperience,
-            int currentRankExperience,
-            int experienceBetweenRanks,
+            int experience,
+            int requiredExperience,
             bool hasNextRank)
         {
             if (hasNextRank is false)
                 return 1f;
 
-            var experience = Math.Max(0, totalExperience - currentRankExperience);
-            return (float)Math.Min(experience, experienceBetweenRanks) / experienceBetweenRanks;
+            return (float)Math.Clamp(experience, 0, requiredExperience) / requiredExperience;
         }
     }
 }

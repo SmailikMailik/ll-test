@@ -7,7 +7,7 @@ namespace LL.Game.Ranks
 {
     internal sealed class RankProgression : IRankProgression
     {
-        private readonly IReadOnlyList<int> _experienceThresholds;
+        private readonly IReadOnlyList<int> _experienceRequirements;
 
         [Inject]
         internal RankProgression(IDataLoader<RankCatalog> loader)
@@ -15,62 +15,43 @@ namespace LL.Game.Ranks
             if (loader is null)
                 throw new ArgumentNullException(nameof(loader));
 
-            _experienceThresholds = Normalize(loader.Load()?.ExperienceThresholds);
+            _experienceRequirements = Normalize(loader.Load()?.ExperienceRequirements);
         }
 
-        public RankProgress GetProgress(int rank, int totalExperience)
+        public RankProgress GetProgress(int rank, int experience)
         {
-            rank = Math.Clamp(rank, 1, _experienceThresholds.Count);
-            totalExperience = Math.Max(0, totalExperience);
+            rank = Math.Clamp(rank, 1, _experienceRequirements.Count);
+            experience = Math.Max(0, experience);
 
-            var currentRankExperience = _experienceThresholds[rank - 1];
-            var hasNextRank = rank < _experienceThresholds.Count;
-            var nextRankExperience = hasNextRank
-                ? _experienceThresholds[rank]
+            var hasNextRank = rank < _experienceRequirements.Count;
+            var requiredExperience = hasNextRank
+                ? _experienceRequirements[rank]
                 : 0;
 
             return new RankProgress(
                 rank,
-                totalExperience,
-                currentRankExperience,
-                nextRankExperience,
+                experience,
+                requiredExperience,
                 hasNextRank);
         }
 
-        public int GetRank(int totalExperience)
+        public bool CanPromote(int rank, int experience)
         {
-            totalExperience = Math.Max(0, totalExperience);
-
-            for (var index = 1; index < _experienceThresholds.Count; index++)
-            {
-                if (totalExperience < _experienceThresholds[index])
-                    return index;
-            }
-
-            return _experienceThresholds.Count;
-        }
-
-        public bool CanPromote(int rank, int totalExperience)
-        {
-            var progress = GetProgress(rank, totalExperience);
+            var progress = GetProgress(rank, experience);
 
             return progress.HasNextRank &&
-                   totalExperience >= progress.NextRankExperience;
+                   experience >= progress.RequiredExperience;
         }
 
-        private static IReadOnlyList<int> Normalize(IReadOnlyList<int> thresholds)
+        private static IReadOnlyList<int> Normalize(IReadOnlyList<int> requirements)
         {
-            if (thresholds == null || thresholds.Count == 0)
+            if (requirements == null || requirements.Count == 0)
                 return new[] { 0 };
 
-            var normalized = new int[thresholds.Count];
+            var normalized = new int[requirements.Count];
 
-            for (var index = 1; index < thresholds.Count; index++)
-            {
-                normalized[index] = Math.Max(
-                    thresholds[index],
-                    normalized[index - 1] + 1);
-            }
+            for (var index = 1; index < requirements.Count; index++)
+                normalized[index] = Math.Max(1, requirements[index]);
 
             return normalized;
         }

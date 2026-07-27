@@ -13,10 +13,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             get
             {
                 var progress = _rankProgression.GetProgress(_baseRank, _baseExperience);
-
-                return progress.HasNextRank
-                    ? Math.Max(MinimumAmount, progress.NextRankExperience - _baseExperience)
-                    : MinimumAmount;
+                return progress.RemainingExperience;
             }
         }
 
@@ -45,7 +42,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         internal void ResetPreview()
         {
             _baseRank = _userProgress.Rank;
-            _baseExperience = _userProgress.TotalExperience;
+            _baseExperience = _userProgress.Experience;
             ClearPreview();
         }
 
