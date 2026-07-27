@@ -8,6 +8,7 @@ namespace LL.User.Core.Progress
         Observable<int> TotalExperience { get; }
         Observable<int> Rank { get; }
 
+        bool CanAddExperience(int amount);
         bool TryAddExperience(int amount);
     }
 }

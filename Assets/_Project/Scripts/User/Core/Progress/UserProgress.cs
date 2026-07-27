@@ -25,9 +25,22 @@ namespace LL.User.Core.Progress
                 .DistinctUntilChanged();
         }
 
+        public bool CanAddExperience(int amount)
+        {
+            var hasExperienceToAdd = amount > 0;
+
+            if (hasExperienceToAdd is false)
+                return false;
+
+            var currentExperience = _totalExperience.Value;
+            var availableExperience = int.MaxValue - currentExperience;
+
+            return amount <= availableExperience;
+        }
+
         public bool TryAddExperience(int amount)
         {
-            if (amount <= 0 || _totalExperience.Value > int.MaxValue - amount)
+            if (CanAddExperience(amount) is false)
                 return false;
 
             _totalExperience.Value += amount;

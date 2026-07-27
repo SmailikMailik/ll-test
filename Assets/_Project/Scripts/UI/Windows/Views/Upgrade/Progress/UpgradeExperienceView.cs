@@ -1,3 +1,5 @@
+using LL.Game.Ranks;
+using LL.UI.Formatting;
 using TMPro;
 using UnityEngine;
 
@@ -11,17 +13,18 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         [SerializeField] private TMP_Text _experienceLabel;
         [SerializeField] private TMP_Text _addedExperienceLabel;
 
-        internal void Show(
-            string rank,
-            string experience,
-            string addedExperience,
-            float currentProgress,
-            float previewProgress)
+        internal void Show(RankProgress progress, int currentExperience, int addedExperience)
         {
-            _rankLabel.text = rank;
-            _experienceLabel.text = experience;
-            _addedExperienceLabel.text = addedExperience;
-            _bar.SetProgress(currentProgress, previewProgress);
+            _rankLabel.text = progress.Rank.ToString();
+            _experienceLabel.text = progress.HasNextRank
+                ? TextFormatter.Progress(progress.TotalExperience, progress.NextRankExperience)
+                : TextFormatter.Number(progress.TotalExperience);
+            _addedExperienceLabel.text = addedExperience > 0
+                ? $"+ {TextFormatter.Number(addedExperience)}"
+                : string.Empty;
+            _bar.SetProgress(
+                progress.GetNormalizedExperience(currentExperience),
+                progress.NormalizedExperience);
         }
     }
 }

@@ -1,33 +1,28 @@
 using System;
 using LL.Game.Ranks;
-using LL.UI.Formatting;
 using LL.User.Core.Progress;
-using UnityEngine;
-using VContainer;
 
 namespace LL.UI.Windows.Views.Upgrade.Progress
 {
-    [DisallowMultipleComponent]
-    internal sealed class UpgradeExperienceController : MonoBehaviour
+    internal sealed class UpgradeExperienceController
     {
-        [SerializeField] private UpgradeExperienceView _view;
-
         private const int MinimumAmount = 0;
 
-        internal bool CanApplyPendingExperience =>
-            _pendingExperience > MinimumAmount &&
-            _userProgress.CurrentTotalExperience <= int.MaxValue - _pendingExperience;
+        internal bool CanApplyPendingExperience => _userProgress.CanAddExperience(_pendingExperience);
 
-        private IUserProgress _userProgress;
-        private IRankProgression _rankProgression;
+        private readonly UpgradeExperienceView _view;
+        private readonly IUserProgress _userProgress;
+        private readonly IRankProgression _rankProgression;
+
         private int _baseExperience;
         private int _pendingExperience;
 
-        [Inject]
-        private void Construct(
+        internal UpgradeExperienceController(
+            UpgradeExperienceView view,
             IUserProgress userProgress,
             IRankProgression rankProgression)
         {
+            _view = view ?? throw new ArgumentNullException(nameof(view));
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
         }
@@ -38,36 +33,36 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             ClearPreview();
         }
 
-        internal int GetMaximumApplicableAmount(int experiencePerItem)
+        internal void ClearPreview()
         {
-            if (experiencePerItem <= 0)
-                return MinimumAmount;
-
-            return (int)Math.Min(
-                int.MaxValue,
-                ((long)int.MaxValue - _baseExperience) / experiencePerItem);
+            _pendingExperience = MinimumAmount;
+            RefreshView();
         }
 
         internal void SetPendingItems(int amount, int experiencePerItem)
         {
             if (amount < MinimumAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
+
             if (experiencePerItem <= 0)
                 throw new ArgumentOutOfRangeException(nameof(experiencePerItem));
 
-            var pendingExperience = (long)amount * experiencePerItem;
+            var maximumApplicableAmount = GetMaximumApplicableAmount(experiencePerItem);
 
-            if ((long)_baseExperience + pendingExperience > int.MaxValue)
+            if (amount > maximumApplicableAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            _pendingExperience = (int)pendingExperience;
+            _pendingExperience = amount * experiencePerItem;
             RefreshView();
         }
 
-        internal void ClearPreview()
+        internal int GetMaximumApplicableAmount(int experiencePerItem)
         {
-            _pendingExperience = MinimumAmount;
-            RefreshView();
+            if (experiencePerItem <= 0)
+                return MinimumAmount;
+
+            var availableExperience = int.MaxValue - _baseExperience;
+            return availableExperience / experiencePerItem;
         }
 
         internal bool TryApplyPendingExperience()
@@ -86,19 +81,8 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         {
             var previewExperience = _baseExperience + _pendingExperience;
             var progress = _rankProgression.GetProgress(previewExperience);
-            var experience = progress.HasNextRank
-                ? TextFormatter.Progress(progress.TotalExperience, progress.NextRankExperience)
-                : TextFormatter.Number(progress.TotalExperience);
-            var addedExperience = _pendingExperience > MinimumAmount
-                ? $"+ {TextFormatter.Number(_pendingExperience)}"
-                : string.Empty;
 
-            _view.Show(
-                progress.Rank.ToString(),
-                experience,
-                addedExperience,
-                progress.GetNormalizedExperience(_baseExperience),
-                progress.NormalizedExperience);
+            _view.Show(progress, _baseExperience, _pendingExperience);
         }
     }
 }

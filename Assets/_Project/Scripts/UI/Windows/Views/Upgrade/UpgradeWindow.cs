@@ -1,9 +1,11 @@
 using System;
+using LL.Game.Ranks;
 using LL.UI.Controls.Buttons;
 using LL.UI.Controls.Steppers;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;
 using LL.User.Core.Cards;
+using LL.User.Core.Progress;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -12,9 +14,10 @@ namespace LL.UI.Windows.Views.Upgrade
 {
     internal sealed class UpgradeWindow : Window<UpgradeWindowParameters>
     {
-        [SerializeField] private UpgradeExperienceController _experienceController;
+        [SerializeField] private UpgradeExperienceView _experienceView;
         [SerializeField] private UpgradeCardSelector _cardSelector;
         [SerializeField] private AmountStepper _amountStepper;
+
         [SerializeField] private InteractiveButton _useButton;
         [SerializeField] private InteractiveButton _resetButton;
 
@@ -22,13 +25,22 @@ namespace LL.UI.Windows.Views.Upgrade
         private const int MinimumAmount = 0;
 
         private IUserCards _userCards;
+        private IUserProgress _userProgress;
+        private IRankProgression _rankProgression;
+        private UpgradeExperienceController _experienceController;
+
         private bool _isApplying;
         private bool _isInitialized;
 
         [Inject]
-        private void Construct(IUserCards userCards)
+        private void Construct(
+            IUserCards userCards,
+            IUserProgress userProgress,
+            IRankProgression rankProgression)
         {
             _userCards = userCards ?? throw new ArgumentNullException(nameof(userCards));
+            _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
+            _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
         }
 
         protected override void OnShow()
@@ -51,6 +63,10 @@ namespace LL.UI.Windows.Views.Upgrade
                 return;
 
             _isInitialized = true;
+            _experienceController = new UpgradeExperienceController(
+                _experienceView,
+                _userProgress,
+                _rankProgression);
             _cardSelector.Initialize();
             _amountStepper.Initialize(AmountDelta);
 
@@ -104,15 +120,9 @@ namespace LL.UI.Windows.Views.Upgrade
             _cardSelector.SetPlannedAmount(amount);
 
             if (_cardSelector.HasSelection)
-            {
-                _experienceController.SetPendingItems(
-                    amount,
-                    _cardSelector.SelectedCard.ExperienceAmount);
-            }
+                _experienceController.SetPendingItems(amount, _cardSelector.SelectedCard.ExperienceAmount);
             else
-            {
                 _experienceController.ClearPreview();
-            }
 
             RefreshUseButton();
         }
@@ -156,8 +166,7 @@ namespace LL.UI.Windows.Views.Upgrade
 
             return Math.Min(
                 _cardSelector.SelectedAmount,
-                _experienceController.GetMaximumApplicableAmount(
-                    _cardSelector.SelectedCard.ExperienceAmount));
+                _experienceController.GetMaximumApplicableAmount(_cardSelector.SelectedCard.ExperienceAmount));
         }
 
         private void RefreshUseButton()
