@@ -13,6 +13,7 @@ using LL.User.Configuration;
 using LL.User.Core;
 using LL.User.Core.Cards;
 using LL.User.Core.Progress;
+using LL.User.Core.Upgrades;
 using LL.User.Core.Wallet;
 using LL.User.Persistence;
 using UnityEngine;
@@ -83,6 +84,7 @@ namespace LL.DI
             builder.Register<UserCards>(Lifetime.Singleton).As<IUserCards>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
+            builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
             builder.Register<PurchaseService>(Lifetime.Singleton).As<IPurchaseService>();
 

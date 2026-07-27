@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using LL.Game.Cards;
+using LL.User.Core.Cards;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -15,41 +17,15 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         private const int MinimumAmount = 0;
 
         internal bool HasSelection => _selectedView != null;
-        internal ICard SelectedCard { get; private set; }
-        internal int SelectedAmount => _selectedView == null
-            ? MinimumAmount
-            : _selectedView.AvailableAmount;
-        internal int SelectedPlannedAmount => _selectedView == null
-            ? MinimumAmount
-            : _selectedView.PlannedAmount;
-        internal int PlannedExperience
-        {
-            get
-            {
-                var experience = MinimumAmount;
+        internal ICard SelectedCard => _selectedView?.Card;
+        internal int SelectedAvailableAmount => _selectedView?.AvailableAmount ?? MinimumAmount;
+        internal int SelectedPlannedAmount => _selectedView?.PlannedAmount ?? MinimumAmount;
+        internal int PlannedExperience => _slots.Sum(slot => slot.View.PlannedAmount * slot.View.Card.ExperienceAmount);
 
-                foreach (var slot in _slots)
-                {
-                    var plannedAmount = slot.View.PlannedAmount;
+        internal Observable<Unit> Changed => _changed;
 
-                    if (plannedAmount <= MinimumAmount ||
-                        _cardCatalog.TryGetCard(slot.Id, out var card) is false)
-                    {
-                        continue;
-                    }
+        private readonly Subject<Unit> _changed = new();
 
-                    experience += plannedAmount * card.ExperienceAmount;
-                }
-
-                return experience;
-            }
-        }
-
-        internal Observable<Unit> SelectionChanged => _selectionChanged;
-        internal Observable<int> SelectedAmountChanged => _selectedAmountChanged;
-
-        private readonly Subject<Unit> _selectionChanged = new();
-        private readonly Subject<int> _selectedAmountChanged = new();
         private CardCatalog _cardCatalog;
         private UpgradeCardView _selectedView;
         private bool _isInitialized;
@@ -66,36 +42,34 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
                 throw new InvalidOperationException($"{nameof(UpgradeCardSelector)} is already initialized.");
 
             _isInitialized = true;
+            _changed.AddTo(this);
 
             foreach (var slot in _slots)
             {
-                var card = slot.View;
-                card.Clicked
-                    .Subscribe(_ => Select(card))
+                if (_cardCatalog.TryGetCard(slot.Id, out var card) is false)
+                    throw new KeyNotFoundException($"Missing card data for Card Id: {slot.Id}");
+
+                var view = slot.View;
+
+                view.Clicked
+                    .Subscribe(_ => Select(view))
                     .AddTo(this);
-                card.AvailableAmountChanged
-                    .Subscribe(_ => OnAmountChanged(card))
+                view.AvailableAmountChanged
+                    .Subscribe(_ => OnAmountChanged(view))
                     .AddTo(this);
-                card.Initialize(slot.Id);
+
+                view.Initialize(card);
             }
         }
 
-        private void OnDestroy()
+        internal void Reset()
         {
-            _selectionChanged.Dispose();
-            _selectedAmountChanged.Dispose();
-        }
+            ClearPlan();
 
-        internal void ResetSelection()
-        {
             foreach (var slot in _slots)
-            {
                 slot.View.SetSelected(false);
-                slot.View.SetPlannedAmount(MinimumAmount);
-            }
 
             _selectedView = null;
-            SelectedCard = null;
 
             foreach (var slot in _slots)
             {
@@ -105,28 +79,28 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
                     return;
             }
 
-            _selectionChanged.OnNext(Unit.Default);
+            _changed.OnNext(Unit.Default);
         }
 
-        internal void SetPlannedAmount(int amount)
+        internal void SetSelectedPlannedAmount(int amount)
         {
             _selectedView?.SetPlannedAmount(amount);
         }
 
-        internal IReadOnlyList<PlannedCard> GetPlannedCards()
+        internal IReadOnlyList<CardStack> GetPlan()
         {
-            var plannedCards = new List<PlannedCard>(_slots.Length);
+            var plannedCards = new List<CardStack>(_slots.Length);
 
             foreach (var slot in _slots)
             {
                 if (slot.View.PlannedAmount > MinimumAmount)
-                    plannedCards.Add(new PlannedCard(slot.Id, slot.View.PlannedAmount));
+                    plannedCards.Add(new CardStack(slot.Id, slot.View.PlannedAmount));
             }
 
             return plannedCards;
         }
 
-        internal void ClearPlannedAmounts()
+        internal void ClearPlan()
         {
             foreach (var slot in _slots)
                 slot.View.SetPlannedAmount(MinimumAmount);
@@ -134,11 +108,8 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         private void Select(UpgradeCardView card)
         {
-            if (card.AvailableAmount <= MinimumAmount ||
-                _cardCatalog.TryGetCard(card.Id, out var cardData) is false)
-            {
+            if (card.AvailableAmount <= MinimumAmount)
                 return;
-            }
 
             foreach (var slot in _slots)
             {
@@ -147,8 +118,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             }
 
             _selectedView = card;
-            SelectedCard = cardData;
-            _selectionChanged.OnNext(Unit.Default);
+            _changed.OnNext(Unit.Default);
         }
 
         private void OnAmountChanged(UpgradeCardView card)
@@ -160,12 +130,9 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             {
                 card.SetSelected(false);
                 _selectedView = null;
-                SelectedCard = null;
-                _selectionChanged.OnNext(Unit.Default);
-                return;
             }
 
-            _selectedAmountChanged.OnNext(card.AvailableAmount);
+            _changed.OnNext(Unit.Default);
         }
     }
 
@@ -177,17 +144,5 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         internal UpgradeCardView View => _view;
         internal CardId Id => new(_cardId);
-    }
-
-    internal readonly struct PlannedCard
-    {
-        internal CardId Id { get; }
-        internal int Amount { get; }
-
-        internal PlannedCard(CardId id, int amount)
-        {
-            Id = id;
-            Amount = amount;
-        }
     }
 }

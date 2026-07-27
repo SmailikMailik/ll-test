@@ -29,7 +29,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         internal void ResetPreview()
         {
-            _baseExperience = _userProgress.CurrentTotalExperience;
+            _baseExperience = _userProgress.TotalExperience;
             ClearPreview();
         }
 
@@ -44,11 +44,8 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             if (amount < MinimumAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            if (amount > MinimumAmount &&
-                _userProgress.CanAddExperience(amount) is false)
-            {
+            if (amount > MinimumAmount && _userProgress.CanAddExperience(amount) is false)
                 throw new ArgumentOutOfRangeException(nameof(amount));
-            }
 
             _pendingExperience = amount;
             RefreshView();
@@ -71,18 +68,6 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
             var availableExperience = totalAvailableExperience - reservedExperience;
             return availableExperience / experiencePerItem;
-        }
-
-        internal bool TryApplyPendingExperience()
-        {
-            if (CanApplyPendingExperience is false ||
-                _userProgress.TryAddExperience(_pendingExperience) is false)
-            {
-                return false;
-            }
-
-            ResetPreview();
-            return true;
         }
 
         private void RefreshView()

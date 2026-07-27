@@ -81,7 +81,7 @@ namespace LL.User.Persistence
                     .Subscribe(value => UpdateCardAndSave(cardId, value)));
             }
 
-            _subscriptions.Add(_progress.TotalExperience
+            _subscriptions.Add(_progress.TotalExperienceChanged
                 .Subscribe(value => UpdateAndSave(ref _totalExperience, value)));
         }
 

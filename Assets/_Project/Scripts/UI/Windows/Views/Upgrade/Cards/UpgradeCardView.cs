@@ -27,7 +27,8 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         private const int AddAmount = 1;
         private const int MinimumAmount = 0;
 
-        internal CardId Id { get; private set; }
+        internal ICard Card { get; private set; }
+
         internal int AvailableAmount { get; private set; }
         internal int PlannedAmount { get; private set; }
 
@@ -50,31 +51,34 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             _iconProvider = iconProvider ?? throw new ArgumentNullException(nameof(iconProvider));
         }
 
-        internal void Initialize(CardId id)
+        internal void Initialize(ICard card)
         {
             if (_isInitialized)
                 throw new InvalidOperationException($"{nameof(UpgradeCardView)} is already initialized.");
 
-            if (id.IsEmpty)
-                throw new ArgumentException("Card Id cannot be empty.", nameof(id));
+            if (card == null)
+                throw new ArgumentNullException(nameof(card));
 
-            if (_iconProvider.TryGetIcon(id, out var icon) is false)
-                throw new KeyNotFoundException($"Missing icon for Card Id: {id}");
+            if (card.Id.IsEmpty)
+                throw new ArgumentException("Card Id cannot be empty.", nameof(card));
+
+            if (_iconProvider.TryGetIcon(card.Id, out var icon) is false)
+                throw new KeyNotFoundException($"Missing icon for Card Id: {card.Id}");
 
             _isInitialized = true;
 
-            Id = id;
+            Card = card;
             PlannedAmount = MinimumAmount;
             _iconImage.sprite = icon;
 
             SetSelected(false);
 
             _addButton.Clicked
-                .Subscribe(_ => _userCards.TryAdd(Id, AddAmount))
+                .Subscribe(_ => _userCards.TryAdd(Card.Id, AddAmount))
                 .AddTo(this);
 
             _userCards
-                .ObserveAmount(id)
+                .ObserveAmount(Card.Id)
                 .Subscribe(UpdateProgress)
                 .AddTo(this);
         }

@@ -1,5 +1,4 @@
 using System;
-using LL.Game.Ranks;
 using R3;
 using VContainer;
 
@@ -7,34 +6,24 @@ namespace LL.User.Core.Progress
 {
     internal sealed class UserProgress : IUserProgress, IDisposable
     {
-        public int CurrentTotalExperience => _totalExperience.Value;
-        public Observable<int> TotalExperience => _totalExperience;
-        public Observable<int> Rank => _rank;
+        public int TotalExperience { get; private set; }
 
-        private readonly ReactiveProperty<int> _totalExperience;
-        private readonly Observable<int> _rank;
+        public Observable<int> TotalExperienceChanged => _totalExperienceChanged;
+
+        private readonly Subject<int> _totalExperienceChanged = new();
 
         [Inject]
-        internal UserProgress(
-            ProgressInitialData initialData,
-            IRankProgression rankProgression)
+        internal UserProgress(ProgressInitialData initialData)
         {
-            _totalExperience = new ReactiveProperty<int>(initialData.TotalExperience);
-            _rank = _totalExperience
-                .Select(rankProgression.GetRank)
-                .DistinctUntilChanged();
+            TotalExperience = initialData.TotalExperience;
         }
 
         public bool CanAddExperience(int amount)
         {
-            var hasExperienceToAdd = amount > 0;
-
-            if (hasExperienceToAdd is false)
+            if (amount <= 0)
                 return false;
 
-            var currentExperience = _totalExperience.Value;
-            var availableExperience = int.MaxValue - currentExperience;
-
+            var availableExperience = int.MaxValue - TotalExperience;
             return amount <= availableExperience;
         }
 
@@ -43,13 +32,15 @@ namespace LL.User.Core.Progress
             if (CanAddExperience(amount) is false)
                 return false;
 
-            _totalExperience.Value += amount;
+            TotalExperience += amount;
+            _totalExperienceChanged.OnNext(TotalExperience);
+
             return true;
         }
 
         public void Dispose()
         {
-            _totalExperience.Dispose();
+            _totalExperienceChanged.Dispose();
         }
     }
 }

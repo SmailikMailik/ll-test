@@ -17,11 +17,6 @@ namespace LL.Game.Ranks
             _experienceThresholds = Normalize(loader.Load()?.ExperienceThresholds);
         }
 
-        public int GetRank(int totalExperience)
-        {
-            return CalculateRank(Math.Max(0, totalExperience));
-        }
-
         public RankProgress GetProgress(int totalExperience)
         {
             totalExperience = Math.Max(0, totalExperience);
