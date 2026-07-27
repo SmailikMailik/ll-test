@@ -40,9 +40,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - id: 0
+  - m_Id: 352062502440979
+    m_Localized: "\u041F\u043E\u0432\u044B\u0441\u0438\u0442\u044C \u0440\u0430\u043D\u0433 \u0437\u0430 {price}?"
+    m_Metadata:
+      m_Items:
+      - id: 0
+  - m_Id: 352062502440980
+    m_Localized: "\u041F\u0440\u043E\u043F\u0443\u0441\u0442\u0438\u0442\u044C \u043F\u0440\u0438\u043A\u0430\u0437 \u0438 \u0441\u0440\u0430\u0437\u0443 \u043F\u043E\u0432\u044B\u0441\u0438\u0442\u044C \u0440\u0430\u043D\u0433 \u0437\u0430 {price}?"
+    m_Metadata:
+      m_Items:
+      - id: 0
   references:
     version: 1
     00000000:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
-        m_Entries: 0c9065f0324001000f9065f032400100
+        m_Entries: 0c9065f0324001000f9065f032400100139065f032400100149065f032400100

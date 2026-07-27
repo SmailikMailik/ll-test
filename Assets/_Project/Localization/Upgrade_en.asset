@@ -40,9 +40,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - id: 0
+  - m_Id: 352062502440979
+    m_Localized: Promote your rank for {price}?
+    m_Metadata:
+      m_Items:
+      - id: 0
+  - m_Id: 352062502440980
+    m_Localized: Skip the order and promote your rank immediately for {price}?
+    m_Metadata:
+      m_Items:
+      - id: 0
   references:
     version: 1
     00000000:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
-        m_Entries: 0c9065f0324001000f9065f032400100
+        m_Entries: 0c9065f0324001000f9065f032400100139065f032400100149065f032400100

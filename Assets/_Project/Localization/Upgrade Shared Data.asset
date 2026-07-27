@@ -35,6 +35,14 @@ MonoBehaviour:
     m_Key: messages.headshot_requirement
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440979
+    m_Key: messages.confirm_rank_promotion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440980
+    m_Key: messages.confirm_instant_rank_promotion
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

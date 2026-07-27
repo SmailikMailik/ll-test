@@ -1,4 +1,3 @@
-using R3;
 using UnityEngine;
 using VContainer;
 
@@ -8,24 +7,13 @@ namespace LL.UI.Windows
     {
         [SerializeField] private Transform _container;
 
-        internal Observable<WindowBase> CurrentWindow => _navigator.CurrentWindow;
-        internal bool CanGoBack => _navigator.CanGoBack;
-
         private WindowProvider _provider;
         private WindowNavigator _navigator;
 
-        private void Awake()
-        {
-            if (_container == null)
-            {
-                Debug.LogError(
-                    "[WindowController::Awake] Window container is not assigned",
-                    this);
-            }
-        }
-
         [Inject]
-        private void Construct(WindowProvider provider, WindowNavigator navigator)
+        private void Construct(
+            WindowProvider provider,
+            WindowNavigator navigator)
         {
             _provider = provider;
             _navigator = navigator;
@@ -34,23 +22,41 @@ namespace LL.UI.Windows
         internal void Show<TParameter>(TParameter parameters)
             where TParameter : class, IWindowParameters
         {
-            if (parameters is null)
-            {
-                Debug.LogError(
-                    "[WindowController::Show] Parameters are null",
-                    this);
-                return;
-            }
+            if (TryGetWindow(parameters, out var window))
+                _navigator.Show(window, parameters);
+        }
 
-            if (_container == null)
-                return;
-
-            if (_provider.TryGetOrCreate<TParameter>(_container, out var window) is false)
-                return;
-
-            _navigator.Show(window, parameters);
+        internal void Replace<TParameter>(TParameter parameters)
+            where TParameter : class, IWindowParameters
+        {
+            if (TryGetWindow(parameters, out var window))
+                _navigator.Replace(window, parameters);
         }
 
         internal bool Back() => _navigator.Back();
+
+        private bool TryGetWindow<TParameter>(TParameter parameters, out Window<TParameter> window)
+            where TParameter : class, IWindowParameters
+        {
+            window = null;
+
+            if (parameters is null)
+            {
+                Debug.LogError(
+                    "[WindowController::TryGetWindow] Parameters are null",
+                    this);
+                return false;
+            }
+
+            if (_container == null)
+            {
+                Debug.LogError(
+                    "[WindowController::TryGetWindow] Window container is not assigned",
+                    this);
+                return false;
+            }
+
+            return _provider.TryGetOrCreate(_container, out window);
+        }
     }
 }

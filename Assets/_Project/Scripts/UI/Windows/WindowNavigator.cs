@@ -45,12 +45,11 @@ namespace LL.UI.Windows
         internal void Show<TParameter>(Window<TParameter> window, TParameter parameters)
             where TParameter : class, IWindowParameters
         {
-            _history.Push(new WindowHistoryEntry(window, parameters));
-            _knownWindows.Add(window);
+            Push(window, parameters);
 
             try
             {
-                ApplyVisibleState(window);
+                CompleteNavigation(window);
             }
             catch
             {
@@ -58,8 +57,31 @@ namespace LL.UI.Windows
                 ApplyVisibleState();
                 throw;
             }
+        }
 
-            CurrentWindow.OnNext(window);
+        internal void Replace<TParameter>(Window<TParameter> window, TParameter parameters)
+            where TParameter : class, IWindowParameters
+        {
+            var replacedEntry = _history.Count > 0
+                ? _history.Pop()
+                : (WindowHistoryEntry?)null;
+
+            Push(window, parameters);
+
+            try
+            {
+                CompleteNavigation(window);
+            }
+            catch
+            {
+                _history.Pop();
+
+                if (replacedEntry.HasValue)
+                    _history.Push(replacedEntry.Value);
+
+                ApplyVisibleState(replacedEntry?.Window);
+                throw;
+            }
         }
 
         internal bool Back()
@@ -87,6 +109,21 @@ namespace LL.UI.Windows
         }
 
         public void Dispose() => CurrentWindow.Dispose();
+
+        private void Push<TParameter>(
+            Window<TParameter> window,
+            TParameter parameters)
+            where TParameter : class, IWindowParameters
+        {
+            _history.Push(new WindowHistoryEntry(window, parameters));
+            _knownWindows.Add(window);
+        }
+
+        private void CompleteNavigation(WindowBase window)
+        {
+            ApplyVisibleState(window);
+            CurrentWindow.OnNext(window);
+        }
 
         private void ApplyVisibleState(WindowBase forceRefresh = null)
         {

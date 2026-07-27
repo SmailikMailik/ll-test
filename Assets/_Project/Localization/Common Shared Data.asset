@@ -59,6 +59,22 @@ MonoBehaviour:
     m_Key: prompts.continue
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440976
+    m_Key: titles.confirm_purchase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440977
+    m_Key: actions.purchase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440978
+    m_Key: actions.cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440981
+    m_Key: messages.confirm_purchase
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

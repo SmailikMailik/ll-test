@@ -15,7 +15,7 @@ namespace LL.User.Configuration
 {
     [CreateAssetMenu(fileName = nameof(UserDefaultsConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class UserDefaultsConfig : ScriptableObject, IDefaultDataLoader<UserInitialData>
+    internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsProvider
     {
         internal const string CreationPath = "LL/User/User Defaults Config";
 
@@ -43,7 +43,7 @@ namespace LL.User.Configuration
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private CardAmountEntry[] _cards;
 
-        UserInitialData IDataLoader<UserInitialData>.Load()
+        UserInitialData IUserDefaultsProvider.GetDefaults()
         {
             IdentifierCatalogValidator.EnsureValidIds(
                 _currencies,

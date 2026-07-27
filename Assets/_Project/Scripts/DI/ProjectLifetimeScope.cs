@@ -3,8 +3,10 @@ using LL.Game.Configuration;
 using LL.Game.Currencies;
 using LL.Game.Purchases;
 using LL.Game.Ranks;
+using LL.Loading;
 using LL.Presentation.Configuration;
 using LL.Presentation.Icons;
+using LL.Presentation.Localization;
 using LL.Rewards;
 using LL.Saving;
 using LL.Upgrades;
@@ -46,6 +48,7 @@ namespace LL.DI
             builder.RegisterInstance(_windowCatalog);
             builder.Register<WindowProvider>(Lifetime.Scoped);
             builder.Register<WindowNavigator>(Lifetime.Scoped);
+            builder.Register<UnityLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
 
             builder.RegisterInstance<IDataLoader<RankCatalog>>(_rankCatalogConfig);
             builder.RegisterInstance<IDataLoader<CardCatalog>>(_cardCatalogConfig);
@@ -53,7 +56,7 @@ namespace LL.DI
             builder.RegisterInstance<IDataLoader<IconCatalog<CurrencyId>>>(_currencyIconCatalogConfig);
             builder.RegisterInstance<IDataLoader<IconCatalog<CardId>>>(
                 _cardIconCatalogConfig);
-            builder.RegisterInstance<IDefaultDataLoader<UserInitialData>>(_userDefaultsConfig);
+            builder.RegisterInstance<IUserDefaultsProvider>(_userDefaultsConfig);
 
             builder.Register(
                 resolver => resolver.Resolve<IDataLoader<CardCatalog>>().Load(),

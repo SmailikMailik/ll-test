@@ -5,21 +5,6 @@ using VContainer;
 
 namespace LL.Purchasing
 {
-    internal interface IPurchaseService
-    {
-        bool TryGetPurchase(PurchaseId id, out IPurchase purchase);
-
-        void Purchase(
-            PurchaseId id,
-            Action onSucceeded,
-            Action onFailed);
-    }
-
-    internal interface IPurchaseConfirmation
-    {
-        void Confirm(IPurchase purchase, Action onConfirmed, Action onRejected);
-    }
-
     internal sealed class PurchaseService : IPurchaseService
     {
         private readonly PurchaseCatalog _catalog;
@@ -40,10 +25,7 @@ namespace LL.Purchasing
         public bool TryGetPurchase(PurchaseId id, out IPurchase purchase) =>
             _catalog.TryGetPurchase(id, out purchase);
 
-        public void Purchase(
-            PurchaseId id,
-            Action onSucceeded,
-            Action onFailed)
+        public void Purchase(PurchaseId id, Action onSucceeded, Action onFailed)
         {
             if (_catalog.TryGetPurchase(id, out var purchase) is false)
             {
@@ -57,10 +39,7 @@ namespace LL.Purchasing
                 onFailed);
         }
 
-        private void CompletePurchase(
-            IPurchase purchase,
-            Action onSucceeded,
-            Action onFailed)
+        private void CompletePurchase(IPurchase purchase, Action onSucceeded, Action onFailed)
         {
             if (_wallet.TrySpend(purchase.CurrencyId, purchase.Price))
                 onSucceeded?.Invoke();

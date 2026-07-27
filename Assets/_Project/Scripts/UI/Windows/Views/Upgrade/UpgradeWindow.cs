@@ -3,6 +3,7 @@ using LL.Game.Ranks;
 using LL.Upgrades;
 using LL.UI.Controls.Buttons;
 using LL.UI.Controls.Steppers;
+using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;
 using LL.User.Core.Progress;
@@ -28,6 +29,7 @@ namespace LL.UI.Windows.Views.Upgrade
         private IUserProgress _userProgress;
         private ICardExperienceService _cardExperienceService;
         private IRankProgression _rankProgression;
+        private UpgradeFlow _upgradeFlow;
         private UpgradeExperienceController _experienceController;
 
         private bool _isApplying;
@@ -37,12 +39,13 @@ namespace LL.UI.Windows.Views.Upgrade
         private void Construct(
             IUserProgress userProgress,
             ICardExperienceService cardExperienceService,
-            IRankProgression rankProgression)
+            IRankProgression rankProgression,
+            UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _cardExperienceService =
-                cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
+            _cardExperienceService = cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
+            _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
 
         protected override void OnShow()
@@ -126,16 +129,20 @@ namespace LL.UI.Windows.Views.Upgrade
                 return;
 
             _isApplying = true;
+            bool applied;
 
             try
             {
-                _cardExperienceService.TryApply(_cardSelector.GetPlan());
+                applied = _cardExperienceService.TryApply(_cardSelector.GetPlan());
             }
             finally
             {
                 _isApplying = false;
                 ResetPendingChanges();
             }
+
+            if (applied && _userProgress.CanPromoteRank)
+                _upgradeFlow.ReplaceCurrent();
         }
 
         private int GetMaximumAmount()

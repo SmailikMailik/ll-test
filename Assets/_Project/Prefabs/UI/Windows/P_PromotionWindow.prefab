@@ -275,7 +275,19 @@ MonoBehaviour:
   m_FormatArguments: []
   m_UpdateString:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1815875750463363878}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   references:
     version: 2
     RefIds: []
@@ -1261,10 +1273,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _currentRankLabel: {fileID: 2233690373681334854}
   _nextRankLabel: {fileID: 7540754940811745395}
-  _softButton: {fileID: 5026556986183734536}
   _softPriceLabel: {fileID: 1461057108868792146}
-  _hardButton: {fileID: 4127851390835802154}
+  _softButton: {fileID: 5026556986183734536}
   _hardPriceLabel: {fileID: 7552061282649467504}
+  _hardButton: {fileID: 4127851390835802154}
 --- !u!1001 &1934037493274840877
 PrefabInstance:
   m_ObjectHideFlags: 0
