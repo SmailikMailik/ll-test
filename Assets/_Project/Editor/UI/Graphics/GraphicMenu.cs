@@ -1,11 +1,11 @@
-using LL.UI.Effects;
+using LL.UI.Graphics;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LLEditor.UI.Effects
+namespace LLEditor.UI.Graphics
 {
-    internal static class EffectGraphicMenu
+    internal static class GraphicMenu
     {
         private const int MenuPriority = 2048;
         private static readonly Vector2 _defaultSize = new(100f, 100f);

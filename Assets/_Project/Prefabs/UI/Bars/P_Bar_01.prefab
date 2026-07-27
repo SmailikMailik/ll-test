@@ -404,7 +404,7 @@ MonoBehaviour:
   _currentProgressRect: {fileID: 1929898402355099761}
   _predictedProgressRect: {fileID: 4895890294508468353}
   _currentCap: {fileID: 103541446698824960}
-  _predictGlow: {fileID: 606925799916595968}
+  _predictGlow: {fileID: 122369205717640576}
 --- !u!114 &5696204089413291922
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,5 +1,4 @@
 using LL.Extensions;
-using LL.UI.Effects;
 using UnityEngine;
 
 namespace LL.UI
@@ -8,8 +7,9 @@ namespace LL.UI
     {
         [SerializeField] private RectTransform _currentProgressRect;
         [SerializeField] private RectTransform _predictedProgressRect;
+
         [SerializeField] private RectTransform _currentCap;
-        [SerializeField] private SoftGlowGraphic _predictGlow;
+        [SerializeField] private RectTransform _predictGlow;
 
         private const float MinimumVisibleProgress = 0.0001f;
 
@@ -33,7 +33,7 @@ namespace LL.UI
             _predictedProgressRect.SetRange(currentProgress, predictedProgress);
 
             _predictGlow.gameObject.SetActive(hasPrediction);
-            _predictGlow.rectTransform.SetRange(currentProgress, predictedProgress);
+            _predictGlow.SetRange(currentProgress, predictedProgress);
         }
     }
 }

@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LL.UI.Effects
+namespace LL.UI.Graphics
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    [AddComponentMenu("LL/UI/Effects/Rounded Rectangle")]
+    [AddComponentMenu("LL/UI/Graphics/Rounded Rectangle")]
     internal sealed class RoundedRectangleGraphic : MaskableGraphic
     {
         [Min(0f)]

@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LL.UI.Effects
+namespace LL.UI.Graphics
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    [AddComponentMenu("LL/UI/Effects/Gradient")]
+    [AddComponentMenu("LL/UI/Graphics/Gradient")]
     internal sealed class GradientGraphic : MaskableGraphic
     {
         [SerializeField] private Gradient _gradient = CreateDefaultGradient();

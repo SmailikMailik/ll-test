@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LL.UI.Effects
+namespace LL.UI.Graphics
 {
     internal sealed class SoftGlowGraphic : MaskableGraphic
     {

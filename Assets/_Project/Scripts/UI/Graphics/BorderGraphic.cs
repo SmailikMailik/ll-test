@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LL.UI.Effects
+namespace LL.UI.Graphics
 {
     [RequireComponent(typeof(CanvasRenderer))]
-    [AddComponentMenu("LL/UI/Effects/Border")]
+    [AddComponentMenu("LL/UI/Graphics/Border")]
     internal sealed class BorderGraphic : MaskableGraphic
     {
         [SerializeField, Min(0f)] private float _thickness = 4f;

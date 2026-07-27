@@ -1,10 +1,10 @@
-using LL.UI.Effects;
+using LL.UI.Graphics;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace LLEditor.UI.Effects
+namespace LLEditor.UI.Graphics
 {
     [CustomEditor(typeof(GradientGraphic))]
     [CanEditMultipleObjects]
