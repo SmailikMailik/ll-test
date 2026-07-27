@@ -18,24 +18,27 @@ namespace LL.UI.Items
     [DisallowMultipleComponent]
     internal sealed class CardView : MonoBehaviour
     {
-        [Required]
-        [SerializeField] private SelectionStateSource _stateSource;
+        [Required] [SerializeField] private SelectionStateSource _stateSource;
 
         [SerializeField] private Image _iconImage;
         [SerializeField] private InteractiveButton _addButton;
         [SerializeField] private TMP_Text _progressLabel;
 
         [SerializeField] private string _cardId;
-        [Min(0)]
-        [SerializeField] private int _plannedAmount;
 
+        internal CardId Id { get; private set; }
+
+        internal int AvailableAmount { get; private set; }
         private IUserCards _userCards;
         private IIconProvider<CardId> _iconProvider;
         private IDisposable _amountSubscription;
-        private CardId _id;
-        private bool _isInitialized;
+        private readonly Subject<Unit> _clicked = new();
+        private readonly Subject<int> _availableAmountChanged = new();
+        private int _plannedAmount;
 
         internal bool IsSelected => _stateSource.IsSelected;
+        internal Observable<Unit> Clicked => _clicked;
+        internal Observable<int> AvailableAmountChanged => _availableAmountChanged;
 
         [Inject]
         private void Construct(
@@ -46,22 +49,20 @@ namespace LL.UI.Items
             _iconProvider = iconProvider ?? throw new ArgumentNullException(nameof(iconProvider));
 
             _addButton.Clicked
-                .Subscribe(_ => AddCard())
+                .Subscribe(_ => TrySelect())
                 .AddTo(this);
-        }
 
-        private void Start()
-        {
-            if (_isInitialized is false)
-                UpdateView(new CardId(_cardId), _plannedAmount);
+            UpdateView(new CardId(_cardId));
         }
 
         private void OnDestroy()
         {
             _amountSubscription?.Dispose();
+            _clicked.Dispose();
+            _availableAmountChanged.Dispose();
         }
 
-        internal void UpdateView(CardId id, int plannedAmount)
+        private void UpdateView(CardId id)
         {
             if (id.IsEmpty)
                 throw new ArgumentException("Card ID cannot be empty.", nameof(id));
@@ -69,10 +70,10 @@ namespace LL.UI.Items
             if (_iconProvider.TryGetIcon(id, out var icon) is false)
                 throw new KeyNotFoundException($"Missing icon for card ID: {id}");
 
-            _isInitialized = true;
             SetSelected(false);
-            _id = id;
-            _plannedAmount = Math.Max(0, plannedAmount);
+
+            Id = id;
+            _plannedAmount = 0;
             _iconImage.sprite = icon;
 
             _amountSubscription?.Dispose();
@@ -81,19 +82,35 @@ namespace LL.UI.Items
                 .Subscribe(UpdateProgress);
         }
 
+        internal void SetPlannedAmount(int amount)
+        {
+            _plannedAmount = Math.Clamp(amount, 0, AvailableAmount);
+            ShowProgress();
+        }
+
         internal void SetSelected(bool isSelected)
         {
             _stateSource.SetSelected(isSelected);
         }
 
-        private void AddCard()
+        private void TrySelect()
         {
-            _userCards.TryAdd(_id, 1);
+            if (AvailableAmount > 0)
+                _clicked.OnNext(Unit.Default);
         }
 
         private void UpdateProgress(int availableAmount)
         {
-            _progressLabel.text = TextFormatter.Progress(availableAmount, _plannedAmount);
+            AvailableAmount = Math.Max(0, availableAmount);
+            _plannedAmount = Math.Min(_plannedAmount, AvailableAmount);
+            _addButton.SetInteractable(AvailableAmount > 0);
+            ShowProgress();
+            _availableAmountChanged.OnNext(AvailableAmount);
+        }
+
+        private void ShowProgress()
+        {
+            _progressLabel.text = TextFormatter.Progress(_plannedAmount, AvailableAmount);
         }
     }
 }

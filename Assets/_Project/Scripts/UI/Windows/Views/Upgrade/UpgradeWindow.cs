@@ -1,7 +1,7 @@
-using LL.Game.Ranks;
-using LL.UI.Formatting;
-using LL.User.Core.Progress;
-using TMPro;
+using System;
+using LL.UI.Controls.Buttons;
+using LL.User.Core.Cards;
+using R3;
 using UnityEngine;
 using VContainer;
 
@@ -9,117 +9,143 @@ namespace LL.UI.Windows.Views.Upgrade
 {
     internal sealed class UpgradeWindow : Window<UpgradeWindowParameters>
     {
-        [SerializeField] private PredictedProgressBar _bar;
-        [SerializeField] private TMP_Text _rankLabel;
-        [SerializeField] private TMP_Text _expLabel;
-        [SerializeField] private TMP_Text _addLabel;
+        [SerializeField] private UpgradeProgressView _progressView;
+        [SerializeField] private UpgradeCardSelector _cardSelector;
+        [SerializeField] private UpgradeAmountStepper _amountStepper;
+        [SerializeField] private InteractiveButton _useButton;
 
-        private IUserProgress _userProgress;
-        private IRankProgression _rankProgression;
+        private const int AmountDelta = 1;
+        private const int MinimumAmount = 0;
 
-        private int _appliedExperience;
-        private int _pendingExperience;
+        private IUserCards _userCards;
+        private bool _isApplying;
 
         [Inject]
-        private void Construct(
-            IUserProgress userProgress,
-            IRankProgression rankProgression)
+        private void Construct(IUserCards userCards)
         {
-            _userProgress = userProgress;
-            _rankProgression = rankProgression;
+            _userCards = userCards ?? throw new ArgumentNullException(nameof(userCards));
+            _amountStepper.Initialize(AmountDelta);
+
+            _cardSelector.SelectionChanged
+                .Subscribe(_ => OnSelectionChanged())
+                .AddTo(this);
+            _cardSelector.SelectedAmountChanged
+                .Subscribe(_ => OnSelectedAmountChanged())
+                .AddTo(this);
+            _amountStepper.ValueChanged
+                .Subscribe(OnPlannedAmountChanged)
+                .AddTo(this);
+            _useButton.Clicked
+                .Subscribe(_ => ApplyCards())
+                .AddTo(this);
         }
 
         protected override void OnShow()
         {
-            _appliedExperience = _userProgress.CurrentTotalExperience;
-            _pendingExperience = 0;
-
-            ShowProgress();
+            _progressView.ResetPreview();
+            _cardSelector.ResetSelection();
+            _amountStepper.ResetValue();
+            RefreshUseButton();
         }
 
         protected override void OnHide()
         {
-            _pendingExperience = 0;
+            _cardSelector.SetPlannedAmount(MinimumAmount);
+            _amountStepper.ResetValue();
+            _progressView.ClearPreview();
         }
 
-        private void ShowProgress()
+        private void OnSelectionChanged()
         {
-            var previewExperience = _appliedExperience + _pendingExperience;
-            var progress = _rankProgression.GetProgress(previewExperience);
-
-            _rankLabel.text = progress.Rank.ToString();
-            _expLabel.text = progress.HasNextRank
-                ? TextFormatter.Progress(progress.TotalExperience, progress.NextRankExperience)
-                : TextFormatter.Number(progress.TotalExperience);
-            _addLabel.text = _pendingExperience > 0
-                ? $"+ {TextFormatter.Number(_pendingExperience)}"
-                : string.Empty;
-
-            _bar.SetProgress(progress.GetNormalizedExperience(_appliedExperience), progress.NormalizedExperience);
-        }
-
-        private void AddPendingExperience(int amount)
-        {
-            var pendingExperience = (long)_pendingExperience + amount;
-            var previewExperience = _appliedExperience + pendingExperience;
-
-            if (amount <= 0 || previewExperience > int.MaxValue)
+            if (_isApplying)
                 return;
 
-            _pendingExperience = (int)pendingExperience;
-            ShowProgress();
+            _cardSelector.SetPlannedAmount(MinimumAmount);
+            _progressView.ClearPreview();
+            _amountStepper.ResetValue(GetMaximumAmount());
+            RefreshUseButton();
         }
 
-        private void ApplyExperience()
+        private void OnSelectedAmountChanged()
         {
-            if (_pendingExperience <= 0 ||
-                _userProgress.TryAddExperience(_pendingExperience) is false)
+            if (_isApplying)
                 return;
 
-            _appliedExperience = _userProgress.CurrentTotalExperience;
-            _pendingExperience = 0;
-            ShowProgress();
+            _amountStepper.SetMaximum(GetMaximumAmount());
+            RefreshUseButton();
         }
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-        private void OnGUI()
+        private void OnPlannedAmountChanged(int amount)
         {
-            if (IsVisible is false)
+            _cardSelector.SetPlannedAmount(amount);
+
+            if (_cardSelector.HasSelection)
+            {
+                _progressView.SetPendingItems(
+                    amount,
+                    _cardSelector.SelectedCard.ExperienceAmount);
+            }
+            else
+            {
+                _progressView.ClearPreview();
+            }
+
+            RefreshUseButton();
+        }
+
+        private void ApplyCards()
+        {
+            if (CanUse() is false)
                 return;
 
-            GUILayout.BeginArea(
-                new Rect(16f, Mathf.Max(0f, Screen.height - 164f), 120f, 148f),
-                GUI.skin.box);
+            var cardId = _cardSelector.SelectedCard.Id;
+            var amount = _amountStepper.Value;
 
-            if (GUILayout.Button("+100 XP"))
-                AddPendingExperience(100);
+            _isApplying = true;
 
-            if (GUILayout.Button("+500 XP"))
-                AddPendingExperience(500);
+            if (_userCards.TrySpend(cardId, amount) is false)
+            {
+                _isApplying = false;
+                SynchronizeControls();
+                return;
+            }
 
-            if (GUILayout.Button("+2000 XP"))
-                AddPendingExperience(2000);
+            if (_progressView.TryApplyPendingExperience() is false)
+                _userCards.TryAdd(cardId, amount);
 
-            var guiEnabled = GUI.enabled;
-            GUI.enabled = _pendingExperience > 0;
-
-            if (GUILayout.Button("Apply"))
-                ApplyExperience();
-
-            GUI.enabled = guiEnabled;
-
-            GUILayout.EndArea();
+            _isApplying = false;
+            SynchronizeControls();
         }
-#endif
+
+        private void SynchronizeControls()
+        {
+            _cardSelector.SetPlannedAmount(MinimumAmount);
+            _amountStepper.ResetValue(GetMaximumAmount());
+            _progressView.ClearPreview();
+            RefreshUseButton();
+        }
+
+        private int GetMaximumAmount()
+        {
+            if (_cardSelector.HasSelection is false)
+                return MinimumAmount;
+
+            return Math.Min(
+                _cardSelector.SelectedAmount,
+                _progressView.GetMaximumApplicableAmount(_cardSelector.SelectedCard.ExperienceAmount));
+        }
+
+        private void RefreshUseButton()
+        {
+            _useButton.SetInteractable(CanUse());
+        }
+
+        private bool CanUse() =>
+            _cardSelector.HasSelection &&
+            _amountStepper.Value > MinimumAmount &&
+            _amountStepper.Value <= _cardSelector.SelectedAmount &&
+            _progressView.CanApplyPendingExperience;
     }
 
-    internal sealed class UpgradeWindowParameters : IWindowParameters
-    {
-        internal int Id { get; }
-
-        internal UpgradeWindowParameters(int id)
-        {
-            Id = id;
-        }
-    }
+    internal sealed class UpgradeWindowParameters : IWindowParameters { }
 }

@@ -9,6 +9,8 @@ namespace LL.Game.Cards
     {
         internal IReadOnlyList<ICard> Cards { get; }
 
+        private readonly IReadOnlyDictionary<CardId, ICard> _cardsById;
+
         internal CardCatalog(IEnumerable<ICard> cards)
         {
             var copy = cards?.ToArray() ?? Array.Empty<ICard>();
@@ -19,6 +21,10 @@ namespace LL.Game.Cards
                 nameof(cards));
 
             Cards = Array.AsReadOnly(copy);
+            _cardsById = copy.ToDictionary(card => card.Id);
         }
+
+        internal bool TryGetCard(CardId id, out ICard card) =>
+            _cardsById.TryGetValue(id, out card);
     }
 }

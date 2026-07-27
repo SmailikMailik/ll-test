@@ -43,6 +43,19 @@ namespace LL.User.Core.Cards
             return true;
         }
 
+        public bool TrySpend(CardId id, int amount)
+        {
+            if (amount <= 0 ||
+                TryGetAmount(id, out var currentAmount) is false ||
+                currentAmount.Value < amount)
+            {
+                return false;
+            }
+
+            currentAmount.Value -= amount;
+            return true;
+        }
+
         public void Dispose()
         {
             foreach (var amount in _amounts.Values)

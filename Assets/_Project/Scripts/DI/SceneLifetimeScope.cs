@@ -17,7 +17,7 @@ namespace LL.DI
 
         private void Start()
         {
-            _windowController.Show(new UpgradeWindowParameters(1));
+            _windowController.Show(new UpgradeWindowParameters());
         }
     }
 }

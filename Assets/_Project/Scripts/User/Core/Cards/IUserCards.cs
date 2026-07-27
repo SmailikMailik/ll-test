@@ -8,5 +8,6 @@ namespace LL.User.Core.Cards
         Observable<int> ObserveAmount(CardId id);
 
         bool TryAdd(CardId id, int amount);
+        bool TrySpend(CardId id, int amount);
     }
 }

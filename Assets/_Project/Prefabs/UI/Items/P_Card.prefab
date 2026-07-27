@@ -52,14 +52,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cf08aa113d94cc284a6681321bf9dc7, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _stateSource: {fileID: 7419062748502947183}
   _iconImage: {fileID: 3736454698003732823}
   _addButton: {fileID: 7502684135798462419}
   _progressLabel: {fileID: 1525261692928005945}
-  _cardId: card_1
-  _plannedAmount: 100
+  _cardId: 
 --- !u!114 &7419062748502947183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,8 +69,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 57053300145848cca02c8da5f64762fa, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4662536458133563002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,8 +81,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c651c7418b3a4138b983a20a111b855f, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   _source: {fileID: 7419062748502947183}
   _target: {fileID: 8897623689837278141}
   _states:
@@ -148,8 +147,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d864bd2039c40c19a5de16f06a7ad25, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.101960786}
   m_RaycastTarget: 0
@@ -216,8 +215,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.08235294, g: 0.11372549, b: 0.13333334, a: 1}
   m_RaycastTarget: 1
@@ -500,8 +499,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d864bd2039c40c19a5de16f06a7ad25, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.972549, g: 0.8392157, b: 0.53333336, a: 1}
   m_RaycastTarget: 0
@@ -699,8 +698,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13a5df11b5cd49bd90028e5ee77d64b0, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7931981633225763314 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7358197253307477832, guid: 11dcd0c3ddf8231478bce09a10773269, type: 3}

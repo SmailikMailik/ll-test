@@ -52,6 +52,9 @@ namespace LL.DI
                 _cardIconCatalogConfig);
             builder.RegisterInstance<IDefaultDataLoader<UserInitialData>>(_userDefaultsConfig);
 
+            builder.Register(
+                resolver => resolver.Resolve<IDataLoader<CardCatalog>>().Load(),
+                Lifetime.Singleton);
             builder
                 .Register(
                     resolver => resolver
