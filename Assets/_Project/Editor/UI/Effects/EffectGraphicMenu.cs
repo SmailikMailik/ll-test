@@ -22,6 +22,12 @@ namespace LLEditor.UI.Effects
             CreateGraphic<BorderGraphic>("Border", menuCommand);
         }
 
+        [MenuItem("GameObject/UI/Rounded Rectangle", false, MenuPriority + 2)]
+        private static void CreateRoundedRectangle(MenuCommand menuCommand)
+        {
+            CreateGraphic<RoundedRectangleGraphic>("Rounded Rectangle", menuCommand);
+        }
+
         private static void CreateGraphic<TGraphic>(string name, MenuCommand menuCommand)
             where TGraphic : MaskableGraphic
         {

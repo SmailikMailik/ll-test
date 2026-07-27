@@ -11,21 +11,78 @@ namespace LL.Upgrades
 
         internal static IReadOnlyList<CardStack> Build(
             IReadOnlyList<ExperienceCardOption> cards,
-            int experienceLimit)
+            int requiredExperience)
         {
             if (cards == null)
                 throw new ArgumentNullException(nameof(cards));
 
-            if (experienceLimit <= MinimumAmount)
+            if (CanReach(cards, requiredExperience) is false)
                 return Array.Empty<CardStack>();
 
+            var experienceLimit = GetExperienceLimit(cards, requiredExperience);
             var plans = CreatePlans(cards.Count, experienceLimit);
 
             for (var cardIndex = 0; cardIndex < cards.Count; cardIndex++)
                 AddCardOptions(plans, cards[cardIndex], cardIndex, experienceLimit);
 
-            var bestPlan = FindBestPlan(plans);
+            var bestPlan = FindBestPlan(plans, requiredExperience);
             return CreateCardStacks(cards, bestPlan);
+        }
+
+        internal static bool CanReach(
+            IReadOnlyList<ExperienceCardOption> cards,
+            int requiredExperience)
+        {
+            if (cards == null)
+                throw new ArgumentNullException(nameof(cards));
+
+            if (requiredExperience <= MinimumAmount)
+                return false;
+
+            var missingExperience = requiredExperience;
+
+            foreach (var card in cards)
+            {
+                if (card.AvailableAmount <= MinimumAmount ||
+                    card.ExperienceAmount <= MinimumAmount)
+                {
+                    continue;
+                }
+
+                var requiredAmount =
+                    (missingExperience - 1) / card.ExperienceAmount + 1;
+
+                if (card.AvailableAmount >= requiredAmount)
+                    return true;
+
+                missingExperience -=
+                    card.AvailableAmount * card.ExperienceAmount;
+            }
+
+            return false;
+        }
+
+        private static int GetExperienceLimit(
+            IReadOnlyList<ExperienceCardOption> cards,
+            int requiredExperience)
+        {
+            var maximumCardExperience = MinimumAmount;
+
+            foreach (var card in cards)
+            {
+                if (card.AvailableAmount > MinimumAmount)
+                {
+                    maximumCardExperience = Math.Max(
+                        maximumCardExperience,
+                        card.ExperienceAmount);
+                }
+            }
+
+            var overflowAllowance = maximumCardExperience - 1;
+
+            return requiredExperience <= int.MaxValue - overflowAllowance
+                ? requiredExperience + overflowAllowance
+                : int.MaxValue;
         }
 
         private static Plan[] CreatePlans(int cardTypesCount, int experienceLimit)
@@ -109,11 +166,13 @@ namespace LL.Upgrades
             plans[experience] = currentPlan.Add(cardIndex, amount);
         }
 
-        private static Plan FindBestPlan(IReadOnlyList<Plan> plans)
+        private static Plan FindBestPlan(
+            IReadOnlyList<Plan> plans,
+            int requiredExperience)
         {
-            for (var experience = plans.Count - 1;
-                 experience > MinimumAmount;
-                 experience--)
+            for (var experience = requiredExperience;
+                 experience < plans.Count;
+                 experience++)
             {
                 if (plans[experience] != null)
                     return plans[experience];

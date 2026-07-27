@@ -162,7 +162,7 @@ namespace LL.UI.Windows.Views.Upgrade
 
             _maxButton.SetInteractable(
                 hasPlan is false &&
-                _cardSelector.CanPlanExperience(_experienceController.RemainingExperience));
+                _cardSelector.CanReachExperience(_experienceController.RemainingExperience));
             _useButton.SetInteractable(CanUse());
         }
 

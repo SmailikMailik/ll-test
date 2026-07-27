@@ -12,6 +12,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         [SerializeField] private TMP_Text _rankLabel;
         [SerializeField] private TMP_Text _experienceLabel;
         [SerializeField] private TMP_Text _addedExperienceLabel;
+        [SerializeField] private GameObject _maximumExperienceMarker;
 
         internal void Show(RankProgress progress, int currentExperience, int addedExperience)
         {
@@ -24,6 +25,9 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             _addedExperienceLabel.text = addedExperience > 0
                 ? $"+ {TextFormatter.Number(addedExperience)}"
                 : string.Empty;
+            _maximumExperienceMarker.SetActive(
+                progress.HasNextRank is false ||
+                previewExperience >= progress.NextRankExperience);
             _bar.SetProgress(
                 progress.GetNormalizedExperience(currentExperience),
                 progress.GetNormalizedExperience(previewExperience));

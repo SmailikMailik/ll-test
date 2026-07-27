@@ -22,7 +22,6 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         internal bool CanApplyPendingExperience =>
             _pendingExperience > MinimumAmount &&
-            _pendingExperience <= RemainingExperience &&
             _userProgress.CanAddExperience(_pendingExperience);
 
         private readonly UpgradeExperienceView _view;
@@ -59,11 +58,8 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             if (amount < MinimumAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            if (amount > RemainingExperience ||
-                amount > MinimumAmount && _userProgress.CanAddExperience(amount) is false)
-            {
+            if (amount > MinimumAmount && _userProgress.CanAddExperience(amount) is false)
                 throw new ArgumentOutOfRangeException(nameof(amount));
-            }
 
             _pendingExperience = amount;
             RefreshView();
@@ -79,19 +75,16 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             if (reservedExperience < MinimumAmount)
                 throw new ArgumentOutOfRangeException(nameof(reservedExperience));
 
-            var totalAvailableExperience = RemainingExperience;
-
-            if (reservedExperience >= totalAvailableExperience)
+            if (reservedExperience >= RemainingExperience)
                 return MinimumAmount;
 
-            var availableExperience = totalAvailableExperience - reservedExperience;
-            return availableExperience / experiencePerItem;
+            var requiredExperience = RemainingExperience - reservedExperience;
+            return (requiredExperience - 1) / experiencePerItem + 1;
         }
 
         private void RefreshView()
         {
             var progress = _rankProgression.GetProgress(_baseExperience);
-
             _view.Show(progress, _baseExperience, _pendingExperience);
         }
     }

@@ -88,22 +88,17 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             _selectedView?.SetPlannedAmount(amount);
         }
 
-        internal bool CanPlanExperience(int maximumExperience)
+        internal bool CanReachExperience(int requiredExperience)
         {
-            return _slots.Any(slot =>
-                slot.View.AvailableAmount > MinimumAmount &&
-                slot.View.Card.ExperienceAmount <= maximumExperience);
+            return CardExperiencePlanBuilder.CanReach(
+                CreateExperienceOptions(),
+                requiredExperience);
         }
 
-        internal void SetMaximumPlan(int maximumExperience)
+        internal void SetMaximumPlan(int requiredExperience)
         {
-            var cards = _slots
-                .Select(slot => new ExperienceCardOption(
-                    slot.Id,
-                    slot.View.AvailableAmount,
-                    slot.View.Card.ExperienceAmount))
-                .ToArray();
-            var plan = CardExperiencePlanBuilder.Build(cards, maximumExperience);
+            var cards = CreateExperienceOptions();
+            var plan = CardExperiencePlanBuilder.Build(cards, requiredExperience);
 
             ClearPlan();
 
@@ -133,6 +128,16 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         {
             foreach (var slot in _slots)
                 slot.View.SetPlannedAmount(MinimumAmount);
+        }
+
+        private ExperienceCardOption[] CreateExperienceOptions()
+        {
+            return _slots
+                .Select(slot => new ExperienceCardOption(
+                    slot.Id,
+                    slot.View.AvailableAmount,
+                    slot.View.Card.ExperienceAmount))
+                .ToArray();
         }
 
         private void Select(UpgradeCardView card)
