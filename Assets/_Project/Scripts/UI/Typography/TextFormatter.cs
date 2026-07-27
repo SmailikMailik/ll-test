@@ -24,6 +24,11 @@ namespace LL.UI.Typography
             return value.ToString("N0", _numberFormat);
         }
 
+        internal static string Amount(int value)
+        {
+            return $"x{Number(value)}";
+        }
+
         internal static string Progress(int current, int target)
         {
             return Number(current) + TextTags.Style($"/{Number(target)}", TextStyle.Muted);

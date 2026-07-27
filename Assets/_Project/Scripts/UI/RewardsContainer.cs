@@ -5,13 +5,22 @@ using LL.Coroutines;
 using LL.Extensions;
 using LL.Rewards;
 using UnityEngine;
+using VContainer;
 
 namespace LL.UI
 {
     internal sealed class RewardsContainer : MonoBehaviour
     {
-        [SerializeField] private RewardItemView _viewTemplate;
+        [SerializeField] private RewardView _viewTemplate;
         [SerializeField] private RectTransform _container;
+
+        private RewardIconProvider _iconProvider;
+
+        [Inject]
+        private void Construct(RewardIconProvider iconProvider)
+        {
+            _iconProvider = iconProvider;
+        }
 
         internal void ShowRewardsDelayed(IReadOnlyList<IReward> rewards)
         {
@@ -54,10 +63,10 @@ namespace LL.UI
             }
         }
 
-        private RewardItemView CreateReward(IReward reward)
+        private RewardView CreateReward(IReward reward)
         {
             var newView = Instantiate(_viewTemplate, _container);
-            newView.UpdateView(reward);
+            newView.UpdateView(reward, _iconProvider);
 
             return newView;
         }

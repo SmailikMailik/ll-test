@@ -1,4 +1,6 @@
+using LL.Game.Cards;
 using LL.Game.Currencies;
+using LL.Game.Items;
 
 namespace LL.Rewards
 {
@@ -19,12 +21,26 @@ namespace LL.Rewards
         }
     }
 
-    internal sealed class ExperienceReward : IReward
+    internal sealed class CardReward : IReward
     {
+        internal CardId CardId { get; }
         public int Amount { get; }
 
-        internal ExperienceReward(int amount)
+        internal CardReward(CardId cardId, int amount)
         {
+            CardId = cardId;
+            Amount = amount;
+        }
+    }
+
+    internal sealed class ItemReward : IReward
+    {
+        internal ItemId ItemId { get; }
+        public int Amount { get; }
+
+        internal ItemReward(ItemId itemId, int amount)
+        {
+            ItemId = itemId;
             Amount = amount;
         }
     }
