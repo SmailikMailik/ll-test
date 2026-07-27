@@ -6,6 +6,6 @@ namespace LL.Purchases
     {
         internal static string GetPriceText(IPurchase purchase) => purchase == null
             ? string.Empty
-            : $"{purchase.Price} {TextFormatter.CurrencySprite(purchase.CurrencyId)}";
+            : TextFormatter.CurrencyAmount(purchase.CurrencyId, purchase.Price);
     }
 }

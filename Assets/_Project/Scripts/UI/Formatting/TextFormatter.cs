@@ -7,11 +7,11 @@ namespace LL.UI.Formatting
 {
     internal static class TextFormatter
     {
-        private static readonly Dictionary<CurrencyId, string> _currencySprites = new()
+        private static readonly Dictionary<CurrencyId, CurrencyFormat> _currencyFormats = new()
         {
-            [CurrencyIds.Soft] = TextSprites.Cash,
-            [CurrencyIds.Hard] = TextSprites.Gold,
-            [CurrencyIds.MasterPoint] = TextSprites.MasterPoints
+            [CurrencyIds.Soft] = new CurrencyFormat(TextSprites.Cash, TextStyles.White),
+            [CurrencyIds.Hard] = new CurrencyFormat(TextSprites.Gold, TextStyles.Gold),
+            [CurrencyIds.MasterPoint] = new CurrencyFormat(TextSprites.MasterPoints, TextStyles.White)
         };
 
         private static readonly NumberFormatInfo _numberFormat = new()
@@ -30,11 +30,27 @@ namespace LL.UI.Formatting
             return Number(current) + RichText.Style($"/{Number(target)}", TextStyles.Muted);
         }
 
-        internal static string CurrencySprite(CurrencyId id)
+        internal static string CurrencyAmount(CurrencyId id, int amount)
         {
-            return _currencySprites.TryGetValue(id, out var sprite)
-                ? RichText.Sprite(sprite)
-                : string.Empty;
+            var formattedAmount = Number(amount);
+
+            if (_currencyFormats.TryGetValue(id, out var format) is false)
+                return formattedAmount;
+
+            var sprite = RichText.Sprite(format.Sprite);
+            return RichText.Style($"{sprite} {formattedAmount}", format.Style);
+        }
+
+        private readonly struct CurrencyFormat
+        {
+            internal string Sprite { get; }
+            internal string Style { get; }
+
+            internal CurrencyFormat(string sprite, string style)
+            {
+                Sprite = sprite;
+                Style = style;
+            }
         }
     }
 }

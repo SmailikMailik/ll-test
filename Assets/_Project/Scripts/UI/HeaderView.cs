@@ -43,16 +43,15 @@ namespace LL.UI
 
             _userLabel.text = $"{_identity.RegionCode} {_identity.UserId}";
 
-            _userWallet.ObserveAmount(CurrencyIds.Soft)
-                .Subscribe(value => _softLabel.text = TextFormatter.Number(value))
-                .AddTo(this);
+            ObserveCurrency(CurrencyIds.Soft, _softLabel);
+            ObserveCurrency(CurrencyIds.Hard, _hardLabel);
+            ObserveCurrency(CurrencyIds.MasterPoint, _masterPointLabel);
+        }
 
-            _userWallet.ObserveAmount(CurrencyIds.Hard)
-                .Subscribe(value => _hardLabel.text = TextFormatter.Number(value))
-                .AddTo(this);
-
-            _userWallet.ObserveAmount(CurrencyIds.MasterPoint)
-                .Subscribe(value => _masterPointLabel.text = TextFormatter.Number(value))
+        private void ObserveCurrency(CurrencyId id, TMP_Text label)
+        {
+            _userWallet.ObserveAmount(id)
+                .Subscribe(amount => label.text = TextFormatter.CurrencyAmount(id, amount))
                 .AddTo(this);
         }
     }
