@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
+using LL.Upgrades;
 using LL.User.Core.Cards;
 using R3;
 using UnityEngine;
@@ -85,6 +86,34 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         internal void SetSelectedPlannedAmount(int amount)
         {
             _selectedView?.SetPlannedAmount(amount);
+        }
+
+        internal bool CanPlanExperience(int maximumExperience)
+        {
+            return _slots.Any(slot =>
+                slot.View.AvailableAmount > MinimumAmount &&
+                slot.View.Card.ExperienceAmount <= maximumExperience);
+        }
+
+        internal void SetMaximumPlan(int maximumExperience)
+        {
+            var cards = _slots
+                .Select(slot => new ExperienceCardOption(
+                    slot.Id,
+                    slot.View.AvailableAmount,
+                    slot.View.Card.ExperienceAmount))
+                .ToArray();
+            var plan = CardExperiencePlanBuilder.Build(cards, maximumExperience);
+
+            ClearPlan();
+
+            foreach (var stack in plan)
+            {
+                var slot = _slots.First(item => item.Id.Equals(stack.Id));
+                slot.View.SetPlannedAmount(stack.Amount);
+            }
+
+            _changed.OnNext(Unit.Default);
         }
 
         internal IReadOnlyList<CardStack> GetPlan()

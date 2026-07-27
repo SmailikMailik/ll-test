@@ -1,11 +1,11 @@
 using System;
 using LL.Game.Ranks;
+using LL.Upgrades;
 using LL.UI.Controls.Buttons;
 using LL.UI.Controls.Steppers;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;
 using LL.User.Core.Progress;
-using LL.User.Core.Upgrades;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -19,6 +19,7 @@ namespace LL.UI.Windows.Views.Upgrade
         [SerializeField] private AmountStepper _amountStepper;
 
         [SerializeField] private InteractiveButton _useButton;
+        [SerializeField] private InteractiveButton _maxButton;
         [SerializeField] private InteractiveButton _resetButton;
 
         private const int AmountDelta = 1;
@@ -39,8 +40,8 @@ namespace LL.UI.Windows.Views.Upgrade
             IRankProgression rankProgression)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _cardExperienceService = cardExperienceService ??
-                throw new ArgumentNullException(nameof(cardExperienceService));
+            _cardExperienceService =
+                cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
         }
 
@@ -79,6 +80,9 @@ namespace LL.UI.Windows.Views.Upgrade
             _useButton.Clicked
                 .Subscribe(_ => ApplyCards())
                 .AddTo(this);
+            _maxButton.Clicked
+                .Subscribe(_ => SetMaximumPlan())
+                .AddTo(this);
             _resetButton.Clicked
                 .Subscribe(_ => ResetPendingChanges())
                 .AddTo(this);
@@ -88,7 +92,7 @@ namespace LL.UI.Windows.Views.Upgrade
         {
             _experienceController.ResetPreview();
             _cardSelector.Reset();
-            RefreshUseButton();
+            RefreshActions();
         }
 
         private void OnCardSelectionChanged()
@@ -96,17 +100,24 @@ namespace LL.UI.Windows.Views.Upgrade
             if (_isApplying)
                 return;
 
-            _amountStepper.SetValue(
-                _cardSelector.SelectedPlannedAmount,
-                GetMaximumAmount());
-            RefreshUseButton();
+            _amountStepper.SetValue(_cardSelector.SelectedPlannedAmount, GetMaximumAmount());
+            _experienceController.SetPendingExperience(_cardSelector.PlannedExperience);
+            RefreshActions();
         }
 
         private void OnPlannedAmountChanged(int amount)
         {
             _cardSelector.SetSelectedPlannedAmount(amount);
             _experienceController.SetPendingExperience(_cardSelector.PlannedExperience);
-            RefreshUseButton();
+            RefreshActions();
+        }
+
+        private void SetMaximumPlan()
+        {
+            if (_cardSelector.PlannedExperience > MinimumAmount)
+                return;
+
+            _cardSelector.SetMaximumPlan(_experienceController.RemainingExperience);
         }
 
         private void ApplyCards()
@@ -142,8 +153,16 @@ namespace LL.UI.Windows.Views.Upgrade
             return Math.Min(_cardSelector.SelectedAvailableAmount, maximumExperienceAmount);
         }
 
-        private void RefreshUseButton()
+        private void RefreshActions()
         {
+            var hasPlan = _cardSelector.PlannedExperience > MinimumAmount;
+
+            _maxButton.gameObject.SetActive(hasPlan is false);
+            _resetButton.gameObject.SetActive(hasPlan);
+
+            _maxButton.SetInteractable(
+                hasPlan is false &&
+                _cardSelector.CanPlanExperience(_experienceController.RemainingExperience));
             _useButton.SetInteractable(CanUse());
         }
 

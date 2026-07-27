@@ -8,7 +8,22 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
     {
         private const int MinimumAmount = 0;
 
-        internal bool CanApplyPendingExperience => _userProgress.CanAddExperience(_pendingExperience);
+        internal int RemainingExperience
+        {
+            get
+            {
+                var progress = _rankProgression.GetProgress(_baseExperience);
+
+                return progress.HasNextRank
+                    ? progress.NextRankExperience - _baseExperience
+                    : MinimumAmount;
+            }
+        }
+
+        internal bool CanApplyPendingExperience =>
+            _pendingExperience > MinimumAmount &&
+            _pendingExperience <= RemainingExperience &&
+            _userProgress.CanAddExperience(_pendingExperience);
 
         private readonly UpgradeExperienceView _view;
         private readonly IUserProgress _userProgress;
@@ -44,8 +59,11 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             if (amount < MinimumAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            if (amount > MinimumAmount && _userProgress.CanAddExperience(amount) is false)
+            if (amount > RemainingExperience ||
+                amount > MinimumAmount && _userProgress.CanAddExperience(amount) is false)
+            {
                 throw new ArgumentOutOfRangeException(nameof(amount));
+            }
 
             _pendingExperience = amount;
             RefreshView();
@@ -61,7 +79,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             if (reservedExperience < MinimumAmount)
                 throw new ArgumentOutOfRangeException(nameof(reservedExperience));
 
-            var totalAvailableExperience = int.MaxValue - _baseExperience;
+            var totalAvailableExperience = RemainingExperience;
 
             if (reservedExperience >= totalAvailableExperience)
                 return MinimumAmount;
@@ -72,8 +90,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         private void RefreshView()
         {
-            var previewExperience = _baseExperience + _pendingExperience;
-            var progress = _rankProgression.GetProgress(previewExperience);
+            var progress = _rankProgression.GetProgress(_baseExperience);
 
             _view.Show(progress, _baseExperience, _pendingExperience);
         }

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Cards;
+using LL.Game.Ranks;
 using LL.User.Core.Cards;
 using LL.User.Core.Progress;
 using VContainer;
 
-namespace LL.User.Core.Upgrades
+namespace LL.Upgrades
 {
     internal interface ICardExperienceService
     {
@@ -19,22 +20,25 @@ namespace LL.User.Core.Upgrades
         private readonly IUserCards _userCards;
         private readonly IUserProgress _userProgress;
         private readonly CardCatalog _cardCatalog;
+        private readonly IRankProgression _rankProgression;
 
         [Inject]
         internal CardExperienceService(
             IUserCards userCards,
             IUserProgress userProgress,
-            CardCatalog cardCatalog)
+            CardCatalog cardCatalog,
+            IRankProgression rankProgression)
         {
             _userCards = userCards ?? throw new ArgumentNullException(nameof(userCards));
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _cardCatalog = cardCatalog ?? throw new ArgumentNullException(nameof(cardCatalog));
+            _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
         }
 
         public bool TryApply(IReadOnlyList<CardStack> cards)
         {
             if (TryCalculateExperience(cards, out var experience) is false ||
-                _userProgress.CanAddExperience(experience) is false)
+                CanApplyExperience(experience) is false)
             {
                 return false;
             }
@@ -89,6 +93,17 @@ namespace LL.User.Core.Upgrades
             }
 
             return experience > MinimumAmount;
+        }
+
+        private bool CanApplyExperience(int experience)
+        {
+            if (_userProgress.CanAddExperience(experience) is false)
+                return false;
+
+            var totalExperience = _userProgress.TotalExperience;
+            var progress = _rankProgression.GetProgress(totalExperience);
+
+            return progress.HasNextRank && experience <= progress.NextRankExperience - totalExperience;
         }
 
         private void RestoreCards(IEnumerable<CardStack> cards)

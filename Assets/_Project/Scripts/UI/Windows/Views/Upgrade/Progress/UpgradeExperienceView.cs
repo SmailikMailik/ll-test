@@ -15,16 +15,18 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         internal void Show(RankProgress progress, int currentExperience, int addedExperience)
         {
+            var previewExperience = currentExperience + addedExperience;
+
             _rankLabel.text = progress.Rank.ToString();
             _experienceLabel.text = progress.HasNextRank
-                ? TextFormatter.Progress(progress.TotalExperience, progress.NextRankExperience)
-                : TextFormatter.Number(progress.TotalExperience);
+                ? TextFormatter.Progress(previewExperience, progress.NextRankExperience)
+                : TextFormatter.Number(previewExperience);
             _addedExperienceLabel.text = addedExperience > 0
                 ? $"+ {TextFormatter.Number(addedExperience)}"
                 : string.Empty;
             _bar.SetProgress(
                 progress.GetNormalizedExperience(currentExperience),
-                progress.NormalizedExperience);
+                progress.GetNormalizedExperience(previewExperience));
         }
     }
 }
