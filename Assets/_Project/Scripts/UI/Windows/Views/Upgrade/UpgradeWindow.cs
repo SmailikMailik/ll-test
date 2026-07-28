@@ -4,6 +4,7 @@ using LL.Game.Ranks;
 using LL.Upgrades;
 using LL.UI.Controls.Buttons;
 using LL.UI.Controls.Steppers;
+using LL.UI.Rewards;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;
@@ -18,6 +19,7 @@ namespace LL.UI.Windows.Views.Upgrade
     internal sealed class UpgradeWindow : Window<UpgradeWindowParameters>
     {
         [SerializeField] private UpgradeExperienceView _experienceView;
+        [SerializeField] private RewardPreview _rewardPreview;
         [SerializeField] private UpgradeCardSelector _cardSelector;
         [SerializeField] private AmountStepper _amountStepper;
 
@@ -56,6 +58,7 @@ namespace LL.UI.Windows.Views.Upgrade
         protected override void OnShow()
         {
             InitializeComponents();
+            _rewardPreview.ShowNextRank(_userProgress.Rank);
             ResetPendingChanges();
         }
 

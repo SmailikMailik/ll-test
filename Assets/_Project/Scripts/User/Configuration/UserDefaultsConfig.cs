@@ -6,6 +6,7 @@ using LL.Identifiers;
 using LL.User.Core;
 using LL.User.Core.Cards;
 using LL.User.Core.Identity;
+using LL.User.Core.Promotions;
 using LL.User.Core.Progress;
 using LL.User.Core.Items;
 using LL.User.Core.Rewards;
@@ -65,6 +66,7 @@ namespace LL.User.Configuration
                 new UserIdentity(_regionCode, _userId),
                 new ItemsInitialData(_items?.Select(item => item.ToData())),
                 new ProgressInitialData(_rank, _experience),
+                new PromotionOrderInitialData(default, 0L, false),
                 new CardsInitialData(_cards?.Select(card => card.ToData())),
                 new RewardClaimsInitialData(null));
         }

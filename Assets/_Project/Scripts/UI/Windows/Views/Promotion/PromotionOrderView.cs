@@ -6,12 +6,13 @@ using LL.Presentation.Orders;
 using LL.UI.Controls.Buttons;
 using LL.UI.Localization;
 using LL.UI.Typography;
+using LL.User.Core.Promotions;
 using R3;
 using TMPro;
 using UnityEngine;
 using VContainer;
 
-namespace LL.UI.Windows.Views
+namespace LL.UI.Windows.Views.Promotion
 {
     [DisallowMultipleComponent]
     internal sealed class PromotionOrderView : MonoBehaviour
@@ -24,7 +25,8 @@ namespace LL.UI.Windows.Views
 
         private const string CountVariable = "count";
         private const string TargetVariable = "target";
-        private static readonly TimeSpan TimerTickInterval = TimeSpan.FromSeconds(1);
+
+        private static readonly TimeSpan _timerTickInterval = TimeSpan.FromSeconds(1);
 
         internal Observable<Unit> Completed => _completed;
         internal bool IsCompleted => _state == OrderState.Completed;
@@ -33,9 +35,10 @@ namespace LL.UI.Windows.Views
 
         private IOrderCompletionConfirmation _completionConfirmation;
         private ILocalizationService _localization;
+        private IUserPromotionOrder _promotionOrder;
 
         private OrderState _state = OrderState.Available;
-        private float _deadline;
+        private PromotionRequirementId _requirementId;
         private int _displayedRemainingSeconds = -1;
         private bool _canAccept;
         private TimeSpan _duration;
@@ -43,29 +46,28 @@ namespace LL.UI.Windows.Views
         [Inject]
         private void Construct(
             IOrderCompletionConfirmation completionConfirmation,
-            ILocalizationService localization)
+            ILocalizationService localization,
+            IUserPromotionOrder promotionOrder)
         {
-            _completionConfirmation = completionConfirmation ??
-                throw new ArgumentNullException(nameof(completionConfirmation));
+            _completionConfirmation = completionConfirmation
+                                      ?? throw new ArgumentNullException(nameof(completionConfirmation));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
         }
 
         private void Start()
         {
+            _completed.AddTo(this);
+
             _button.Clicked
                 .Subscribe(_ => OnButtonClicked())
                 .AddTo(this);
 
             Observable
-                .Interval(TimerTickInterval)
+                .Interval(_timerTickInterval)
                 .Where(_ => _state == OrderState.Active)
                 .Subscribe(_ => TickTimer())
                 .AddTo(this);
-        }
-
-        private void OnDestroy()
-        {
-            _completed.Dispose();
         }
 
         internal void Refresh(
@@ -73,54 +75,46 @@ namespace LL.UI.Windows.Views
             TimeSpan duration,
             bool canAccept)
         {
+            if (requirement == null)
+                throw new ArgumentNullException(nameof(requirement));
+
+            _requirementId = requirement.Id;
             _duration = duration;
+            _canAccept = canAccept;
+            RestoreState();
             RefreshText(requirement);
-            RefreshTime();
-            RefreshButtonText();
-            SetAvailable(canAccept);
+            RefreshState();
         }
 
         internal void SetAvailable(bool canAccept)
         {
             _canAccept = canAccept;
-            _button.SetInteractable(_canAccept && IsCompleted is false);
+            RefreshButtonAvailability();
         }
 
         internal void Reset()
         {
-            _state = OrderState.Available;
-            _deadline = 0f;
-            _displayedRemainingSeconds = -1;
-            RefreshTime();
-            RefreshButtonText();
-            SetAvailable(_canAccept);
+            _promotionOrder.Reset();
+            SetState(OrderState.Available);
         }
 
         private void RefreshText(RankPromotionRequirement requirement)
         {
-            if (requirement == null)
-                throw new ArgumentNullException(nameof(requirement));
-
-            var target = _localization.GetText(requirement.TargetLocalizationKey);
-
             _titleLabel.text = _localization.GetText(requirement.TitleLocalizationKey);
             _descriptionLabel.text = _localization.GetText(
                 requirement.DescriptionLocalizationKey,
                 new Dictionary<string, object>
                 {
                     [CountVariable] = TextFormatter.Number(requirement.RequiredAmount),
-                    [TargetVariable] = target
+                    [TargetVariable] = _localization.GetText(requirement.TargetLocalizationKey)
                 });
         }
 
         private void RefreshButtonText()
         {
-            var localizationKey = _state switch
-            {
-                OrderState.Available => OrderLocalizationKeys.AcceptAction,
-                OrderState.Active or OrderState.Completed => OrderLocalizationKeys.CompleteAction,
-                _ => OrderLocalizationKeys.AcceptAction
-            };
+            var localizationKey = _state == OrderState.Available
+                ? OrderLocalizationKeys.AcceptAction
+                : OrderLocalizationKeys.CompleteAction;
 
             _buttonLabel.text = _localization.GetText(localizationKey);
         }
@@ -130,32 +124,62 @@ namespace LL.UI.Windows.Views
             if (_canAccept is false || IsCompleted)
                 return;
 
-            if (_state == OrderState.Available)
-                StartOrder();
+            if (_state == OrderState.Available && StartOrder() is false)
+                return;
 
             _completionConfirmation.Confirm(CompleteOrder);
         }
 
-        private void StartOrder()
+        private bool StartOrder()
         {
-            _state = OrderState.Active;
-            _deadline = Time.unscaledTime + Mathf.Max(0f, (float)_duration.TotalSeconds);
-            _displayedRemainingSeconds = -1;
-            RefreshTime();
-            RefreshButtonText();
+            if (_promotionOrder.TryStart(_requirementId, _duration) is false)
+                return false;
+
+            SetState(OrderState.Active);
+            return true;
         }
 
         private void CompleteOrder()
         {
-            if (_state != OrderState.Active)
+            if (_state != OrderState.Active || _promotionOrder.TryComplete() is false)
                 return;
 
-            _state = OrderState.Completed;
+            SetState(OrderState.Completed);
+            _completed.OnNext(Unit.Default);
+        }
+
+        private void SetState(OrderState state)
+        {
+            _state = state;
+            RefreshState();
+        }
+
+        private void RestoreState()
+        {
+            if (_promotionOrder.RequirementId.Equals(_requirementId) is false)
+                _promotionOrder.Reset();
+
+            _promotionOrder.TryExpire();
+
+            if (_promotionOrder.IsCompleted)
+                _state = OrderState.Completed;
+            else if (_promotionOrder.IsActive)
+                _state = OrderState.Active;
+            else
+                _state = OrderState.Available;
+        }
+
+        private void RefreshState()
+        {
             _displayedRemainingSeconds = -1;
             RefreshTime();
             RefreshButtonText();
-            SetAvailable(_canAccept);
-            _completed.OnNext(Unit.Default);
+            RefreshButtonAvailability();
+        }
+
+        private void RefreshButtonAvailability()
+        {
+            _button.SetInteractable(_canAccept && IsCompleted is false);
         }
 
         private void TickTimer()
@@ -177,7 +201,6 @@ namespace LL.UI.Windows.Views
             {
                 OrderState.Available => Mathf.Max(0f, (float)_duration.TotalSeconds),
                 OrderState.Active => GetRemainingSeconds(),
-                OrderState.Completed => 0f,
                 _ => 0f
             };
 
@@ -197,7 +220,7 @@ namespace LL.UI.Windows.Views
 
         private float GetRemainingSeconds()
         {
-            return Mathf.Max(0f, _deadline - Time.unscaledTime);
+            return Mathf.Max(0f, (float)_promotionOrder.GetRemainingTime().TotalSeconds);
         }
 
         private enum OrderState : byte

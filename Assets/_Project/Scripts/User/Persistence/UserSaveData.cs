@@ -12,6 +12,7 @@ namespace LL.User.Persistence
         [JsonProperty] private ProgressSaveData _progress;
         [JsonProperty] private CardSaveData[] _cards;
         [JsonProperty] private ItemSaveData[] _items;
+        [JsonProperty] private PromotionOrderSaveData _promotionOrder;
         [JsonProperty] private string[] _claimedRewardIds;
 
         private const int CurrentVersion = 2;
@@ -22,6 +23,7 @@ namespace LL.User.Persistence
         internal ProgressSaveData Progress => _progress;
         internal IReadOnlyList<CardSaveData> Cards => _cards ?? Array.Empty<CardSaveData>();
         internal IReadOnlyList<ItemSaveData> Items => _items ?? Array.Empty<ItemSaveData>();
+        internal PromotionOrderSaveData PromotionOrder => _promotionOrder;
         internal IReadOnlyList<string> ClaimedRewardIds => _claimedRewardIds ?? Array.Empty<string>();
 
         [JsonConstructor]
@@ -32,6 +34,7 @@ namespace LL.User.Persistence
             ProgressSaveData progress,
             CardSaveData[] cards,
             ItemSaveData[] items,
+            PromotionOrderSaveData promotionOrder,
             string[] claimedRewardIds)
         {
             _version = CurrentVersion;
@@ -39,6 +42,7 @@ namespace LL.User.Persistence
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _cards = cards ?? Array.Empty<CardSaveData>();
             _items = items ?? Array.Empty<ItemSaveData>();
+            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
             _claimedRewardIds = claimedRewardIds ?? Array.Empty<string>();
         }
     }
@@ -116,6 +120,31 @@ namespace LL.User.Persistence
         {
             _id = id;
             _amount = amount;
+        }
+    }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    internal sealed class PromotionOrderSaveData
+    {
+        [JsonProperty] private string _requirementId;
+        [JsonProperty] private long _deadlineUnixMilliseconds;
+        [JsonProperty] private bool _isCompleted;
+
+        internal string RequirementId => _requirementId;
+        internal long DeadlineUnixMilliseconds => _deadlineUnixMilliseconds;
+        internal bool IsCompleted => _isCompleted;
+
+        [JsonConstructor]
+        private PromotionOrderSaveData() { }
+
+        internal PromotionOrderSaveData(
+            string requirementId,
+            long deadlineUnixMilliseconds,
+            bool isCompleted)
+        {
+            _requirementId = requirementId;
+            _deadlineUnixMilliseconds = deadlineUnixMilliseconds;
+            _isCompleted = isCompleted;
         }
     }
 }

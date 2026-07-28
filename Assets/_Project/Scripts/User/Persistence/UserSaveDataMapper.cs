@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Items;
+using LL.Game.Promotions;
 using LL.Rewards;
 using LL.User.Core;
 using LL.User.Core.Cards;
 using LL.User.Core.Identity;
+using LL.User.Core.Promotions;
 using LL.User.Core.Progress;
 using LL.User.Core.Items;
 using LL.User.Core.Rewards;
@@ -26,6 +28,10 @@ namespace LL.User.Persistence
                     data.Items.Select(item =>
                         new ItemAmount(new ItemId(item.Id), item.Amount))),
                 new ProgressInitialData(data.Progress.Rank, data.Progress.Experience),
+                new PromotionOrderInitialData(
+                    new PromotionRequirementId(data.PromotionOrder?.RequirementId),
+                    data.PromotionOrder?.DeadlineUnixMilliseconds ?? 0L,
+                    data.PromotionOrder?.IsCompleted ?? false),
                 new CardsInitialData(
                     data.Cards.Select(card =>
                         new CardStack(new CardId(card.Id), card.Amount))),
@@ -43,6 +49,7 @@ namespace LL.User.Persistence
                 new ProgressSaveData(data.Progress.Rank, data.Progress.Experience),
                 data.Cards.Stacks,
                 data.Items.Amounts,
+                data.PromotionOrder,
                 data.RewardClaims.ClaimedIds);
         }
 
@@ -51,6 +58,7 @@ namespace LL.User.Persistence
             ProgressSaveData progress,
             IEnumerable<CardStack> cards,
             IEnumerable<ItemAmount> items,
+            PromotionOrderInitialData promotionOrder,
             IEnumerable<RewardBundleId> claimedRewardIds)
         {
             if (identity == null)
@@ -64,6 +72,9 @@ namespace LL.User.Persistence
 
             if (items == null)
                 throw new ArgumentNullException(nameof(items));
+
+            if (promotionOrder == null)
+                throw new ArgumentNullException(nameof(promotionOrder));
 
             if (claimedRewardIds == null)
                 throw new ArgumentNullException(nameof(claimedRewardIds));
@@ -79,6 +90,10 @@ namespace LL.User.Persistence
                     .Where(item => item != null)
                     .Select(item => new ItemSaveData(item.Id.Value, item.Amount))
                     .ToArray(),
+                new PromotionOrderSaveData(
+                    promotionOrder.RequirementId.Value,
+                    promotionOrder.DeadlineUnixMilliseconds,
+                    promotionOrder.IsCompleted),
                 claimedRewardIds
                     .Where(id => id.IsEmpty is false)
                     .Select(id => id.Value)

@@ -18,6 +18,7 @@ using LL.User.Core;
 using LL.User.Core.Cards;
 using LL.User.Core.Progress;
 using LL.User.Core.Items;
+using LL.User.Core.Promotions;
 using LL.User.Core.Rewards;
 using LL.User.Persistence;
 using UnityEngine;
@@ -96,11 +97,13 @@ namespace LL.DI
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Identity, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Items, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Progress, Lifetime.Singleton);
+            builder.Register(resolver => resolver.Resolve<UserInitialData>().PromotionOrder, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Cards, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().RewardClaims, Lifetime.Singleton);
 
             builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
             builder.Register<UserCards>(Lifetime.Singleton).As<IUserCards>();
+            builder.Register<UserPromotionOrder>(Lifetime.Singleton).As<IUserPromotionOrder>();
             builder.Register<UserRewardClaims>(Lifetime.Singleton).As<IUserRewardClaims>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();

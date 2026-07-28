@@ -1,5 +1,5 @@
 using System;
-using LL.UI.Windows.Views;
+using LL.UI.Windows.Views.Promotion;
 using LL.UI.Windows.Views.Upgrade;
 using LL.User.Core.Progress;
 using VContainer;
