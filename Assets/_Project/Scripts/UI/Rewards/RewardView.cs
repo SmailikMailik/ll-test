@@ -9,17 +9,13 @@ namespace LL.UI.Rewards
     [DisallowMultipleComponent]
     internal sealed class RewardView : MonoBehaviour
     {
-        [SerializeField] private Image _icon;
+        [SerializeField] private Image _iconImage;
         [SerializeField] private TMP_Text _amountLabel;
-
-        internal IReward Data { get; private set; }
 
         internal void UpdateView(IReward reward, RewardIconProvider iconProvider)
         {
-            Data = reward;
-
-            _icon.sprite = iconProvider.GetIcon(reward);
-            _amountLabel.text = TextFormatter.Amount(reward.Amount);
+            _iconImage.sprite = iconProvider.GetIcon(reward);
+            _amountLabel.text = reward.Amount > 1 ? TextFormatter.Amount(reward.Amount) : string.Empty;
         }
     }
 }
