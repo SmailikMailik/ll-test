@@ -31,21 +31,21 @@ namespace LL.Presentation.Purchasing
             if (purchase == null)
                 throw new ArgumentNullException(nameof(purchase));
 
-            var price = PurchaseFormatter.GetPriceText(purchase);
-            var confirmationKey = PurchaseLocalizationKeys.GetConfirmation(purchase.Id);
-
-            _windowController.Show(
-                new ModalWindowParameters(
-                    headerText: _localization.GetText(PurchaseLocalizationKeys.ConfirmationTitle),
-                    messageText: _localization.GetText(confirmationKey, new Dictionary<string, object>
+            _windowController.Show(new ModalWindowParameters
+            (
+                headerText: _localization.GetText(PurchaseLocalizationKeys.ConfirmationTitle),
+                messageText: _localization.GetText(
+                    PurchaseLocalizationKeys.GetConfirmation(purchase.Id),
+                    new Dictionary<string, object>
                     {
-                        [PriceVariable] = price,
+                        [PriceVariable] = PurchaseFormatter.GetPriceText(purchase)
                     }),
-                    positiveText: _localization.GetText(PurchaseLocalizationKeys.PurchaseAction),
-                    positiveCallback: onConfirmed,
-                    negativeText: _localization.GetText(PurchaseLocalizationKeys.CancelAction),
-                    negativeCallback: onRejected,
-                    closeCallback: onRejected));
+                positiveText: _localization.GetText(PurchaseLocalizationKeys.PurchaseAction),
+                positiveCallback: onConfirmed,
+                negativeText: _localization.GetText(PurchaseLocalizationKeys.CancelAction),
+                negativeCallback: onRejected,
+                closeCallback: onRejected
+            ));
         }
     }
 }

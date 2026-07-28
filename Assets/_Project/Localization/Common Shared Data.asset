@@ -75,6 +75,14 @@ MonoBehaviour:
     m_Key: messages.confirm_purchase
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440984
+    m_Key: actions.yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440985
+    m_Key: actions.no
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

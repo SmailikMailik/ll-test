@@ -33,20 +33,22 @@ namespace LL.Presentation.Upgrades
                 return;
             }
 
-            _windowController.Show(
-                new ModalWindowParameters(
-                    headerText: _localization.GetText(ExperienceOverflowLocalizationKeys.Title),
-                    messageText: _localization.GetText(
-                        ExperienceOverflowLocalizationKeys.Message,
-                        new Dictionary<string, object>
-                        {
-                            [ExperienceVariable] = TextFormatter.Number(lostExperience)
-                        }),
-                    positiveText: _localization.GetText(ExperienceOverflowLocalizationKeys.UseAction),
-                    positiveCallback: onConfirmed,
-                    negativeText: _localization.GetText(ExperienceOverflowLocalizationKeys.CancelAction),
-                    negativeCallback: onRejected,
-                    closeCallback: onRejected));
+            _windowController.Show(new ModalWindowParameters
+            (
+                headerText: _localization.GetText(ExperienceOverflowLocalizationKeys.Title),
+                messageText: _localization.GetText(
+                    ExperienceOverflowLocalizationKeys.Message,
+                    new Dictionary<string, object>
+                    {
+                        [ExperienceVariable] = TextFormatter.Number(lostExperience)
+                    }),
+                positiveText: _localization.GetText(ExperienceOverflowLocalizationKeys.YesAction),
+                positiveCallback: onConfirmed,
+                negativeText: _localization.GetText(ExperienceOverflowLocalizationKeys.NoAction),
+                negativeCallback: onRejected,
+                closeCallback: onRejected,
+                closeActive: false
+            ));
         }
     }
 }

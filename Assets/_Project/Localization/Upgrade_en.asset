@@ -51,11 +51,11 @@ MonoBehaviour:
       m_Items:
       - id: 0
   - m_Id: 352062502440982
-    m_Localized: Experience Will Be Lost
+    m_Localized: Warning!
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440983
-    m_Localized: Using these cards will waste {experience} Battle EXP. Continue?
+    m_Localized: You've exceeded the required amount of EXP by {experience}. These EXP points will be lost. Your hero will not be able to receive EXP until you increase their rank.
     m_Metadata:
       m_Items:
       - id: 0

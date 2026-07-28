@@ -4,7 +4,7 @@ namespace LL.Presentation.Upgrades
     {
         internal const string Title = "Upgrade/titles.experience_overflow";
         internal const string Message = "Upgrade/messages.confirm_experience_overflow";
-        internal const string UseAction = "Common/actions.use";
-        internal const string CancelAction = "Common/actions.cancel";
+        internal const string YesAction = "Common/actions.yes";
+        internal const string NoAction = "Common/actions.no";
     }
 }
