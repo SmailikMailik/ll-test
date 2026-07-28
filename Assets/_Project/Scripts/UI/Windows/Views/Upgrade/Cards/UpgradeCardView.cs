@@ -5,7 +5,7 @@ using LL.Presentation.Icons;
 using LL.UI.Controls;
 using LL.UI.Typography;
 using LL.UI.VisualStates.Sources;
-using LL.User.Core.Cards;
+using LL.User.Core.Amounts;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -38,13 +38,13 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         private readonly Subject<Unit> _clicked = new();
         private readonly Subject<int> _availableAmountChanged = new();
 
-        private IUserCards _userCards;
+        private IUserAmounts<CardId> _userCards;
         private IIconProvider<CardId> _iconProvider;
         private bool _isInitialized;
 
         [Inject]
         private void Construct(
-            IUserCards userCards,
+            IUserAmounts<CardId> userCards,
             IIconProvider<CardId> iconProvider)
         {
             _userCards = userCards ?? throw new ArgumentNullException(nameof(userCards));

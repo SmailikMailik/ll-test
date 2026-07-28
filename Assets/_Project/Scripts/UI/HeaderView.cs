@@ -2,8 +2,8 @@ using LL.Game.Items;
 using LL.UI.Controls;
 using LL.UI.Typography;
 using LL.UI.Windows;
+using LL.User.Core.Amounts;
 using LL.User.Core.Identity;
-using LL.User.Core.Items;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -23,13 +23,13 @@ namespace LL.UI
         [SerializeField] private TMP_Text _masterPointLabel;
 
         private UserIdentity _identity;
-        private IUserItems _items;
+        private IUserAmounts<ItemId> _items;
         private WindowController _windowController;
 
         [Inject]
         private void Construct(
             UserIdentity identity,
-            IUserItems items,
+            IUserAmounts<ItemId> items,
             WindowController windowController)
         {
             _identity = identity;

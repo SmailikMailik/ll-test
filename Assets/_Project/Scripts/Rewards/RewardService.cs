@@ -1,6 +1,7 @@
 using System;
-using LL.User.Core.Cards;
-using LL.User.Core.Items;
+using LL.Game.Cards;
+using LL.Game.Items;
+using LL.User.Core.Amounts;
 using VContainer;
 
 namespace LL.Rewards
@@ -13,13 +14,13 @@ namespace LL.Rewards
 
     internal sealed class RewardService : IRewardService
     {
-        private readonly IUserItems _items;
-        private readonly IUserCards _cards;
+        private readonly IUserAmounts<ItemId> _items;
+        private readonly IUserAmounts<CardId> _cards;
 
         [Inject]
         internal RewardService(
-            IUserItems items,
-            IUserCards cards)
+            IUserAmounts<ItemId> items,
+            IUserAmounts<CardId> cards)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
             _cards = cards ?? throw new ArgumentNullException(nameof(cards));

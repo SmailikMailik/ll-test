@@ -1,9 +1,10 @@
 using System;
-using LL.User.Core.Cards;
+using LL.Game.Cards;
+using LL.Game.Items;
+using LL.User.Core.Amounts;
 using LL.User.Core.Identity;
 using LL.User.Core.Promotions;
 using LL.User.Core.Progress;
-using LL.User.Core.Items;
 using LL.User.Core.Rewards;
 
 namespace LL.User.Core
@@ -11,18 +12,18 @@ namespace LL.User.Core
     internal sealed class UserInitialData
     {
         internal UserIdentity Identity { get; }
-        internal ItemsInitialData Items { get; }
+        internal AmountsInitialData<ItemId> Items { get; }
         internal ProgressInitialData Progress { get; }
         internal PromotionOrderInitialData PromotionOrder { get; }
-        internal CardsInitialData Cards { get; }
+        internal AmountsInitialData<CardId> Cards { get; }
         internal RewardClaimsInitialData RewardClaims { get; }
 
         internal UserInitialData(
             UserIdentity identity,
-            ItemsInitialData items,
+            AmountsInitialData<ItemId> items,
             ProgressInitialData progress,
             PromotionOrderInitialData promotionOrder,
-            CardsInitialData cards,
+            AmountsInitialData<CardId> cards,
             RewardClaimsInitialData rewardClaims)
         {
             Identity = identity ?? throw new ArgumentNullException(nameof(identity));

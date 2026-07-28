@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
 using LL.Upgrades;
-using LL.User.Core.Cards;
+using LL.User.Core.Amounts;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -102,23 +102,23 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
             ClearPlan();
 
-            foreach (var stack in plan)
+            foreach (var cardAmount in plan)
             {
-                var slot = _slots.First(item => item.Id.Equals(stack.Id));
-                slot.View.SetPlannedAmount(stack.Amount);
+                var slot = _slots.First(item => item.Id.Equals(cardAmount.Id));
+                slot.View.SetPlannedAmount(cardAmount.Value);
             }
 
             _changed.OnNext(Unit.Default);
         }
 
-        internal IReadOnlyList<CardAmount> GetPlan()
+        internal IReadOnlyList<Amount<CardId>> GetPlan()
         {
-            var plannedCards = new List<CardAmount>(_slots.Length);
+            var plannedCards = new List<Amount<CardId>>(_slots.Length);
 
             foreach (var slot in _slots)
             {
                 if (slot.View.PlannedAmount > MinimumAmount)
-                    plannedCards.Add(new CardAmount(slot.Id, slot.View.PlannedAmount));
+                    plannedCards.Add(new Amount<CardId>(slot.Id, slot.View.PlannedAmount));
             }
 
             return plannedCards;

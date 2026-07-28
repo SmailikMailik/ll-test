@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Cards;
-using LL.User.Core.Cards;
+using LL.User.Core.Amounts;
 
 namespace LL.Upgrades
 {
@@ -9,7 +9,7 @@ namespace LL.Upgrades
     {
         private const int MinimumAmount = 0;
 
-        internal static IReadOnlyList<CardAmount> Build(
+        internal static IReadOnlyList<Amount<CardId>> Build(
             IReadOnlyList<ExperienceCardOption> cards,
             int requiredExperience)
         {
@@ -17,7 +17,7 @@ namespace LL.Upgrades
                 throw new ArgumentNullException(nameof(cards));
 
             if (CanReach(cards, requiredExperience) is false)
-                return Array.Empty<CardAmount>();
+                return Array.Empty<Amount<CardId>>();
 
             var experienceLimit = GetExperienceLimit(cards, requiredExperience);
             var plans = CreatePlans(cards.Count, experienceLimit);
@@ -181,21 +181,21 @@ namespace LL.Upgrades
             return null;
         }
 
-        private static IReadOnlyList<CardAmount> CreateCardAmounts(
+        private static IReadOnlyList<Amount<CardId>> CreateCardAmounts(
             IReadOnlyList<ExperienceCardOption> cards,
             Plan plan)
         {
             if (plan == null)
-                return Array.Empty<CardAmount>();
+                return Array.Empty<Amount<CardId>>();
 
-            var cardAmounts = new List<CardAmount>(cards.Count);
+            var cardAmounts = new List<Amount<CardId>>(cards.Count);
 
             for (var index = 0; index < cards.Count; index++)
             {
                 var amount = plan.Amounts[index];
 
                 if (amount > MinimumAmount)
-                    cardAmounts.Add(new CardAmount(cards[index].Id, amount));
+                    cardAmounts.Add(new Amount<CardId>(cards[index].Id, amount));
             }
 
             return cardAmounts;

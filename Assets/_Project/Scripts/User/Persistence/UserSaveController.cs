@@ -6,11 +6,10 @@ using LL.Game.Items;
 using LL.Game.Promotions;
 using LL.Rewards;
 using LL.Saving;
-using LL.User.Core.Cards;
+using LL.User.Core.Amounts;
 using LL.User.Core.Identity;
 using LL.User.Core.Promotions;
 using LL.User.Core.Progress;
-using LL.User.Core.Items;
 using LL.User.Core.Rewards;
 using R3;
 using VContainer;
@@ -21,10 +20,10 @@ namespace LL.User.Persistence
     internal sealed class UserSaveController : IInitializable, IDisposable
     {
         private readonly UserIdentity _identity;
-        private readonly IUserItems _items;
+        private readonly IUserAmounts<ItemId> _items;
         private readonly IUserProgress _progress;
         private readonly ISaveService _saveService;
-        private readonly IUserCards _cards;
+        private readonly IUserAmounts<CardId> _cards;
         private readonly IUserPromotionOrder _promotionOrder;
         private readonly IUserRewardClaims _rewardClaims;
         private readonly List<IDisposable> _subscriptions = new();
@@ -41,11 +40,11 @@ namespace LL.User.Persistence
         [Inject]
         internal UserSaveController(
             UserIdentity identity,
-            ItemsInitialData items,
-            CardsInitialData cards,
+            AmountsInitialData<ItemId> items,
+            AmountsInitialData<CardId> cards,
             PromotionOrderInitialData promotionOrder,
-            IUserItems userItems,
-            IUserCards userCards,
+            IUserAmounts<ItemId> userItems,
+            IUserAmounts<CardId> userCards,
             IUserPromotionOrder userPromotionOrder,
             IUserRewardClaims rewardClaims,
             IUserProgress progress,
@@ -71,10 +70,10 @@ namespace LL.User.Persistence
 
             _itemAmounts = items.Amounts.ToDictionary(
                 item => item.Id,
-                item => item.Amount);
+                item => item.Value);
             _cardAmounts = cards.Amounts.ToDictionary(
                 stack => stack.Id,
-                stack => stack.Amount);
+                card => card.Value);
             _claimedRewardIds = new HashSet<RewardBundleId>(rewardClaims.ClaimedIds);
             _rank = progress.Rank;
             _experience = progress.Experience;
@@ -174,8 +173,8 @@ namespace LL.User.Persistence
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
                 new ProgressSaveData(_rank, _experience),
-                _cardAmounts.Select(pair => new CardAmount(pair.Key, pair.Value)),
-                _itemAmounts.Select(pair => new ItemAmount(pair.Key, pair.Value)),
+                _cardAmounts.Select(pair => new Amount<CardId>(pair.Key, pair.Value)),
+                _itemAmounts.Select(pair => new Amount<ItemId>(pair.Key, pair.Value)),
                 new PromotionOrderInitialData(
                     _promotionOrderRequirementId,
                     _promotionOrderDeadlineUnixMilliseconds,

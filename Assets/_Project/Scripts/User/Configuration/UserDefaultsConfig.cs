@@ -4,11 +4,10 @@ using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Identifiers;
 using LL.User.Core;
-using LL.User.Core.Cards;
+using LL.User.Core.Amounts;
 using LL.User.Core.Identity;
 using LL.User.Core.Promotions;
 using LL.User.Core.Progress;
-using LL.User.Core.Items;
 using LL.User.Core.Rewards;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -53,10 +52,10 @@ namespace LL.User.Configuration
                 nameof(_cards));
             return new UserInitialData(
                 _identity.ToData(),
-                new ItemsInitialData(_items?.Select(item => item.ToData())),
+                new AmountsInitialData<ItemId>(_items?.Select(item => item.ToData())),
                 _progress.ToData(),
                 new PromotionOrderInitialData(default, 0L, false),
-                new CardsInitialData(_cards?.Select(card => card.ToData())),
+                new AmountsInitialData<CardId>(_cards?.Select(card => card.ToData())),
                 new RewardClaimsInitialData(null));
         }
 
@@ -101,7 +100,7 @@ namespace LL.User.Configuration
     }
 
     [Serializable]
-    internal abstract class AmountEntry<TId, TData>
+    internal abstract class AmountEntry<TId>
         where TId : struct, IIdentifier
     {
         [LabelText("ID")]
@@ -113,25 +112,20 @@ namespace LL.User.Configuration
 
         internal TId Id => CreateId(_id);
 
-        internal TData ToData() => CreateData(Id, _amount);
+        internal Amount<TId> ToData() => new(Id, _amount);
 
         protected abstract TId CreateId(string value);
-        protected abstract TData CreateData(TId id, int amount);
     }
 
     [Serializable]
-    internal sealed class ItemAmountEntry : AmountEntry<ItemId, ItemAmount>
+    internal sealed class ItemAmountEntry : AmountEntry<ItemId>
     {
         protected override ItemId CreateId(string value) => new(value);
-
-        protected override ItemAmount CreateData(ItemId id, int amount) => new(id, amount);
     }
 
     [Serializable]
-    internal sealed class CardAmountEntry : AmountEntry<CardId, CardAmount>
+    internal sealed class CardAmountEntry : AmountEntry<CardId>
     {
         protected override CardId CreateId(string value) => new(value);
-
-        protected override CardAmount CreateData(CardId id, int amount) => new(id, amount);
     }
 }

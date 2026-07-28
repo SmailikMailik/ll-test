@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Cards;
 using LL.Game.Ranks;
 using LL.UI.Controls;
 using LL.Upgrades;
@@ -7,7 +8,7 @@ using LL.UI.Rewards;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;
-using LL.User.Core.Cards;
+using LL.User.Core.Amounts;
 using LL.User.Core.Progress;
 using R3;
 using UnityEngine;
@@ -154,7 +155,7 @@ namespace LL.UI.Windows.Views.Upgrade
             ApplyCards(plan);
         }
 
-        private void ApplyCards(IReadOnlyList<CardAmount> cards)
+        private void ApplyCards(IReadOnlyList<Amount<CardId>> cards)
         {
             _isApplying = true;
             bool applied;

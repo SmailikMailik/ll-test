@@ -1,17 +1,18 @@
 using System;
-using LL.User.Core.Items;
+using LL.Game.Items;
+using LL.User.Core.Amounts;
 using VContainer;
 
 namespace LL.Purchasing
 {
     internal sealed class PurchaseService : IPurchaseService
     {
-        private readonly IUserItems _items;
+        private readonly IUserAmounts<ItemId> _items;
         private readonly IPurchaseConfirmation _confirmation;
 
         [Inject]
         internal PurchaseService(
-            IUserItems items,
+            IUserAmounts<ItemId> items,
             IPurchaseConfirmation confirmation)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
