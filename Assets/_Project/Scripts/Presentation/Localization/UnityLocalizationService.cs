@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using R3;
+using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using VContainer;
 
@@ -9,8 +11,16 @@ namespace LL.Presentation.Localization
     {
         private const char ScopeSeparator = '/';
 
+        public Observable<Unit> LocaleChanged { get; }
+
         [Inject]
-        internal UnityLocalizationService() { }
+        internal UnityLocalizationService()
+        {
+            LocaleChanged = Observable.FromEvent<Action<Locale>>(
+                handler => _ => handler(),
+                handler => LocalizationSettings.SelectedLocaleChanged += handler,
+                handler => LocalizationSettings.SelectedLocaleChanged -= handler);
+        }
 
         public string GetText(string key) => GetText(key, null);
 

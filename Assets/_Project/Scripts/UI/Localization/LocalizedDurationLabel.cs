@@ -1,6 +1,7 @@
 using System;
 using LL.Presentation.Localization;
 using LL.UI.Typography;
+using R3;
 using TMPro;
 using UnityEngine;
 using VContainer;
@@ -14,6 +15,8 @@ namespace LL.UI.Localization
         [SerializeField] private TMP_Text _label;
 
         private ILocalizationService _localization;
+        private TimeSpan _duration;
+        private bool _hasDuration;
 
         [Inject]
         private void Construct(ILocalizationService localization)
@@ -21,12 +24,30 @@ namespace LL.UI.Localization
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
 
+        private void Start()
+        {
+            _localization.LocaleChanged.Subscribe(_ => OnLocaleChanged()).AddTo(this);
+        }
+
         internal void SetDuration(TimeSpan duration)
+        {
+            _duration = duration;
+            _hasDuration = true;
+            RefreshText();
+        }
+
+        private void OnLocaleChanged()
+        {
+            if (_hasDuration)
+                RefreshText();
+        }
+
+        private void RefreshText()
         {
             var hoursUnit = _localization.GetText(DurationLocalizationKeys.HoursUnit);
             var minutesUnit = _localization.GetText(DurationLocalizationKeys.MinutesUnit);
             var secondsUnit = _localization.GetText(DurationLocalizationKeys.SecondsUnit);
-            _label.text = TextFormatter.Duration(duration, hoursUnit, minutesUnit, secondsUnit);
+            _label.text = TextFormatter.Duration(_duration, hoursUnit, minutesUnit, secondsUnit);
         }
     }
 }

@@ -40,6 +40,7 @@ namespace LL.UI.Windows.Views.Promotion
         private IUserPromotionOrder _promotionOrder;
 
         private OrderState _state = OrderState.Available;
+        private RankPromotionRequirement _requirement;
         private PromotionRequirementId _requirementId;
         private int _displayedRemainingSeconds = -1;
         private bool _canAccept;
@@ -61,6 +62,7 @@ namespace LL.UI.Windows.Views.Promotion
         {
             _completed.AddTo(this);
             _button.Clicked.Subscribe(_ => OnButtonClicked()).AddTo(this);
+            _localization.LocaleChanged.Subscribe(_ => OnLocaleChanged()).AddTo(this);
 
             Observable
                 .Interval(_timerTickInterval)
@@ -74,9 +76,7 @@ namespace LL.UI.Windows.Views.Promotion
             TimeSpan duration,
             bool canAccept)
         {
-            if (requirement == null)
-                throw new ArgumentNullException(nameof(requirement));
-
+            _requirement = requirement ?? throw new ArgumentNullException(nameof(requirement));
             _requirementId = requirement.Id;
             _duration = duration;
             _canAccept = canAccept;
@@ -199,6 +199,14 @@ namespace LL.UI.Windows.Views.Promotion
         private void RefreshButtonAvailability()
         {
             _button.SetInteractable(_canAccept && IsCompleted is false);
+        }
+
+        private void OnLocaleChanged()
+        {
+            if (_requirement != null)
+                RefreshText(_requirement);
+
+            RefreshButtonText();
         }
 
         private void TickTimer()
