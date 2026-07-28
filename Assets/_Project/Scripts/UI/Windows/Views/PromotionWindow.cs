@@ -90,11 +90,11 @@ namespace LL.UI.Windows.Views
 
             if (_promotionService.TryGetPromotion(out _promotion))
             {
-                _softPriceLabel.text = TextFormatter.CurrencyAmount(
-                    _promotion.SoftPurchase.CurrencyId,
+                _softPriceLabel.text = TextFormatter.ItemAmount(
+                    _promotion.SoftPurchase.ItemId,
                     _promotion.SoftPurchase.Price);
-                _hardPriceLabel.text = TextFormatter.CurrencyAmount(
-                    _promotion.HardPurchase.CurrencyId,
+                _hardPriceLabel.text = TextFormatter.ItemAmount(
+                    _promotion.HardPurchase.ItemId,
                     _promotion.HardPurchase.Price);
                 ShowRewards(_promotion);
                 _orderView.Refresh(

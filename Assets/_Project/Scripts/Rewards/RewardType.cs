@@ -2,8 +2,7 @@ namespace LL.Rewards
 {
     internal enum RewardType : byte
     {
-        Currency = 0,
-        Item = 1,
-        Card = 2
+        Item = 0,
+        Card = 1
     }
 }

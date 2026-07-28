@@ -41,7 +41,6 @@ namespace LL.Rewards
                    reward.Amount > 0 &&
                    reward switch
                    {
-                       CurrencyReward currency => currency.CurrencyId.IsEmpty is false,
                        ItemReward item => item.ItemId.IsEmpty is false,
                        CardReward card => card.CardId.IsEmpty is false,
                        _ => false
@@ -52,7 +51,6 @@ namespace LL.Rewards
         {
             return reward switch
             {
-                CurrencyReward currency => $"{nameof(CurrencyReward)}:{currency.CurrencyId}",
                 ItemReward item => $"{nameof(ItemReward)}:{item.ItemId}",
                 CardReward card => $"{nameof(CardReward)}:{card.CardId}",
                 _ => string.Empty

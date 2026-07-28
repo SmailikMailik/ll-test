@@ -1,6 +1,6 @@
+using System;
 using LL.User.Core.Cards;
 using LL.User.Core.Items;
-using LL.User.Core.Wallet;
 using VContainer;
 
 namespace LL.Rewards
@@ -13,24 +13,20 @@ namespace LL.Rewards
 
     internal sealed class RewardService : IRewardService
     {
-        private readonly IUserWallet _wallet;
-        private readonly IUserCards _cards;
         private readonly IUserItems _items;
+        private readonly IUserCards _cards;
 
         [Inject]
         internal RewardService(
-            IUserWallet wallet,
-            IUserCards cards,
-            IUserItems items)
+            IUserItems items,
+            IUserCards cards)
         {
-            _wallet = wallet;
-            _cards = cards;
-            _items = items;
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+            _cards = cards ?? throw new ArgumentNullException(nameof(cards));
         }
 
         public bool CanApply(IReward reward) => reward switch
         {
-            CurrencyReward currency => _wallet.CanAdd(currency.CurrencyId, currency.Amount),
             ItemReward item => _items.CanAdd(item.ItemId, item.Amount),
             CardReward card => _cards.CanAdd(card.CardId, card.Amount),
             _ => false
@@ -38,7 +34,6 @@ namespace LL.Rewards
 
         public bool TryApply(IReward reward) => reward switch
         {
-            CurrencyReward currency => _wallet.TryAdd(currency.CurrencyId, currency.Amount),
             ItemReward item => _items.TryAdd(item.ItemId, item.Amount),
             CardReward card => _cards.TryAdd(card.CardId, card.Amount),
             _ => false

@@ -8,10 +8,10 @@ namespace LLEditor.Presentation
     {
         private const string MenuPath = ConfigurationAssetMenu.RootPath + "Presentation/";
 
-        [MenuItem(MenuPath + "Currency Icon Catalog")]
-        private static void SelectCurrencyIconCatalog()
+        [MenuItem(MenuPath + "Item Icon Catalog")]
+        private static void SelectItemIconCatalog()
         {
-            ConfigurationAssetMenu.Select<CurrencyIconCatalogConfig>(CurrencyIconCatalogConfig.CreationPath);
+            ConfigurationAssetMenu.Select<ItemIconCatalogConfig>(ItemIconCatalogConfig.CreationPath);
         }
 
         [MenuItem(MenuPath + "Card Icon Catalog")]
@@ -19,12 +19,6 @@ namespace LLEditor.Presentation
         {
             ConfigurationAssetMenu.Select<CardIconCatalogConfig>(CardIconCatalogConfig
                 .CreationPath);
-        }
-
-        [MenuItem(MenuPath + "Item Icon Catalog")]
-        private static void SelectItemIconCatalog()
-        {
-            ConfigurationAssetMenu.Select<ItemIconCatalogConfig>(ItemIconCatalogConfig.CreationPath);
         }
     }
 }

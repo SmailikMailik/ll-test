@@ -1,9 +1,9 @@
-using LL.Game.Currencies;
+using LL.Game.Items;
 using LL.UI.Controls.Buttons;
 using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.User.Core.Identity;
-using LL.User.Core.Wallet;
+using LL.User.Core.Items;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -23,17 +23,17 @@ namespace LL.UI
         [SerializeField] private TMP_Text _masterPointLabel;
 
         private UserIdentity _identity;
-        private IUserWallet _userWallet;
+        private IUserItems _items;
         private WindowController _windowController;
 
         [Inject]
         private void Construct(
             UserIdentity identity,
-            IUserWallet userWallet,
+            IUserItems items,
             WindowController windowController)
         {
             _identity = identity;
-            _userWallet = userWallet;
+            _items = items;
             _windowController = windowController;
         }
 
@@ -44,15 +44,15 @@ namespace LL.UI
 
             _userLabel.text = $"{_identity.RegionCode} {_identity.UserId}";
 
-            ObserveCurrency(CurrencyIds.Soft, _softLabel);
-            ObserveCurrency(CurrencyIds.Hard, _hardLabel);
-            ObserveCurrency(CurrencyIds.MasterPoint, _masterPointLabel);
+            ObserveItem(ItemIds.Soft, _softLabel);
+            ObserveItem(ItemIds.Hard, _hardLabel);
+            ObserveItem(ItemIds.MasterPoint, _masterPointLabel);
         }
 
-        private void ObserveCurrency(CurrencyId id, TMP_Text label)
+        private void ObserveItem(ItemId id, TMP_Text label)
         {
-            _userWallet.ObserveAmount(id)
-                .Subscribe(amount => label.text = TextFormatter.CurrencyAmount(id, amount))
+            _items.ObserveAmount(id)
+                .Subscribe(amount => label.text = TextFormatter.ItemAmount(id, amount))
                 .AddTo(this);
         }
     }

@@ -2,8 +2,10 @@ namespace LL.Game.Items
 {
     internal static class ItemIds
     {
-        internal static readonly ItemId Item1 = new("item_1");
-        internal static readonly ItemId Item2 = new("item_2");
-        internal static readonly ItemId Item3 = new("item_3");
+        internal static readonly ItemId Soft = new("soft");
+        internal static readonly ItemId Hard = new("hard");
+        internal static readonly ItemId MasterPoint = new("master_point");
+        internal static readonly ItemId Skill = new("skill");
+        internal static readonly ItemId Slot = new("slot");
     }
 }

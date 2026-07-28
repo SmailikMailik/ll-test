@@ -31,7 +31,7 @@ namespace LL.Presentation.Purchasing
             if (purchase == null)
                 throw new ArgumentNullException(nameof(purchase));
 
-            var priceText = TextFormatter.CurrencyAmount(purchase.CurrencyId, purchase.Price);
+            var priceText = TextFormatter.ItemAmount(purchase.ItemId, purchase.Price);
 
             _windowController.Show(new ModalWindowParameters
             (

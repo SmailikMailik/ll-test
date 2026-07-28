@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using LL.Game.Cards;
-using LL.Game.Currencies;
 using LL.Game.Items;
 using LL.Identifiers;
 using LL.Loading;
@@ -84,7 +83,6 @@ namespace LL.Rewards.Configuration
         {
             return _type switch
             {
-                RewardType.Currency => new CurrencyReward(new CurrencyId(_id), _amount),
                 RewardType.Item => new ItemReward(new ItemId(_id), _amount),
                 RewardType.Card => new CardReward(new CardId(_id), _amount),
                 _ => throw new ArgumentOutOfRangeException()

@@ -17,18 +17,12 @@ namespace LL.User.Core.Items
             if (initialData == null)
                 throw new ArgumentNullException(nameof(initialData));
 
-            _amounts = initialData.Stacks.ToDictionary(
-                stack => stack.Id,
-                stack => new ReactiveProperty<int>(stack.Amount));
+            _amounts = initialData.Amounts.ToDictionary(
+                item => item.Id,
+                item => new ReactiveProperty<int>(item.Amount));
         }
 
-        public Observable<int> ObserveAmount(ItemId id)
-        {
-            if (TryGetAmount(id, out var amount))
-                return amount;
-
-            throw new KeyNotFoundException($"Unknown item ID: {id}");
-        }
+        public Observable<int> ObserveAmount(ItemId id) => GetAmount(id);
 
         public bool CanAdd(ItemId id, int amount)
         {
@@ -42,28 +36,26 @@ namespace LL.User.Core.Items
             if (CanAdd(id, amount) is false)
                 return false;
 
-            TryGetAmount(id, out var currentAmount);
-            currentAmount.Value += amount;
-            return true;
+            return TryAdd(GetAmount(id), amount);
         }
 
         public bool TrySpend(ItemId id, int amount)
         {
-            if (amount <= 0 ||
-                TryGetAmount(id, out var currentAmount) is false ||
-                currentAmount.Value < amount)
-            {
-                return false;
-            }
-
-            currentAmount.Value -= amount;
-            return true;
+            return TryGetAmount(id, out var currentAmount) && TrySpend(currentAmount, amount);
         }
 
         public void Dispose()
         {
             foreach (var amount in _amounts.Values)
                 amount.Dispose();
+        }
+
+        private ReactiveProperty<int> GetAmount(ItemId id)
+        {
+            if (TryGetAmount(id, out var amount))
+                return amount;
+
+            throw new KeyNotFoundException($"Unknown item ID: {id}");
         }
 
         private bool TryGetAmount(ItemId id, out ReactiveProperty<int> amount)
@@ -75,6 +67,24 @@ namespace LL.User.Core.Items
             }
 
             return _amounts.TryGetValue(id, out amount);
+        }
+
+        private static bool TryAdd(ReactiveProperty<int> balance, int amount)
+        {
+            if (amount <= 0 || balance.Value > int.MaxValue - amount)
+                return false;
+
+            balance.Value += amount;
+            return true;
+        }
+
+        private static bool TrySpend(ReactiveProperty<int> balance, int amount)
+        {
+            if (amount <= 0 || balance.Value < amount)
+                return false;
+
+            balance.Value -= amount;
+            return true;
         }
     }
 }

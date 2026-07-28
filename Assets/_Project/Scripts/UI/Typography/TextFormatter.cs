@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using LL.Extensions;
-using LL.Game.Currencies;
+using LL.Game.Items;
 
 namespace LL.UI.Typography
 {
     internal static class TextFormatter
     {
-        private static readonly Dictionary<CurrencyId, (TextSprite Sprite, TextStyle Style)> _currencyFormats = new()
+        private static readonly Dictionary<ItemId, (TextSprite Sprite, TextStyle Style)> _itemFormats = new()
         {
-            [CurrencyIds.Soft] = (TextSprite.Cash, TextStyle.White),
-            [CurrencyIds.Hard] = (TextSprite.Gold, TextStyle.Gold),
-            [CurrencyIds.MasterPoint] = (TextSprite.MasterPoints, TextStyle.White)
+            [ItemIds.Soft] = (TextSprite.Cash, TextStyle.White),
+            [ItemIds.Hard] = (TextSprite.Gold, TextStyle.Gold),
+            [ItemIds.MasterPoint] = (TextSprite.MasterPoints, TextStyle.White)
         };
 
         private static readonly NumberFormatInfo _numberFormat = new()
@@ -54,11 +54,11 @@ namespace LL.UI.Typography
             return $"{TextTags.Sprite(TextSprite.Time)}{separator}{time}";
         }
 
-        internal static string CurrencyAmount(CurrencyId id, int amount)
+        internal static string ItemAmount(ItemId id, int amount)
         {
             var formattedAmount = Number(amount);
 
-            if (_currencyFormats.TryGetValue(id, out var format) is false)
+            if (_itemFormats.TryGetValue(id, out var format) is false)
                 return formattedAmount;
 
             var sprite = TextTags.Sprite(format.Sprite);

@@ -1,6 +1,6 @@
 using System;
-using LL.Game.Currencies;
 using LL.Game.Purchases;
+using LL.Game.Items;
 using LL.Rewards;
 
 namespace LL.Game.Promotions
@@ -43,8 +43,8 @@ namespace LL.Game.Promotions
             Rank = rank;
             Requirement = requirement ?? throw new ArgumentNullException(nameof(requirement));
             OrderDuration = orderDuration;
-            SoftPurchase = new Purchase(PurchaseIds.RankPromotion, CurrencyIds.Soft, softPrice);
-            HardPurchase = new Purchase(PurchaseIds.InstantRankPromotion, CurrencyIds.Hard, hardPrice);
+            SoftPurchase = new Purchase(PurchaseIds.RankPromotion, ItemIds.Soft, softPrice);
+            HardPurchase = new Purchase(PurchaseIds.InstantRankPromotion, ItemIds.Hard, hardPrice);
             RewardBundleId = rewardBundleId;
         }
 

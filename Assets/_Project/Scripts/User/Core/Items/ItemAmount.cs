@@ -3,12 +3,12 @@ using LL.Game.Items;
 
 namespace LL.User.Core.Items
 {
-    internal sealed class ItemStack
+    internal sealed class ItemAmount
     {
         internal ItemId Id { get; }
         internal int Amount { get; }
 
-        internal ItemStack(ItemId id, int amount)
+        internal ItemAmount(ItemId id, int amount)
         {
             Id = id;
             Amount = Math.Max(0, amount);

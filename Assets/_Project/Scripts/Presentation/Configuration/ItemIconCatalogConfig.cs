@@ -46,7 +46,7 @@ namespace LL.Presentation.Configuration
         [SerializeField] private string _id;
 
         [Required]
-        [PreviewField(80, ObjectFieldAlignment.Center)]
+        [PreviewField(55, ObjectFieldAlignment.Center)]
         [SerializeField] private Sprite _icon;
 
         internal ItemId Id => new(_id);

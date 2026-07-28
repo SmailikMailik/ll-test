@@ -7,26 +7,26 @@ namespace LL.User.Core.Items
 {
     internal sealed class ItemsInitialData
     {
-        internal IReadOnlyList<ItemStack> Stacks { get; }
+        internal IReadOnlyList<ItemAmount> Amounts { get; }
 
-        internal ItemsInitialData(IEnumerable<ItemStack> stacks)
+        internal ItemsInitialData(IEnumerable<ItemAmount> items)
         {
             var amounts = new Dictionary<ItemId, long>();
 
-            if (stacks != null)
+            if (items != null)
             {
-                foreach (var stack in stacks)
+                foreach (var item in items)
                 {
-                    if (stack == null || stack.Id.IsEmpty)
+                    if (item == null || item.Id.IsEmpty)
                         continue;
 
-                    amounts.TryGetValue(stack.Id, out var current);
-                    amounts[stack.Id] = Math.Min(current + stack.Amount, int.MaxValue);
+                    amounts.TryGetValue(item.Id, out var current);
+                    amounts[item.Id] = Math.Min(current + item.Amount, int.MaxValue);
                 }
             }
 
-            var copy = amounts.Select(pair => new ItemStack(pair.Key, (int)pair.Value)).ToArray();
-            Stacks = Array.AsReadOnly(copy);
+            var copy = amounts.Select(pair => new ItemAmount(pair.Key, (int)pair.Value)).ToArray();
+            Amounts = Array.AsReadOnly(copy);
         }
     }
 }

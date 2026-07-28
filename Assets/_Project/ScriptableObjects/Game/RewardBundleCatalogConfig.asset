@@ -16,72 +16,72 @@ MonoBehaviour:
   - _id: rank_1_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100
   - _id: rank_2_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100
   - _id: rank_3_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100
   - _id: rank_4_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100
   - _id: rank_5_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100
   - _id: rank_6_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100
   - _id: rank_7_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100
   - _id: rank_8_promotion
     _grantMode: 0
     _rewards:
-    - _type: 1
-      _id: item_1
+    - _type: 0
+      _id: master_point
       _amount: 1
-    - _type: 1
-      _id: item_2
+    - _type: 0
+      _id: skill
       _amount: 100

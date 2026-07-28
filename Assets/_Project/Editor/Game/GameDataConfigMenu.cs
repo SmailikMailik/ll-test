@@ -27,12 +27,6 @@ namespace LLEditor.Game
             ConfigurationAssetMenu.Select<CardCatalogConfig>(CardCatalogConfig.CreationPath);
         }
 
-        [MenuItem(MenuPath + "Purchase Catalog")]
-        private static void SelectPurchaseCatalog()
-        {
-            ConfigurationAssetMenu.Select<PurchaseCatalogConfig>(PurchaseCatalogConfig.CreationPath);
-        }
-
         [MenuItem(MenuPath + "Reward Bundle Catalog")]
         private static void SelectRewardBundleCatalog()
         {

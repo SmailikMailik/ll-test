@@ -1,16 +1,14 @@
 using System;
 using System.Linq;
-using LL.Game.Currencies;
 using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Identifiers;
 using LL.User.Core;
 using LL.User.Core.Cards;
 using LL.User.Core.Identity;
-using LL.User.Core.Items;
 using LL.User.Core.Progress;
+using LL.User.Core.Items;
 using LL.User.Core.Rewards;
-using LL.User.Core.Wallet;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -28,10 +26,10 @@ namespace LL.User.Configuration
         [LabelText("User ID")]
         [SerializeField] private string _userId;
 
-        [BoxGroup("Wallet")]
-        [ValidateInput(nameof(HasValidCurrencyIds), "Currency IDs must be non-empty and unique.")]
+        [BoxGroup("Items")]
+        [ValidateInput(nameof(HasValidItemIds), "Item IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
-        [SerializeField] private CurrencyBalanceEntry[] _currencies;
+        [SerializeField] private ItemAmountEntry[] _items;
 
         [BoxGroup("Progress")]
         [LabelText("Rank")]
@@ -49,41 +47,29 @@ namespace LL.User.Configuration
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private CardAmountEntry[] _cards;
 
-        [BoxGroup("Items")]
-        [ValidateInput(nameof(HasValidItemIds), "Item IDs must be non-empty and unique.")]
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
-        [SerializeField] private ItemAmountEntry[] _items;
-
         internal const string CreationPath = "LL/User/User Defaults Config";
 
         UserInitialData IUserDefaultsProvider.GetDefaults()
         {
             IdentifierCatalogValidator.EnsureValidIds(
-                _currencies,
+                _items,
                 entry => entry.Id,
-                "Default currency balances",
-                nameof(_currencies));
+                "Default item amounts",
+                nameof(_items));
             IdentifierCatalogValidator.EnsureValidIds(
                 _cards,
                 entry => entry.Id,
                 "Default card amounts",
                 nameof(_cards));
-            IdentifierCatalogValidator.EnsureValidIds(
-                _items,
-                entry => entry.Id,
-                "Default item amounts",
-                nameof(_items));
-
             return new UserInitialData(
                 new UserIdentity(_regionCode, _userId),
-                new WalletInitialData(_currencies?.Select(currency => currency.ToData())),
+                new ItemsInitialData(_items?.Select(item => item.ToData())),
                 new ProgressInitialData(_rank, _experience),
                 new CardsInitialData(_cards?.Select(card => card.ToData())),
-                new ItemsInitialData(_items?.Select(item => item.ToData())),
                 new RewardClaimsInitialData(null));
         }
 
-        private static bool HasValidCurrencyIds(CurrencyBalanceEntry[] entries)
+        private static bool HasValidItemIds(ItemAmountEntry[] entries)
         {
             return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
         }
@@ -92,26 +78,21 @@ namespace LL.User.Configuration
         {
             return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
         }
-
-        private static bool HasValidItemIds(ItemAmountEntry[] entries)
-        {
-            return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
-        }
     }
 
     [Serializable]
-    internal sealed class CurrencyBalanceEntry
+    internal sealed class ItemAmountEntry
     {
-        [LabelText("Currency ID")]
+        [LabelText("Item ID")]
         [SerializeField] private string _id;
 
         [LabelText("Amount")]
         [MinValue(0)]
         [SerializeField] private int _amount;
 
-        internal CurrencyId Id => new(_id);
+        internal ItemId Id => new(_id);
 
-        internal CurrencyBalance ToData() => new(Id, _amount);
+        internal ItemAmount ToData() => new(Id, _amount);
     }
 
     [Serializable]
@@ -127,20 +108,5 @@ namespace LL.User.Configuration
         internal CardId Id => new(_id);
 
         internal CardStack ToData() => new(Id, _amount);
-    }
-
-    [Serializable]
-    internal sealed class ItemAmountEntry
-    {
-        [LabelText("Item ID")]
-        [SerializeField] private string _id;
-
-        [LabelText("Amount")]
-        [MinValue(0)]
-        [SerializeField] private int _amount;
-
-        internal ItemId Id => new(_id);
-
-        internal ItemStack ToData() => new(Id, _amount);
     }
 }

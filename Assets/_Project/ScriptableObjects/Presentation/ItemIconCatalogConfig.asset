@@ -9,13 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e36c2ce67bd1154b823c9608c5c6854, type: 3}
+  m_Script: {fileID: 11500000, guid: c28bf87daf454de6bd59f10b9b28ba5c, type: 3}
   m_Name: ItemIconCatalogConfig
   m_EditorClassIdentifier:
   _icons:
-  - _id: item_1
+  - _id: soft
+    _icon: {fileID: 21300000, guid: c8f9940cfb90c7645bba5a4342bd3f80, type: 3}
+  - _id: hard
+    _icon: {fileID: 21300000, guid: 89a2d82750d03da4794e3a4f6bddfd2d, type: 3}
+  - _id: master_point
     _icon: {fileID: 21300000, guid: a81b3f2e18e648148a232cd621b67c77, type: 3}
-  - _id: item_2
+  - _id: skill
     _icon: {fileID: 21300000, guid: ecb22bfcb0fd5a744befb6b5506c6fbb, type: 3}
-  - _id: item_3
+  - _id: slot
     _icon: {fileID: 21300000, guid: eff58d9945d878a4990401ad83e5220c, type: 3}
