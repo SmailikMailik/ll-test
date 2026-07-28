@@ -3,6 +3,7 @@ using VContainer;
 
 namespace LL.UI.Windows
 {
+    [DisallowMultipleComponent]
     internal sealed class WindowController : MonoBehaviour
     {
         [SerializeField] private Transform _container;

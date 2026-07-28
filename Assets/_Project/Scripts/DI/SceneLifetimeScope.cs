@@ -10,6 +10,7 @@ using VContainer.Unity;
 
 namespace LL.DI
 {
+    [DisallowMultipleComponent]
     internal sealed class SceneLifetimeScope : LifetimeScope
     {
         [SerializeField] private WindowController _windowController;

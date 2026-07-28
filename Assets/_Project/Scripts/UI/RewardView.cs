@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace LL.UI
 {
+    [DisallowMultipleComponent]
     internal sealed class RewardView : MonoBehaviour
     {
         [SerializeField] private Image _icon;

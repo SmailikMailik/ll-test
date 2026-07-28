@@ -17,23 +17,60 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         internal void Show(RankProgress progress, int currentExperience, int addedExperience)
         {
-            var previewExperience = progress.HasNextRank
-                ? (int)Math.Min((long)currentExperience + addedExperience, progress.RequiredExperience)
-                : currentExperience;
-
             _rankLabel.text = progress.Rank.ToString();
-            _experienceLabel.text = progress.HasNextRank
-                ? TextFormatter.Progress(previewExperience, progress.RequiredExperience)
-                : TextFormatter.Number(previewExperience);
-            _addedExperienceLabel.text = addedExperience > 0
-                ? $"+ {TextFormatter.Number(addedExperience)}"
-                : string.Empty;
-            _maximumExperienceMarker.SetActive(
-                progress.HasNextRank is false ||
-                previewExperience >= progress.RequiredExperience);
-            _bar.SetProgress(
-                progress.GetNormalizedExperience(currentExperience),
-                progress.GetNormalizedExperience(previewExperience));
+
+            if (progress.HasNextRank is false)
+            {
+                ShowMaximumRank(progress, currentExperience);
+                return;
+            }
+
+            if (addedExperience <= 0)
+            {
+                ShowCurrentProgress(progress, currentExperience);
+                return;
+            }
+
+            ShowPreviewProgress(progress, currentExperience, addedExperience);
+        }
+
+        private void ShowMaximumRank(RankProgress progress, int currentExperience)
+        {
+            _experienceLabel.text = TextFormatter.Number(currentExperience);
+            _addedExperienceLabel.text = string.Empty;
+            _maximumExperienceMarker.SetActive(true);
+            SetBarProgress(progress, currentExperience);
+        }
+
+        private void ShowCurrentProgress(RankProgress progress, int currentExperience)
+        {
+            _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.RequiredExperience);
+            _addedExperienceLabel.text = string.Empty;
+            _maximumExperienceMarker.SetActive(currentExperience >= progress.RequiredExperience);
+            SetBarProgress(progress, currentExperience);
+        }
+
+        private void ShowPreviewProgress(RankProgress progress, int currentExperience, int addedExperience)
+        {
+            var previewExperience = Math.Min(currentExperience + addedExperience, progress.RequiredExperience);
+
+            _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.RequiredExperience);
+            _addedExperienceLabel.text = $"+ {TextFormatter.Number(addedExperience)}";
+            _maximumExperienceMarker.SetActive(previewExperience >= progress.RequiredExperience);
+            SetBarProgress(progress, currentExperience, previewExperience);
+        }
+
+        private void SetBarProgress(RankProgress progress, int currentExperience)
+        {
+            SetBarProgress(progress, currentExperience, currentExperience);
+        }
+
+        private void SetBarProgress(RankProgress progress, int currentExperience, int previewExperience)
+        {
+            var currentProgress = progress.GetNormalizedExperience(currentExperience);
+            var previewProgress = progress.GetNormalizedExperience(previewExperience);
+
+            _bar.SetProgress(currentProgress, previewProgress);
         }
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace LL.UI
 {
+    [DisallowMultipleComponent]
     internal sealed class PredictedProgressBar : MonoBehaviour
     {
         [SerializeField] private RectTransform _currentProgressRect;

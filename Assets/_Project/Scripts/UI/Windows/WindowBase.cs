@@ -30,6 +30,7 @@ namespace LL.UI.Windows
         }
     }
 
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
     internal abstract class WindowBase : RectMonoBehaviour

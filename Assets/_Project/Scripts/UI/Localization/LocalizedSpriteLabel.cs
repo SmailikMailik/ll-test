@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace LL.UI.Localization
 {
+    [DisallowMultipleComponent]
     [AddComponentMenu("LL/UI/Localization/Localized Sprite Label")]
     internal sealed class LocalizedSpriteLabel : MonoBehaviour
     {

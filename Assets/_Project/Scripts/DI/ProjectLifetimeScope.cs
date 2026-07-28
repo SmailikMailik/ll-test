@@ -30,6 +30,7 @@ using VContainer.Unity;
 
 namespace LL.DI
 {
+    [DisallowMultipleComponent]
     internal sealed class ProjectLifetimeScope : LifetimeScope
     {
         [SerializeField] private WindowCatalog _windowCatalog;

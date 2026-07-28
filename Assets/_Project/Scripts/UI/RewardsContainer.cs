@@ -9,6 +9,7 @@ using VContainer;
 
 namespace LL.UI
 {
+    [DisallowMultipleComponent]
     internal sealed class RewardsContainer : MonoBehaviour
     {
         [SerializeField] private RewardView _viewTemplate;

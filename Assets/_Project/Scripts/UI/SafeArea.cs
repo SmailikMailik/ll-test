@@ -2,7 +2,7 @@
 
 namespace LL.UI
 {
-    /// <summary> Отступает элементы интерфейса от края, чтобы на устройстве интерфейс не залезал под камеры. </summary>
+    [DisallowMultipleComponent]
     internal sealed class SafeArea : RectMonoBehaviour
     {
         [SerializeField] private bool _verticalSymmetry = true;

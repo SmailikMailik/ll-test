@@ -11,6 +11,7 @@ using VContainer;
 
 namespace LL.UI
 {
+    [DisallowMultipleComponent]
     internal sealed class HeaderView : MonoBehaviour
     {
         [SerializeField] private InteractiveButton _backButton;

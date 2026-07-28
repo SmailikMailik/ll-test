@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace LL.UI
 {
+    [DisallowMultipleComponent]
     internal sealed class GlobalMessage : MonoBehaviour
     {
         [SerializeField] private RectTransform _container;
@@ -96,7 +97,8 @@ namespace LL.UI
 
         [ContextMenu("DEV/ShowForced/LargeMessage")]
         private void DEV_ShowForced_LargeMessage() => ShowForced(
-            "Hello! It's forced large message. More characters need to be displayed so this message won't make any sense.");
+            "Hello! It's forced large message. " +
+            "More characters need to be displayed so this message won't make any sense.");
 
         [ContextMenu("DEV/ShowQueued/NullMessage")]
         private void DEV_ShowQueued_NullMessage() => ShowQueued(
@@ -112,7 +114,8 @@ namespace LL.UI
 
         [ContextMenu("DEV/ShowQueued/LargeMessage")]
         private void DEV_ShowQueued_LargeMessage() => ShowQueued(
-            "Hello! It's queued large message. More characters need to be displayed so this message won't make any sense.");
+            "Hello! It's queued large message. " +
+            "More characters need to be displayed so this message won't make any sense.");
 
         #endregion
 
