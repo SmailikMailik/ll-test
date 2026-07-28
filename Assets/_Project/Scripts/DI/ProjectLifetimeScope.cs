@@ -64,6 +64,9 @@ namespace LL.DI
             builder.RegisterInstance<IUserDefaultsProvider>(_userDefaultsConfig);
 
             builder.Register(
+                resolver => resolver.Resolve<IDataLoader<RankCatalog>>().Load(),
+                Lifetime.Singleton);
+            builder.Register(
                 resolver => resolver.Resolve<IDataLoader<CardCatalog>>().Load(),
                 Lifetime.Singleton);
             builder.Register(

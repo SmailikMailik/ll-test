@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using LL.Game.Promotions;
 using LL.Presentation.Localization;
 using LL.Presentation.Orders;
-using LL.UI.Controls.Buttons;
+using LL.Presentation.Promotions;
+using LL.UI.Controls;
 using LL.UI.Localization;
 using LL.UI.Typography;
 using LL.User.Core.Promotions;
@@ -25,6 +26,7 @@ namespace LL.UI.Windows.Views.Promotion
 
         private const string CountVariable = "count";
         private const string TargetVariable = "target";
+        private const string UnlockVariable = "unlock";
 
         private static readonly TimeSpan _timerTickInterval = TimeSpan.FromSeconds(1);
 
@@ -100,12 +102,24 @@ namespace LL.UI.Windows.Views.Promotion
 
         private void RefreshText(RankPromotionRequirement requirement)
         {
-            _titleLabel.text = _localization.GetText(requirement.TitleLocalizationKey);
+            var unlockText = TextTags.Style(
+                _localization.GetText(RankPromotionLocalizationKeys.Unlock),
+                TextStyle.Accent);
+            var countText = TextTags.Style(
+                TextFormatter.Number(requirement.RequiredAmount),
+                TextStyle.Accent);
+
+            _titleLabel.text = _localization.GetText(
+                requirement.TitleLocalizationKey,
+                new Dictionary<string, object>
+                {
+                    [UnlockVariable] = unlockText
+                });
             _descriptionLabel.text = _localization.GetText(
                 requirement.DescriptionLocalizationKey,
                 new Dictionary<string, object>
                 {
-                    [CountVariable] = TextFormatter.Number(requirement.RequiredAmount),
+                    [CountVariable] = countText,
                     [TargetVariable] = _localization.GetText(requirement.TargetLocalizationKey)
                 });
         }

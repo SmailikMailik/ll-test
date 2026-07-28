@@ -55,6 +55,14 @@ MonoBehaviour:
     m_Key: actions.cancel_rank_promotion
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440986
+    m_Key: fragments.promotion_unlock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440987
+    m_Key: labels.price
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using LL.Loading;
 using VContainer;
 
 namespace LL.Game.Ranks
@@ -10,12 +9,9 @@ namespace LL.Game.Ranks
         private readonly IReadOnlyList<int> _experienceRequirements;
 
         [Inject]
-        internal RankProgression(IDataLoader<RankCatalog> loader)
+        internal RankProgression(RankCatalog catalog)
         {
-            if (loader is null)
-                throw new ArgumentNullException(nameof(loader));
-
-            _experienceRequirements = Normalize(loader.Load()?.ExperienceRequirements);
+            _experienceRequirements = catalog?.ExperienceRequirements ?? throw new ArgumentNullException(nameof(catalog));
         }
 
         public RankProgress GetProgress(int rank, int experience)
@@ -41,19 +37,6 @@ namespace LL.Game.Ranks
 
             return progress.HasNextRank &&
                    experience >= progress.RequiredExperience;
-        }
-
-        private static IReadOnlyList<int> Normalize(IReadOnlyList<int> requirements)
-        {
-            if (requirements == null || requirements.Count == 0)
-                return new[] { 0 };
-
-            var normalized = new int[requirements.Count];
-
-            for (var index = 1; index < requirements.Count; index++)
-                normalized[index] = Math.Max(1, requirements[index]);
-
-            return normalized;
         }
     }
 }

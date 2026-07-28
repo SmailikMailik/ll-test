@@ -11,12 +11,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c28bf87daf454de6bd59f10b9b28ba5c, type: 3}
   m_Name: ItemIconCatalogConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   _icons:
   - _id: soft
-    _icon: {fileID: 21300000, guid: c8f9940cfb90c7645bba5a4342bd3f80, type: 3}
+    _icon: {fileID: 21300000, guid: d2dc9b57212708b449ac93bf0b2a9955, type: 3}
   - _id: hard
-    _icon: {fileID: 21300000, guid: 89a2d82750d03da4794e3a4f6bddfd2d, type: 3}
+    _icon: {fileID: 21300000, guid: 2a764cfe61dad194e80c90a78ffce1dc, type: 3}
   - _id: master_point
     _icon: {fileID: 21300000, guid: a81b3f2e18e648148a232cd621b67c77, type: 3}
   - _id: skill

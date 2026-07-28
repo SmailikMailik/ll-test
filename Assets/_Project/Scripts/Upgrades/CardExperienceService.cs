@@ -9,8 +9,8 @@ namespace LL.Upgrades
 {
     internal interface ICardExperienceService
     {
-        bool TryGetApplication(IReadOnlyList<CardStack> cards, out ExperienceApplication application);
-        bool TryApply(IReadOnlyList<CardStack> cards);
+        bool TryGetApplication(IReadOnlyList<CardAmount> cards, out ExperienceApplication application);
+        bool TryApply(IReadOnlyList<CardAmount> cards);
     }
 
     internal sealed class CardExperienceService : ICardExperienceService
@@ -32,12 +32,12 @@ namespace LL.Upgrades
             _cardCatalog = cardCatalog ?? throw new ArgumentNullException(nameof(cardCatalog));
         }
 
-        public bool TryApply(IReadOnlyList<CardStack> cards)
+        public bool TryApply(IReadOnlyList<CardAmount> cards)
         {
             if (TryGetApplication(cards, out var application) is false)
                 return false;
 
-            var spentCards = new List<CardStack>(cards.Count);
+            var spentCards = new List<CardAmount>(cards.Count);
 
             foreach (var card in cards)
             {
@@ -58,7 +58,7 @@ namespace LL.Upgrades
             return false;
         }
 
-        public bool TryGetApplication(IReadOnlyList<CardStack> cards, out ExperienceApplication application)
+        public bool TryGetApplication(IReadOnlyList<CardAmount> cards, out ExperienceApplication application)
         {
             application = default;
 
@@ -74,7 +74,7 @@ namespace LL.Upgrades
             return true;
         }
 
-        private bool TryCalculateExperience(IReadOnlyList<CardStack> cards, out int experience)
+        private bool TryCalculateExperience(IReadOnlyList<CardAmount> cards, out int experience)
         {
             experience = MinimumAmount;
 
@@ -103,7 +103,7 @@ namespace LL.Upgrades
             return experience > MinimumAmount;
         }
 
-        private void RestoreCards(IEnumerable<CardStack> cards)
+        private void RestoreCards(IEnumerable<CardAmount> cards)
         {
             foreach (var card in cards)
                 _userCards.TryAdd(card.Id, card.Amount);

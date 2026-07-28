@@ -1,11 +1,10 @@
 using System;
-using LL.UI.Controls.Buttons;
 using LL.UI.Typography;
 using R3;
 using TMPro;
 using UnityEngine;
 
-namespace LL.UI.Controls.Steppers
+namespace LL.UI.Controls
 {
     [DisallowMultipleComponent]
     internal sealed class AmountStepper : MonoBehaviour

@@ -1,6 +1,6 @@
 using LL.Game.Items;
 
-namespace LL.Game.Purchases
+namespace LL.Purchasing
 {
     internal interface IPurchase
     {

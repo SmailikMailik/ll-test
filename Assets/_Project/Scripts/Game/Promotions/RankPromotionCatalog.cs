@@ -11,12 +11,10 @@ namespace LL.Game.Promotions
         internal RankPromotionCatalog(IEnumerable<RankPromotion> promotions)
         {
             var copy = promotions?.ToArray() ?? Array.Empty<RankPromotion>();
-
-            if (copy.Any(promotion => promotion == null))
-                throw new ArgumentException("Rank promotion entries must be non-null.", nameof(promotions));
-
-            if (copy.Select(promotion => promotion.Rank).Distinct().Count() != copy.Length)
-                throw new ArgumentException("Rank promotion entries must have unique ranks.", nameof(promotions));
+            RankPromotionCatalogValidator.EnsureValidRanks(
+                copy,
+                promotion => promotion.Rank,
+                nameof(promotions));
 
             _promotions = copy.ToDictionary(promotion => promotion.Rank);
         }

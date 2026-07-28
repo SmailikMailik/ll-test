@@ -1,5 +1,5 @@
 using System;
-using LL.UI.Controls.Buttons;
+using LL.UI.Controls;
 using R3;
 using TMPro;
 using UnityEngine;

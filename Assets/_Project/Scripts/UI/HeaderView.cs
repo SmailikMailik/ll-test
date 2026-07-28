@@ -1,5 +1,5 @@
 using LL.Game.Items;
-using LL.UI.Controls.Buttons;
+using LL.UI.Controls;
 using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.User.Core.Identity;
@@ -42,7 +42,7 @@ namespace LL.UI
             _backButton.Clicked.Subscribe(_ => _windowController.Back()).AddTo(this);
             _homeButton.Clicked.Subscribe(_ => Debug.LogError("OnHomeClicked")).AddTo(this);
 
-            _userLabel.text = $"{_identity.RegionCode} {_identity.UserId}";
+            _userLabel.text = $"{_identity.UserId} {_identity.RegionCode}";
 
             ObserveItem(ItemIds.Soft, _softLabel);
             ObserveItem(ItemIds.Hard, _hardLabel);

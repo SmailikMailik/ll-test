@@ -44,19 +44,19 @@ namespace LL.User.Persistence
     [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class IdentitySaveData
     {
-        [JsonProperty] private string _regionCode;
         [JsonProperty] private string _userId;
+        [JsonProperty] private string _regionCode;
 
-        internal string RegionCode => _regionCode;
         internal string UserId => _userId;
+        internal string RegionCode => _regionCode;
 
         [JsonConstructor]
         private IdentitySaveData() { }
 
-        internal IdentitySaveData(string regionCode, string userId)
+        internal IdentitySaveData(string userId, string regionCode)
         {
-            _regionCode = regionCode;
             _userId = userId;
+            _regionCode = regionCode;
         }
     }
 

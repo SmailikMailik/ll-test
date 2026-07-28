@@ -111,14 +111,14 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             _changed.OnNext(Unit.Default);
         }
 
-        internal IReadOnlyList<CardStack> GetPlan()
+        internal IReadOnlyList<CardAmount> GetPlan()
         {
-            var plannedCards = new List<CardStack>(_slots.Length);
+            var plannedCards = new List<CardAmount>(_slots.Length);
 
             foreach (var slot in _slots)
             {
                 if (slot.View.PlannedAmount > MinimumAmount)
-                    plannedCards.Add(new CardStack(slot.Id, slot.View.PlannedAmount));
+                    plannedCards.Add(new CardAmount(slot.Id, slot.View.PlannedAmount));
             }
 
             return plannedCards;

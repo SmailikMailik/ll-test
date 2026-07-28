@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Purchases;
 using LL.Presentation.Localization;
 using LL.Purchasing;
 using LL.UI.Typography;
@@ -33,7 +32,13 @@ namespace LL.Presentation.Promotions
                 throw new ArgumentNullException(nameof(purchase));
 
             var priceText = TextFormatter.ItemAmount(purchase.ItemId, purchase.Price);
-            var heroText = _localization.GetText(RankPromotionLocalizationKeys.Hero);
+            var priceLabel = TextTags.Style(
+                _localization.GetText(RankPromotionLocalizationKeys.PriceLabel),
+                TextStyle.Muted);
+            var priceLine = $"{priceLabel} {priceText}";
+            var heroText = TextTags.Style(
+                _localization.GetText(RankPromotionLocalizationKeys.Hero),
+                TextStyle.Accent);
 
             _windowController.Show(new ModalWindowParameters
             (
@@ -42,7 +47,7 @@ namespace LL.Presentation.Promotions
                     RankPromotionLocalizationKeys.Confirmation,
                     new Dictionary<string, object>
                     {
-                        [PriceVariable] = priceText,
+                        [PriceVariable] = priceLine,
                         [HeroVariable] = heroText
                     }),
                 positiveText: _localization.GetText(RankPromotionLocalizationKeys.ConfirmAction),

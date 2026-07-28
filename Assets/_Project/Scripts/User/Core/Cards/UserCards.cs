@@ -17,7 +17,7 @@ namespace LL.User.Core.Cards
             if (initialData == null)
                 throw new ArgumentNullException(nameof(initialData));
 
-            _amounts = initialData.Stacks.ToDictionary(
+            _amounts = initialData.Amounts.ToDictionary(
                 stack => stack.Id,
                 stack => new ReactiveProperty<int>(stack.Amount));
         }

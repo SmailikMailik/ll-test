@@ -9,7 +9,7 @@ namespace LL.Upgrades
     {
         private const int MinimumAmount = 0;
 
-        internal static IReadOnlyList<CardStack> Build(
+        internal static IReadOnlyList<CardAmount> Build(
             IReadOnlyList<ExperienceCardOption> cards,
             int requiredExperience)
         {
@@ -17,7 +17,7 @@ namespace LL.Upgrades
                 throw new ArgumentNullException(nameof(cards));
 
             if (CanReach(cards, requiredExperience) is false)
-                return Array.Empty<CardStack>();
+                return Array.Empty<CardAmount>();
 
             var experienceLimit = GetExperienceLimit(cards, requiredExperience);
             var plans = CreatePlans(cards.Count, experienceLimit);
@@ -26,7 +26,7 @@ namespace LL.Upgrades
                 AddCardOptions(plans, cards[cardIndex], cardIndex, experienceLimit);
 
             var bestPlan = FindBestPlan(plans, requiredExperience);
-            return CreateCardStacks(cards, bestPlan);
+            return CreateCardAmounts(cards, bestPlan);
         }
 
         internal static bool CanReach(
@@ -181,24 +181,24 @@ namespace LL.Upgrades
             return null;
         }
 
-        private static IReadOnlyList<CardStack> CreateCardStacks(
+        private static IReadOnlyList<CardAmount> CreateCardAmounts(
             IReadOnlyList<ExperienceCardOption> cards,
             Plan plan)
         {
             if (plan == null)
-                return Array.Empty<CardStack>();
+                return Array.Empty<CardAmount>();
 
-            var cardStacks = new List<CardStack>(cards.Count);
+            var cardAmounts = new List<CardAmount>(cards.Count);
 
             for (var index = 0; index < cards.Count; index++)
             {
                 var amount = plan.Amounts[index];
 
                 if (amount > MinimumAmount)
-                    cardStacks.Add(new CardStack(cards[index].Id, amount));
+                    cardAmounts.Add(new CardAmount(cards[index].Id, amount));
             }
 
-            return cardStacks;
+            return cardAmounts;
         }
 
         private sealed class Plan

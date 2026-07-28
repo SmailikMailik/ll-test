@@ -4,7 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace LL.UI.Controls.Buttons
+namespace LL.UI.Controls
 {
     [DisallowMultipleComponent]
     [AddComponentMenu("LL/UI/Controls/Interactive Button")]

@@ -1,6 +1,6 @@
 using System;
-using LL.Game.Purchases;
 using LL.Game.Items;
+using LL.Purchasing;
 using LL.Rewards;
 
 namespace LL.Game.Promotions
@@ -40,6 +40,9 @@ namespace LL.Game.Promotions
             if (hardPrice <= 0)
                 throw new ArgumentOutOfRangeException(nameof(hardPrice));
 
+            if (rewardBundleId.IsEmpty)
+                throw new ArgumentException("Promotion reward bundle ID must be non-empty.", nameof(rewardBundleId));
+
             Rank = rank;
             Requirement = requirement ?? throw new ArgumentNullException(nameof(requirement));
             OrderDuration = orderDuration;
@@ -48,14 +51,11 @@ namespace LL.Game.Promotions
             RewardBundleId = rewardBundleId;
         }
 
-        internal IPurchase GetPurchase(PromotionPaymentType paymentType)
+        internal IPurchase GetPurchase(PromotionPaymentType paymentType) => paymentType switch
         {
-            return paymentType switch
-            {
-                PromotionPaymentType.Soft => SoftPurchase,
-                PromotionPaymentType.Hard => HardPurchase,
-                _ => throw new ArgumentOutOfRangeException(nameof(paymentType))
-            };
-        }
+            PromotionPaymentType.Soft => SoftPurchase,
+            PromotionPaymentType.Hard => HardPurchase,
+            _ => throw new ArgumentOutOfRangeException(nameof(paymentType))
+        };
     }
 }

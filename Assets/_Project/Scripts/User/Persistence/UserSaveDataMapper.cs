@@ -23,7 +23,7 @@ namespace LL.User.Persistence
                 throw new ArgumentNullException(nameof(data));
 
             return new UserInitialData(
-                new UserIdentity(data.Identity.RegionCode, data.Identity.UserId),
+                new UserIdentity(data.Identity.UserId, data.Identity.RegionCode),
                 new ItemsInitialData(
                     data.Items.Select(item =>
                         new ItemAmount(new ItemId(item.Id), item.Amount))),
@@ -34,7 +34,7 @@ namespace LL.User.Persistence
                     data.PromotionOrder.IsCompleted),
                 new CardsInitialData(
                     data.Cards.Select(card =>
-                        new CardStack(new CardId(card.Id), card.Amount))),
+                        new CardAmount(new CardId(card.Id), card.Amount))),
                 new RewardClaimsInitialData(
                     data.ClaimedRewardIds.Select(id => new RewardBundleId(id))));
         }
@@ -47,7 +47,7 @@ namespace LL.User.Persistence
             return ToSaveData(
                 data.Identity,
                 new ProgressSaveData(data.Progress.Rank, data.Progress.Experience),
-                data.Cards.Stacks,
+                data.Cards.Amounts,
                 data.Items.Amounts,
                 data.PromotionOrder,
                 data.RewardClaims.ClaimedIds);
@@ -56,7 +56,7 @@ namespace LL.User.Persistence
         internal static UserSaveData ToSaveData(
             UserIdentity identity,
             ProgressSaveData progress,
-            IEnumerable<CardStack> cards,
+            IEnumerable<CardAmount> cards,
             IEnumerable<ItemAmount> items,
             PromotionOrderInitialData promotionOrder,
             IEnumerable<RewardBundleId> claimedRewardIds)
@@ -80,7 +80,7 @@ namespace LL.User.Persistence
                 throw new ArgumentNullException(nameof(claimedRewardIds));
 
             return new UserSaveData(
-                new IdentitySaveData(identity.RegionCode, identity.UserId),
+                new IdentitySaveData(identity.UserId, identity.RegionCode),
                 progress,
                 new PromotionOrderSaveData(
                     promotionOrder.RequirementId.Value,

@@ -4,7 +4,7 @@ using LL.Game.Promotions;
 using LL.Game.Ranks;
 using LL.Promotions;
 using LL.Rewards;
-using LL.UI.Controls.Buttons;
+using LL.UI.Controls;
 using LL.UI.Rewards;
 using LL.UI.Typography;
 using LL.UI.Windows.Flows;

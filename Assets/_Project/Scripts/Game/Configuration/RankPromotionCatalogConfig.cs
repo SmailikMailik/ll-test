@@ -20,7 +20,7 @@ namespace LL.Game.Configuration
 
         public RankPromotionCatalog Load()
         {
-            return new RankPromotionCatalog(_promotions?.Select(entry => entry.ToPromotion()));
+            return new RankPromotionCatalog(_promotions?.Select(entry => entry?.ToPromotion()));
         }
 
         private void OnValidate()
@@ -34,11 +34,9 @@ namespace LL.Game.Configuration
 
         private static bool HasValidPromotions(RankPromotionEntry[] promotions)
         {
-            if (promotions == null)
-                return true;
-
-            return promotions.All(promotion => promotion != null && promotion.Rank > 0) &&
-                   promotions.Select(promotion => promotion.Rank).Distinct().Count() == promotions.Length;
+            return RankPromotionCatalogValidator.HasValidRanks(
+                promotions,
+                promotion => promotion.Rank);
         }
     }
 

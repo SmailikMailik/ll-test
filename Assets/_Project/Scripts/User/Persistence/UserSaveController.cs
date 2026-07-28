@@ -72,7 +72,7 @@ namespace LL.User.Persistence
             _itemAmounts = items.Amounts.ToDictionary(
                 item => item.Id,
                 item => item.Amount);
-            _cardAmounts = cards.Stacks.ToDictionary(
+            _cardAmounts = cards.Amounts.ToDictionary(
                 stack => stack.Id,
                 stack => stack.Amount);
             _claimedRewardIds = new HashSet<RewardBundleId>(rewardClaims.ClaimedIds);
@@ -174,7 +174,7 @@ namespace LL.User.Persistence
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
                 new ProgressSaveData(_rank, _experience),
-                _cardAmounts.Select(pair => new CardStack(pair.Key, pair.Value)),
+                _cardAmounts.Select(pair => new CardAmount(pair.Key, pair.Value)),
                 _itemAmounts.Select(pair => new ItemAmount(pair.Key, pair.Value)),
                 new PromotionOrderInitialData(
                     _promotionOrderRequirementId,

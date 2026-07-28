@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
 using LL.Identifiers;
@@ -40,17 +39,8 @@ namespace LL.Presentation.Configuration
     }
 
     [Serializable]
-    internal sealed class ItemIconEntry
+    internal sealed class ItemIconEntry : IconEntry<ItemId>
     {
-        [LabelText("Item ID")]
-        [SerializeField] private string _id;
-
-        [Required]
-        [PreviewField(55, ObjectFieldAlignment.Center)]
-        [SerializeField] private Sprite _icon;
-
-        internal ItemId Id => new(_id);
-
-        internal KeyValuePair<ItemId, Sprite> ToPair() => new(Id, _icon);
+        protected override ItemId CreateId(string value) => new(value);
     }
 }

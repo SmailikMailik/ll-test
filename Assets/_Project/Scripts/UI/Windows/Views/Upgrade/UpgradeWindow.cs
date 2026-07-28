@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Ranks;
+using LL.UI.Controls;
 using LL.Upgrades;
-using LL.UI.Controls.Buttons;
-using LL.UI.Controls.Steppers;
 using LL.UI.Rewards;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;
@@ -49,8 +48,10 @@ namespace LL.UI.Windows.Views.Upgrade
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _cardExperienceService = cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
-            _overflowConfirmation = overflowConfirmation ?? throw new ArgumentNullException(nameof(overflowConfirmation));
+            _cardExperienceService = cardExperienceService
+                                     ?? throw new ArgumentNullException(nameof(cardExperienceService));
+            _overflowConfirmation = overflowConfirmation
+                                    ?? throw new ArgumentNullException(nameof(overflowConfirmation));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
@@ -153,7 +154,7 @@ namespace LL.UI.Windows.Views.Upgrade
             ApplyCards(plan);
         }
 
-        private void ApplyCards(IReadOnlyList<CardStack> cards)
+        private void ApplyCards(IReadOnlyList<CardAmount> cards)
         {
             _isApplying = true;
             bool applied;

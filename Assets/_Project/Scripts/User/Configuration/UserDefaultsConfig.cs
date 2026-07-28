@@ -20,28 +20,17 @@ namespace LL.User.Configuration
     internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsProvider
     {
         [BoxGroup("Identity")]
-        [LabelText("Region Code")]
-        [SerializeField] private string _regionCode;
+        [HideLabel]
+        [SerializeField] private UserIdentityDefaults _identity = new();
 
-        [BoxGroup("Identity")]
-        [LabelText("User ID")]
-        [SerializeField] private string _userId;
+        [BoxGroup("Progress")]
+        [HideLabel]
+        [SerializeField] private UserProgressDefaults _progress = new();
 
         [BoxGroup("Items")]
         [ValidateInput(nameof(HasValidItemIds), "Item IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ItemAmountEntry[] _items;
-
-        [BoxGroup("Progress")]
-        [LabelText("Rank")]
-        [MinValue(1)]
-        [SerializeField] private int _rank = 1;
-
-        [BoxGroup("Progress")]
-        [LabelText("Experience")]
-        [SuffixLabel("XP", true)]
-        [MinValue(0)]
-        [SerializeField] private int _experience;
 
         [BoxGroup("Cards")]
         [ValidateInput(nameof(HasValidCardIds), "Card IDs must be non-empty and unique.")]
@@ -63,9 +52,9 @@ namespace LL.User.Configuration
                 "Default card amounts",
                 nameof(_cards));
             return new UserInitialData(
-                new UserIdentity(_regionCode, _userId),
+                _identity.ToData(),
                 new ItemsInitialData(_items?.Select(item => item.ToData())),
-                new ProgressInitialData(_rank, _experience),
+                _progress.ToData(),
                 new PromotionOrderInitialData(default, 0L, false),
                 new CardsInitialData(_cards?.Select(card => card.ToData())),
                 new RewardClaimsInitialData(null));
@@ -83,32 +72,66 @@ namespace LL.User.Configuration
     }
 
     [Serializable]
-    internal sealed class ItemAmountEntry
+    [InlineProperty]
+    internal sealed class UserIdentityDefaults
     {
-        [LabelText("Item ID")]
-        [SerializeField] private string _id;
+        [LabelText("User ID")]
+        [SerializeField] private string _userId;
 
-        [LabelText("Amount")]
-        [MinValue(0)]
-        [SerializeField] private int _amount;
+        [LabelText("Region Code")]
+        [SerializeField] private string _regionCode;
 
-        internal ItemId Id => new(_id);
-
-        internal ItemAmount ToData() => new(Id, _amount);
+        internal UserIdentity ToData() => new(_userId, _regionCode);
     }
 
     [Serializable]
-    internal sealed class CardAmountEntry
+    [InlineProperty]
+    internal sealed class UserProgressDefaults
     {
-        [LabelText("Card ID")]
+        [LabelText("Rank")]
+        [MinValue(1)]
+        [SerializeField] private int _rank = 1;
+
+        [LabelText("Experience")]
+        [SuffixLabel("XP", true)]
+        [MinValue(0)]
+        [SerializeField] private int _experience;
+
+        internal ProgressInitialData ToData() => new(_rank, _experience);
+    }
+
+    [Serializable]
+    internal abstract class AmountEntry<TId, TData>
+        where TId : struct, IIdentifier
+    {
+        [LabelText("ID")]
         [SerializeField] private string _id;
 
         [LabelText("Amount")]
         [MinValue(0)]
         [SerializeField] private int _amount;
 
-        internal CardId Id => new(_id);
+        internal TId Id => CreateId(_id);
 
-        internal CardStack ToData() => new(Id, _amount);
+        internal TData ToData() => CreateData(Id, _amount);
+
+        protected abstract TId CreateId(string value);
+        protected abstract TData CreateData(TId id, int amount);
+    }
+
+    [Serializable]
+    internal sealed class ItemAmountEntry : AmountEntry<ItemId, ItemAmount>
+    {
+        protected override ItemId CreateId(string value) => new(value);
+
+        protected override ItemAmount CreateData(ItemId id, int amount) => new(id, amount);
+    }
+
+    [Serializable]
+    internal sealed class CardAmountEntry : AmountEntry<CardId, CardAmount>
+    {
+        protected override CardId CreateId(string value) => new(value);
+
+        protected override CardAmount CreateData(CardId id, int amount) => new(id, amount);
     }
 }

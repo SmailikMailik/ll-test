@@ -7,26 +7,26 @@ namespace LL.User.Core.Cards
 {
     internal sealed class CardsInitialData
     {
-        internal IReadOnlyList<CardStack> Stacks { get; }
+        internal IReadOnlyList<CardAmount> Amounts { get; }
 
-        internal CardsInitialData(IEnumerable<CardStack> stacks)
+        internal CardsInitialData(IEnumerable<CardAmount> cards)
         {
             var amounts = new Dictionary<CardId, long>();
 
-            if (stacks != null)
+            if (cards != null)
             {
-                foreach (var stack in stacks)
+                foreach (var card in cards)
                 {
-                    if (stack == null || stack.Id.IsEmpty)
+                    if (card == null || card.Id.IsEmpty)
                         continue;
 
-                    amounts.TryGetValue(stack.Id, out var current);
-                    amounts[stack.Id] = Math.Min(current + stack.Amount, int.MaxValue);
+                    amounts.TryGetValue(card.Id, out var current);
+                    amounts[card.Id] = Math.Min(current + card.Amount, int.MaxValue);
                 }
             }
 
-            var copy = amounts.Select(pair => new CardStack(pair.Key, (int)pair.Value)).ToArray();
-            Stacks = Array.AsReadOnly(copy);
+            var copy = amounts.Select(pair => new CardAmount(pair.Key, (int)pair.Value)).ToArray();
+            Amounts = Array.AsReadOnly(copy);
         }
     }
 }
