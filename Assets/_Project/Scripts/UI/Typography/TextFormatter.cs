@@ -36,15 +36,21 @@ namespace LL.UI.Typography
             return Number(current) + TextTags.Style($"/{Number(target)}", TextStyle.Muted);
         }
 
-        internal static string Duration(TimeSpan duration, string hoursUnit, string minutesUnit)
+        internal static string Duration(
+            TimeSpan duration,
+            string hoursUnit,
+            string minutesUnit,
+            string secondsUnit)
         {
             if (duration < TimeSpan.Zero)
                 duration = TimeSpan.Zero;
 
             var hours = duration.GetWholeHours();
             var minutes = duration.Minutes.ToString("00", CultureInfo.InvariantCulture);
+            var seconds = duration.Seconds.ToString("00", CultureInfo.InvariantCulture);
+
             var separator = TextSymbols.GetValue(TextSymbol.NonBreakingSpace);
-            var time = $"{hours}{hoursUnit}{separator}{minutes}{minutesUnit}";
+            var time = $"{hours}{hoursUnit}{separator}{minutes}{minutesUnit}{separator}{seconds}{secondsUnit}";
             return $"{TextTags.Sprite(TextSprite.Time)}{separator}{time}";
         }
 

@@ -31,6 +31,8 @@ namespace LL.Presentation.Purchasing
             if (purchase == null)
                 throw new ArgumentNullException(nameof(purchase));
 
+            var priceText = TextFormatter.CurrencyAmount(purchase.CurrencyId, purchase.Price);
+
             _windowController.Show(new ModalWindowParameters
             (
                 headerText: _localization.GetText(PurchaseLocalizationKeys.ConfirmationTitle),
@@ -38,7 +40,7 @@ namespace LL.Presentation.Purchasing
                     PurchaseLocalizationKeys.GetConfirmation(purchase.Id),
                     new Dictionary<string, object>
                     {
-                        [PriceVariable] = PurchaseFormatter.GetPriceText(purchase)
+                        [PriceVariable] = priceText
                     }),
                 positiveText: _localization.GetText(PurchaseLocalizationKeys.PurchaseAction),
                 positiveCallback: onConfirmed,

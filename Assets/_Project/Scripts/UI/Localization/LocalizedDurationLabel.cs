@@ -13,9 +13,6 @@ namespace LL.UI.Localization
     {
         [SerializeField] private TMP_Text _label;
 
-        private const string HoursUnitKey = "Common/units.hours_short";
-        private const string MinutesUnitKey = "Common/units.minutes_short";
-
         private ILocalizationService _localization;
 
         [Inject]
@@ -24,11 +21,12 @@ namespace LL.UI.Localization
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
 
-        public void SetDuration(TimeSpan duration)
+        internal void SetDuration(TimeSpan duration)
         {
-            var hoursUnit = _localization.GetText(HoursUnitKey);
-            var minutesUnit = _localization.GetText(MinutesUnitKey);
-            _label.text = TextFormatter.Duration(duration, hoursUnit, minutesUnit);
+            var hoursUnit = _localization.GetText(DurationLocalizationKeys.HoursUnit);
+            var minutesUnit = _localization.GetText(DurationLocalizationKeys.MinutesUnit);
+            var secondsUnit = _localization.GetText(DurationLocalizationKeys.SecondsUnit);
+            _label.text = TextFormatter.Duration(duration, hoursUnit, minutesUnit, secondsUnit);
         }
     }
 }

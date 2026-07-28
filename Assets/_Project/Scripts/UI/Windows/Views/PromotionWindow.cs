@@ -1,9 +1,15 @@
 using System;
+using System.Collections.Generic;
 using LL.Game.Promotions;
 using LL.Game.Ranks;
+using LL.Presentation.Localization;
+using LL.Presentation.Promotions;
 using LL.Promotions;
+using LL.Rewards;
 using LL.UI.Controls.Buttons;
+using LL.UI.Rewards;
 using LL.UI.Typography;
+using LL.UI.Windows.Flows;
 using LL.User.Core.Progress;
 using R3;
 using TMPro;
@@ -16,6 +22,8 @@ namespace LL.UI.Windows.Views
     {
         [SerializeField] private TMP_Text _currentRankLabel;
         [SerializeField] private TMP_Text _nextRankLabel;
+        [SerializeField] private TMP_Text _rewardsTitleLabel;
+        [SerializeField] private RewardLayout _rewardLayout;
 
         [SerializeField] private TMP_Text _softPriceLabel;
         [SerializeField] private InteractiveButton _softButton;
@@ -25,20 +33,31 @@ namespace LL.UI.Windows.Views
 
         [SerializeField] private PromotionOrderView _orderView;
 
+        private const string RankVariable = "rank";
+
         private IUserProgress _userProgress;
         private IRankProgression _rankProgression;
         private IRankPromotionService _promotionService;
+        private UpgradeFlow _upgradeFlow;
+        private ILocalizationService _localization;
+        private RewardBundleCatalog _rewardBundleCatalog;
         private RankPromotion _promotion;
 
         [Inject]
         private void Construct(
             IUserProgress userProgress,
             IRankProgression rankProgression,
-            IRankPromotionService promotionService)
+            IRankPromotionService promotionService,
+            UpgradeFlow upgradeFlow,
+            ILocalizationService localization,
+            RewardBundleCatalog rewardBundleCatalog)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
+            _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
+            _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+            _rewardBundleCatalog = rewardBundleCatalog ?? throw new ArgumentNullException(nameof(rewardBundleCatalog));
         }
 
         private void Start()
@@ -62,11 +81,22 @@ namespace LL.UI.Windows.Views
 
             _currentRankLabel.text = TextFormatter.Number(rank);
             _nextRankLabel.text = TextFormatter.Number(nextRank);
+            _rewardsTitleLabel.text = _localization.GetText(
+                PromotionLocalizationKeys.RewardsAtRank,
+                new Dictionary<string, object>
+                {
+                    [RankVariable] = nextRank
+                });
 
             if (_promotionService.TryGetPromotion(out _promotion))
             {
-                _softPriceLabel.text = PurchaseFormatter.GetPriceText(_promotion.SoftPurchase);
-                _hardPriceLabel.text = PurchaseFormatter.GetPriceText(_promotion.HardPurchase);
+                _softPriceLabel.text = TextFormatter.CurrencyAmount(
+                    _promotion.SoftPurchase.CurrencyId,
+                    _promotion.SoftPurchase.Price);
+                _hardPriceLabel.text = TextFormatter.CurrencyAmount(
+                    _promotion.HardPurchase.CurrencyId,
+                    _promotion.HardPurchase.Price);
+                ShowRewards(_promotion);
                 _orderView.Refresh(
                     _promotion.Requirement,
                     _promotion.OrderDuration,
@@ -76,6 +106,7 @@ namespace LL.UI.Windows.Views
             {
                 _softPriceLabel.text = string.Empty;
                 _hardPriceLabel.text = string.Empty;
+                _rewardLayout.Clear();
             }
 
             _orderView.gameObject.SetActive(_promotion != null);
@@ -97,7 +128,19 @@ namespace LL.UI.Windows.Views
         private void CompletePromotion()
         {
             _orderView.Reset();
-            TryClose();
+            _upgradeFlow.ReplaceCurrent();
+        }
+
+        private void ShowRewards(RankPromotion promotion)
+        {
+            if (promotion.RewardBundleId.IsEmpty ||
+                _rewardBundleCatalog.TryGetBundle(promotion.RewardBundleId, out var bundle) is false)
+            {
+                _rewardLayout.Clear();
+                return;
+            }
+
+            _rewardLayout.SetRewards(bundle.Rewards);
         }
 
         private void RefreshActions()

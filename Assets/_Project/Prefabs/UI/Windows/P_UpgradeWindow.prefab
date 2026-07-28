@@ -2787,7 +2787,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3068324807842040941, guid: 6c6668896fd2d664e97793ef625e135c, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 156.54
+      value: 156.63
       objectReference: {fileID: 0}
     - target: {fileID: 3068324807842040941, guid: 6c6668896fd2d664e97793ef625e135c, type: 3}
       propertyPath: m_SizeDelta.y
@@ -4131,6 +4131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _label: {fileID: 5831370792043829888}
   _sprite: 3
+  _placement: 0
 --- !u!114 &2455006809074729707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4157,8 +4158,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1097265296034949565}
-        m_TargetAssemblyTypeName: LL.UI.Localization.LocalizedSpriteLabel, LL.Runtime
-        m_MethodName: SetText
+        m_TargetAssemblyTypeName: LL.UI.InlineSpriteLabel, LL.Runtime
+        m_MethodName: OnTextChanged
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

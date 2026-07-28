@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Rewards;
 using LL.UI.Controls.Buttons;
+using LL.UI.Rewards;
 using R3;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace LL.UI.Windows.Views
 {
     internal sealed class RewardWindow : Window<RewardWindowParameters>
     {
-        [SerializeField] private RewardsContainer _container;
+        [SerializeField] private RewardLayout _rewardLayout;
         [SerializeField] private InteractiveButton _continueButton;
 
         private void Start()
@@ -20,7 +21,7 @@ namespace LL.UI.Windows.Views
 
         protected override void OnShow()
         {
-            _container.ShowRewardsDelayed(Parameters.Rewards);
+            _rewardLayout.SetRewards(Parameters.Rewards);
         }
     }
 

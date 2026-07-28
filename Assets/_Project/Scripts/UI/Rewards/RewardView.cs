@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LL.UI
+namespace LL.UI.Rewards
 {
     [DisallowMultipleComponent]
     internal sealed class RewardView : MonoBehaviour

@@ -21,9 +21,9 @@ namespace LL.UI.Windows.Views
 
         private void Start()
         {
-            _positiveButton.Clicked.Subscribe(_ => HandleClick(Parameters.PositiveCallback)).AddTo(this);
-            _negativeButton.Clicked.Subscribe(_ => HandleClick(Parameters.NegativeCallback)).AddTo(this);
-            _closeButton.Clicked.Subscribe(_ => HandleClick(Parameters.CloseCallback)).AddTo(this);
+            _positiveButton.Clicked.Subscribe(_ => OnButtonClicked(Parameters.PositiveCallback)).AddTo(this);
+            _negativeButton.Clicked.Subscribe(_ => OnButtonClicked(Parameters.NegativeCallback)).AddTo(this);
+            _closeButton.Clicked.Subscribe(_ => OnButtonClicked(Parameters.CloseCallback)).AddTo(this);
         }
 
         protected override void OnShow()
@@ -39,7 +39,7 @@ namespace LL.UI.Windows.Views
             _negativeLabel.text = Parameters.NegativeText;
         }
 
-        private void HandleClick(Action callback)
+        private void OnButtonClicked(Action callback)
         {
             // The argument captures the current callback before TryClose can replace Parameters.
             TryClose();

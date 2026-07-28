@@ -19,6 +19,7 @@ namespace LL.UI.Windows.Views
         [SerializeField] private TMP_Text _titleLabel;
         [SerializeField] private TMP_Text _descriptionLabel;
         [SerializeField] private LocalizedDurationLabel _timeLabel;
+        [SerializeField] private TMP_Text _buttonLabel;
         [SerializeField] private InteractiveButton _button;
 
         private const string CountVariable = "count";
@@ -35,7 +36,7 @@ namespace LL.UI.Windows.Views
 
         private OrderState _state = OrderState.Available;
         private float _deadline;
-        private int _displayedRemainingMinutes = -1;
+        private int _displayedRemainingSeconds = -1;
         private bool _canAccept;
         private TimeSpan _duration;
 
@@ -52,7 +53,7 @@ namespace LL.UI.Windows.Views
         private void Start()
         {
             _button.Clicked
-                .Subscribe(_ => HandleClick())
+                .Subscribe(_ => OnButtonClicked())
                 .AddTo(this);
 
             Observable
@@ -75,6 +76,7 @@ namespace LL.UI.Windows.Views
             _duration = duration;
             RefreshText(requirement);
             RefreshTime();
+            RefreshButtonText();
             SetAvailable(canAccept);
         }
 
@@ -88,8 +90,9 @@ namespace LL.UI.Windows.Views
         {
             _state = OrderState.Available;
             _deadline = 0f;
-            _displayedRemainingMinutes = -1;
+            _displayedRemainingSeconds = -1;
             RefreshTime();
+            RefreshButtonText();
             SetAvailable(_canAccept);
         }
 
@@ -110,7 +113,19 @@ namespace LL.UI.Windows.Views
                 });
         }
 
-        private void HandleClick()
+        private void RefreshButtonText()
+        {
+            var localizationKey = _state switch
+            {
+                OrderState.Available => OrderLocalizationKeys.AcceptAction,
+                OrderState.Active or OrderState.Completed => OrderLocalizationKeys.CompleteAction,
+                _ => OrderLocalizationKeys.AcceptAction
+            };
+
+            _buttonLabel.text = _localization.GetText(localizationKey);
+        }
+
+        private void OnButtonClicked()
         {
             if (_canAccept is false || IsCompleted)
                 return;
@@ -125,8 +140,9 @@ namespace LL.UI.Windows.Views
         {
             _state = OrderState.Active;
             _deadline = Time.unscaledTime + Mathf.Max(0f, (float)_duration.TotalSeconds);
-            _displayedRemainingMinutes = -1;
+            _displayedRemainingSeconds = -1;
             RefreshTime();
+            RefreshButtonText();
         }
 
         private void CompleteOrder()
@@ -135,8 +151,9 @@ namespace LL.UI.Windows.Views
                 return;
 
             _state = OrderState.Completed;
-            _displayedRemainingMinutes = -1;
+            _displayedRemainingSeconds = -1;
             RefreshTime();
+            RefreshButtonText();
             SetAvailable(_canAccept);
             _completed.OnNext(Unit.Default);
         }
@@ -169,13 +186,13 @@ namespace LL.UI.Windows.Views
 
         private void RefreshTime(float remainingSeconds)
         {
-            var remainingMinutes = Mathf.CeilToInt(Mathf.Max(0f, remainingSeconds) / 60f);
+            var displayedRemainingSeconds = Mathf.CeilToInt(Mathf.Max(0f, remainingSeconds));
 
-            if (_displayedRemainingMinutes == remainingMinutes)
+            if (_displayedRemainingSeconds == displayedRemainingSeconds)
                 return;
 
-            _displayedRemainingMinutes = remainingMinutes;
-            _timeLabel.SetDuration(TimeSpan.FromMinutes(remainingMinutes));
+            _displayedRemainingSeconds = displayedRemainingSeconds;
+            _timeLabel.SetDuration(TimeSpan.FromSeconds(displayedRemainingSeconds));
         }
 
         private float GetRemainingSeconds()

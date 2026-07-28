@@ -103,6 +103,10 @@ MonoBehaviour:
     m_Key: actions.complete_order
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440991
+    m_Key: units.seconds_short
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

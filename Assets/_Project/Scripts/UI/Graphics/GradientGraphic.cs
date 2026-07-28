@@ -10,7 +10,7 @@ namespace LL.UI.Graphics
         [SerializeField] private Gradient _gradient = CreateDefaultGradient();
         [SerializeField] private GradientType _type;
         [SerializeField, Range(0f, 360f)] private float _angle;
-        [SerializeField, Range(1, 32)] private int _resolution = 8;
+        [SerializeField, Range(1, 32)] private int _resolution = 16;
 
         internal enum GradientType : byte
         {
@@ -41,7 +41,7 @@ namespace LL.UI.Graphics
             var minimumProjection = GetMinimumProjection(rect, direction);
             var maximumProjection = GetMaximumProjection(rect, direction);
             var center = rect.center;
-            var maximumRadius = Vector2.Distance(center, new Vector2(rect.xMax, rect.yMax));
+            var radius = rect.size * 0.5f;
 
             for (var y = 0; y <= resolution; y++)
             {
@@ -59,7 +59,7 @@ namespace LL.UI.Graphics
                         minimumProjection,
                         maximumProjection,
                         center,
-                        maximumRadius);
+                        radius);
                     var gradientColor = _gradient.Evaluate(gradientPosition);
                     var vertexColor = new Color(
                         color.r * gradientColor.r,
@@ -140,7 +140,7 @@ namespace LL.UI.Graphics
             var minimumProjection = GetMinimumProjection(rect, direction);
             var maximumProjection = GetMaximumProjection(rect, direction);
             var center = rect.center;
-            var maximumRadius = Vector2.Distance(center, new Vector2(rect.xMax, rect.yMax));
+            var radius = rect.size * 0.5f;
             var pixels = new Color32[textureSize * textureSize];
 
             for (var y = 0; y < textureSize; y++)
@@ -159,7 +159,7 @@ namespace LL.UI.Graphics
                         minimumProjection,
                         maximumProjection,
                         center,
-                        maximumRadius);
+                        radius);
                     var alpha = _gradient.Evaluate(gradientPosition).a;
 
                     pixels[y * textureSize + x] = new Color(1f, 1f, 1f, alpha);
@@ -190,13 +190,25 @@ namespace LL.UI.Graphics
             float minimumProjection,
             float maximumProjection,
             Vector2 center,
-            float maximumRadius)
+            Vector2 radius)
         {
             return _type switch
             {
-                GradientType.Radial when maximumRadius > 0f => Vector2.Distance(center, position) / maximumRadius,
+                GradientType.Radial => GetRadialGradientPosition(position, center, radius),
                 _ => Mathf.InverseLerp(minimumProjection, maximumProjection, Vector2.Dot(position, direction))
             };
+        }
+
+        private static float GetRadialGradientPosition(Vector2 position, Vector2 center, Vector2 radius)
+        {
+            if (radius.x <= 0f || radius.y <= 0f)
+                return 0f;
+
+            var offset = position - center;
+            var normalizedOffset = new Vector2(
+                offset.x / radius.x,
+                offset.y / radius.y);
+            return Mathf.Clamp01(normalizedOffset.magnitude);
         }
 
         private Vector2 GetDirection()
