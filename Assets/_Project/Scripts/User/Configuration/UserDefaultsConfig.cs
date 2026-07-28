@@ -53,9 +53,9 @@ namespace LL.User.Configuration
             return new UserInitialData(
                 _identity.ToData(),
                 new AmountsInitialData<ItemId>(_items?.Select(item => item.ToData())),
+                new AmountsInitialData<CardId>(_cards?.Select(card => card.ToData())),
                 _progress.ToData(),
                 new PromotionOrderInitialData(default, 0L, false),
-                new AmountsInitialData<CardId>(_cards?.Select(card => card.ToData())),
                 new RewardClaimsInitialData(null));
         }
 

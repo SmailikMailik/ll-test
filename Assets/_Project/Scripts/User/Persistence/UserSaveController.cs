@@ -173,8 +173,8 @@ namespace LL.User.Persistence
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
                 new ProgressSaveData(_rank, _experience),
-                _cardAmounts.Select(pair => new Amount<CardId>(pair.Key, pair.Value)),
                 _itemAmounts.Select(pair => new Amount<ItemId>(pair.Key, pair.Value)),
+                _cardAmounts.Select(pair => new Amount<CardId>(pair.Key, pair.Value)),
                 new PromotionOrderInitialData(
                     _promotionOrderRequirementId,
                     _promotionOrderDeadlineUnixMilliseconds,

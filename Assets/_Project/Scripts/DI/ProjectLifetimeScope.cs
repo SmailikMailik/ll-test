@@ -94,9 +94,9 @@ namespace LL.DI
             builder.Register(resolver => resolver.Resolve<IDataLoader<UserInitialData>>().Load(), Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Identity, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Items, Lifetime.Singleton);
+            builder.Register(resolver => resolver.Resolve<UserInitialData>().Cards, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().Progress, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().PromotionOrder, Lifetime.Singleton);
-            builder.Register(resolver => resolver.Resolve<UserInitialData>().Cards, Lifetime.Singleton);
             builder.Register(resolver => resolver.Resolve<UserInitialData>().RewardClaims, Lifetime.Singleton);
 
             builder.Register<UserAmounts<ItemId>>(Lifetime.Singleton).As<IUserAmounts<ItemId>>();

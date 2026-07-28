@@ -26,14 +26,14 @@ namespace LL.User.Persistence
                 new AmountsInitialData<ItemId>(
                     data.Items.Select(item =>
                         new Amount<ItemId>(new ItemId(item.Id), item.Amount))),
+                new AmountsInitialData<CardId>(
+                    data.Cards.Select(card =>
+                        new Amount<CardId>(new CardId(card.Id), card.Amount))),
                 new ProgressInitialData(data.Progress.Rank, data.Progress.Experience),
                 new PromotionOrderInitialData(
                     new PromotionRequirementId(data.PromotionOrder.RequirementId),
                     data.PromotionOrder.DeadlineUnixMilliseconds,
                     data.PromotionOrder.IsCompleted),
-                new AmountsInitialData<CardId>(
-                    data.Cards.Select(card =>
-                        new Amount<CardId>(new CardId(card.Id), card.Amount))),
                 new RewardClaimsInitialData(
                     data.ClaimedRewardIds.Select(id => new RewardBundleId(id))));
         }
@@ -46,8 +46,8 @@ namespace LL.User.Persistence
             return ToSaveData(
                 data.Identity,
                 new ProgressSaveData(data.Progress.Rank, data.Progress.Experience),
-                data.Cards.Amounts,
                 data.Items.Amounts,
+                data.Cards.Amounts,
                 data.PromotionOrder,
                 data.RewardClaims.ClaimedIds);
         }
@@ -55,8 +55,8 @@ namespace LL.User.Persistence
         internal static UserSaveData ToSaveData(
             UserIdentity identity,
             ProgressSaveData progress,
-            IEnumerable<Amount<CardId>> cards,
             IEnumerable<Amount<ItemId>> items,
+            IEnumerable<Amount<CardId>> cards,
             PromotionOrderInitialData promotionOrder,
             IEnumerable<RewardBundleId> claimedRewardIds)
         {
@@ -66,11 +66,11 @@ namespace LL.User.Persistence
             if (progress == null)
                 throw new ArgumentNullException(nameof(progress));
 
-            if (cards == null)
-                throw new ArgumentNullException(nameof(cards));
-
             if (items == null)
                 throw new ArgumentNullException(nameof(items));
+
+            if (cards == null)
+                throw new ArgumentNullException(nameof(cards));
 
             if (promotionOrder == null)
                 throw new ArgumentNullException(nameof(promotionOrder));
@@ -85,11 +85,11 @@ namespace LL.User.Persistence
                     promotionOrder.RequirementId.Value,
                     promotionOrder.DeadlineUnixMilliseconds,
                     promotionOrder.IsCompleted),
-                cards
-                    .Select(card => new CardSaveData(card.Id.Value, card.Value))
-                    .ToArray(),
                 items
-                    .Select(item => new ItemSaveData(item.Id.Value, item.Value))
+                    .Select(item => new AmountSaveData(item.Id.Value, item.Value))
+                    .ToArray(),
+                cards
+                    .Select(card => new AmountSaveData(card.Id.Value, card.Value))
                     .ToArray(),
                 claimedRewardIds
                     .Where(id => id.IsEmpty is false)

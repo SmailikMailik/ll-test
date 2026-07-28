@@ -10,15 +10,15 @@ namespace LL.User.Persistence
         [JsonProperty] private IdentitySaveData _identity;
         [JsonProperty] private ProgressSaveData _progress;
         [JsonProperty] private PromotionOrderSaveData _promotionOrder;
-        [JsonProperty] private CardSaveData[] _cards;
-        [JsonProperty] private ItemSaveData[] _items;
+        [JsonProperty] private AmountSaveData[] _items;
+        [JsonProperty] private AmountSaveData[] _cards;
         [JsonProperty] private string[] _claimedRewardIds;
 
         internal IdentitySaveData Identity => _identity;
         internal ProgressSaveData Progress => _progress;
         internal PromotionOrderSaveData PromotionOrder => _promotionOrder;
-        internal IReadOnlyList<CardSaveData> Cards => _cards;
-        internal IReadOnlyList<ItemSaveData> Items => _items;
+        internal IReadOnlyList<AmountSaveData> Items => _items;
+        internal IReadOnlyList<AmountSaveData> Cards => _cards;
         internal IReadOnlyList<string> ClaimedRewardIds => _claimedRewardIds;
 
         [JsonConstructor]
@@ -28,15 +28,15 @@ namespace LL.User.Persistence
             IdentitySaveData identity,
             ProgressSaveData progress,
             PromotionOrderSaveData promotionOrder,
-            CardSaveData[] cards,
-            ItemSaveData[] items,
+            AmountSaveData[] items,
+            AmountSaveData[] cards,
             string[] claimedRewardIds)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
-            _cards = cards ?? Array.Empty<CardSaveData>();
-            _items = items ?? Array.Empty<ItemSaveData>();
+            _items = items ?? Array.Empty<AmountSaveData>();
+            _cards = cards ?? Array.Empty<AmountSaveData>();
             _claimedRewardIds = claimedRewardIds ?? Array.Empty<string>();
         }
     }
@@ -80,7 +80,7 @@ namespace LL.User.Persistence
     }
 
     [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
-    internal sealed class CardSaveData
+    internal sealed class AmountSaveData
     {
         [JsonProperty] private string _id;
         [JsonProperty] private int _amount;
@@ -89,28 +89,9 @@ namespace LL.User.Persistence
         internal int Amount => _amount;
 
         [JsonConstructor]
-        private CardSaveData() { }
+        private AmountSaveData() { }
 
-        internal CardSaveData(string id, int amount)
-        {
-            _id = id;
-            _amount = amount;
-        }
-    }
-
-    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
-    internal sealed class ItemSaveData
-    {
-        [JsonProperty] private string _id;
-        [JsonProperty] private int _amount;
-
-        internal string Id => _id;
-        internal int Amount => _amount;
-
-        [JsonConstructor]
-        private ItemSaveData() { }
-
-        internal ItemSaveData(string id, int amount)
+        internal AmountSaveData(string id, int amount)
         {
             _id = id;
             _amount = amount;
