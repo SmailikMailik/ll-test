@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e17dc7f71bb5c544e9c6e4230504f731
+guid: 0d46b8c5030ae44439e743dc20ee23d2
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Jost
+  - Jost*
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
