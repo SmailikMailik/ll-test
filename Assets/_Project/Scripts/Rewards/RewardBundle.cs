@@ -47,14 +47,11 @@ namespace LL.Rewards
                    };
         }
 
-        private static string GetRewardKey(IReward reward)
+        private static string GetRewardKey(IReward reward) => reward switch
         {
-            return reward switch
-            {
-                ItemReward item => $"{nameof(ItemReward)}:{item.ItemId}",
-                CardReward card => $"{nameof(CardReward)}:{card.CardId}",
-                _ => string.Empty
-            };
-        }
+            ItemReward item => $"{nameof(ItemReward)}:{item.ItemId}",
+            CardReward card => $"{nameof(CardReward)}:{card.CardId}",
+            _ => string.Empty
+        };
     }
 }

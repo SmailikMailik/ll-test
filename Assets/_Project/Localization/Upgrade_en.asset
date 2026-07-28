@@ -41,12 +41,7 @@ MonoBehaviour:
       m_Items:
       - id: 0
   - m_Id: 352062502440979
-    m_Localized: Promote your rank for {price}?
-    m_Metadata:
-      m_Items:
-      - id: 0
-  - m_Id: 352062502440980
-    m_Localized: Skip the order and promote your rank immediately for {price}?
+    m_Localized: "Are you sure you want to promote the rank of the character\n<style=\"Accent\">{hero}</style>?\n\n<style=\"Muted\">Price:</style> {price}"
     m_Metadata:
       m_Items:
       - id: 0
@@ -59,9 +54,17 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - id: 0
+  - m_Id: 352062502440984
+    m_Localized: CONFIRM
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440985
+    m_Localized: CANCEL
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
-        m_Entries: 0c9065f0324001000f9065f032400100139065f032400100149065f032400100179065f032400100
+        m_Entries: 0c9065f0324001000f9065f032400100139065f032400100179065f032400100

@@ -18,20 +18,16 @@ namespace LL.Rewards
             IIconProvider<ItemId> itemIconProvider,
             IIconProvider<CardId> cardIconProvider)
         {
-            _itemIconProvider = itemIconProvider
-                                    ?? throw new ArgumentNullException(nameof(itemIconProvider));
+            _itemIconProvider = itemIconProvider ?? throw new ArgumentNullException(nameof(itemIconProvider));
             _cardIconProvider = cardIconProvider ?? throw new ArgumentNullException(nameof(cardIconProvider));
         }
 
-        internal Sprite GetIcon(IReward reward)
+        internal Sprite GetIcon(IReward reward) => reward switch
         {
-            return reward switch
-            {
-                ItemReward item => GetIcon(_itemIconProvider, item.ItemId),
-                CardReward card => GetIcon(_cardIconProvider, card.CardId),
-                _ => null
-            };
-        }
+            ItemReward item => GetIcon(_itemIconProvider, item.ItemId),
+            CardReward card => GetIcon(_cardIconProvider, card.CardId),
+            _ => null
+        };
 
         private static Sprite GetIcon<TId>(IIconProvider<TId> provider, TId id)
             where TId : struct, IIdentifier

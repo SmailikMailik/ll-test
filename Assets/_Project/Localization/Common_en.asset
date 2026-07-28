@@ -62,23 +62,10 @@ MonoBehaviour:
     m_Localized: Press to continue
     m_Metadata:
       m_Items: []
-  - m_Id: 352062502440976
-    m_Localized: Confirm Purchase
-    m_Metadata:
-      m_Items: []
-  - m_Id: 352062502440977
-    m_Localized: Purchase
-    m_Metadata:
-      m_Items: []
   - m_Id: 352062502440978
     m_Localized: Cancel
     m_Metadata:
       m_Items: []
-  - m_Id: 352062502440981
-    m_Localized: Purchase for {price}?
-    m_Metadata:
-      m_Items:
-      - id: 0
   - m_Id: 352062502440984
     m_Localized: "YES"
     m_Metadata:
@@ -112,8 +99,5 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   references:
-    version: 1
-    00000000:
-      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
-      data:
-        m_Entries: 159065f032400100
+    version: 2
+    RefIds: []

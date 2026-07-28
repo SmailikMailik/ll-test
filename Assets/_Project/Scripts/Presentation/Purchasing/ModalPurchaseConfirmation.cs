@@ -13,6 +13,7 @@ namespace LL.Presentation.Purchasing
     internal sealed class ModalPurchaseConfirmation : IPurchaseConfirmation
     {
         private const string PriceVariable = "price";
+        private const string HeroVariable = "hero";
 
         private readonly WindowController _windowController;
         private readonly ILocalizationService _localization;
@@ -32,17 +33,19 @@ namespace LL.Presentation.Purchasing
                 throw new ArgumentNullException(nameof(purchase));
 
             var priceText = TextFormatter.ItemAmount(purchase.ItemId, purchase.Price);
+            var heroText = _localization.GetText(PurchaseLocalizationKeys.Hero);
 
             _windowController.Show(new ModalWindowParameters
             (
-                headerText: _localization.GetText(PurchaseLocalizationKeys.ConfirmationTitle),
+                headerText: _localization.GetText(PurchaseLocalizationKeys.Title),
                 messageText: _localization.GetText(
-                    PurchaseLocalizationKeys.GetConfirmation(purchase.Id),
+                    PurchaseLocalizationKeys.Confirmation,
                     new Dictionary<string, object>
                     {
-                        [PriceVariable] = priceText
+                        [PriceVariable] = priceText,
+                        [HeroVariable] = heroText
                     }),
-                positiveText: _localization.GetText(PurchaseLocalizationKeys.PurchaseAction),
+                positiveText: _localization.GetText(PurchaseLocalizationKeys.ConfirmAction),
                 positiveCallback: onConfirmed,
                 negativeText: _localization.GetText(PurchaseLocalizationKeys.CancelAction),
                 negativeCallback: onRejected,

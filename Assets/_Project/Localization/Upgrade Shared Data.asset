@@ -39,16 +39,20 @@ MonoBehaviour:
     m_Key: messages.confirm_rank_promotion
     m_Metadata:
       m_Items: []
-  - m_Id: 352062502440980
-    m_Key: messages.confirm_instant_rank_promotion
-    m_Metadata:
-      m_Items: []
   - m_Id: 352062502440982
     m_Key: titles.experience_overflow
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440983
     m_Key: messages.confirm_experience_overflow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440984
+    m_Key: actions.confirm_rank_promotion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440985
+    m_Key: actions.cancel_rank_promotion
     m_Metadata:
       m_Items: []
   m_Metadata:
