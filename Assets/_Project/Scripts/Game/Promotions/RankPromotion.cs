@@ -43,8 +43,8 @@ namespace LL.Game.Promotions
             Rank = rank;
             Requirement = requirement ?? throw new ArgumentNullException(nameof(requirement));
             OrderDuration = orderDuration;
-            SoftPurchase = new Purchase(PurchaseIds.RankPromotion, ItemIds.Soft, softPrice);
-            HardPurchase = new Purchase(PurchaseIds.InstantRankPromotion, ItemIds.Hard, hardPrice);
+            SoftPurchase = new Purchase(ItemIds.Soft, softPrice);
+            HardPurchase = new Purchase(ItemIds.Hard, hardPrice);
             RewardBundleId = rewardBundleId;
         }
 

@@ -22,7 +22,6 @@ using LL.User.Core.Promotions;
 using LL.User.Core.Rewards;
 using LL.User.Persistence;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -34,7 +33,6 @@ namespace LL.DI
         [SerializeField] private WindowCatalog _windowCatalog;
 
         [Header("Game Data")]
-        [FormerlySerializedAs("_rankProgressionConfig")]
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private CardCatalogConfig _cardCatalogConfig;
         [SerializeField] private RankPromotionCatalogConfig _rankPromotionCatalogConfig;
@@ -43,12 +41,10 @@ namespace LL.DI
         [SerializeField] private RewardBundleCatalogConfig _rewardBundleCatalogConfig;
 
         [Header("Presentation")]
-        [FormerlySerializedAs("_currencyIconCatalogConfig")]
         [SerializeField] private ItemIconCatalogConfig _itemIconCatalogConfig;
         [SerializeField] private CardIconCatalogConfig _cardIconCatalogConfig;
 
         [Header("User")]
-        [FormerlySerializedAs("_userDataConfig")]
         [SerializeField] private UserDefaultsConfig _userDefaultsConfig;
 
         protected override void Configure(IContainerBuilder builder)

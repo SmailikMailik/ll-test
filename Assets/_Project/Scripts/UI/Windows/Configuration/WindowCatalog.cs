@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LL.UI.Windows.Configuration
 {
@@ -55,7 +54,6 @@ namespace LL.UI.Windows.Configuration
         [TableColumnWidth(180)]
         private string Parameters => _prefab == null ? "—" : _prefab.ParameterType.Name;
 
-        [FormerlySerializedAs("_isPopup")]
         [HideLabel]
         [PropertyOrder(2)]
         [TableColumnWidth(65, Resizable = false)]

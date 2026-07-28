@@ -16,7 +16,7 @@ namespace LL.Saving
         private static readonly JsonSerializerSettings _serializerSettings = new()
         {
             Formatting = Formatting.Indented,
-            MissingMemberHandling = MissingMemberHandling.Ignore,
+            MissingMemberHandling = MissingMemberHandling.Error,
             TypeNameHandling = TypeNameHandling.None
         };
 

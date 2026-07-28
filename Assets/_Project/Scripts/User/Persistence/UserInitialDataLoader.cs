@@ -25,7 +25,7 @@ namespace LL.User.Persistence
 
         public UserInitialData Load()
         {
-            if (_saveService.TryLoad<UserSaveData>(SaveKey, out var savedData) && savedData.IsSupported)
+            if (_saveService.TryLoad<UserSaveData>(SaveKey, out var savedData))
                 return UserSaveDataMapper.ToInitialData(savedData);
 
             var defaultData = _defaults.GetDefaults();

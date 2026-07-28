@@ -11,6 +11,8 @@
 - Declare serialized fields first in a type, without `[Required]` by default; place constants immediately after them.
 - Declare every project enum with `byte` as its underlying type and assign explicit sequential values starting at `0`.
 - C# namespaces must mirror the folder structure within their containing assembly.
+- Keep configuration types with the subsystem whose data they define or construct; do not centralize unrelated
+  configurations under `Presentation`. Use `Presentation/Configuration` only for presentation-specific data.
 - Keep code lines within 120 characters; wrap earlier only when it materially improves readability.
 - When generating code, prioritize readability and clear separation of responsibilities. Reuse existing code wherever possible, and introduce abstractions when they make repeated use simpler without adding unnecessary complexity.
 - When asked for a commit message, output only a concise English imperative phrase as plain text: start with a capital letter and do not use quotation marks, backticks, explanations, conventional prefixes such as `feat:` or `refactor:`, or a trailing period.

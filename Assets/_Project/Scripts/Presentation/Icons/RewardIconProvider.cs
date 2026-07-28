@@ -2,11 +2,11 @@ using System;
 using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Identifiers;
-using LL.Presentation.Icons;
+using LL.Rewards;
 using UnityEngine;
 using VContainer;
 
-namespace LL.Rewards
+namespace LL.Presentation.Icons
 {
     internal sealed class RewardIconProvider
     {

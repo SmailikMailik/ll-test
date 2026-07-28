@@ -8,9 +8,9 @@ using LL.UI.Windows;
 using LL.UI.Windows.Views;
 using VContainer;
 
-namespace LL.Presentation.Purchasing
+namespace LL.Presentation.Promotions
 {
-    internal sealed class ModalPurchaseConfirmation : IPurchaseConfirmation
+    internal sealed class ModalRankPromotionConfirmation : IPurchaseConfirmation
     {
         private const string PriceVariable = "price";
         private const string HeroVariable = "hero";
@@ -19,7 +19,7 @@ namespace LL.Presentation.Purchasing
         private readonly ILocalizationService _localization;
 
         [Inject]
-        internal ModalPurchaseConfirmation(
+        internal ModalRankPromotionConfirmation(
             WindowController windowController,
             ILocalizationService localization)
         {
@@ -33,21 +33,21 @@ namespace LL.Presentation.Purchasing
                 throw new ArgumentNullException(nameof(purchase));
 
             var priceText = TextFormatter.ItemAmount(purchase.ItemId, purchase.Price);
-            var heroText = _localization.GetText(PurchaseLocalizationKeys.Hero);
+            var heroText = _localization.GetText(RankPromotionLocalizationKeys.Hero);
 
             _windowController.Show(new ModalWindowParameters
             (
-                headerText: _localization.GetText(PurchaseLocalizationKeys.Title),
+                headerText: _localization.GetText(RankPromotionLocalizationKeys.Title),
                 messageText: _localization.GetText(
-                    PurchaseLocalizationKeys.Confirmation,
+                    RankPromotionLocalizationKeys.Confirmation,
                     new Dictionary<string, object>
                     {
                         [PriceVariable] = priceText,
                         [HeroVariable] = heroText
                     }),
-                positiveText: _localization.GetText(PurchaseLocalizationKeys.ConfirmAction),
+                positiveText: _localization.GetText(RankPromotionLocalizationKeys.ConfirmAction),
                 positiveCallback: onConfirmed,
-                negativeText: _localization.GetText(PurchaseLocalizationKeys.CancelAction),
+                negativeText: _localization.GetText(RankPromotionLocalizationKeys.CancelAction),
                 negativeCallback: onRejected,
                 closeCallback: onRejected
             ));

@@ -45,7 +45,7 @@ namespace LL.UI.Rewards
 
             gameObject.SetActive(true);
             _titleLabel.text = _localization.GetText(
-                PromotionLocalizationKeys.RewardsAtRank,
+                RankPromotionLocalizationKeys.RewardsAtRank,
                 new Dictionary<string, object>
                 {
                     [RankVariable] = currentRank + 1

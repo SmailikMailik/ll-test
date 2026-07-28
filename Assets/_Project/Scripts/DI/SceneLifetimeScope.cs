@@ -1,5 +1,5 @@
 using LL.Presentation.Orders;
-using LL.Presentation.Purchasing;
+using LL.Presentation.Promotions;
 using LL.Presentation.Upgrades;
 using LL.Promotions;
 using LL.Purchasing;
@@ -23,7 +23,7 @@ namespace LL.DI
             builder
                 .Register<ModalOrderCompletionConfirmation>(Lifetime.Scoped)
                 .As<IOrderCompletionConfirmation>();
-            builder.Register<ModalPurchaseConfirmation>(Lifetime.Scoped).As<IPurchaseConfirmation>();
+            builder.Register<ModalRankPromotionConfirmation>(Lifetime.Scoped).As<IPurchaseConfirmation>();
             builder
                 .Register<ModalExperienceOverflowConfirmation>(Lifetime.Scoped)
                 .As<IExperienceOverflowConfirmation>();

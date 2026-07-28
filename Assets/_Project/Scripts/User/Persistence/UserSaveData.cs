@@ -4,27 +4,22 @@ using Newtonsoft.Json;
 
 namespace LL.User.Persistence
 {
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class UserSaveData
     {
-        [JsonProperty] private int _version;
         [JsonProperty] private IdentitySaveData _identity;
         [JsonProperty] private ProgressSaveData _progress;
+        [JsonProperty] private PromotionOrderSaveData _promotionOrder;
         [JsonProperty] private CardSaveData[] _cards;
         [JsonProperty] private ItemSaveData[] _items;
-        [JsonProperty] private PromotionOrderSaveData _promotionOrder;
         [JsonProperty] private string[] _claimedRewardIds;
-
-        private const int CurrentVersion = 2;
-
-        internal bool IsSupported => _version == CurrentVersion;
 
         internal IdentitySaveData Identity => _identity;
         internal ProgressSaveData Progress => _progress;
-        internal IReadOnlyList<CardSaveData> Cards => _cards ?? Array.Empty<CardSaveData>();
-        internal IReadOnlyList<ItemSaveData> Items => _items ?? Array.Empty<ItemSaveData>();
         internal PromotionOrderSaveData PromotionOrder => _promotionOrder;
-        internal IReadOnlyList<string> ClaimedRewardIds => _claimedRewardIds ?? Array.Empty<string>();
+        internal IReadOnlyList<CardSaveData> Cards => _cards;
+        internal IReadOnlyList<ItemSaveData> Items => _items;
+        internal IReadOnlyList<string> ClaimedRewardIds => _claimedRewardIds;
 
         [JsonConstructor]
         private UserSaveData() { }
@@ -32,22 +27,21 @@ namespace LL.User.Persistence
         internal UserSaveData(
             IdentitySaveData identity,
             ProgressSaveData progress,
+            PromotionOrderSaveData promotionOrder,
             CardSaveData[] cards,
             ItemSaveData[] items,
-            PromotionOrderSaveData promotionOrder,
             string[] claimedRewardIds)
         {
-            _version = CurrentVersion;
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
+            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
             _cards = cards ?? Array.Empty<CardSaveData>();
             _items = items ?? Array.Empty<ItemSaveData>();
-            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
             _claimedRewardIds = claimedRewardIds ?? Array.Empty<string>();
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class IdentitySaveData
     {
         [JsonProperty] private string _regionCode;
@@ -66,7 +60,7 @@ namespace LL.User.Persistence
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class ProgressSaveData
     {
         [JsonProperty] private int _rank;
@@ -85,7 +79,7 @@ namespace LL.User.Persistence
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class CardSaveData
     {
         [JsonProperty] private string _id;
@@ -104,7 +98,7 @@ namespace LL.User.Persistence
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class ItemSaveData
     {
         [JsonProperty] private string _id;
@@ -123,7 +117,7 @@ namespace LL.User.Persistence
         }
     }
 
-    [JsonObject(MemberSerialization.OptIn)]
+    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class PromotionOrderSaveData
     {
         [JsonProperty] private string _requirementId;

@@ -29,9 +29,9 @@ namespace LL.User.Persistence
                         new ItemAmount(new ItemId(item.Id), item.Amount))),
                 new ProgressInitialData(data.Progress.Rank, data.Progress.Experience),
                 new PromotionOrderInitialData(
-                    new PromotionRequirementId(data.PromotionOrder?.RequirementId),
-                    data.PromotionOrder?.DeadlineUnixMilliseconds ?? 0L,
-                    data.PromotionOrder?.IsCompleted ?? false),
+                    new PromotionRequirementId(data.PromotionOrder.RequirementId),
+                    data.PromotionOrder.DeadlineUnixMilliseconds,
+                    data.PromotionOrder.IsCompleted),
                 new CardsInitialData(
                     data.Cards.Select(card =>
                         new CardStack(new CardId(card.Id), card.Amount))),
@@ -82,6 +82,10 @@ namespace LL.User.Persistence
             return new UserSaveData(
                 new IdentitySaveData(identity.RegionCode, identity.UserId),
                 progress,
+                new PromotionOrderSaveData(
+                    promotionOrder.RequirementId.Value,
+                    promotionOrder.DeadlineUnixMilliseconds,
+                    promotionOrder.IsCompleted),
                 cards
                     .Where(stack => stack != null)
                     .Select(stack => new CardSaveData(stack.Id.Value, stack.Amount))
@@ -90,10 +94,6 @@ namespace LL.User.Persistence
                     .Where(item => item != null)
                     .Select(item => new ItemSaveData(item.Id.Value, item.Amount))
                     .ToArray(),
-                new PromotionOrderSaveData(
-                    promotionOrder.RequirementId.Value,
-                    promotionOrder.DeadlineUnixMilliseconds,
-                    promotionOrder.IsCompleted),
                 claimedRewardIds
                     .Where(id => id.IsEmpty is false)
                     .Select(id => id.Value)

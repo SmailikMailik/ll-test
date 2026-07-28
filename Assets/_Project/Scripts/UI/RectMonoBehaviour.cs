@@ -2,7 +2,7 @@
 
 namespace LL.UI
 {
-    internal class RectMonoBehaviour : MonoBehaviour
+    internal abstract class RectMonoBehaviour : MonoBehaviour
     {
         internal RectTransform RectTransform
         {

@@ -5,67 +5,45 @@ namespace LL.UI
     [DisallowMultipleComponent]
     internal sealed class SafeArea : RectMonoBehaviour
     {
-        [SerializeField] private bool _verticalSymmetry = true;
-        [SerializeField] private bool _horizontalSymmetry = true;
+        private Rect _lastSafeArea;
+        private Vector2Int _lastScreenSize;
 
-        private ScreenOrientation _lastOrientation;
-
-        private void Awake()
+        private void OnEnable()
         {
-            UpdateRect();
+            Refresh(
+                Screen.safeArea,
+                new Vector2Int(Screen.width, Screen.height));
         }
 
         private void Update()
         {
-            if (Screen.orientation != _lastOrientation)
-                UpdateRect();
+            var safeArea = Screen.safeArea;
+            var screenSize = new Vector2Int(Screen.width, Screen.height);
+
+            if (safeArea != _lastSafeArea || screenSize != _lastScreenSize)
+                Refresh(safeArea, screenSize);
         }
 
-        private void UpdateRect()
+        private void Refresh(Rect safeArea, Vector2Int screenSize)
         {
-            _lastOrientation = Screen.orientation;
+            _lastSafeArea = safeArea;
+            _lastScreenSize = screenSize;
 
-            var safeArea = Screen.safeArea;
-            var anchorMin = safeArea.position;
-            var offsetMax = new Vector2(Screen.width, Screen.height) - (safeArea.size + safeArea.position);
+            var horizontalInset = Mathf.Max(safeArea.xMin, screenSize.x - safeArea.xMax);
+            safeArea.xMin = horizontalInset;
+            safeArea.xMax = screenSize.x - horizontalInset;
 
-            if (_horizontalSymmetry)
-            {
-                if (anchorMin.x < offsetMax.x)
-                {
-                    anchorMin.x = offsetMax.x;
-                    safeArea.size = new Vector2(safeArea.size.x - anchorMin.x, safeArea.size.y);
-                }
-                else
-                {
-                    if (anchorMin.x > offsetMax.x)
-                        safeArea.size = new Vector2(safeArea.size.x - anchorMin.x, safeArea.size.y);
-                }
-            }
+            var verticalInset = Mathf.Max(safeArea.yMin, screenSize.y - safeArea.yMax);
+            safeArea.yMin = verticalInset;
+            safeArea.yMax = screenSize.y - verticalInset;
 
-            if (_verticalSymmetry)
-            {
-                if (anchorMin.y < offsetMax.y)
-                {
-                    anchorMin.y = offsetMax.y;
-                    safeArea.size = new Vector2(safeArea.size.x, safeArea.size.y - anchorMin.y);
-                }
-                else
-                {
-                    if (anchorMin.y > offsetMax.y)
-                        safeArea.size = new Vector2(safeArea.size.x, safeArea.size.y - anchorMin.y);
-                }
-            }
+            var width = Mathf.Max(1, screenSize.x);
+            var height = Mathf.Max(1, screenSize.y);
 
-            var anchorMax = anchorMin + safeArea.size;
-
-            anchorMin.x /= Screen.width;
-            anchorMin.y /= Screen.height;
-            anchorMax.x /= Screen.width;
-            anchorMax.y /= Screen.height;
-
-            RectTransform.anchorMin = anchorMin;
-            RectTransform.anchorMax = anchorMax;
+            RectTransform.anchorMin = new Vector2(safeArea.xMin / width, safeArea.yMin / height);
+            RectTransform.anchorMax = new Vector2(safeArea.xMax / width, safeArea.yMax / height);
+            RectTransform.offsetMin = Vector2.zero;
+            RectTransform.offsetMax = Vector2.zero;
         }
     }
 }
