@@ -1,8 +1,9 @@
+using System;
 using LL.Game.Cards;
 using LL.Game.Configuration;
-using LL.Game.Promotions;
-using LL.Game.Ranks;
 using LL.Game.Items;
+using LL.Game.Ranks;
+using LL.Identifiers;
 using LL.Loading;
 using LL.Presentation.Configuration;
 using LL.Presentation.Icons;
@@ -10,9 +11,9 @@ using LL.Presentation.Localization;
 using LL.Rewards;
 using LL.Rewards.Configuration;
 using LL.Saving;
-using LL.Upgrades;
 using LL.UI.Windows;
 using LL.UI.Windows.Configuration;
+using LL.Upgrades;
 using LL.User.Configuration;
 using LL.User.Core;
 using LL.User.Core.Amounts;
@@ -48,69 +49,98 @@ namespace LL.DI
 
         protected override void Configure(IContainerBuilder builder)
         {
+            RegisterWindows(builder);
+            RegisterLocalization(builder);
+            RegisterCatalogs(builder);
+            RegisterPersistence(builder);
+            RegisterUserState(builder);
+            RegisterGameServices(builder);
+
+            builder.RegisterEntryPoint<UserSaveController>();
+        }
+
+        private void RegisterWindows(IContainerBuilder builder)
+        {
             builder.RegisterInstance(_windowCatalog);
             builder.Register<WindowProvider>(Lifetime.Scoped);
             builder.Register<WindowNavigator>(Lifetime.Scoped);
+        }
+
+        private static void RegisterLocalization(IContainerBuilder builder)
+        {
             builder.Register<UnityLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
+        }
 
-            builder.RegisterInstance<IDataLoader<RankCatalog>>(_rankCatalogConfig);
-            builder.RegisterInstance<IDataLoader<CardCatalog>>(_cardCatalogConfig);
-            builder.RegisterInstance<IDataLoader<RankPromotionCatalog>>(_rankPromotionCatalogConfig);
-            builder.RegisterInstance<IDataLoader<RewardBundleCatalog>>(_rewardBundleCatalogConfig);
-            builder.RegisterInstance<IDataLoader<IconCatalog<ItemId>>>(_itemIconCatalogConfig);
-            builder.RegisterInstance<IDataLoader<IconCatalog<CardId>>>(
-                _cardIconCatalogConfig);
+        private void RegisterCatalogs(IContainerBuilder builder)
+        {
+            RegisterLoadedData(builder, _rankCatalogConfig);
+            RegisterLoadedData(builder, _cardCatalogConfig);
+            RegisterLoadedData(builder, _rankPromotionCatalogConfig);
+            RegisterLoadedData(builder, _rewardBundleCatalogConfig);
+            RegisterIconCatalog(builder, _itemIconCatalogConfig);
+            RegisterIconCatalog(builder, _cardIconCatalogConfig);
+        }
+
+        private void RegisterPersistence(IContainerBuilder builder)
+        {
             builder.RegisterInstance<IUserDefaultsProvider>(_userDefaultsConfig);
-
-            builder.Register(
-                resolver => resolver.Resolve<IDataLoader<RankCatalog>>().Load(),
-                Lifetime.Singleton);
-            builder.Register(
-                resolver => resolver.Resolve<IDataLoader<CardCatalog>>().Load(),
-                Lifetime.Singleton);
-            builder.Register(
-                resolver => resolver.Resolve<IDataLoader<RankPromotionCatalog>>().Load(),
-                Lifetime.Singleton);
-            builder.Register(
-                resolver => resolver.Resolve<IDataLoader<RewardBundleCatalog>>().Load(),
-                Lifetime.Singleton);
-            builder
-                .Register(
-                    resolver => resolver
-                        .Resolve<IDataLoader<IconCatalog<ItemId>>>()
-                        .Load(),
-                    Lifetime.Singleton)
-                .As<IIconProvider<ItemId>>();
-            builder
-                .Register(
-                    resolver => resolver
-                        .Resolve<IDataLoader<IconCatalog<CardId>>>()
-                        .Load(),
-                    Lifetime.Singleton)
-                .As<IIconProvider<CardId>>();
             builder.Register<JsonFileSaveService>(Lifetime.Singleton).As<ISaveService>();
             builder.Register<UserInitialDataLoader>(Lifetime.Singleton).As<IDataLoader<UserInitialData>>();
 
-            builder.Register(resolver => resolver.Resolve<IDataLoader<UserInitialData>>().Load(), Lifetime.Singleton);
-            builder.Register(resolver => resolver.Resolve<UserInitialData>().Identity, Lifetime.Singleton);
-            builder.Register(resolver => resolver.Resolve<UserInitialData>().Items, Lifetime.Singleton);
-            builder.Register(resolver => resolver.Resolve<UserInitialData>().Cards, Lifetime.Singleton);
-            builder.Register(resolver => resolver.Resolve<UserInitialData>().Progress, Lifetime.Singleton);
-            builder.Register(resolver => resolver.Resolve<UserInitialData>().PromotionOrder, Lifetime.Singleton);
-            builder.Register(resolver => resolver.Resolve<UserInitialData>().RewardClaims, Lifetime.Singleton);
+            RegisterLoadedData<UserInitialData>(builder);
+            RegisterInitialDataPart(builder, data => data.Identity);
+            RegisterInitialDataPart(builder, data => data.Items);
+            RegisterInitialDataPart(builder, data => data.Cards);
+            RegisterInitialDataPart(builder, data => data.Progress);
+            RegisterInitialDataPart(builder, data => data.PromotionOrder);
+            RegisterInitialDataPart(builder, data => data.RewardClaims);
+        }
 
+        private static void RegisterUserState(IContainerBuilder builder)
+        {
             builder.Register<UserAmounts<ItemId>>(Lifetime.Singleton).As<IUserAmounts<ItemId>>();
             builder.Register<UserAmounts<CardId>>(Lifetime.Singleton).As<IUserAmounts<CardId>>();
             builder.Register<UserPromotionOrder>(Lifetime.Singleton).As<IUserPromotionOrder>();
             builder.Register<UserRewardClaims>(Lifetime.Singleton).As<IUserRewardClaims>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
+        }
+
+        private static void RegisterGameServices(IContainerBuilder builder)
+        {
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
             builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();
             builder.Register<RewardIconProvider>(Lifetime.Singleton);
+        }
 
-            builder.RegisterEntryPoint<UserSaveController>();
+        private static void RegisterLoadedData<TData>(IContainerBuilder builder, IDataLoader<TData> loader)
+        {
+            builder.RegisterInstance(loader);
+            RegisterLoadedData<TData>(builder);
+        }
+
+        private static void RegisterLoadedData<TData>(IContainerBuilder builder)
+        {
+            builder.Register(resolver => resolver.Resolve<IDataLoader<TData>>().Load(), Lifetime.Singleton);
+        }
+
+        private static void RegisterIconCatalog<TId>(
+            IContainerBuilder builder,
+            IDataLoader<IconCatalog<TId>> loader)
+            where TId : struct, IIdentifier
+        {
+            builder.RegisterInstance(loader);
+            builder
+                .Register(resolver => resolver.Resolve<IDataLoader<IconCatalog<TId>>>().Load(), Lifetime.Singleton)
+                .As<IIconProvider<TId>>();
+        }
+
+        private static void RegisterInitialDataPart<TData>(
+            IContainerBuilder builder,
+            Func<UserInitialData, TData> selector)
+        {
+            builder.Register(resolver => selector(resolver.Resolve<UserInitialData>()), Lifetime.Singleton);
         }
     }
 }

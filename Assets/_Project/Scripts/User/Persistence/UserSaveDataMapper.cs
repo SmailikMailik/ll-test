@@ -45,7 +45,7 @@ namespace LL.User.Persistence
 
             return ToSaveData(
                 data.Identity,
-                new ProgressSaveData(data.Progress.Rank, data.Progress.Experience),
+                data.Progress,
                 data.Items.Amounts,
                 data.Cards.Amounts,
                 data.PromotionOrder,
@@ -54,7 +54,7 @@ namespace LL.User.Persistence
 
         internal static UserSaveData ToSaveData(
             UserIdentity identity,
-            ProgressSaveData progress,
+            ProgressInitialData progress,
             IEnumerable<Amount<ItemId>> items,
             IEnumerable<Amount<CardId>> cards,
             PromotionOrderInitialData promotionOrder,
@@ -80,7 +80,7 @@ namespace LL.User.Persistence
 
             return new UserSaveData(
                 new IdentitySaveData(identity.UserId, identity.RegionCode),
-                progress,
+                new ProgressSaveData(progress.Rank, progress.Experience),
                 new PromotionOrderSaveData(
                     promotionOrder.RequirementId.Value,
                     promotionOrder.DeadlineUnixMilliseconds,

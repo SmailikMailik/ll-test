@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Items;
-using LL.Game.Promotions;
+using LL.Identifiers;
 using LL.Rewards;
 using LL.Saving;
 using LL.User.Core.Amounts;
 using LL.User.Core.Identity;
-using LL.User.Core.Promotions;
 using LL.User.Core.Progress;
+using LL.User.Core.Promotions;
 using LL.User.Core.Rewards;
 using R3;
 using VContainer;
@@ -21,89 +21,59 @@ namespace LL.User.Persistence
     {
         private readonly UserIdentity _identity;
         private readonly IUserAmounts<ItemId> _items;
-        private readonly IUserProgress _progress;
-        private readonly ISaveService _saveService;
         private readonly IUserAmounts<CardId> _cards;
+        private readonly IUserProgress _progress;
         private readonly IUserPromotionOrder _promotionOrder;
         private readonly IUserRewardClaims _rewardClaims;
+        private readonly ISaveService _saveService;
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<ItemId, int> _itemAmounts;
         private readonly Dictionary<CardId, int> _cardAmounts;
         private readonly HashSet<RewardBundleId> _claimedRewardIds;
-        private int _rank;
-        private int _experience;
-        private PromotionRequirementId _promotionOrderRequirementId;
-        private long _promotionOrderDeadlineUnixMilliseconds;
-        private bool _isPromotionOrderCompleted;
+        private ProgressInitialData _progressData;
+        private PromotionOrderInitialData _promotionOrderData;
 
         [Inject]
         internal UserSaveController(
             UserIdentity identity,
-            AmountsInitialData<ItemId> items,
-            AmountsInitialData<CardId> cards,
-            PromotionOrderInitialData promotionOrder,
-            IUserAmounts<ItemId> userItems,
-            IUserAmounts<CardId> userCards,
-            IUserPromotionOrder userPromotionOrder,
-            IUserRewardClaims rewardClaims,
+            AmountsInitialData<ItemId> itemAmounts,
+            AmountsInitialData<CardId> cardAmounts,
+            PromotionOrderInitialData promotionOrderData,
+            IUserAmounts<ItemId> items,
+            IUserAmounts<CardId> cards,
             IUserProgress progress,
+            IUserPromotionOrder promotionOrder,
+            IUserRewardClaims rewardClaims,
             ISaveService saveService)
         {
+            if (itemAmounts == null)
+                throw new ArgumentNullException(nameof(itemAmounts));
+
+            if (cardAmounts == null)
+                throw new ArgumentNullException(nameof(cardAmounts));
+
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            if (cards == null)
-                throw new ArgumentNullException(nameof(cards));
-
-            if (promotionOrder == null)
-                throw new ArgumentNullException(nameof(promotionOrder));
-
-            _items = userItems ?? throw new ArgumentNullException(nameof(userItems));
-            _cards = userCards ?? throw new ArgumentNullException(nameof(userCards));
-            _promotionOrder = userPromotionOrder ?? throw new ArgumentNullException(nameof(userPromotionOrder));
-            _rewardClaims = rewardClaims ?? throw new ArgumentNullException(nameof(rewardClaims));
+            _itemAmounts = itemAmounts.Amounts.ToDictionary(item => item.Id, item => item.Value);
+            _cardAmounts = cardAmounts.Amounts.ToDictionary(card => card.Id, card => card.Value);
+            _promotionOrderData = promotionOrderData ?? throw new ArgumentNullException(nameof(promotionOrderData));
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+            _cards = cards ?? throw new ArgumentNullException(nameof(cards));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
-
-            _itemAmounts = items.Amounts.ToDictionary(
-                item => item.Id,
-                item => item.Value);
-            _cardAmounts = cards.Amounts.ToDictionary(
-                stack => stack.Id,
-                card => card.Value);
+            _progressData = new ProgressInitialData(progress.Rank, progress.Experience);
+            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
+            _rewardClaims = rewardClaims ?? throw new ArgumentNullException(nameof(rewardClaims));
             _claimedRewardIds = new HashSet<RewardBundleId>(rewardClaims.ClaimedIds);
-            _rank = progress.Rank;
-            _experience = progress.Experience;
-            _promotionOrderRequirementId = promotionOrder.RequirementId;
-            _promotionOrderDeadlineUnixMilliseconds = promotionOrder.DeadlineUnixMilliseconds;
-            _isPromotionOrderCompleted = promotionOrder.IsCompleted;
+            _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
         }
 
         public void Initialize()
         {
-            foreach (var id in _itemAmounts.Keys.ToArray())
-            {
-                var itemId = id;
-                _subscriptions.Add(_items
-                    .ObserveAmount(itemId)
-                    .Subscribe(value => UpdateItemAndSave(itemId, value)));
-            }
+            ObserveAmounts(_items, _itemAmounts);
+            ObserveAmounts(_cards, _cardAmounts);
 
-            foreach (var id in _cardAmounts.Keys.ToArray())
-            {
-                var cardId = id;
-                _subscriptions.Add(_cards
-                    .ObserveAmount(cardId)
-                    .Subscribe(value => UpdateCardAndSave(cardId, value)));
-            }
-
-            _subscriptions.Add(_progress.RankChanged
-                .Subscribe(value => UpdateAndSave(ref _rank, value)));
-            _subscriptions.Add(_progress.ExperienceChanged
-                .Subscribe(value => UpdateAndSave(ref _experience, value)));
+            _subscriptions.Add(_progress.RankChanged.Subscribe(_ => UpdateProgressAndSave()));
+            _subscriptions.Add(_progress.ExperienceChanged.Subscribe(_ => UpdateProgressAndSave()));
             _subscriptions.Add(_promotionOrder.Changed.Subscribe(_ => UpdatePromotionOrderAndSave()));
             _subscriptions.Add(_rewardClaims.RewardClaimed.Subscribe(AddClaimAndSave));
         }
@@ -116,30 +86,26 @@ namespace LL.User.Persistence
             _subscriptions.Clear();
         }
 
-        private void UpdateAndSave(ref int field, int value)
+        private void ObserveAmounts<TId>(
+            IUserAmounts<TId> source,
+            Dictionary<TId, int> amounts)
+            where TId : struct, IIdentifier
         {
-            if (field == value)
-                return;
-
-            field = value;
-            Save();
+            foreach (var id in amounts.Keys.ToArray())
+            {
+                var amountId = id;
+                _subscriptions.Add(source
+                    .ObserveAmount(amountId)
+                    .Subscribe(value => UpdateAmountAndSave(amounts, amountId, value)));
+            }
         }
 
-        private void UpdateItemAndSave(ItemId id, int value)
+        private void UpdateAmountAndSave<TId>(Dictionary<TId, int> amounts, TId id, int value)
         {
-            if (_itemAmounts[id] == value)
+            if (amounts[id] == value)
                 return;
 
-            _itemAmounts[id] = value;
-            Save();
-        }
-
-        private void UpdateCardAndSave(CardId id, int value)
-        {
-            if (_cardAmounts[id] == value)
-                return;
-
-            _cardAmounts[id] = value;
+            amounts[id] = value;
             Save();
         }
 
@@ -151,20 +117,35 @@ namespace LL.User.Persistence
 
         private void UpdatePromotionOrderAndSave()
         {
-            var requirementId = _promotionOrder.RequirementId;
-            var deadlineUnixMilliseconds = _promotionOrder.DeadlineUnixMilliseconds;
-            var isCompleted = _promotionOrder.IsCompleted;
+            var data = new PromotionOrderInitialData(
+                _promotionOrder.RequirementId,
+                _promotionOrder.DeadlineUnixMilliseconds,
+                _promotionOrder.IsCompleted);
 
-            if (_promotionOrderRequirementId.Equals(requirementId) &&
-                _promotionOrderDeadlineUnixMilliseconds == deadlineUnixMilliseconds &&
-                _isPromotionOrderCompleted == isCompleted)
+            if (_promotionOrderData.RequirementId.Equals(data.RequirementId) &&
+                _promotionOrderData.DeadlineUnixMilliseconds == data.DeadlineUnixMilliseconds &&
+                _promotionOrderData.IsCompleted == data.IsCompleted)
             {
                 return;
             }
 
-            _promotionOrderRequirementId = requirementId;
-            _promotionOrderDeadlineUnixMilliseconds = deadlineUnixMilliseconds;
-            _isPromotionOrderCompleted = isCompleted;
+            _promotionOrderData = data;
+            Save();
+        }
+
+        private void UpdateProgressAndSave()
+        {
+            var data = new ProgressInitialData(
+                _progress.Rank,
+                _progress.Experience);
+
+            if (_progressData.Rank == data.Rank &&
+                _progressData.Experience == data.Experience)
+            {
+                return;
+            }
+
+            _progressData = data;
             Save();
         }
 
@@ -172,13 +153,10 @@ namespace LL.User.Persistence
         {
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
-                new ProgressSaveData(_rank, _experience),
+                _progressData,
                 _itemAmounts.Select(pair => new Amount<ItemId>(pair.Key, pair.Value)),
                 _cardAmounts.Select(pair => new Amount<CardId>(pair.Key, pair.Value)),
-                new PromotionOrderInitialData(
-                    _promotionOrderRequirementId,
-                    _promotionOrderDeadlineUnixMilliseconds,
-                    _isPromotionOrderCompleted),
+                _promotionOrderData,
                 _claimedRewardIds);
 
             _saveService.TrySave(UserInitialDataLoader.SaveKey, data);
