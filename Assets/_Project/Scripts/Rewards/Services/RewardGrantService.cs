@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Rewards.Models;
 using LL.User.Core.Rewards;
 using VContainer;
 
-namespace LL.Rewards
+namespace LL.Rewards.Services
 {
     internal sealed class RewardGrantService : IRewardGrantService
     {

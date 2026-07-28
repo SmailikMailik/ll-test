@@ -13,7 +13,7 @@ namespace LL.UI.Graphics
         [SerializeField, Range(0f, 360f)] private float _angle;
         [SerializeField, Range(1, 32)] private int _resolution = 16;
 
-        internal enum GradientType : byte
+        private enum GradientType : byte
         {
             Linear = 0,
             Radial = 1

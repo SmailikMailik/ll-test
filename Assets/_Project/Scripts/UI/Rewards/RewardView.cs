@@ -1,5 +1,5 @@
 using LL.Presentation.Icons;
-using LL.Rewards;
+using LL.Rewards.Models;
 using LL.UI.Typography;
 using TMPro;
 using UnityEngine;

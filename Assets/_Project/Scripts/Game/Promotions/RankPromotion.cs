@@ -1,7 +1,7 @@
 using System;
 using LL.Game.Items;
 using LL.Purchasing;
-using LL.Rewards;
+using LL.Rewards.Models;
 
 namespace LL.Game.Promotions
 {

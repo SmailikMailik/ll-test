@@ -19,16 +19,38 @@ namespace LL.DI
 
         protected override void Configure(IContainerBuilder builder)
         {
+            RegisterWindow(builder);
+            RegisterConfirmations(builder);
+            RegisterPromotionServices(builder);
+            RegisterUpgradeFlow(builder);
+        }
+
+        private void RegisterWindow(IContainerBuilder builder)
+        {
             builder.RegisterComponent(_windowController);
+        }
+
+        private static void RegisterConfirmations(IContainerBuilder builder)
+        {
             builder
                 .Register<ModalOrderCompletionConfirmation>(Lifetime.Scoped)
                 .As<IOrderCompletionConfirmation>();
-            builder.Register<ModalRankPromotionConfirmation>(Lifetime.Scoped).As<IPurchaseConfirmation>();
+            builder
+                .Register<ModalRankPromotionConfirmation>(Lifetime.Scoped)
+                .As<IPurchaseConfirmation>();
             builder
                 .Register<ModalExperienceOverflowConfirmation>(Lifetime.Scoped)
                 .As<IExperienceOverflowConfirmation>();
+        }
+
+        private static void RegisterPromotionServices(IContainerBuilder builder)
+        {
             builder.Register<PurchaseService>(Lifetime.Scoped).As<IPurchaseService>();
             builder.Register<RankPromotionService>(Lifetime.Scoped).As<IRankPromotionService>();
+        }
+
+        private static void RegisterUpgradeFlow(IContainerBuilder builder)
+        {
             builder.Register<UpgradeFlow>(Lifetime.Scoped);
             builder.RegisterEntryPoint<UpgradeFlowStartup>();
         }

@@ -10,6 +10,8 @@ namespace LLEditor.UI.Graphics
     [CanEditMultipleObjects]
     internal sealed class GradientGraphicEditor : OdinEditor
     {
+        private const int LinearTypeIndex = 0;
+
         private static readonly GUIContent _materialLabel = new("Material");
         private static readonly GUIContent _colorLabel = new("Tint");
         private static readonly GUIContent _raycastTargetLabel = new("Raycast Target");
@@ -123,7 +125,7 @@ namespace LLEditor.UI.Graphics
         private bool IsLinear()
         {
             return _type.hasMultipleDifferentValues ||
-                   _type.enumValueIndex == (int)GradientGraphic.GradientType.Linear;
+                   _type.enumValueIndex == LinearTypeIndex;
         }
 
         private void FindProperties()

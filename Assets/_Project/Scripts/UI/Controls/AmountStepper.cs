@@ -75,9 +75,7 @@ namespace LL.UI.Controls
             var sign = delta > 0 ? "+" : "-";
             label.text = $"{sign}{Math.Abs(delta)}";
 
-            button.Clicked
-                .Subscribe(_ => ChangeValue(delta))
-                .AddTo(this);
+            button.Clicked.Subscribe(_ => ChangeValue(delta)).AddTo(this);
         }
 
         private void ChangeValue(int delta)

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LL.Rewards;
+using LL.Rewards.Models;
 
 namespace LL.User.Core.Rewards
 {

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.Rewards;
+using LL.Rewards.Models;
 using R3;
 using VContainer;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Promotions;
-using LL.Rewards;
+using LL.Rewards.Models;
 
 namespace LL.Promotions
 {

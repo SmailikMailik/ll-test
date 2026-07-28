@@ -40,7 +40,7 @@ namespace LL.UI
         private void Start()
         {
             _backButton.Clicked.Subscribe(_ => _windowController.Back()).AddTo(this);
-            _homeButton.Clicked.Subscribe(_ => Debug.LogError("OnHomeClicked")).AddTo(this);
+            _homeButton.Clicked.Subscribe(_ => Debug.LogError("Дом в сделку не входил")).AddTo(this);
 
             _userLabel.text = $"{_identity.UserId} {_identity.RegionCode}";
 

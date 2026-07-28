@@ -1,6 +1,6 @@
 using LL.Game.Cards;
 
-namespace LL.Rewards
+namespace LL.Rewards.Models
 {
     internal sealed class CardReward : IReward
     {

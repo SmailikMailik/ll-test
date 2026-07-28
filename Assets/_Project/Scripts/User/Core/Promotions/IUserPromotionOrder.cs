@@ -16,6 +16,6 @@ namespace LL.User.Core.Promotions
         bool TryStart(PromotionRequirementId requirementId, TimeSpan duration);
         bool TryComplete();
         bool TryExpire();
-        void Reset();
+        void ClearOrder();
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Game.Promotions;
-using LL.Rewards;
+using LL.Rewards.Models;
 using LL.User.Core;
 using LL.User.Core.Amounts;
 using LL.User.Core.Identity;

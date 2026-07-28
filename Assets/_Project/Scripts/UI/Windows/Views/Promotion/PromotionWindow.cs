@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LL.Game.Promotions;
 using LL.Game.Ranks;
 using LL.Promotions;
-using LL.Rewards;
+using LL.Rewards.Models;
 using LL.UI.Controls;
 using LL.UI.Rewards;
 using LL.UI.Typography;
@@ -51,15 +51,9 @@ namespace LL.UI.Windows.Views.Promotion
 
         private void Start()
         {
-            _softButton.Clicked
-                .Subscribe(_ => PurchasePromotion(PromotionPaymentType.Soft))
-                .AddTo(this);
-            _hardButton.Clicked
-                .Subscribe(_ => PurchasePromotion(PromotionPaymentType.Hard))
-                .AddTo(this);
-            _orderView.Completed
-                .Subscribe(_ => RefreshActions())
-                .AddTo(this);
+            _softButton.Clicked.Subscribe(_ => PurchasePromotion(PromotionPaymentType.Soft)).AddTo(this);
+            _hardButton.Clicked.Subscribe(_ => PurchasePromotion(PromotionPaymentType.Hard)).AddTo(this);
+            _orderView.Completed.Subscribe(_ => RefreshActions()).AddTo(this);
         }
 
         protected override void OnShow()
@@ -109,7 +103,7 @@ namespace LL.UI.Windows.Views.Promotion
 
         private void CompletePromotion(IReadOnlyList<IReward> rewards)
         {
-            _orderView.Reset();
+            _orderView.ClearOrder();
             _upgradeFlow.CompletePromotion(_userProgress.Rank, rewards);
         }
 

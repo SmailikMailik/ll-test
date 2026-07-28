@@ -1,7 +1,7 @@
 using System;
 using LL.Identifiers;
 
-namespace LL.Rewards
+namespace LL.Rewards.Models
 {
     internal readonly struct RewardBundleId : IIdentifier, IEquatable<RewardBundleId>
     {

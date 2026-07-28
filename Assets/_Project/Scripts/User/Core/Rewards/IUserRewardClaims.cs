@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using LL.Rewards;
+using LL.Rewards.Models;
 using R3;
 
 namespace LL.User.Core.Rewards

@@ -11,7 +11,7 @@ namespace LL.UI.Graphics
         [SerializeField, Min(0f)] private float _thickness = 4f;
         [SerializeField] private BorderAlignment _alignment;
 
-        internal enum BorderAlignment : byte
+        private enum BorderAlignment : byte
         {
             Inside = 0,
             Center = 1,

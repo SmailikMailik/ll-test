@@ -73,14 +73,8 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
             SetSelected(false);
 
-            _addButton.Clicked
-                .Subscribe(_ => _userCards.TryAdd(Card.Id, AddAmount))
-                .AddTo(this);
-
-            _userCards
-                .ObserveAmount(Card.Id)
-                .Subscribe(UpdateProgress)
-                .AddTo(this);
+            _addButton.Clicked.Subscribe(_ => _userCards.TryAdd(Card.Id, AddAmount)).AddTo(this);
+            _userCards.ObserveAmount(Card.Id).Subscribe(UpdateProgress).AddTo(this);
         }
 
         public void OnPointerClick(PointerEventData _)

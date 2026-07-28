@@ -73,11 +73,11 @@ namespace LL.User.Core.Promotions
             if (HasOrder is false || IsCompleted || GetRemainingTime() > TimeSpan.Zero)
                 return false;
 
-            Reset();
+            ClearOrder();
             return true;
         }
 
-        public void Reset()
+        public void ClearOrder()
         {
             if (HasOrder is false && IsCompleted is false)
                 return;

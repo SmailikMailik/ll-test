@@ -1,10 +1,11 @@
 using System;
 using LL.Game.Cards;
 using LL.Game.Items;
+using LL.Rewards.Models;
 using LL.User.Core.Amounts;
 using VContainer;
 
-namespace LL.Rewards
+namespace LL.Rewards.Services
 {
     internal interface IRewardService
     {

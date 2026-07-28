@@ -1,4 +1,4 @@
-namespace LL.Rewards
+namespace LL.Rewards.Models
 {
     internal interface IReward
     {

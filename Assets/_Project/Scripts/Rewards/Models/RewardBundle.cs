@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LL.Rewards
+namespace LL.Rewards.Models
 {
     internal sealed class RewardBundle
     {

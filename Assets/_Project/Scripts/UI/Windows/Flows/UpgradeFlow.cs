@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.Rewards;
+using LL.Rewards.Models;
 using LL.UI.Windows.Views.Promotion;
 using LL.UI.Windows.Views.Reward;
 using LL.UI.Windows.Views.Upgrade;

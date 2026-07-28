@@ -4,6 +4,7 @@ using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Identifiers;
 using LL.Loading;
+using LL.Rewards.Models;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

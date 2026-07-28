@@ -673,9 +673,9 @@ MonoBehaviour:
   m_UpdateString:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2383678139630286335}
-        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
-        m_MethodName: set_text
+      - m_Target: {fileID: 3000102401174466987}
+        m_TargetAssemblyTypeName: LL.UI.InlineSpriteLabel, LL.Runtime
+        m_MethodName: OnTextChanged
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

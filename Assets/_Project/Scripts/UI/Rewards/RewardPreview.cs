@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LL.Game.Promotions;
 using LL.Presentation.Localization;
 using LL.Presentation.Promotions;
-using LL.Rewards;
+using LL.Rewards.Models;
 using TMPro;
 using UnityEngine;
 using VContainer;

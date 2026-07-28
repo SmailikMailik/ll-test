@@ -2,7 +2,7 @@ using System;
 using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Identifiers;
-using LL.Rewards;
+using LL.Rewards.Models;
 using UnityEngine;
 using VContainer;
 

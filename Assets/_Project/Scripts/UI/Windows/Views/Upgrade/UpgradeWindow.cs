@@ -49,10 +49,8 @@ namespace LL.UI.Windows.Views.Upgrade
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _cardExperienceService = cardExperienceService
-                                     ?? throw new ArgumentNullException(nameof(cardExperienceService));
-            _overflowConfirmation = overflowConfirmation
-                                    ?? throw new ArgumentNullException(nameof(overflowConfirmation));
+            _cardExperienceService = cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
+            _overflowConfirmation = overflowConfirmation ?? throw new ArgumentNullException(nameof(overflowConfirmation));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
@@ -84,27 +82,17 @@ namespace LL.UI.Windows.Views.Upgrade
             _cardSelector.Initialize();
             _amountStepper.Initialize(AmountDelta);
 
-            _cardSelector.Changed
-                .Subscribe(_ => OnCardSelectionChanged())
-                .AddTo(this);
-            _amountStepper.ValueChanged
-                .Subscribe(OnPlannedAmountChanged)
-                .AddTo(this);
-            _useButton.Clicked
-                .Subscribe(_ => ApplyCards())
-                .AddTo(this);
-            _maxButton.Clicked
-                .Subscribe(_ => SetMaximumPlan())
-                .AddTo(this);
-            _resetButton.Clicked
-                .Subscribe(_ => ResetPendingChanges())
-                .AddTo(this);
+            _cardSelector.Changed.Subscribe(_ => OnCardSelectionChanged()).AddTo(this);
+            _amountStepper.ValueChanged.Subscribe(OnPlannedAmountChanged).AddTo(this);
+            _useButton.Clicked.Subscribe(_ => ApplyCards()).AddTo(this);
+            _maxButton.Clicked.Subscribe(_ => SetMaximumPlan()).AddTo(this);
+            _resetButton.Clicked.Subscribe(_ => ResetPendingChanges()).AddTo(this);
         }
 
         private void ResetPendingChanges()
         {
             _experienceController.ResetPreview();
-            _cardSelector.Reset();
+            _cardSelector.RestoreDefaultSelection();
             RefreshActions();
         }
 

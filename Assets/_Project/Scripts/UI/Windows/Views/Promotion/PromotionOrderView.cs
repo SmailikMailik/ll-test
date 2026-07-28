@@ -52,7 +52,7 @@ namespace LL.UI.Windows.Views.Promotion
             IUserPromotionOrder promotionOrder)
         {
             _completionConfirmation = completionConfirmation
-                                      ?? throw new ArgumentNullException(nameof(completionConfirmation));
+                ?? throw new ArgumentNullException(nameof(completionConfirmation));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
         }
@@ -60,10 +60,7 @@ namespace LL.UI.Windows.Views.Promotion
         private void Start()
         {
             _completed.AddTo(this);
-
-            _button.Clicked
-                .Subscribe(_ => OnButtonClicked())
-                .AddTo(this);
+            _button.Clicked.Subscribe(_ => OnButtonClicked()).AddTo(this);
 
             Observable
                 .Interval(_timerTickInterval)
@@ -94,9 +91,9 @@ namespace LL.UI.Windows.Views.Promotion
             RefreshButtonAvailability();
         }
 
-        internal void Reset()
+        internal void ClearOrder()
         {
-            _promotionOrder.Reset();
+            _promotionOrder.ClearOrder();
             SetState(OrderState.Available);
         }
 
@@ -126,9 +123,12 @@ namespace LL.UI.Windows.Views.Promotion
 
         private void RefreshButtonText()
         {
-            var localizationKey = _state == OrderState.Available
-                ? OrderLocalizationKeys.AcceptAction
-                : OrderLocalizationKeys.CompleteAction;
+            var localizationKey = _state switch
+            {
+                OrderState.Available => OrderLocalizationKeys.AcceptAction,
+                OrderState.Active => OrderLocalizationKeys.CompleteAction,
+                _ => OrderLocalizationKeys.CompletedLabel
+            };
 
             _buttonLabel.text = _localization.GetText(localizationKey);
         }
@@ -171,7 +171,7 @@ namespace LL.UI.Windows.Views.Promotion
         private void RestoreState()
         {
             if (_promotionOrder.RequirementId.Equals(_requirementId) is false)
-                _promotionOrder.Reset();
+                _promotionOrder.ClearOrder();
 
             _promotionOrder.TryExpire();
 
@@ -186,7 +186,12 @@ namespace LL.UI.Windows.Views.Promotion
         private void RefreshState()
         {
             _displayedRemainingSeconds = -1;
-            RefreshTime();
+            var showTime = _state != OrderState.Completed;
+            _timeLabel.gameObject.SetActive(showTime);
+
+            if (showTime)
+                RefreshTime();
+
             RefreshButtonText();
             RefreshButtonAvailability();
         }
@@ -202,7 +207,7 @@ namespace LL.UI.Windows.Views.Promotion
 
             if (remainingSeconds <= 0f)
             {
-                Reset();
+                ClearOrder();
                 return;
             }
 

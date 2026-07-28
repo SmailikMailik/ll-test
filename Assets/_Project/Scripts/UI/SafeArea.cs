@@ -3,7 +3,8 @@
 namespace LL.UI
 {
     [DisallowMultipleComponent]
-    internal sealed class SafeArea : RectMonoBehaviour
+    [RequireComponent(typeof(RectTransform))]
+    internal sealed class SafeArea : MonoBehaviour
     {
         private Rect _lastSafeArea;
         private Vector2Int _lastScreenSize;
@@ -40,10 +41,11 @@ namespace LL.UI
             var width = Mathf.Max(1, screenSize.x);
             var height = Mathf.Max(1, screenSize.y);
 
-            RectTransform.anchorMin = new Vector2(safeArea.xMin / width, safeArea.yMin / height);
-            RectTransform.anchorMax = new Vector2(safeArea.xMax / width, safeArea.yMax / height);
-            RectTransform.offsetMin = Vector2.zero;
-            RectTransform.offsetMax = Vector2.zero;
+            var rectTransform = (RectTransform)transform;
+            rectTransform.anchorMin = new Vector2(safeArea.xMin / width, safeArea.yMin / height);
+            rectTransform.anchorMax = new Vector2(safeArea.xMax / width, safeArea.yMax / height);
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
         }
     }
 }

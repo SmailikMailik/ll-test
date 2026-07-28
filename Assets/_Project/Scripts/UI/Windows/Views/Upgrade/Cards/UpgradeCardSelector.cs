@@ -52,18 +52,14 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
                 var view = slot.View;
 
-                view.Clicked
-                    .Subscribe(_ => Select(view))
-                    .AddTo(this);
-                view.AvailableAmountChanged
-                    .Subscribe(_ => OnAmountChanged(view))
-                    .AddTo(this);
+                view.Clicked.Subscribe(_ => Select(view)).AddTo(this);
+                view.AvailableAmountChanged.Subscribe(_ => OnAmountChanged(view)).AddTo(this);
 
                 view.Initialize(card);
             }
         }
 
-        internal void Reset()
+        internal void RestoreDefaultSelection()
         {
             ClearPlan();
 

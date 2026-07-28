@@ -15,15 +15,13 @@ namespace LL.UI.Windows.Views.Reward
 
         protected override void BuildSequence(Sequence sequence)
         {
-            sequence
-                .Append(
-                    _target
-                        .DOLocalRotate(
-                            Vector3.back * FullRotationDegrees,
-                            _durationSeconds,
-                            RotateMode.FastBeyond360)
-                        .SetEase(Ease.Linear))
-                .SetLoops(-1, LoopType.Restart);
+            var fullRotation = Vector3.back * FullRotationDegrees;
+            var rotationTween = _target
+                .DOLocalRotate(fullRotation, _durationSeconds, RotateMode.FastBeyond360)
+                .SetEase(Ease.Linear);
+
+            sequence.Append(rotationTween);
+            sequence.SetLoops(-1, LoopType.Restart);
         }
 
         protected override void ApplyHiddenState()

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using LL.Game.Promotions;
 using LL.Loading;
-using LL.Rewards;
+using LL.Rewards.Models;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

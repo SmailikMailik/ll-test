@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using LL.Extensions;
 using LL.Presentation.Icons;
-using LL.Rewards;
+using LL.Rewards.Models;
 using UnityEngine;
 using VContainer;
 

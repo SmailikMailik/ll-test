@@ -95,6 +95,10 @@ MonoBehaviour:
     m_Key: units.seconds_short
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440992
+    m_Key: labels.completed
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

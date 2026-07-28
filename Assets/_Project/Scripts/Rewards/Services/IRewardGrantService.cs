@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using LL.Rewards.Models;
 
-namespace LL.Rewards
+namespace LL.Rewards.Services
 {
     internal interface IRewardGrantService
     {

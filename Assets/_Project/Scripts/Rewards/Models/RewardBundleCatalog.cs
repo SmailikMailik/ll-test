@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Identifiers;
 
-namespace LL.Rewards
+namespace LL.Rewards.Models
 {
     internal sealed class RewardBundleCatalog
     {

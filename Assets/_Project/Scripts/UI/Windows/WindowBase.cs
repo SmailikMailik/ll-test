@@ -33,10 +33,13 @@ namespace LL.UI.Windows
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(GraphicRaycaster))]
-    internal abstract class WindowBase : RectMonoBehaviour
+    [RequireComponent(typeof(RectTransform))]
+    internal abstract class WindowBase : MonoBehaviour
     {
         internal abstract Type ParameterType { get; }
         internal abstract IWindowParameters CurrentParameters { get; }
+
+        internal RectTransform RectTransform => (RectTransform)transform;
 
         internal WindowDefinition Definition { get; private set; }
         internal bool IsVisible { get; private set; }
