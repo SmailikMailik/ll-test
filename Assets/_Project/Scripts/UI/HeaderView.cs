@@ -42,7 +42,7 @@ namespace LL.UI
             _backButton.Clicked.Subscribe(_ => _windowController.Back()).AddTo(this);
             _homeButton.Clicked.Subscribe(_ => Debug.LogError("Дом в сделку не входил")).AddTo(this);
 
-            _userLabel.text = $"{_identity.UserId} {_identity.RegionCode}";
+            _userLabel.text = $"{_identity.RegionCode} {_identity.UserId}";
 
             ObserveItem(ItemIds.Soft, _softLabel);
             ObserveItem(ItemIds.Hard, _hardLabel);

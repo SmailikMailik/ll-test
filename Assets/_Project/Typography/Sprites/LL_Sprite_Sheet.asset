@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84a92b25f83d49b9bc132d206b370281, type: 3}
+  m_Name: LL_Sprite_Sheet
+  m_EditorClassIdentifier: 
+  hashCode: -2068686138
+  material: {fileID: 0}
+  materialHashCode: 0
+  m_Version: 1.1.0
+  m_FaceInfo:
+    m_FaceIndex: 0
+    m_FamilyName: 
+    m_StyleName: 
+    m_PointSize: 0
+    m_Scale: 0
+    m_UnitsPerEM: 0
+    m_LineHeight: 0
+    m_AscentLine: 0
+    m_CapLine: 0
+    m_MeanLine: 0
+    m_Baseline: 0
+    m_DescentLine: 0
+    m_SuperscriptOffset: 0
+    m_SuperscriptSize: 0
+    m_SubscriptOffset: 0
+    m_SubscriptSize: 0
+    m_UnderlineOffset: 0
+    m_UnderlineThickness: 0
+    m_StrikethroughOffset: 0
+    m_StrikethroughThickness: 0
+    m_TabWidth: 0
+  spriteSheet: {fileID: 0}
+  m_SpriteCharacterTable: []
+  m_SpriteGlyphTable: []
+  spriteInfoList: []
+  fallbackSpriteAssets:
+  - {fileID: 11400000, guid: b5d7933871224308b43bc52b703f4302, type: 2}
+  - {fileID: 11400000, guid: f18d213084c44397aa4ffdaa2d9eb516, type: 2}
+  - {fileID: 11400000, guid: 652fb0726f394855a1d884c579ca68d0, type: 2}
+  - {fileID: 11400000, guid: b85c79b683504550bb75ed971ae5cba9, type: 2}
+  - {fileID: 11400000, guid: 22daf760f2bf49189cad06fafaad0297, type: 2}
+  - {fileID: 11400000, guid: cf38ab8127d84a3a98bac82019f97ce3, type: 2}

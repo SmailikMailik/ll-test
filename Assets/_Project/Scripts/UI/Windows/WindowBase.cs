@@ -32,8 +32,8 @@ namespace LL.UI.Windows
 
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas))]
-    [RequireComponent(typeof(GraphicRaycaster))]
     [RequireComponent(typeof(RectTransform))]
+    [RequireComponent(typeof(GraphicRaycaster))]
     internal abstract class WindowBase : MonoBehaviour
     {
         internal abstract Type ParameterType { get; }
