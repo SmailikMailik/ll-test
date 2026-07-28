@@ -3,6 +3,7 @@ using LL.Game.Configuration;
 using LL.Game.Currencies;
 using LL.Game.Items;
 using LL.Game.Purchases;
+using LL.Game.Promotions;
 using LL.Game.Ranks;
 using LL.Loading;
 using LL.Presentation.Configuration;
@@ -10,7 +11,6 @@ using LL.Presentation.Icons;
 using LL.Presentation.Localization;
 using LL.Rewards;
 using LL.Rewards.Configuration;
-using LL.Rewards.Ranks;
 using LL.Saving;
 using LL.Upgrades;
 using LL.UI.Windows;
@@ -40,10 +40,10 @@ namespace LL.DI
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private CardCatalogConfig _cardCatalogConfig;
         [SerializeField] private PurchaseCatalogConfig _purchaseCatalogConfig;
+        [SerializeField] private RankPromotionCatalogConfig _rankPromotionCatalogConfig;
 
         [Header("Rewards")]
         [SerializeField] private RewardBundleCatalogConfig _rewardBundleCatalogConfig;
-        [SerializeField] private RankRewardCatalogConfig _rankRewardCatalogConfig;
 
         [Header("Presentation")]
         [SerializeField] private CurrencyIconCatalogConfig _currencyIconCatalogConfig;
@@ -64,8 +64,8 @@ namespace LL.DI
             builder.RegisterInstance<IDataLoader<RankCatalog>>(_rankCatalogConfig);
             builder.RegisterInstance<IDataLoader<CardCatalog>>(_cardCatalogConfig);
             builder.RegisterInstance<IDataLoader<PurchaseCatalog>>(_purchaseCatalogConfig);
+            builder.RegisterInstance<IDataLoader<RankPromotionCatalog>>(_rankPromotionCatalogConfig);
             builder.RegisterInstance<IDataLoader<RewardBundleCatalog>>(_rewardBundleCatalogConfig);
-            builder.RegisterInstance<IDataLoader<RankRewardCatalog>>(_rankRewardCatalogConfig);
             builder.RegisterInstance<IDataLoader<IconCatalog<CurrencyId>>>(_currencyIconCatalogConfig);
             builder.RegisterInstance<IDataLoader<IconCatalog<CardId>>>(
                 _cardIconCatalogConfig);
@@ -79,10 +79,10 @@ namespace LL.DI
                 resolver => resolver.Resolve<IDataLoader<PurchaseCatalog>>().Load(),
                 Lifetime.Singleton);
             builder.Register(
-                resolver => resolver.Resolve<IDataLoader<RewardBundleCatalog>>().Load(),
+                resolver => resolver.Resolve<IDataLoader<RankPromotionCatalog>>().Load(),
                 Lifetime.Singleton);
             builder.Register(
-                resolver => resolver.Resolve<IDataLoader<RankRewardCatalog>>().Load(),
+                resolver => resolver.Resolve<IDataLoader<RewardBundleCatalog>>().Load(),
                 Lifetime.Singleton);
             builder
                 .Register(
@@ -129,7 +129,6 @@ namespace LL.DI
             builder.Register<RewardIconProvider>(Lifetime.Singleton);
 
             builder.RegisterEntryPoint<UserSaveController>();
-            builder.RegisterEntryPoint<RankRewardGranter>();
         }
     }
 }

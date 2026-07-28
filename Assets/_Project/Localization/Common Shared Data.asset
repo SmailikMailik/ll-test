@@ -83,6 +83,26 @@ MonoBehaviour:
     m_Key: actions.no
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440986
+    m_Key: units.hours_short
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440987
+    m_Key: units.minutes_short
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440988
+    m_Key: titles.order_testing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440989
+    m_Key: messages.complete_order_for_testing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440990
+    m_Key: actions.complete_order
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

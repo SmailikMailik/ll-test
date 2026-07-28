@@ -12,10 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3877314febff491db0ee5354ba6c96d4, type: 3}
   m_Name: PurchaseCatalogConfig
   m_EditorClassIdentifier:
-  _purchases:
-  - _id: rank_promotion
-    _currencyId: soft
-    _price: 99900
-  - _id: instant_rank_promotion
-    _currencyId: hard
-    _price: 999
+  _purchases: []

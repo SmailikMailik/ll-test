@@ -12,4 +12,76 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa1111aabbbb4ccccddddeeeeeeeee01, type: 3}
   m_Name: RewardBundleCatalogConfig
   m_EditorClassIdentifier:
-  _bundles: []
+  _bundles:
+  - _id: rank_1_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100
+  - _id: rank_2_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100
+  - _id: rank_3_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100
+  - _id: rank_4_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100
+  - _id: rank_5_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100
+  - _id: rank_6_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100
+  - _id: rank_7_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100
+  - _id: rank_8_promotion
+    _grantMode: 0
+    _rewards:
+    - _type: 1
+      _id: item_1
+      _amount: 1
+    - _type: 1
+      _id: item_2
+      _amount: 100

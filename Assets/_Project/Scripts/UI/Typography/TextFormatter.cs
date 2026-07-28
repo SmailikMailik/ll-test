@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using LL.Extensions;
 using LL.Game.Currencies;
 
 namespace LL.UI.Typography
@@ -32,6 +34,18 @@ namespace LL.UI.Typography
         internal static string Progress(int current, int target)
         {
             return Number(current) + TextTags.Style($"/{Number(target)}", TextStyle.Muted);
+        }
+
+        internal static string Duration(TimeSpan duration, string hoursUnit, string minutesUnit)
+        {
+            if (duration < TimeSpan.Zero)
+                duration = TimeSpan.Zero;
+
+            var hours = duration.GetWholeHours();
+            var minutes = duration.Minutes.ToString("00", CultureInfo.InvariantCulture);
+            var separator = TextSymbols.GetValue(TextSymbol.NonBreakingSpace);
+            var time = $"{hours}{hoursUnit}{separator}{minutes}{minutesUnit}";
+            return $"{TextTags.Sprite(TextSprite.Time)}{separator}{time}";
         }
 
         internal static string CurrencyAmount(CurrencyId id, int amount)

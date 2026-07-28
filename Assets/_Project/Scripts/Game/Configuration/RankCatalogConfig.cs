@@ -51,8 +51,7 @@ namespace LL.Game.Configuration
     internal sealed class RankExperienceRequirementEntry
     {
         [ReadOnly]
-        [LabelText("Rank")]
-        [TableColumnWidth(60, Resizable = false)]
+        [TableColumnWidth(40, Resizable = false)]
         [SerializeField] private int _rank;
 
         [LabelText("Required Experience")]

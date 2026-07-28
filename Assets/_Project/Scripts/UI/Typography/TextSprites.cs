@@ -5,7 +5,8 @@ namespace LL.UI.Typography
         Cash = 0,
         Gold = 1,
         MasterPoints = 2,
-        Max = 3
+        Max = 3,
+        Time = 4
     }
 
     internal static class TextSprites
@@ -16,6 +17,7 @@ namespace LL.UI.Typography
             TextSprite.Gold => "gold",
             TextSprite.MasterPoints => "master_points",
             TextSprite.Max => "max",
+            TextSprite.Time => "time",
             _ => string.Empty
         };
     }

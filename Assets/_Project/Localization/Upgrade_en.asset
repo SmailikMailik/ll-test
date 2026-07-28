@@ -36,7 +36,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440975
-    m_Localized: Get <style="Accent">{count}</style> headshot kills while playing as {hero}
+    m_Localized: Get <style="Accent">{count}</style> headshot kills while playing as {target}
     m_Metadata:
       m_Items:
       - id: 0

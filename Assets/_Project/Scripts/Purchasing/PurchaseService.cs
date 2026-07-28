@@ -33,6 +33,17 @@ namespace LL.Purchasing
                 return;
             }
 
+            Purchase(purchase, onSucceeded, onFailed);
+        }
+
+        public void Purchase(IPurchase purchase, Action onSucceeded, Action onFailed)
+        {
+            if (purchase == null)
+            {
+                onFailed?.Invoke();
+                return;
+            }
+
             _confirmation.Confirm(
                 purchase,
                 () => CompletePurchase(purchase, onSucceeded, onFailed),

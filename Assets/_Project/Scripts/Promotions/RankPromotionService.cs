@@ -1,0 +1,80 @@
+using System;
+using LL.Game.Promotions;
+using LL.Purchasing;
+using LL.Rewards;
+using LL.User.Core.Progress;
+using UnityEngine;
+using VContainer;
+
+namespace LL.Promotions
+{
+    internal sealed class RankPromotionService : IRankPromotionService
+    {
+        private readonly RankPromotionCatalog _catalog;
+        private readonly IUserProgress _userProgress;
+        private readonly IPurchaseService _purchaseService;
+        private readonly IRewardGrantService _rewardGrantService;
+
+        [Inject]
+        internal RankPromotionService(
+            RankPromotionCatalog catalog,
+            IUserProgress userProgress,
+            IPurchaseService purchaseService,
+            IRewardGrantService rewardGrantService)
+        {
+            _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
+            _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
+            _purchaseService = purchaseService ?? throw new ArgumentNullException(nameof(purchaseService));
+            _rewardGrantService = rewardGrantService ?? throw new ArgumentNullException(nameof(rewardGrantService));
+        }
+
+        public bool TryGetPromotion(out RankPromotion promotion)
+        {
+            return _catalog.TryGetPromotion(_userProgress.Rank, out promotion);
+        }
+
+        public void Purchase(
+            PromotionPaymentType paymentType,
+            bool requirementCompleted,
+            Action onSucceeded,
+            Action onFailed)
+        {
+            if (TryGetPromotion(out var promotion) is false ||
+                _userProgress.CanPromoteRank is false ||
+                paymentType == PromotionPaymentType.Soft && requirementCompleted is false)
+            {
+                onFailed?.Invoke();
+                return;
+            }
+
+            _purchaseService.Purchase(
+                promotion.GetPurchase(paymentType),
+                () => CompletePromotion(promotion, onSucceeded, onFailed),
+                onFailed);
+        }
+
+        private void CompletePromotion(
+            RankPromotion promotion,
+            Action onSucceeded,
+            Action onFailed)
+        {
+            if (_userProgress.Rank != promotion.Rank || _userProgress.TryPromoteRank() is false)
+            {
+                onFailed?.Invoke();
+                return;
+            }
+
+            TryGrantReward(promotion);
+            onSucceeded?.Invoke();
+        }
+
+        private void TryGrantReward(RankPromotion promotion)
+        {
+            if (promotion.RewardBundleId.IsEmpty)
+                return;
+
+            if (_rewardGrantService.TryGrant(promotion.RewardBundleId, out _) is false)
+                Debug.LogError($"Failed to grant promotion reward bundle: {promotion.RewardBundleId}");
+        }
+    }
+}

@@ -15,7 +15,7 @@ namespace LL.Rewards.Configuration
     internal sealed class RewardBundleCatalogConfig : ScriptableObject, IDataLoader<RewardBundleCatalog>
     {
         [ValidateInput(nameof(HasValidBundleIds), "Reward bundle IDs must be non-empty and unique.")]
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [ListDrawerSettings(ShowFoldout = false, ShowPaging = false)]
         [SerializeField] private RewardBundleEntry[] _bundles;
 
         internal const string CreationPath = "LL/Rewards/Reward Bundle Catalog";
@@ -40,13 +40,17 @@ namespace LL.Rewards.Configuration
     [Serializable]
     internal sealed class RewardBundleEntry
     {
-        [LabelText("Bundle ID")]
+        [HorizontalGroup("Columns")]
+        [BoxGroup("Columns/Bundle")]
+        [LabelText("ID")]
         [SerializeField] private string _id;
 
-        [LabelText("Grant Mode")]
+        [BoxGroup("Columns/Bundle")]
+        [LabelText("Grant mode")]
         [SerializeField] private RewardGrantMode _grantMode;
 
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [BoxGroup("Columns/Rewards")]
+        [TableList(AlwaysExpanded = true, DrawScrollView = false, HideToolbar = false)]
         [SerializeField] private RewardEntry[] _rewards;
 
         internal RewardBundleId Id => new(_id);
@@ -63,13 +67,16 @@ namespace LL.Rewards.Configuration
     [Serializable]
     internal sealed class RewardEntry
     {
-        [LabelText("Type")]
+        [TableColumnWidth(90, Resizable = false)]
+        [HideLabel]
         [SerializeField] private RewardType _type;
 
-        [LabelText("Content ID")]
+        [TableColumnWidth(120, Resizable = false)]
+        [HideLabel]
         [SerializeField] private string _id;
 
-        [LabelText("Amount")]
+        [TableColumnWidth(80, Resizable = false)]
+        [HideLabel]
         [MinValue(1)]
         [SerializeField] private int _amount = 1;
 

@@ -87,6 +87,26 @@ MonoBehaviour:
     m_Localized: "NO"
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440986
+    m_Localized: h
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440987
+    m_Localized: m
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440988
+    m_Localized: Order in Progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440989
+    m_Localized: Complete this order for testing?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 352062502440990
+    m_Localized: Complete
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:

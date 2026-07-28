@@ -33,6 +33,10 @@ namespace LL.Presentation.Upgrades
                 return;
             }
 
+            var formattedLostExperience = TextTags.Style(
+                TextFormatter.Number(lostExperience),
+                TextStyle.Accent);
+
             _windowController.Show(new ModalWindowParameters
             (
                 headerText: _localization.GetText(ExperienceOverflowLocalizationKeys.Title),
@@ -40,7 +44,7 @@ namespace LL.Presentation.Upgrades
                     ExperienceOverflowLocalizationKeys.Message,
                     new Dictionary<string, object>
                     {
-                        [ExperienceVariable] = TextFormatter.Number(lostExperience)
+                        [ExperienceVariable] = formattedLostExperience
                     }),
                 positiveText: _localization.GetText(ExperienceOverflowLocalizationKeys.YesAction),
                 positiveCallback: onConfirmed,

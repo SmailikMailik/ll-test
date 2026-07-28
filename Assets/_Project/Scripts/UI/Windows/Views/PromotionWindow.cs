@@ -1,7 +1,7 @@
 using System;
-using LL.Game.Purchases;
+using LL.Game.Promotions;
 using LL.Game.Ranks;
-using LL.Purchasing;
+using LL.Promotions;
 using LL.UI.Controls.Buttons;
 using LL.UI.Typography;
 using LL.User.Core.Progress;
@@ -23,28 +23,34 @@ namespace LL.UI.Windows.Views
         [SerializeField] private TMP_Text _hardPriceLabel;
         [SerializeField] private InteractiveButton _hardButton;
 
+        [SerializeField] private PromotionOrderView _orderView;
+
         private IUserProgress _userProgress;
         private IRankProgression _rankProgression;
-        private IPurchaseService _purchaseService;
+        private IRankPromotionService _promotionService;
+        private RankPromotion _promotion;
 
         [Inject]
         private void Construct(
             IUserProgress userProgress,
             IRankProgression rankProgression,
-            IPurchaseService purchaseService)
+            IRankPromotionService promotionService)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
-            _purchaseService = purchaseService ?? throw new ArgumentNullException(nameof(purchaseService));
+            _promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
         }
 
         private void Start()
         {
             _softButton.Clicked
-                .Subscribe(_ => PurchasePromotion(PurchaseIds.RankPromotion))
+                .Subscribe(_ => PurchasePromotion(PromotionPaymentType.Soft))
                 .AddTo(this);
             _hardButton.Clicked
-                .Subscribe(_ => PurchasePromotion(PurchaseIds.InstantRankPromotion))
+                .Subscribe(_ => PurchasePromotion(PromotionPaymentType.Hard))
+                .AddTo(this);
+            _orderView.Completed
+                .Subscribe(_ => RefreshActions())
                 .AddTo(this);
         }
 
@@ -57,46 +63,54 @@ namespace LL.UI.Windows.Views
             _currentRankLabel.text = TextFormatter.Number(rank);
             _nextRankLabel.text = TextFormatter.Number(nextRank);
 
-            SetPrice(_softPriceLabel, PurchaseIds.RankPromotion);
-            SetPrice(_hardPriceLabel, PurchaseIds.InstantRankPromotion);
+            if (_promotionService.TryGetPromotion(out _promotion))
+            {
+                _softPriceLabel.text = PurchaseFormatter.GetPriceText(_promotion.SoftPurchase);
+                _hardPriceLabel.text = PurchaseFormatter.GetPriceText(_promotion.HardPurchase);
+                _orderView.Refresh(
+                    _promotion.Requirement,
+                    _promotion.OrderDuration,
+                    _userProgress.CanPromoteRank);
+            }
+            else
+            {
+                _softPriceLabel.text = string.Empty;
+                _hardPriceLabel.text = string.Empty;
+            }
 
+            _orderView.gameObject.SetActive(_promotion != null);
             RefreshActions();
         }
 
-        private void SetPrice(TMP_Text label, PurchaseId id)
+        private void PurchasePromotion(PromotionPaymentType paymentType)
         {
-            if (_purchaseService.TryGetPurchase(id, out var purchase))
-            {
-                label.text = PurchaseFormatter.GetPriceText(purchase);
-                return;
-            }
-
-            label.text = string.Empty;
-        }
-
-        private void PurchasePromotion(PurchaseId id)
-        {
-            if (_userProgress.CanPromoteRank is false)
+            if (_promotion == null || _userProgress.CanPromoteRank is false)
                 return;
 
-            _purchaseService.Purchase(
-                id,
+            _promotionService.Purchase(
+                paymentType,
+                _orderView.IsCompleted,
                 CompletePromotion,
                 RefreshActions);
         }
 
         private void CompletePromotion()
         {
-            if (_userProgress.TryPromoteRank())
-                TryClose();
+            _orderView.Reset();
+            TryClose();
         }
 
         private void RefreshActions()
         {
-            var hasHardPurchase = _purchaseService.TryGetPurchase(PurchaseIds.InstantRankPromotion, out _);
+            var hasPromotion = _promotion != null;
+            var canPromoteRank = _userProgress.CanPromoteRank;
 
-            _softButton.SetInteractable(false);
-            _hardButton.SetInteractable(hasHardPurchase && _userProgress.CanPromoteRank);
+            _orderView.SetAvailable(hasPromotion && canPromoteRank);
+            _softButton.SetInteractable(
+                hasPromotion &&
+                canPromoteRank &&
+                _orderView.IsCompleted);
+            _hardButton.SetInteractable(hasPromotion && canPromoteRank);
         }
     }
 
