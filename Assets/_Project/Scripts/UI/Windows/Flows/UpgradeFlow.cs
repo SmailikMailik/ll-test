@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using LL.Rewards;
 using LL.UI.Windows.Views.Promotion;
+using LL.UI.Windows.Views.Reward;
 using LL.UI.Windows.Views.Upgrade;
 using LL.User.Core.Progress;
 using VContainer;
@@ -35,6 +38,12 @@ namespace LL.UI.Windows.Flows
                 _windowController.Replace(new PromotionWindowParameters());
             else
                 _windowController.Replace(new UpgradeWindowParameters());
+        }
+
+        internal void CompletePromotion(int rank, IReadOnlyList<IReward> rewards)
+        {
+            ReplaceCurrent();
+            _windowController.Show(new RewardWindowParameters(rank, rewards));
         }
     }
 

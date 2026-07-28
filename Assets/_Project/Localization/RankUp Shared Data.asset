@@ -23,6 +23,10 @@ MonoBehaviour:
     m_Key: messages.rewards_received
     m_Metadata:
       m_Items: []
+  - m_Id: 352062502440978
+    m_Key: actions.continue
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

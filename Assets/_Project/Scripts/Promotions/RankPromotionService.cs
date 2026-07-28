@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LL.Game.Promotions;
 using LL.Purchasing;
 using LL.Rewards;
@@ -36,7 +37,7 @@ namespace LL.Promotions
         public void Purchase(
             PromotionPaymentType paymentType,
             bool requirementCompleted,
-            Action onSucceeded,
+            Action<IReadOnlyList<IReward>> onSucceeded,
             Action onFailed)
         {
             if (TryGetPromotion(out var promotion) is false ||
@@ -55,7 +56,7 @@ namespace LL.Promotions
 
         private void CompletePromotion(
             RankPromotion promotion,
-            Action onSucceeded,
+            Action<IReadOnlyList<IReward>> onSucceeded,
             Action onFailed)
         {
             if (_userProgress.Rank != promotion.Rank || _userProgress.TryPromoteRank() is false)
@@ -64,17 +65,20 @@ namespace LL.Promotions
                 return;
             }
 
-            TryGrantReward(promotion);
-            onSucceeded?.Invoke();
+            var rewards = GrantReward(promotion);
+            onSucceeded?.Invoke(rewards);
         }
 
-        private void TryGrantReward(RankPromotion promotion)
+        private IReadOnlyList<IReward> GrantReward(RankPromotion promotion)
         {
             if (promotion.RewardBundleId.IsEmpty)
-                return;
+                return Array.Empty<IReward>();
 
-            if (_rewardGrantService.TryGrant(promotion.RewardBundleId, out _) is false)
-                Debug.LogError($"Failed to grant promotion reward bundle: {promotion.RewardBundleId}");
+            if (_rewardGrantService.TryGrant(promotion.RewardBundleId, out var rewards))
+                return rewards;
+
+            Debug.LogError($"Failed to grant promotion reward bundle: {promotion.RewardBundleId}");
+            return Array.Empty<IReward>();
         }
     }
 }

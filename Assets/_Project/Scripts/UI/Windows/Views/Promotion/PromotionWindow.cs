@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using LL.Game.Promotions;
 using LL.Game.Ranks;
 using LL.Promotions;
+using LL.Rewards;
 using LL.UI.Controls.Buttons;
 using LL.UI.Rewards;
 using LL.UI.Typography;
@@ -105,10 +107,10 @@ namespace LL.UI.Windows.Views.Promotion
                 RefreshActions);
         }
 
-        private void CompletePromotion()
+        private void CompletePromotion(IReadOnlyList<IReward> rewards)
         {
             _orderView.Reset();
-            _upgradeFlow.ReplaceCurrent();
+            _upgradeFlow.CompletePromotion(_userProgress.Rank, rewards);
         }
 
         private void RefreshActions()
