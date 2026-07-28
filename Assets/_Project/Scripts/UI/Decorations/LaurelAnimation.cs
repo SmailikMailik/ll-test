@@ -1,4 +1,5 @@
 using DG.Tweening;
+using LL.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -74,24 +75,24 @@ namespace LL.UI.Decorations
         private void ApplyHiddenState()
         {
             _stem.rectTransform.localScale = new Vector3(1f, 0f, 1f);
-            SetAlpha(_stem, 0f);
+            _stem.SetAlpha(0f);
 
             foreach (var leaf in _leaves)
             {
                 leaf.rectTransform.localScale = new Vector3(0f, 0f, 1f);
-                SetAlpha(leaf, 0f);
+                leaf.SetAlpha(0f);
             }
         }
 
         private void ApplyVisibleState()
         {
             _stem.rectTransform.localScale = Vector3.one;
-            SetAlpha(_stem, 1f);
+            _stem.SetAlpha(1f);
 
             foreach (var leaf in _leaves)
             {
                 leaf.rectTransform.localScale = Vector3.one;
-                SetAlpha(leaf, 1f);
+                leaf.SetAlpha(1f);
             }
         }
 
@@ -101,11 +102,5 @@ namespace LL.UI.Decorations
             _sequence = null;
         }
 
-        private static void SetAlpha(Graphic graphic, float alpha)
-        {
-            var color = graphic.color;
-            color.a = alpha;
-            graphic.color = color;
-        }
     }
 }

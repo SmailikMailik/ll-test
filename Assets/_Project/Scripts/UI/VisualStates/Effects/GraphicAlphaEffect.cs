@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DG.Tweening;
+using LL.Extensions;
 using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace LL.UI.VisualStates.Effects
             if (ShouldApplyImmediately(instantly))
             {
                 StopTransition();
-                SetAlpha(targetAlpha);
+                _target.SetAlpha(targetAlpha);
                 return;
             }
 
@@ -47,14 +48,7 @@ namespace LL.UI.VisualStates.Effects
         protected override void RestoreInitialValue()
         {
             if (_target != null)
-                SetAlpha(_initialAlpha);
-        }
-
-        private void SetAlpha(float alpha)
-        {
-            var color = _target.color;
-            color.a = alpha;
-            _target.color = color;
+                _target.SetAlpha(_initialAlpha);
         }
 
 #if UNITY_EDITOR

@@ -1,3 +1,4 @@
+using LL.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,7 +31,7 @@ namespace LL.UI.Graphics
 
             if (radius <= 0f)
             {
-                AddRectangle(vertexHelper, rect);
+                vertexHelper.AddRectangle(rect, color);
                 return;
             }
 
@@ -50,7 +51,7 @@ namespace LL.UI.Graphics
             float radius,
             int cornerSegments)
         {
-            AddVertex(vertexHelper, rect, rect.center);
+            vertexHelper.AddNormalizedVertex(rect, rect.center, color);
 
             AddCorner(
                 vertexHelper,
@@ -112,31 +113,8 @@ namespace LL.UI.Graphics
                     Mathf.Cos(radians),
                     Mathf.Sin(radians)) * radius;
 
-                AddVertex(vertexHelper, rect, position);
+                vertexHelper.AddNormalizedVertex(rect, position, color);
             }
-        }
-
-        private void AddRectangle(VertexHelper vertexHelper, Rect rect)
-        {
-            AddVertex(vertexHelper, rect, new Vector2(rect.xMin, rect.yMin));
-            AddVertex(vertexHelper, rect, new Vector2(rect.xMin, rect.yMax));
-            AddVertex(vertexHelper, rect, new Vector2(rect.xMax, rect.yMax));
-            AddVertex(vertexHelper, rect, new Vector2(rect.xMax, rect.yMin));
-
-            vertexHelper.AddTriangle(0, 1, 2);
-            vertexHelper.AddTriangle(0, 2, 3);
-        }
-
-        private void AddVertex(
-            VertexHelper vertexHelper,
-            Rect rect,
-            Vector2 position)
-        {
-            var uv = new Vector2(
-                Mathf.InverseLerp(rect.xMin, rect.xMax, position.x),
-                Mathf.InverseLerp(rect.yMin, rect.yMax, position.y));
-
-            vertexHelper.AddVert(position, color, uv);
         }
 
 #if UNITY_EDITOR

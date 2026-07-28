@@ -1,4 +1,5 @@
 using DG.Tweening;
+using LL.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -70,7 +71,7 @@ namespace LL.UI.Decorations
 
         private void ApplyHiddenState()
         {
-            SetAlpha(_base, 0f);
+            _base.SetAlpha(0f);
             SetHidden(_topEdge);
 
             foreach (var feather in _feathers)
@@ -79,7 +80,7 @@ namespace LL.UI.Decorations
 
         private void ApplyVisibleState()
         {
-            SetAlpha(_base, 1f);
+            _base.SetAlpha(1f);
             SetVisible(_topEdge);
 
             foreach (var feather in _feathers)
@@ -95,20 +96,13 @@ namespace LL.UI.Decorations
         private static void SetHidden(Image image)
         {
             image.rectTransform.localScale = new Vector3(0f, 1f, 1f);
-            SetAlpha(image, 0f);
+            image.SetAlpha(0f);
         }
 
         private static void SetVisible(Image image)
         {
             image.rectTransform.localScale = Vector3.one;
-            SetAlpha(image, 1f);
-        }
-
-        private static void SetAlpha(Graphic graphic, float alpha)
-        {
-            var color = graphic.color;
-            color.a = alpha;
-            graphic.color = color;
+            image.SetAlpha(1f);
         }
     }
 }

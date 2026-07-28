@@ -1,3 +1,4 @@
+using LL.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,19 +49,19 @@ namespace LL.UI.Graphics
             var outerRect = Expand(rect, outerOffset);
             var innerRect = Expand(rect, -innerOffset);
 
-            AddVertex(vertexHelper, rect, outerRect.xMin, outerRect.yMin);
-            AddVertex(vertexHelper, rect, outerRect.xMin, outerRect.yMax);
-            AddVertex(vertexHelper, rect, outerRect.xMax, outerRect.yMax);
-            AddVertex(vertexHelper, rect, outerRect.xMax, outerRect.yMin);
-            AddVertex(vertexHelper, rect, innerRect.xMin, innerRect.yMin);
-            AddVertex(vertexHelper, rect, innerRect.xMin, innerRect.yMax);
-            AddVertex(vertexHelper, rect, innerRect.xMax, innerRect.yMax);
-            AddVertex(vertexHelper, rect, innerRect.xMax, innerRect.yMin);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(outerRect.xMin, outerRect.yMin), color);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(outerRect.xMin, outerRect.yMax), color);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(outerRect.xMax, outerRect.yMax), color);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(outerRect.xMax, outerRect.yMin), color);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(innerRect.xMin, innerRect.yMin), color);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(innerRect.xMin, innerRect.yMax), color);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(innerRect.xMax, innerRect.yMax), color);
+            vertexHelper.AddNormalizedVertex(rect, new Vector2(innerRect.xMax, innerRect.yMin), color);
 
-            AddQuad(vertexHelper, 0, 1, 5, 4);
-            AddQuad(vertexHelper, 5, 1, 2, 6);
-            AddQuad(vertexHelper, 7, 6, 2, 3);
-            AddQuad(vertexHelper, 0, 4, 7, 3);
+            vertexHelper.AddQuad(0, 1, 5, 4);
+            vertexHelper.AddQuad(5, 1, 2, 6);
+            vertexHelper.AddQuad(7, 6, 2, 3);
+            vertexHelper.AddQuad(0, 4, 7, 3);
         }
 
         private float GetMaximumThickness(Rect rect)
@@ -82,26 +83,6 @@ namespace LL.UI.Graphics
                 rect.yMin - amount,
                 rect.xMax + amount,
                 rect.yMax + amount);
-        }
-
-        private void AddVertex(VertexHelper vertexHelper, Rect rect, float x, float y)
-        {
-            var uv = new Vector2(
-                Mathf.InverseLerp(rect.xMin, rect.xMax, x),
-                Mathf.InverseLerp(rect.yMin, rect.yMax, y));
-
-            vertexHelper.AddVert(new Vector2(x, y), color, uv);
-        }
-
-        private static void AddQuad(
-            VertexHelper vertexHelper,
-            int bottomLeft,
-            int topLeft,
-            int topRight,
-            int bottomRight)
-        {
-            vertexHelper.AddTriangle(bottomLeft, topLeft, topRight);
-            vertexHelper.AddTriangle(bottomLeft, topRight, bottomRight);
         }
 
 #if UNITY_EDITOR

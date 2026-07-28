@@ -1,3 +1,4 @@
+using LL.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -82,8 +83,7 @@ namespace LL.UI.Graphics
                     var topLeft = bottomLeft + rowLength;
                     var topRight = topLeft + 1;
 
-                    vertexHelper.AddTriangle(bottomLeft, topLeft, topRight);
-                    vertexHelper.AddTriangle(bottomLeft, topRight, bottomRight);
+                    vertexHelper.AddQuad(bottomLeft, topLeft, topRight, bottomRight);
                 }
             }
         }
