@@ -1,7 +1,5 @@
 using System;
-using LL.Game.Cards;
 using LL.Game.Cards.Configuration;
-using LL.Game.Items;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Ranks;
 using LL.Game.Ranks.Configuration;
@@ -19,7 +17,7 @@ using LL.UI.Windows.Configuration;
 using LL.Upgrades;
 using LL.User.Configuration;
 using LL.User.Core;
-using LL.User.Core.Amounts;
+using LL.User.Core.Items;
 using LL.User.Core.Progress;
 using LL.User.Core.Promotions;
 using LL.User.Core.Rewards;
@@ -45,7 +43,6 @@ namespace LL.DI
 
         [Header("Presentation")]
         [SerializeField] private ItemIconCatalogConfig _itemIconCatalogConfig;
-        [SerializeField] private CardIconCatalogConfig _cardIconCatalogConfig;
 
         [Header("User")]
         [SerializeField] private UserDefaultsConfig _userDefaultsConfig;
@@ -81,7 +78,6 @@ namespace LL.DI
             RegisterLoadedData(builder, _rankPromotionCatalogConfig);
             RegisterLoadedData(builder, _rewardBundleCatalogConfig);
             RegisterIconCatalog(builder, _itemIconCatalogConfig);
-            RegisterIconCatalog(builder, _cardIconCatalogConfig);
         }
 
         private void RegisterPersistence(IContainerBuilder builder)
@@ -93,7 +89,6 @@ namespace LL.DI
             RegisterLoadedData<UserInitialData>(builder);
             RegisterInitialDataPart(builder, data => data.Identity);
             RegisterInitialDataPart(builder, data => data.Items);
-            RegisterInitialDataPart(builder, data => data.Cards);
             RegisterInitialDataPart(builder, data => data.Progress);
             RegisterInitialDataPart(builder, data => data.PromotionOrder);
             RegisterInitialDataPart(builder, data => data.RewardClaims);
@@ -101,8 +96,7 @@ namespace LL.DI
 
         private static void RegisterUserState(IContainerBuilder builder)
         {
-            builder.Register<UserAmounts<ItemId>>(Lifetime.Singleton).As<IUserAmounts<ItemId>>();
-            builder.Register<UserAmounts<CardId>>(Lifetime.Singleton).As<IUserAmounts<CardId>>();
+            builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
             builder.Register<UserPromotionOrder>(Lifetime.Singleton).As<IUserPromotionOrder>();
             builder.Register<UserRewardClaims>(Lifetime.Singleton).As<IUserRewardClaims>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();

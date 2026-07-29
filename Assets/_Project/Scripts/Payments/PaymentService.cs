@@ -1,16 +1,15 @@
 using System;
-using LL.Game.Items;
-using LL.User.Core.Amounts;
+using LL.User.Core.Items;
 using VContainer;
 
 namespace LL.Payments
 {
     internal sealed class PaymentService : IPaymentService
     {
-        private readonly IUserAmounts<ItemId> _items;
+        private readonly IUserItems _items;
 
         [Inject]
-        internal PaymentService(IUserAmounts<ItemId> items)
+        internal PaymentService(IUserItems items)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
         }

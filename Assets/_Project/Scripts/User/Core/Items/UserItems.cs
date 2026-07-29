@@ -1,44 +1,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LL.Identifiers;
+using LL.Game.Items;
 using R3;
 using VContainer;
 
-namespace LL.User.Core.Amounts
+namespace LL.User.Core.Items
 {
-    internal sealed class UserAmounts<TId> : IUserAmounts<TId>, IDisposable
-        where TId : struct, IIdentifier
+    internal sealed class UserItems : IUserItems, IDisposable
     {
-        private readonly IReadOnlyDictionary<TId, ReactiveProperty<int>> _amounts;
+        private readonly IReadOnlyDictionary<ItemId, ReactiveProperty<int>> _amounts;
 
         [Inject]
-        internal UserAmounts(AmountsInitialData<TId> initialData)
+        internal UserItems(UserItemsInitialData initialData)
         {
             if (initialData == null)
                 throw new ArgumentNullException(nameof(initialData));
 
             _amounts = initialData.Amounts.ToDictionary(
                 amount => amount.Id,
-                amount => new ReactiveProperty<int>(amount.Value));
+                amount => new ReactiveProperty<int>(amount.Amount));
         }
 
-        public Observable<int> ObserveAmount(TId id)
+        public Observable<int> ObserveAmount(ItemId id)
         {
             if (TryGetAmount(id, out var amount))
                 return amount;
 
-            throw new KeyNotFoundException($"Unknown {typeof(TId).Name}: {id}");
+            throw new KeyNotFoundException($"Unknown item ID: {id}");
         }
 
-        public bool CanAdd(TId id, int amount)
+        public bool CanAdd(ItemId id, int amount)
         {
             return TryGetAmount(id, out var currentAmount) &&
                    amount > 0 &&
                    currentAmount.Value <= int.MaxValue - amount;
         }
 
-        public bool TryAdd(TId id, int amount)
+        public bool TryAdd(ItemId id, int amount)
         {
             if (CanAdd(id, amount) is false)
                 return false;
@@ -48,7 +47,7 @@ namespace LL.User.Core.Amounts
             return true;
         }
 
-        public bool TrySpend(TId id, int amount)
+        public bool TrySpend(ItemId id, int amount)
         {
             if (amount <= 0 ||
                 TryGetAmount(id, out var currentAmount) is false ||
@@ -67,7 +66,7 @@ namespace LL.User.Core.Amounts
                 amount.Dispose();
         }
 
-        private bool TryGetAmount(TId id, out ReactiveProperty<int> amount)
+        private bool TryGetAmount(ItemId id, out ReactiveProperty<int> amount)
         {
             if (id.IsEmpty)
             {

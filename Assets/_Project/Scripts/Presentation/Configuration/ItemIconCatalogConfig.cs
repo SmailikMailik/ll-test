@@ -13,11 +13,11 @@ namespace LL.Presentation.Configuration
     [HideMonoScript]
     internal sealed class ItemIconCatalogConfig : ScriptableObject, IDataLoader<IconCatalog<ItemId>>
     {
-        internal const string CreationPath = "LL/Presentation/Item Icon Catalog";
-
         [ValidateInput(nameof(HasValidIconIds), "Item icon IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ItemIconEntry[] _icons;
+
+        internal const string CreationPath = "LL/Presentation/Item Icon Catalog";
 
         public IconCatalog<ItemId> Load()
         {

@@ -29,7 +29,6 @@ MonoBehaviour:
     _amount: 0
   - _id: slot
     _amount: 0
-  _cards:
   - _id: card_1
     _amount: 99
   - _id: card_2

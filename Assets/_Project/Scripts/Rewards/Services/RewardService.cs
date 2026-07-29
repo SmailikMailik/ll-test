@@ -1,8 +1,6 @@
 using System;
-using LL.Game.Cards;
-using LL.Game.Items;
 using LL.Rewards.Models;
-using LL.User.Core.Amounts;
+using LL.User.Core.Items;
 using VContainer;
 
 namespace LL.Rewards.Services
@@ -15,29 +13,23 @@ namespace LL.Rewards.Services
 
     internal sealed class RewardService : IRewardService
     {
-        private readonly IUserAmounts<ItemId> _items;
-        private readonly IUserAmounts<CardId> _cards;
+        private readonly IUserItems _items;
 
         [Inject]
-        internal RewardService(
-            IUserAmounts<ItemId> items,
-            IUserAmounts<CardId> cards)
+        internal RewardService(IUserItems items)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
-            _cards = cards ?? throw new ArgumentNullException(nameof(cards));
         }
 
         public bool CanApply(IReward reward) => reward switch
         {
             ItemReward item => _items.CanAdd(item.ItemId, item.Amount),
-            CardReward card => _cards.CanAdd(card.CardId, card.Amount),
             _ => false
         };
 
         public bool TryApply(IReward reward) => reward switch
         {
             ItemReward item => _items.TryAdd(item.ItemId, item.Amount),
-            CardReward card => _cards.TryAdd(card.CardId, card.Amount),
             _ => false
         };
     }

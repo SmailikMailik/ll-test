@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Cards;
-using LL.User.Core.Amounts;
+using LL.User.Core.Items;
 using LL.User.Core.Progress;
 using VContainer;
 
@@ -9,39 +9,39 @@ namespace LL.Upgrades
 {
     internal interface ICardExperienceService
     {
-        bool TryGetApplication(IReadOnlyList<Amount<CardId>> cards, out ExperienceApplication application);
-        bool TryApply(IReadOnlyList<Amount<CardId>> cards);
+        bool TryGetApplication(IReadOnlyList<ItemAmount> cards, out ExperienceApplication application);
+        bool TryApply(IReadOnlyList<ItemAmount> cards);
     }
 
     internal sealed class CardExperienceService : ICardExperienceService
     {
         private const int MinimumAmount = 0;
 
-        private readonly IUserAmounts<CardId> _userCards;
+        private readonly IUserItems _userItems;
         private readonly IUserProgress _userProgress;
         private readonly CardCatalog _cardCatalog;
 
         [Inject]
         internal CardExperienceService(
-            IUserAmounts<CardId> userCards,
+            IUserItems userItems,
             IUserProgress userProgress,
             CardCatalog cardCatalog)
         {
-            _userCards = userCards ?? throw new ArgumentNullException(nameof(userCards));
+            _userItems = userItems ?? throw new ArgumentNullException(nameof(userItems));
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _cardCatalog = cardCatalog ?? throw new ArgumentNullException(nameof(cardCatalog));
         }
 
-        public bool TryApply(IReadOnlyList<Amount<CardId>> cards)
+        public bool TryApply(IReadOnlyList<ItemAmount> cards)
         {
             if (TryGetApplication(cards, out var application) is false)
                 return false;
 
-            var spentCards = new List<Amount<CardId>>(cards.Count);
+            var spentCards = new List<ItemAmount>(cards.Count);
 
             foreach (var card in cards)
             {
-                if (_userCards.TrySpend(card.Id, card.Value))
+                if (_userItems.TrySpend(card.Id, card.Amount))
                 {
                     spentCards.Add(card);
                     continue;
@@ -59,7 +59,7 @@ namespace LL.Upgrades
         }
 
         public bool TryGetApplication(
-            IReadOnlyList<Amount<CardId>> cards,
+            IReadOnlyList<ItemAmount> cards,
             out ExperienceApplication application)
         {
             application = default;
@@ -76,7 +76,7 @@ namespace LL.Upgrades
             return true;
         }
 
-        private bool TryCalculateExperience(IReadOnlyList<Amount<CardId>> cards, out int experience)
+        private bool TryCalculateExperience(IReadOnlyList<ItemAmount> cards, out int experience)
         {
             experience = MinimumAmount;
 
@@ -85,7 +85,7 @@ namespace LL.Upgrades
 
             foreach (var cardAmount in cards)
             {
-                if (cardAmount.Value <= MinimumAmount ||
+                if (cardAmount.Amount <= MinimumAmount ||
                     _cardCatalog.TryGetCard(cardAmount.Id, out var card) is false ||
                     card.ExperienceAmount <= MinimumAmount)
                 {
@@ -95,19 +95,19 @@ namespace LL.Upgrades
                 var availableExperience = int.MaxValue - experience;
                 var maximumAmount = availableExperience / card.ExperienceAmount;
 
-                if (cardAmount.Value > maximumAmount)
+                if (cardAmount.Amount > maximumAmount)
                     return false;
 
-                experience += cardAmount.Value * card.ExperienceAmount;
+                experience += cardAmount.Amount * card.ExperienceAmount;
             }
 
             return experience > MinimumAmount;
         }
 
-        private void RestoreCards(IEnumerable<Amount<CardId>> cards)
+        private void RestoreCards(IEnumerable<ItemAmount> cards)
         {
             foreach (var card in cards)
-                _userCards.TryAdd(card.Id, card.Value);
+                _userItems.TryAdd(card.Id, card.Amount);
         }
     }
 }

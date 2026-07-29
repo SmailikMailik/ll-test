@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
+using LL.Game.Items;
 using LL.Upgrades;
-using LL.User.Core.Amounts;
+using LL.User.Core.Items;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -101,20 +102,20 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             foreach (var cardAmount in plan)
             {
                 var slot = _slots.First(item => item.Id.Equals(cardAmount.Id));
-                slot.View.SetPlannedAmount(cardAmount.Value);
+                slot.View.SetPlannedAmount(cardAmount.Amount);
             }
 
             _changed.OnNext(Unit.Default);
         }
 
-        internal IReadOnlyList<Amount<CardId>> GetPlan()
+        internal IReadOnlyList<ItemAmount> GetPlan()
         {
-            var plannedCards = new List<Amount<CardId>>(_slots.Length);
+            var plannedCards = new List<ItemAmount>(_slots.Length);
 
             foreach (var slot in _slots)
             {
                 if (slot.View.PlannedAmount > MinimumAmount)
-                    plannedCards.Add(new Amount<CardId>(slot.Id, slot.View.PlannedAmount));
+                    plannedCards.Add(new ItemAmount(slot.Id, slot.View.PlannedAmount));
             }
 
             return plannedCards;
@@ -173,6 +174,6 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         [SerializeField] private string _cardId;
 
         internal UpgradeCardView View => _view;
-        internal CardId Id => new(_cardId);
+        internal ItemId Id => new(_cardId);
     }
 }

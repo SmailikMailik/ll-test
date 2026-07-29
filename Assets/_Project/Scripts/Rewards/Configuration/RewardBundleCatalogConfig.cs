@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Identifiers;
 using LL.Loading;
@@ -67,10 +66,6 @@ namespace LL.Rewards.Configuration
     [Serializable]
     internal sealed class RewardEntry
     {
-        [TableColumnWidth(90, Resizable = false)]
-        [HideLabel]
-        [SerializeField] private RewardType _type;
-
         [TableColumnWidth(120, Resizable = false)]
         [HideLabel]
         [SerializeField] private string _id;
@@ -80,14 +75,6 @@ namespace LL.Rewards.Configuration
         [MinValue(1)]
         [SerializeField] private int _amount = 1;
 
-        internal IReward ToReward()
-        {
-            return _type switch
-            {
-                RewardType.Item => new ItemReward(new ItemId(_id), _amount),
-                RewardType.Card => new CardReward(new CardId(_id), _amount),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
+        internal IReward ToReward() => new ItemReward(new ItemId(_id), _amount);
     }
 }

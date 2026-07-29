@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Items;
 using LL.Identifiers;
 
 namespace LL.Game.Cards
 {
     internal sealed class CardCatalog
     {
-        private readonly IReadOnlyDictionary<CardId, ICard> _cardsById;
+        private readonly IReadOnlyDictionary<ItemId, ICard> _cardsById;
 
         internal CardCatalog(IEnumerable<ICard> cards)
         {
@@ -21,6 +22,6 @@ namespace LL.Game.Cards
             _cardsById = copy.ToDictionary(card => card.Id);
         }
 
-        internal bool TryGetCard(CardId id, out ICard card) => _cardsById.TryGetValue(id, out card);
+        internal bool TryGetCard(ItemId id, out ICard card) => _cardsById.TryGetValue(id, out card);
     }
 }

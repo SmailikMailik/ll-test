@@ -23,3 +23,9 @@ MonoBehaviour:
     _icon: {fileID: 21300000, guid: ecb22bfcb0fd5a744befb6b5506c6fbb, type: 3}
   - _id: slot
     _icon: {fileID: 21300000, guid: eff58d9945d878a4990401ad83e5220c, type: 3}
+  - _id: card_1
+    _icon: {fileID: 21300000, guid: 0ab3007eec0119945943162c25800a42, type: 3}
+  - _id: card_2
+    _icon: {fileID: 21300000, guid: 8e5153f072987774097e867f1cf63ebc, type: 3}
+  - _id: card_3
+    _icon: {fileID: 21300000, guid: 67645833fb6750c4aa0b0d18743cec5c, type: 3}

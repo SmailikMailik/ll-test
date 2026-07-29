@@ -1,8 +1,10 @@
+using LL.Game.Items;
+
 namespace LL.Game.Cards
 {
     internal interface ICard
     {
-        CardId Id { get; }
+        ItemId Id { get; }
         int ExperienceAmount { get; }
     }
 }

@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LL.Game.Cards;
 using LL.Game.Items;
-using LL.Identifiers;
 using LL.Rewards.Models;
 using LL.Saving;
-using LL.User.Core.Amounts;
+using LL.User.Core.Items;
 using LL.User.Core.Identity;
 using LL.User.Core.Progress;
 using LL.User.Core.Promotions;
@@ -20,8 +18,7 @@ namespace LL.User.Persistence
     internal sealed class UserSaveController : IInitializable, IDisposable
     {
         private readonly UserIdentity _identity;
-        private readonly IUserAmounts<ItemId> _items;
-        private readonly IUserAmounts<CardId> _cards;
+        private readonly IUserItems _items;
         private readonly IUserProgress _progress;
         private readonly IUserPromotionOrder _promotionOrder;
         private readonly IUserRewardClaims _rewardClaims;
@@ -29,7 +26,6 @@ namespace LL.User.Persistence
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<ItemId, int> _itemAmounts;
-        private readonly Dictionary<CardId, int> _cardAmounts;
         private readonly HashSet<RewardBundleId> _claimedRewardIds;
         private ProgressInitialData _progressData;
         private PromotionOrderInitialData _promotionOrderData;
@@ -37,11 +33,9 @@ namespace LL.User.Persistence
         [Inject]
         internal UserSaveController(
             UserIdentity identity,
-            AmountsInitialData<ItemId> itemAmounts,
-            AmountsInitialData<CardId> cardAmounts,
+            UserItemsInitialData itemAmounts,
             PromotionOrderInitialData promotionOrderData,
-            IUserAmounts<ItemId> items,
-            IUserAmounts<CardId> cards,
+            IUserItems items,
             IUserProgress progress,
             IUserPromotionOrder promotionOrder,
             IUserRewardClaims rewardClaims,
@@ -50,15 +44,10 @@ namespace LL.User.Persistence
             if (itemAmounts == null)
                 throw new ArgumentNullException(nameof(itemAmounts));
 
-            if (cardAmounts == null)
-                throw new ArgumentNullException(nameof(cardAmounts));
-
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            _itemAmounts = itemAmounts.Amounts.ToDictionary(item => item.Id, item => item.Value);
-            _cardAmounts = cardAmounts.Amounts.ToDictionary(card => card.Id, card => card.Value);
+            _itemAmounts = itemAmounts.Amounts.ToDictionary(item => item.Id, item => item.Amount);
             _promotionOrderData = promotionOrderData ?? throw new ArgumentNullException(nameof(promotionOrderData));
             _items = items ?? throw new ArgumentNullException(nameof(items));
-            _cards = cards ?? throw new ArgumentNullException(nameof(cards));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _progressData = new ProgressInitialData(progress.Rank, progress.Experience);
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
@@ -69,8 +58,7 @@ namespace LL.User.Persistence
 
         public void Initialize()
         {
-            ObserveAmounts(_items, _itemAmounts);
-            ObserveAmounts(_cards, _cardAmounts);
+            ObserveItems();
 
             _subscriptions.Add(_progress.RankChanged.Subscribe(_ => UpdateProgressAndSave()));
             _subscriptions.Add(_progress.ExperienceChanged.Subscribe(_ => UpdateProgressAndSave()));
@@ -86,26 +74,23 @@ namespace LL.User.Persistence
             _subscriptions.Clear();
         }
 
-        private void ObserveAmounts<TId>(
-            IUserAmounts<TId> source,
-            Dictionary<TId, int> amounts)
-            where TId : struct, IIdentifier
+        private void ObserveItems()
         {
-            foreach (var id in amounts.Keys.ToArray())
+            foreach (var id in _itemAmounts.Keys.ToArray())
             {
-                var amountId = id;
-                _subscriptions.Add(source
-                    .ObserveAmount(amountId)
-                    .Subscribe(value => UpdateAmountAndSave(amounts, amountId, value)));
+                var itemId = id;
+                _subscriptions.Add(_items
+                    .ObserveAmount(itemId)
+                    .Subscribe(value => UpdateAmountAndSave(itemId, value)));
             }
         }
 
-        private void UpdateAmountAndSave<TId>(Dictionary<TId, int> amounts, TId id, int value)
+        private void UpdateAmountAndSave(ItemId id, int value)
         {
-            if (amounts[id] == value)
+            if (_itemAmounts[id] == value)
                 return;
 
-            amounts[id] = value;
+            _itemAmounts[id] = value;
             Save();
         }
 
@@ -154,8 +139,7 @@ namespace LL.User.Persistence
             var data = UserSaveDataMapper.ToSaveData(
                 _identity,
                 _progressData,
-                _itemAmounts.Select(pair => new Amount<ItemId>(pair.Key, pair.Value)),
-                _cardAmounts.Select(pair => new Amount<CardId>(pair.Key, pair.Value)),
+                _itemAmounts.Select(pair => new ItemAmount(pair.Key, pair.Value)),
                 _promotionOrderData,
                 _claimedRewardIds);
 

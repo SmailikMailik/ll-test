@@ -12,17 +12,15 @@ namespace LL.User.Persistence
         [JsonProperty] private ProgressSaveData _progress;
         [JsonProperty] private PromotionOrderSaveData _promotionOrder;
         [JsonProperty] private AmountSaveData[] _items;
-        [JsonProperty] private AmountSaveData[] _cards;
         [JsonProperty] private string[] _claimedRewardIds;
 
-        internal const int CurrentVersion = 1;
+        internal const int CurrentVersion = 2;
 
         internal int Version => _version;
         internal IdentitySaveData Identity => _identity;
         internal ProgressSaveData Progress => _progress;
         internal PromotionOrderSaveData PromotionOrder => _promotionOrder;
         internal IReadOnlyList<AmountSaveData> Items => _items;
-        internal IReadOnlyList<AmountSaveData> Cards => _cards;
         internal IReadOnlyList<string> ClaimedRewardIds => _claimedRewardIds;
 
         [JsonConstructor]
@@ -33,7 +31,6 @@ namespace LL.User.Persistence
             ProgressSaveData progress,
             PromotionOrderSaveData promotionOrder,
             AmountSaveData[] items,
-            AmountSaveData[] cards,
             string[] claimedRewardIds)
         {
             _version = CurrentVersion;
@@ -41,7 +38,6 @@ namespace LL.User.Persistence
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
             _items = items ?? Array.Empty<AmountSaveData>();
-            _cards = cards ?? Array.Empty<AmountSaveData>();
             _claimedRewardIds = claimedRewardIds ?? Array.Empty<string>();
         }
     }

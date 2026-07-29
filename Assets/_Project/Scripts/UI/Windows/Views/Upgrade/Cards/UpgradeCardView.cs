@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Cards;
+using LL.Game.Items;
 using LL.Presentation.Icons;
 using LL.UI.Controls;
 using LL.UI.Typography;
 using LL.UI.VisualStates.Sources;
-using LL.User.Core.Amounts;
+using LL.User.Core.Items;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -38,16 +39,16 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         private readonly Subject<Unit> _clicked = new();
         private readonly Subject<int> _availableAmountChanged = new();
 
-        private IUserAmounts<CardId> _userCards;
-        private IIconProvider<CardId> _iconProvider;
+        private IUserItems _userItems;
+        private IIconProvider<ItemId> _iconProvider;
         private bool _isInitialized;
 
         [Inject]
         private void Construct(
-            IUserAmounts<CardId> userCards,
-            IIconProvider<CardId> iconProvider)
+            IUserItems userItems,
+            IIconProvider<ItemId> iconProvider)
         {
-            _userCards = userCards ?? throw new ArgumentNullException(nameof(userCards));
+            _userItems = userItems ?? throw new ArgumentNullException(nameof(userItems));
             _iconProvider = iconProvider ?? throw new ArgumentNullException(nameof(iconProvider));
         }
 
@@ -73,8 +74,8 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
             SetSelected(false);
 
-            _addButton.Clicked.Subscribe(_ => _userCards.TryAdd(Card.Id, AddAmount)).AddTo(this);
-            _userCards.ObserveAmount(Card.Id).Subscribe(UpdateProgress).AddTo(this);
+            _addButton.Clicked.Subscribe(_ => _userItems.TryAdd(Card.Id, AddAmount)).AddTo(this);
+            _userItems.ObserveAmount(Card.Id).Subscribe(UpdateProgress).AddTo(this);
         }
 
         public void OnPointerClick(PointerEventData _)

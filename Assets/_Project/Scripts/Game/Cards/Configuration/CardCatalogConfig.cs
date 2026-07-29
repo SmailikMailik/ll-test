@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using LL.Game.Cards;
+using LL.Game.Items;
 using LL.Identifiers;
 using LL.Loading;
 using Sirenix.OdinInspector;
@@ -12,11 +13,11 @@ namespace LL.Game.Cards.Configuration
     [HideMonoScript]
     internal sealed class CardCatalogConfig : ScriptableObject, IDataLoader<CardCatalog>
     {
-        internal const string CreationPath = "LL/Game Data/Card Catalog";
-
         [ValidateInput(nameof(HasValidCardIds), "Card IDs must be non-empty and unique.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private CardDefinitionEntry[] _cards;
+
+        internal const string CreationPath = "LL/Game Data/Card Catalog";
 
         public CardCatalog Load() => new
         (
@@ -38,7 +39,7 @@ namespace LL.Game.Cards.Configuration
 
         private static bool HasValidCardIds(CardDefinitionEntry[] cards)
         {
-            return IdentifierCatalogValidator.HasValidIds(cards, card => new CardId(card.Id));
+            return IdentifierCatalogValidator.HasValidIds(cards, card => new ItemId(card.Id));
         }
     }
 
@@ -63,7 +64,7 @@ namespace LL.Game.Cards.Configuration
 
         internal ICard ToCard() => new Card
         (
-            new CardId(_id),
+            new ItemId(_id),
             _experienceAmount
         );
 

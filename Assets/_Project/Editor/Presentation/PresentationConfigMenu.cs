@@ -13,12 +13,5 @@ namespace LLEditor.Presentation
         {
             ConfigurationAssetMenu.Select<ItemIconCatalogConfig>(ItemIconCatalogConfig.CreationPath);
         }
-
-        [MenuItem(MenuPath + "Card Icon Catalog")]
-        private static void SelectCardIconCatalog()
-        {
-            ConfigurationAssetMenu.Select<CardIconCatalogConfig>(CardIconCatalogConfig
-                .CreationPath);
-        }
     }
 }

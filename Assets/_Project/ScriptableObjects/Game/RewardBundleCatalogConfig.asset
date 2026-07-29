@@ -16,72 +16,56 @@ MonoBehaviour:
   - _id: rank_1_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: hard
+    - _id: hard
       _amount: 800
-    - _type: 0
-      _id: master_point
+    - _id: master_point
       _amount: 120
   - _id: rank_2_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: skill
+    - _id: skill
       _amount: 1
-    - _type: 0
-      _id: soft
+    - _id: soft
       _amount: 3600
   - _id: rank_3_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: skill
+    - _id: skill
       _amount: 1
-    - _type: 0
-      _id: master_point
+    - _id: master_point
       _amount: 100
   - _id: rank_4_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: master_point
+    - _id: master_point
       _amount: 180
-    - _type: 0
-      _id: soft
+    - _id: soft
       _amount: 3000
   - _id: rank_5_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: hard
+    - _id: hard
       _amount: 1700
-    - _type: 0
-      _id: skill
+    - _id: skill
       _amount: 1
   - _id: rank_6_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: hard
+    - _id: hard
       _amount: 600
-    - _type: 0
-      _id: soft
+    - _id: soft
       _amount: 1800
   - _id: rank_7_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: master_point
+    - _id: master_point
       _amount: 150
-    - _type: 0
-      _id: skill
+    - _id: skill
       _amount: 1
   - _id: rank_8_promotion
     _grantMode: 0
     _rewards:
-    - _type: 0
-      _id: soft
+    - _id: soft
       _amount: 4800
-    - _type: 0
-      _id: hard
+    - _id: hard
       _amount: 1600

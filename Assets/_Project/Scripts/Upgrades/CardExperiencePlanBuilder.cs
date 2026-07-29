@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Cards;
-using LL.User.Core.Amounts;
+using LL.Game.Items;
+using LL.User.Core.Items;
 
 namespace LL.Upgrades
 {
@@ -9,7 +9,7 @@ namespace LL.Upgrades
     {
         private const int MinimumAmount = 0;
 
-        internal static IReadOnlyList<Amount<CardId>> Build(
+        internal static IReadOnlyList<ItemAmount> Build(
             IReadOnlyList<ExperienceCardOption> cards,
             int requiredExperience)
         {
@@ -17,7 +17,7 @@ namespace LL.Upgrades
                 throw new ArgumentNullException(nameof(cards));
 
             if (CanReach(cards, requiredExperience) is false)
-                return Array.Empty<Amount<CardId>>();
+                return Array.Empty<ItemAmount>();
 
             var experienceLimit = GetExperienceLimit(cards, requiredExperience);
             var plans = CreatePlans(cards.Count, experienceLimit);
@@ -181,21 +181,21 @@ namespace LL.Upgrades
             return null;
         }
 
-        private static IReadOnlyList<Amount<CardId>> CreateCardAmounts(
+        private static IReadOnlyList<ItemAmount> CreateCardAmounts(
             IReadOnlyList<ExperienceCardOption> cards,
             Plan plan)
         {
             if (plan == null)
-                return Array.Empty<Amount<CardId>>();
+                return Array.Empty<ItemAmount>();
 
-            var cardAmounts = new List<Amount<CardId>>(cards.Count);
+            var cardAmounts = new List<ItemAmount>(cards.Count);
 
             for (var index = 0; index < cards.Count; index++)
             {
                 var amount = plan.Amounts[index];
 
                 if (amount > MinimumAmount)
-                    cardAmounts.Add(new Amount<CardId>(cards[index].Id, amount));
+                    cardAmounts.Add(new ItemAmount(cards[index].Id, amount));
             }
 
             return cardAmounts;
@@ -231,12 +231,12 @@ namespace LL.Upgrades
 
     internal readonly struct ExperienceCardOption
     {
-        internal CardId Id { get; }
+        internal ItemId Id { get; }
         internal int AvailableAmount { get; }
         internal int ExperienceAmount { get; }
 
         internal ExperienceCardOption(
-            CardId id,
+            ItemId id,
             int availableAmount,
             int experienceAmount)
         {

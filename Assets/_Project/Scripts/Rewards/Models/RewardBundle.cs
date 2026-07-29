@@ -39,18 +39,13 @@ namespace LL.Rewards.Models
         {
             return reward != null &&
                    reward.Amount > 0 &&
-                   reward switch
-                   {
-                       ItemReward item => item.ItemId.IsEmpty is false,
-                       CardReward card => card.CardId.IsEmpty is false,
-                       _ => false
-                   };
+                   reward is ItemReward item &&
+                   item.ItemId.IsEmpty is false;
         }
 
         private static string GetRewardKey(IReward reward) => reward switch
         {
             ItemReward item => $"{nameof(ItemReward)}:{item.ItemId}",
-            CardReward card => $"{nameof(CardReward)}:{card.CardId}",
             _ => string.Empty
         };
     }

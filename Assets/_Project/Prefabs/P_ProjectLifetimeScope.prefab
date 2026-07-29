@@ -54,5 +54,4 @@ MonoBehaviour:
   _rankPromotionCatalogConfig: {fileID: 11400000, guid: c4db41c7eed54e8c8657bd65c216c53a, type: 2}
   _rewardBundleCatalogConfig: {fileID: 11400000, guid: bb1111aabbbb4ccccddddeeeeeeeee01, type: 2}
   _itemIconCatalogConfig: {fileID: 11400000, guid: a0f86a11d13b4dc3b7ea62ec0e009846, type: 2}
-  _cardIconCatalogConfig: {fileID: 11400000, guid: b0d176f1182a45dc98a9eb624bd41b82, type: 2}
   _userDefaultsConfig: {fileID: 11400000, guid: 08915e9948d847e18fc2884bf8f88076, type: 2}
