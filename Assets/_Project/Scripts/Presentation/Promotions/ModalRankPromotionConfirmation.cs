@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using LL.Payments;
 using LL.Presentation.Localization;
+using LL.Presentation.Payments;
 using LL.Promotions;
 using LL.UI.Typography;
 using LL.UI.Windows;
@@ -29,7 +30,7 @@ namespace LL.Presentation.Promotions
 
         public void Confirm(Payment payment, Action onConfirmed, Action onRejected)
         {
-            var priceText = TextFormatter.ItemAmount(payment.ItemId, payment.Amount);
+            var priceText = PaymentFormatter.Format(payment);
             var priceLabel = TextTags.Style(
                 _localization.GetText(RankPromotionLocalizationKeys.PriceLabel),
                 TextStyle.Muted);

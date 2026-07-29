@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using LL.Game.Promotions;
 using LL.Game.Ranks;
+using LL.Presentation.Payments;
 using LL.Promotions;
 using LL.Rewards.Models;
 using LL.UI.Controls;
@@ -68,12 +69,8 @@ namespace LL.UI.Windows.Views.Promotion
 
             if (_promotionService.TryGetPromotion(out _promotion))
             {
-                _softPriceLabel.text = TextFormatter.ItemAmount(
-                    _promotion.SoftPayment.ItemId,
-                    _promotion.SoftPayment.Amount);
-                _hardPriceLabel.text = TextFormatter.ItemAmount(
-                    _promotion.HardPayment.ItemId,
-                    _promotion.HardPayment.Amount);
+                _softPriceLabel.text = PaymentFormatter.Format(_promotion.SoftPayment);
+                _hardPriceLabel.text = PaymentFormatter.Format(_promotion.HardPayment);
                 _orderView.Refresh(
                     _promotion.Requirement,
                     _promotion.OrderDuration,

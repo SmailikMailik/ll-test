@@ -1,6 +1,6 @@
 using LL.Game.Items;
+using LL.Presentation.Items;
 using LL.UI.Controls;
-using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.User.Core.Amounts;
 using LL.User.Core.Identity;
@@ -52,7 +52,7 @@ namespace LL.UI
         private void ObserveItem(ItemId id, TMP_Text label)
         {
             _items.ObserveAmount(id)
-                .Subscribe(amount => label.text = TextFormatter.ItemAmount(id, amount))
+                .Subscribe(amount => label.text = ItemAmountFormatter.Format(id, amount))
                 .AddTo(this);
         }
     }
