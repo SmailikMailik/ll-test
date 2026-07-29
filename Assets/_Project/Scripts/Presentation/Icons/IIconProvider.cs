@@ -1,4 +1,4 @@
-using LL.Identifiers;
+using LL.Game.Identifiers;
 using UnityEngine;
 
 namespace LL.Presentation.Icons

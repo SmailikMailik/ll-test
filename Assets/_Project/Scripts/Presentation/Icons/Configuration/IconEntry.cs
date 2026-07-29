@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.Identifiers;
+using LL.Game.Identifiers;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

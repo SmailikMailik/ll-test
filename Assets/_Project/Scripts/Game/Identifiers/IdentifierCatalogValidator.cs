@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LL.Identifiers
+namespace LL.Game.Identifiers
 {
     internal static class IdentifierCatalogValidator
     {

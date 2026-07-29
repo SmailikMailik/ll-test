@@ -7,7 +7,7 @@ using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using LL.Game.Rewards.Services;
 using LL.Game.Upgrades;
-using LL.Identifiers;
+using LL.Game.Identifiers;
 using LL.Infrastructure.Loading;
 using LL.Infrastructure.Saving;
 using LL.Presentation.Icons;

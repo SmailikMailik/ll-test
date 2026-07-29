@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
-using LL.Identifiers;
+using LL.Game.Identifiers;
 
 namespace LL.Game.Cards
 {

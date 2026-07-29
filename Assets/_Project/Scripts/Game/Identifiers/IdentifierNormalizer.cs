@@ -1,4 +1,4 @@
-namespace LL.Identifiers
+namespace LL.Game.Identifiers
 {
     internal static class IdentifierNormalizer
     {

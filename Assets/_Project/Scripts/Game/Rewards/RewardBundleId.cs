@@ -1,5 +1,5 @@
 using System;
-using LL.Identifiers;
+using LL.Game.Identifiers;
 
 namespace LL.Game.Rewards
 {
