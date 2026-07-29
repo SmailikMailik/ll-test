@@ -10,10 +10,7 @@ namespace LL.Infrastructure.Validation
     {
         private readonly IValidationIssueFormatter _formatter;
 
-        internal UnityConsoleValidationReporter()
-            : this(new ValidationIssueFormatter())
-        {
-        }
+        internal UnityConsoleValidationReporter() : this(new ValidationIssueFormatter()) { }
 
         [Inject]
         internal UnityConsoleValidationReporter(IValidationIssueFormatter formatter)

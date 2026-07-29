@@ -8,14 +8,9 @@ namespace LL.Validation
     {
         private static readonly IValidationIssueFormatter _formatter = new ValidationIssueFormatter();
 
-        internal static void EnsureValid(ValidationResult result)
-        {
-            EnsureValid(result, null);
-        }
-
         internal static void EnsureValid(
             ValidationResult result,
-            string parameterName)
+            string parameterName = null)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));

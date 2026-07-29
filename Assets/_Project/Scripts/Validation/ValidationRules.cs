@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace LL.Validation
 {
@@ -15,7 +15,8 @@ namespace LL.Validation
             if (value is not null)
                 return true;
 
-            return ReportError(context, code, "Value must not be null.");
+            ReportError(context, code, "Value must not be null.");
+            return false;
         }
 
         internal static bool NotEmpty(
@@ -28,7 +29,8 @@ namespace LL.Validation
             if (string.IsNullOrWhiteSpace(value) is false)
                 return true;
 
-            return ReportError(context, code, "Value must not be empty.");
+            ReportError(context, code, "Value must not be empty.");
+            return false;
         }
 
         internal static bool Trimmed(
@@ -41,7 +43,8 @@ namespace LL.Validation
             if (value == value?.Trim())
                 return true;
 
-            return ReportError(context, code, "Value must not contain leading or trailing whitespace.");
+            ReportError(context, code, "Value must not contain leading or trailing whitespace.");
+            return false;
         }
 
         internal static bool Uppercase(
@@ -54,7 +57,8 @@ namespace LL.Validation
             if (value == value?.ToUpperInvariant())
                 return true;
 
-            return ReportError(context, code, "Value must be uppercase.");
+            ReportError(context, code, "Value must be uppercase.");
+            return false;
         }
 
         internal static bool Lowercase(
@@ -67,7 +71,8 @@ namespace LL.Validation
             if (value == value?.ToLowerInvariant())
                 return true;
 
-            return ReportError(context, code, "Value must be lowercase.");
+            ReportError(context, code, "Value must be lowercase.");
+            return false;
         }
 
         internal static bool NotEmpty<T>(
@@ -80,7 +85,8 @@ namespace LL.Validation
             if (values != null && values.Count > 0)
                 return true;
 
-            return ReportError(context, code, "Collection must contain at least one value.");
+            ReportError(context, code, "Collection must contain at least one value.");
+            return false;
         }
 
         internal static bool Positive(
@@ -93,7 +99,8 @@ namespace LL.Validation
             if (value > 0)
                 return true;
 
-            return ReportError(context, code, "Value must be greater than zero.");
+            ReportError(context, code, "Value must be greater than zero.");
+            return false;
         }
 
         internal static bool NonNegative(
@@ -106,7 +113,8 @@ namespace LL.Validation
             if (value >= 0)
                 return true;
 
-            return ReportError(context, code, "Value must not be negative.");
+            ReportError(context, code, "Value must not be negative.");
+            return false;
         }
 
         internal static bool DefinedEnum<TEnum>(
@@ -120,7 +128,8 @@ namespace LL.Validation
             if (Enum.IsDefined(typeof(TEnum), value))
                 return true;
 
-            return ReportError(context, code, $"Value '{value}' is not supported.");
+            ReportError(context, code, $"Value '{value}' is not supported.");
+            return false;
         }
 
         internal static bool ReferenceExists<T>(
@@ -137,7 +146,8 @@ namespace LL.Validation
             if (availableValues.Contains(value))
                 return true;
 
-            return ReportError(context, code, $"Referenced value '{value}' does not exist.");
+            ReportError(context, code, $"Referenced value '{value}' does not exist.");
+            return false;
         }
 
         internal static bool Unique<T>(
@@ -159,13 +169,7 @@ namespace LL.Validation
             {
                 if (usedValues.Add(value) is false)
                 {
-                    context
-                        .At(index)
-                        .Report(
-                            ValidationSeverity.Error,
-                            code,
-                            $"Value '{value}' must be unique.");
-
+                    ReportError(context.At(index), code, $"Value '{value}' must be unique.");
                     isValid = false;
                 }
 
@@ -175,13 +179,12 @@ namespace LL.Validation
             return isValid;
         }
 
-        private static bool ReportError(
+        private static void ReportError(
             ValidationContext context,
             string code,
             string message)
         {
             context.Report(ValidationSeverity.Error, code, message);
-            return false;
         }
 
         private static void EnsureArguments(

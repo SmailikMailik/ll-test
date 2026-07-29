@@ -8,10 +8,7 @@ namespace LL.Validation
 
         internal string Path { get; }
 
-        internal ValidationContext(ValidationResult result)
-            : this(result, string.Empty)
-        {
-        }
+        internal ValidationContext(ValidationResult result) : this(result, string.Empty) { }
 
         private ValidationContext(ValidationResult result, string path)
         {

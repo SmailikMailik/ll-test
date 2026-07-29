@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System;
 
 namespace LL.Validation
 {
@@ -8,15 +8,13 @@ namespace LL.Validation
     {
         private readonly List<ValidationIssue> _issues = new();
         private readonly ReadOnlyCollection<ValidationIssue> _readOnlyIssues;
-        private int _errorCount;
-        private int _infoCount;
-        private int _warningCount;
 
-        internal bool IsValid => _errorCount == 0;
+        internal bool IsValid => ErrorCount == 0;
         internal IReadOnlyList<ValidationIssue> Issues => _readOnlyIssues;
-        internal int ErrorCount => _errorCount;
-        internal int InfoCount => _infoCount;
-        internal int WarningCount => _warningCount;
+
+        internal int ErrorCount { get; private set; }
+        internal int WarningCount { get; private set; }
+        internal int InfoCount { get; private set; }
 
         internal ValidationResult()
         {
@@ -32,16 +30,16 @@ namespace LL.Validation
 
             switch (issue.Severity)
             {
-                case ValidationSeverity.Info:
-                    _infoCount++;
+                case ValidationSeverity.Error:
+                    ErrorCount++;
                     break;
 
                 case ValidationSeverity.Warning:
-                    _warningCount++;
+                    WarningCount++;
                     break;
 
-                case ValidationSeverity.Error:
-                    _errorCount++;
+                case ValidationSeverity.Info:
+                    InfoCount++;
                     break;
 
                 default:

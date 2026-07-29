@@ -54,12 +54,10 @@ namespace LL.Composition
             RegisterLocalization(builder);
             RegisterValidationReporting(builder);
             RegisterGameData(builder);
-            RegisterPresentationData(builder);
+            RegisterPresentation(builder);
             RegisterUserPersistence(builder);
             RegisterUserState(builder);
             RegisterGameServices(builder);
-
-            builder.RegisterEntryPoint<UserSaveController>();
         }
 
         private void RegisterWindows(IContainerBuilder builder)
@@ -88,9 +86,10 @@ namespace LL.Composition
             RegisterLoadedData(builder, _rewardBundleCatalogConfig);
         }
 
-        private void RegisterPresentationData(IContainerBuilder builder)
+        private void RegisterPresentation(IContainerBuilder builder)
         {
             RegisterIconCatalog(builder, _itemIconCatalogConfig);
+            builder.Register<RewardIconProvider>(Lifetime.Singleton);
         }
 
         private void RegisterUserPersistence(IContainerBuilder builder)
@@ -105,6 +104,8 @@ namespace LL.Composition
             RegisterUserSnapshotPart(builder, snapshot => snapshot.Progress);
             RegisterUserSnapshotPart(builder, snapshot => snapshot.PromotionOrder);
             RegisterUserSnapshotPart(builder, snapshot => snapshot.RewardClaims);
+
+            builder.RegisterEntryPoint<UserSaveController>();
         }
 
         private static void RegisterUserState(IContainerBuilder builder)
@@ -123,7 +124,6 @@ namespace LL.Composition
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
             builder.Register<RewardGrantPolicy>(Lifetime.Singleton);
             builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();
-            builder.Register<RewardIconProvider>(Lifetime.Singleton);
         }
 
         private static void RegisterLoadedData<TData>(IContainerBuilder builder, IDataLoader<TData> loader)

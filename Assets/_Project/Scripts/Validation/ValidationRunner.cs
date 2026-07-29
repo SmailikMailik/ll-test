@@ -14,9 +14,7 @@ namespace LL.Validation
             return result;
         }
 
-        internal static ValidationResult Run<T>(
-            T value,
-            IDataValidator<T> validator)
+        internal static ValidationResult Run<T>(T value, IDataValidator<T> validator)
         {
             if (validator == null)
                 throw new ArgumentNullException(nameof(validator));
@@ -26,18 +24,16 @@ namespace LL.Validation
             return result;
         }
 
-        internal static void EnsureValid(
-            IValidationSource source,
-            string parameterName = null)
-        {
+        internal static void EnsureValid(IValidationSource source, string parameterName = null) =>
             ValidationResultGuard.EnsureValid(Run(source), parameterName);
-        }
 
-        internal static bool IsValid<T>(
-            T value,
-            IDataValidator<T> validator)
-        {
-            return Run(value, validator).IsValid;
-        }
+        internal static void EnsureValid<T>(T value, IDataValidator<T> validator, string parameterName = null) =>
+            ValidationResultGuard.EnsureValid(Run(value, validator), parameterName);
+
+        internal static bool IsValid(IValidationSource source) =>
+            Run(source).IsValid;
+
+        internal static bool IsValid<T>(T value, IDataValidator<T> validator) =>
+            Run(value, validator).IsValid;
     }
 }
