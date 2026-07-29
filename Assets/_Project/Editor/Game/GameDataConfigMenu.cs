@@ -3,36 +3,35 @@ using LL.Game.Promotions.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using LLEditor.Configuration;
+using LLEditor.Menu;
 using UnityEditor;
 
 namespace LLEditor.Game
 {
     internal static class GameDataConfigMenu
     {
-        private const string MenuPath = ConfigurationAssetMenu.RootPath + "Game Data/";
-
-        [MenuItem(MenuPath + "Rank Catalog")]
+        [MenuItem(LLMenu.GamePath + "Ranks/Rank Catalog", false, LLMenu.ContentPriority)]
         private static void SelectRankCatalog()
         {
-            ConfigurationAssetMenu.Select<RankCatalogConfig>(RankCatalogConfig.CreationPath);
+            ConfigurationAssetSelector.Select<RankCatalogConfig>(RankCatalogConfig.CreationPath);
         }
 
-        [MenuItem(MenuPath + "Rank Promotion Catalog")]
+        [MenuItem(LLMenu.GamePath + "Promotions/Rank Promotion Catalog", false, LLMenu.ContentPriority)]
         private static void SelectRankPromotionCatalog()
         {
-            ConfigurationAssetMenu.Select<RankPromotionCatalogConfig>(RankPromotionCatalogConfig.CreationPath);
+            ConfigurationAssetSelector.Select<RankPromotionCatalogConfig>(RankPromotionCatalogConfig.CreationPath);
         }
 
-        [MenuItem(MenuPath + "Card Catalog")]
+        [MenuItem(LLMenu.GamePath + "Cards/Card Catalog", false, LLMenu.ContentPriority)]
         private static void SelectCardCatalog()
         {
-            ConfigurationAssetMenu.Select<CardCatalogConfig>(CardCatalogConfig.CreationPath);
+            ConfigurationAssetSelector.Select<CardCatalogConfig>(CardCatalogConfig.CreationPath);
         }
 
-        [MenuItem(MenuPath + "Reward Bundle Catalog")]
+        [MenuItem(LLMenu.GamePath + "Rewards/Reward Bundle Catalog", false, LLMenu.ContentPriority)]
         private static void SelectRewardBundleCatalog()
         {
-            ConfigurationAssetMenu.Select<RewardBundleCatalogConfig>(RewardBundleCatalogConfig.CreationPath);
+            ConfigurationAssetSelector.Select<RewardBundleCatalogConfig>(RewardBundleCatalogConfig.CreationPath);
         }
     }
 }

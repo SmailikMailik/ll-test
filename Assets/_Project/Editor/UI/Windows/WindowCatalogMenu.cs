@@ -1,15 +1,16 @@
 using LL.UI.Windows.Configuration;
 using LLEditor.Configuration;
+using LLEditor.Menu;
 using UnityEditor;
 
 namespace LLEditor.UI.Windows
 {
     internal static class WindowCatalogMenu
     {
-        [MenuItem(ConfigurationAssetMenu.RootPath + "Window Catalog")]
+        [MenuItem(LLMenu.UIPath + "Windows/Window Catalog", false, LLMenu.ContentPriority)]
         private static void SelectWindowCatalog()
         {
-            ConfigurationAssetMenu.Select<WindowCatalog>(WindowCatalog.CreationPath);
+            ConfigurationAssetSelector.Select<WindowCatalog>(WindowCatalog.CreationPath);
         }
     }
 }

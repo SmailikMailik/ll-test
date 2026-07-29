@@ -1,4 +1,4 @@
-using LLEditor.Configuration;
+using LLEditor.Menu;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -8,8 +8,6 @@ namespace LLEditor.Scenes
 {
     internal static class MainSceneMenu
     {
-        private const string MenuPath = ConfigurationAssetMenu.RootPath + "Open Main Scene";
-
         private const string MainScenePath = "Assets/_Project/Scenes/Main.unity";
         private const string WelcomePreferenceKey = "LL.Editor.MainSceneWelcomeShown";
 
@@ -22,10 +20,10 @@ namespace LLEditor.Scenes
             EditorApplication.delayCall += OnEditorReady;
         }
 
-        [MenuItem(MenuPath)]
+        [MenuItem(LLMenu.OpenMainScenePath, false, LLMenu.OpenMainScenePriority)]
         private static void OpenMainScene() => TryOpenMainScene();
 
-        [MenuItem(MenuPath, true)]
+        [MenuItem(LLMenu.OpenMainScenePath, true, LLMenu.OpenMainScenePriority)]
         private static bool CanOpenMainScene() => EditorApplication.isPlayingOrWillChangePlaymode is false;
 
         private static void OnEditorReady()
@@ -46,11 +44,10 @@ namespace LLEditor.Scenes
                 return;
 
             var openMainScene = EditorUtility.DisplayDialog(
-                "Добро пожаловать в LL-Test Project",
-                "Добро пожаловать в LL-Test Project!\n\n" +
-                "Сейчас открыта пустая сцена. Хотите открыть основную сцену Main?",
-                "Открыть Main",
-                "Не сейчас");
+                "Welcome to LL-Test Project",
+                "The currently open scene is empty. Would you like to open the Main scene?",
+                "Open Main",
+                "Not Now");
 
             if (openMainScene)
                 TryOpenMainScene();

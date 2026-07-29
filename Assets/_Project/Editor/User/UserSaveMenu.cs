@@ -1,6 +1,6 @@
 using LL.Composition.Persistence;
 using LL.User.Persistence;
-using LLEditor.Configuration;
+using LLEditor.Menu;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,10 +8,8 @@ namespace LLEditor.User
 {
     internal static class UserSaveMenu
     {
-        private const string MenuPath = ConfigurationAssetMenu.RootPath + "User/Delete Saved Data";
-
-        [MenuItem(MenuPath)]
-        private static void DeleteSavedData()
+        [MenuItem(LLMenu.DeleteSavedUserDataPath, false, LLMenu.DeleteSavedUserDataPriority)]
+        private static void DeleteSavedUserData()
         {
             const string saveKey = UserSnapshotLoader.SaveKey;
             var saveService = PersistenceComposition.CreateDefaultSaveService();
@@ -23,7 +21,7 @@ namespace LLEditor.User
             }
 
             var confirmed = EditorUtility.DisplayDialog(
-                "Delete Saved Data",
+                "Delete Saved User Data",
                 "Delete all saved user data? This action cannot be undone.",
                 "Delete",
                 "Cancel");
@@ -35,7 +33,7 @@ namespace LLEditor.User
                 Debug.Log("Saved user data was deleted.");
         }
 
-        [MenuItem(MenuPath, true)]
-        private static bool CanDeleteSavedData() => EditorApplication.isPlayingOrWillChangePlaymode is false;
+        [MenuItem(LLMenu.DeleteSavedUserDataPath, true, LLMenu.DeleteSavedUserDataPriority)]
+        private static bool CanDeleteSavedUserData() => EditorApplication.isPlayingOrWillChangePlaymode is false;
     }
 }

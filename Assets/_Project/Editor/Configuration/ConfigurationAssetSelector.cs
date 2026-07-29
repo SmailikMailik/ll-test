@@ -3,10 +3,8 @@ using UnityEngine;
 
 namespace LLEditor.Configuration
 {
-    internal static class ConfigurationAssetMenu
+    internal static class ConfigurationAssetSelector
     {
-        internal const string RootPath = "Tools/LL/";
-
         internal static void Select<TAsset>(string creationPath) where TAsset : Object
         {
             var assetGuids = AssetDatabase.FindAssets($"t:{typeof(TAsset).Name}");

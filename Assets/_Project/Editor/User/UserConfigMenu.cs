@@ -1,17 +1,16 @@
 using LL.User.Configuration;
 using LLEditor.Configuration;
+using LLEditor.Menu;
 using UnityEditor;
 
 namespace LLEditor.User
 {
     internal static class UserConfigMenu
     {
-        private const string MenuPath = ConfigurationAssetMenu.RootPath + "User/";
-
-        [MenuItem(MenuPath + "User Defaults Config")]
+        [MenuItem(LLMenu.UserPath + "Configuration/User Defaults", false, LLMenu.ContentPriority)]
         private static void SelectUserDefaultsConfig()
         {
-            ConfigurationAssetMenu.Select<UserDefaultsConfig>(UserDefaultsConfig.CreationPath);
+            ConfigurationAssetSelector.Select<UserDefaultsConfig>(UserDefaultsConfig.CreationPath);
         }
     }
 }

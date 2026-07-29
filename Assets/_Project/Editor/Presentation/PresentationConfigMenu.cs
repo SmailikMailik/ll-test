@@ -1,17 +1,16 @@
 using LL.Presentation.Icons.Configuration;
 using LLEditor.Configuration;
+using LLEditor.Menu;
 using UnityEditor;
 
 namespace LLEditor.Presentation
 {
     internal static class PresentationConfigMenu
     {
-        private const string MenuPath = ConfigurationAssetMenu.RootPath + "Presentation/";
-
-        [MenuItem(MenuPath + "Item Icon Catalog")]
+        [MenuItem(LLMenu.PresentationPath + "Icons/Item Icon Catalog", false, LLMenu.ContentPriority)]
         private static void SelectItemIconCatalog()
         {
-            ConfigurationAssetMenu.Select<ItemIconCatalogConfig>(ItemIconCatalogConfig.CreationPath);
+            ConfigurationAssetSelector.Select<ItemIconCatalogConfig>(ItemIconCatalogConfig.CreationPath);
         }
     }
 }
