@@ -16,7 +16,7 @@ namespace LL.Game.Rewards
             RewardGrantMode grantMode,
             IEnumerable<IReward> rewards)
         {
-            if (id.IsEmpty)
+            if (string.IsNullOrWhiteSpace(id.Value))
                 throw new ArgumentException("Reward bundle ID must be non-empty.", nameof(id));
 
             if (Enum.IsDefined(typeof(RewardGrantMode), grantMode) is false)

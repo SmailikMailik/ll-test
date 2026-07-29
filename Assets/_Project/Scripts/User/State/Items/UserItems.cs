@@ -69,7 +69,7 @@ namespace LL.User.State.Items
 
         private bool TryGetAmount(ItemId id, out ReactiveProperty<int> amount)
         {
-            if (id.IsEmpty)
+            if (string.IsNullOrWhiteSpace(id.Value))
             {
                 amount = null;
                 return false;

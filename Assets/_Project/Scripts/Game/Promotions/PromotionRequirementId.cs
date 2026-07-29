@@ -6,7 +6,6 @@ namespace LL.Game.Promotions
     internal readonly struct PromotionRequirementId : IIdentifier, IEquatable<PromotionRequirementId>
     {
         public string Value { get; }
-        public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
         internal PromotionRequirementId(string value) => Value = value;
 

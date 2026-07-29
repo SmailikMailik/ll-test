@@ -9,7 +9,7 @@ namespace LL.Game.Items
 
         internal ItemAmount(ItemId id, int amount)
         {
-            if (id.IsEmpty)
+            if (string.IsNullOrWhiteSpace(id.Value))
                 throw new ArgumentException("Item amount ID must be non-empty.", nameof(id));
 
             if (amount < 0)

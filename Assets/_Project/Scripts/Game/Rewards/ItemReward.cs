@@ -10,7 +10,7 @@ namespace LL.Game.Rewards
 
         internal ItemReward(ItemId itemId, int amount)
         {
-            if (itemId.IsEmpty)
+            if (string.IsNullOrWhiteSpace(itemId.Value))
                 throw new ArgumentException("Reward item ID must be non-empty.", nameof(itemId));
 
             if (amount <= 0)

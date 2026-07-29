@@ -60,7 +60,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             if (card == null)
                 throw new ArgumentNullException(nameof(card));
 
-            if (card.Id.IsEmpty)
+            if (string.IsNullOrWhiteSpace(card.Id.Value))
                 throw new ArgumentException("Card Id cannot be empty.", nameof(card));
 
             if (_iconProvider.TryGetIcon(card.Id, out var icon) is false)

@@ -6,7 +6,6 @@ namespace LL.Game.Rewards
     internal readonly struct RewardBundleId : IIdentifier, IEquatable<RewardBundleId>
     {
         public string Value { get; }
-        public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
         internal RewardBundleId(string value) => Value = value;
 

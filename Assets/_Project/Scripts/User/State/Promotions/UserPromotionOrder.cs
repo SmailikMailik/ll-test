@@ -22,7 +22,9 @@ namespace LL.User.State.Promotions
         private long _deadlineUnixMilliseconds;
         private bool _isCompleted;
 
-        private bool HasOrder => _requirementId.IsEmpty is false && _deadlineUnixMilliseconds > NoDeadline;
+        private bool HasOrder =>
+            string.IsNullOrWhiteSpace(_requirementId.Value) is false &&
+            _deadlineUnixMilliseconds > NoDeadline;
 
         [Inject]
         internal UserPromotionOrder(UserPromotionOrderSnapshot snapshot)
@@ -46,7 +48,10 @@ namespace LL.User.State.Promotions
 
         public bool TryStart(PromotionRequirementId requirementId, TimeSpan duration)
         {
-            if (requirementId.IsEmpty || duration <= TimeSpan.Zero || IsActive || IsCompleted)
+            if (string.IsNullOrWhiteSpace(requirementId.Value) ||
+                duration <= TimeSpan.Zero ||
+                IsActive ||
+                IsCompleted)
                 return false;
 
             _requirementId = requirementId;

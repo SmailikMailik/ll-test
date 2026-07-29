@@ -8,6 +8,8 @@ namespace LL.User.Snapshots
 {
     internal sealed class UserRewardClaimsSnapshot
     {
+        internal static UserRewardClaimsSnapshot Empty { get; } = new(Array.Empty<RewardBundleId>());
+
         internal IReadOnlyList<RewardBundleId> ClaimedIds { get; }
 
         internal UserRewardClaimsSnapshot(IEnumerable<RewardBundleId> claimedIds)

@@ -33,7 +33,7 @@ namespace LL.Game.Promotions
             if (orderDuration <= TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(orderDuration));
 
-            if (rewardBundleId.IsEmpty)
+            if (string.IsNullOrWhiteSpace(rewardBundleId.Value))
                 throw new ArgumentException("Promotion reward bundle ID must be non-empty.", nameof(rewardBundleId));
 
             Rank = rank;

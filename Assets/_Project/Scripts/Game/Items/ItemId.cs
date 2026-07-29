@@ -6,7 +6,6 @@ namespace LL.Game.Items
     internal readonly struct ItemId : IIdentifier, IEquatable<ItemId>
     {
         public string Value { get; }
-        public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
         internal ItemId(string value) => Value = value;
 

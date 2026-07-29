@@ -10,7 +10,7 @@ namespace LL.Game.Payments
 
         internal Payment(ItemId itemId, int amount)
         {
-            if (itemId.IsEmpty)
+            if (string.IsNullOrWhiteSpace(itemId.Value))
                 throw new ArgumentException("Payment item ID must be non-empty.", nameof(itemId));
 
             if (amount <= 0)

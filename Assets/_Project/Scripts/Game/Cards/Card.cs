@@ -10,7 +10,7 @@ namespace LL.Game.Cards
 
         internal Card(ItemId id, int experienceAmount)
         {
-            if (id.IsEmpty)
+            if (string.IsNullOrWhiteSpace(id.Value))
                 throw new ArgumentException("Card ID must be non-empty.", nameof(id));
 
             if (experienceAmount <= 0)

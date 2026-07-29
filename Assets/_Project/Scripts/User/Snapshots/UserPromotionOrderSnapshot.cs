@@ -6,6 +6,8 @@ namespace LL.User.Snapshots
 {
     internal sealed class UserPromotionOrderSnapshot
     {
+        internal static UserPromotionOrderSnapshot Empty { get; } = new(default, 0L, false);
+
         internal PromotionRequirementId RequirementId { get; }
         internal long DeadlineUnixMilliseconds { get; }
         internal bool IsCompleted { get; }
@@ -15,7 +17,7 @@ namespace LL.User.Snapshots
             long deadlineUnixMilliseconds,
             bool isCompleted)
         {
-            if (requirementId.IsEmpty)
+            if (string.IsNullOrWhiteSpace(requirementId.Value))
             {
                 if (deadlineUnixMilliseconds != 0L)
                     throw new ArgumentException(
@@ -35,7 +37,7 @@ namespace LL.User.Snapshots
                     "Promotion order deadline must be greater than zero.");
             }
 
-            if (requirementId.IsEmpty is false)
+            if (string.IsNullOrWhiteSpace(requirementId.Value) is false)
                 IdentifierValidator.EnsureValid(requirementId, nameof(requirementId));
 
             RequirementId = requirementId;

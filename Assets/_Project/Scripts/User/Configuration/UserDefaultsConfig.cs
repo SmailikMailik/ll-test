@@ -43,10 +43,10 @@ namespace LL.User.Configuration
 
             return new UserSnapshot(
                 Identity.ToSnapshot(),
-                new UserItemsSnapshot(Items?.Select(item => item.ToItemAmount())),
+                new UserItemsSnapshot(Items.Select(item => item.ToItemAmount())),
                 Progress.ToSnapshot(),
-                new UserPromotionOrderSnapshot(default, 0L, false),
-                new UserRewardClaimsSnapshot(null));
+                UserPromotionOrderSnapshot.Empty,
+                UserRewardClaimsSnapshot.Empty);
         }
 
         private static bool HasValidItems(ItemAmountEntry[] entries)

@@ -28,7 +28,7 @@ namespace LL.User.State.Rewards
 
         public bool TryClaim(RewardBundleId id)
         {
-            if (id.IsEmpty || _claimedIds.Add(id) is false)
+            if (string.IsNullOrWhiteSpace(id.Value) || _claimedIds.Add(id) is false)
                 return false;
 
             _rewardClaimed.OnNext(id);

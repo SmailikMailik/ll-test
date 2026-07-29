@@ -17,7 +17,7 @@ namespace LL.Game.Promotions
             string targetLocalizationKey,
             int requiredAmount)
         {
-            if (id.IsEmpty)
+            if (string.IsNullOrWhiteSpace(id.Value))
                 throw new ArgumentException("Promotion requirement ID must be non-empty.", nameof(id));
 
             if (string.IsNullOrWhiteSpace(titleLocalizationKey))
