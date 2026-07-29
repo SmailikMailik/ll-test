@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Rewards;
+using LL.Game.Items;
 using LL.UI.Windows.Views.Promotion;
 using LL.UI.Windows.Views.Reward;
 using LL.UI.Windows.Views.Upgrade;
@@ -40,10 +40,10 @@ namespace LL.UI.Windows.Flows
                 _windowController.Replace(new UpgradeWindowParameters());
         }
 
-        internal void CompletePromotion(int rank, IReadOnlyList<IReward> rewards)
+        internal void CompletePromotion(int rank, IReadOnlyList<ItemAmount> rewardItems)
         {
             ReplaceCurrent();
-            _windowController.Show(new RewardWindowParameters(rank, rewards));
+            _windowController.Show(new RewardWindowParameters(rank, rewardItems));
         }
     }
 

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LL.Presentation.Icons
 {
-    internal sealed class IconCatalog<TId> : IIconProvider<TId>
+    internal sealed class IconCatalog<TId>
         where TId : struct, IIdentifier
     {
         private readonly IReadOnlyDictionary<TId, Sprite> _icons;
@@ -34,7 +34,7 @@ namespace LL.Presentation.Icons
             _icons = copy.ToDictionary(icon => icon.Key, icon => icon.Value);
         }
 
-        public bool TryGetIcon(TId id, out Sprite icon)
+        internal bool TryGetIcon(TId id, out Sprite icon)
         {
             return _icons.TryGetValue(id, out icon);
         }

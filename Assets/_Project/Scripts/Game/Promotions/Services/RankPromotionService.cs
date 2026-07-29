@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Items;
 using LL.Game.Payments;
-using LL.Game.Rewards;
 using LL.Game.Rewards.Services;
 using LL.User.State.Progress;
 using LL.User.State.Promotions;
@@ -45,7 +45,7 @@ namespace LL.Game.Promotions.Services
 
         public void Promote(
             PromotionPaymentType paymentType,
-            Action<IReadOnlyList<IReward>> onSucceeded,
+            Action<IReadOnlyList<ItemAmount>> onSucceeded,
             Action onFailed)
         {
             if (_isPromotionPending ||
@@ -68,12 +68,12 @@ namespace LL.Game.Promotions.Services
             RankPromotion promotion,
             PromotionPaymentType paymentType,
             Payment payment,
-            Action<IReadOnlyList<IReward>> onSucceeded,
+            Action<IReadOnlyList<ItemAmount>> onSucceeded,
             Action onFailed)
         {
             if (_isPromotionPending is false ||
                 CanPromote(promotion, paymentType) is false ||
-                _rewardGrantService.CanGrant(promotion.RewardBundleId) is false ||
+                _rewardGrantService.CanGrant(promotion.RewardId) is false ||
                 _paymentService.TryPay(payment) is false)
             {
                 RejectPromotion(onFailed);
@@ -87,10 +87,10 @@ namespace LL.Game.Promotions.Services
                 return;
             }
 
-            var rewards = GrantReward(promotion);
+            var rewardItems = GrantReward(promotion);
             _promotionOrder.ClearOrder();
             _isPromotionPending = false;
-            onSucceeded?.Invoke(rewards);
+            onSucceeded?.Invoke(rewardItems);
         }
 
         private bool CanPromote(RankPromotion promotion, PromotionPaymentType paymentType)
@@ -108,13 +108,13 @@ namespace LL.Game.Promotions.Services
             };
         }
 
-        private IReadOnlyList<IReward> GrantReward(RankPromotion promotion)
+        private IReadOnlyList<ItemAmount> GrantReward(RankPromotion promotion)
         {
-            if (_rewardGrantService.TryGrant(promotion.RewardBundleId, out var rewards))
-                return rewards;
+            if (_rewardGrantService.TryGrant(promotion.RewardId, out var items))
+                return items;
 
-            Debug.LogError($"Failed to grant promotion reward bundle: {promotion.RewardBundleId}");
-            return Array.Empty<IReward>();
+            Debug.LogError($"Failed to grant promotion reward: {promotion.RewardId}");
+            return Array.Empty<ItemAmount>();
         }
 
         private void RefundPayment(Payment payment)

@@ -17,7 +17,7 @@ namespace LL.Game.Promotions
         internal TimeSpan OrderDuration { get; }
         internal Payment SoftPayment { get; }
         internal Payment HardPayment { get; }
-        internal RewardBundleId RewardBundleId { get; }
+        internal RewardId RewardId { get; }
 
         internal RankPromotion(
             int rank,
@@ -25,7 +25,7 @@ namespace LL.Game.Promotions
             TimeSpan orderDuration,
             Payment softPayment,
             Payment hardPayment,
-            RewardBundleId rewardBundleId)
+            RewardId rewardId)
         {
             if (rank < 1)
                 throw new ArgumentOutOfRangeException(nameof(rank));
@@ -33,15 +33,15 @@ namespace LL.Game.Promotions
             if (orderDuration <= TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(orderDuration));
 
-            if (string.IsNullOrWhiteSpace(rewardBundleId.Value))
-                throw new ArgumentException("Promotion reward bundle ID must be non-empty.", nameof(rewardBundleId));
+            if (string.IsNullOrWhiteSpace(rewardId.Value))
+                throw new ArgumentException("Promotion reward ID must be non-empty.", nameof(rewardId));
 
             Rank = rank;
             Requirement = requirement ?? throw new ArgumentNullException(nameof(requirement));
             OrderDuration = orderDuration;
             SoftPayment = softPayment;
             HardPayment = hardPayment;
-            RewardBundleId = rewardBundleId;
+            RewardId = rewardId;
         }
 
         internal Payment GetPayment(PromotionPaymentType paymentType) => paymentType switch

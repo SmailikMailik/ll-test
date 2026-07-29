@@ -25,7 +25,7 @@ namespace LL.User.Persistence
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<ItemId, int> _itemAmounts;
-        private readonly HashSet<RewardBundleId> _claimedRewardIds;
+        private readonly HashSet<RewardId> _claimedRewardIds;
         private UserProgressSnapshot _progressSnapshot;
         private UserPromotionOrderSnapshot _promotionOrderSnapshot;
 
@@ -58,7 +58,7 @@ namespace LL.User.Persistence
                 _promotionOrder.RequirementId,
                 _promotionOrder.DeadlineUnixMilliseconds,
                 _promotionOrder.IsCompleted);
-            _claimedRewardIds = new HashSet<RewardBundleId>(_rewardClaims.ClaimedIds);
+            _claimedRewardIds = new HashSet<RewardId>(_rewardClaims.ClaimedIds);
         }
 
         public void Initialize()
@@ -98,7 +98,7 @@ namespace LL.User.Persistence
             Save();
         }
 
-        private void OnRewardClaimed(RewardBundleId rewardId)
+        private void OnRewardClaimed(RewardId rewardId)
         {
             if (_claimedRewardIds.Add(rewardId))
                 Save();

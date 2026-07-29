@@ -28,10 +28,10 @@ namespace LLEditor.Game
             ConfigurationAssetSelector.Select<CardCatalogConfig>(CardCatalogConfig.CreationPath);
         }
 
-        [MenuItem(LLMenu.GamePath + "Rewards/Reward Bundle Catalog", false, LLMenu.ContentPriority)]
-        private static void SelectRewardBundleCatalog()
+        [MenuItem(LLMenu.GamePath + "Rewards/Reward Catalog", false, LLMenu.ContentPriority)]
+        private static void SelectRewardCatalog()
         {
-            ConfigurationAssetSelector.Select<RewardBundleCatalogConfig>(RewardBundleCatalogConfig.CreationPath);
+            ConfigurationAssetSelector.Select<RewardCatalogConfig>(RewardCatalogConfig.CreationPath);
         }
     }
 }

@@ -6,10 +6,10 @@ namespace LL.User.State.Rewards
 {
     internal interface IUserRewardClaims
     {
-        IReadOnlyCollection<RewardBundleId> ClaimedIds { get; }
-        Observable<RewardBundleId> RewardClaimed { get; }
+        IReadOnlyCollection<RewardId> ClaimedIds { get; }
+        Observable<RewardId> RewardClaimed { get; }
 
-        bool Contains(RewardBundleId id);
-        bool TryClaim(RewardBundleId id);
+        bool Contains(RewardId id);
+        bool TryClaim(RewardId id);
     }
 }

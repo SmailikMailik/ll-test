@@ -8,13 +8,13 @@ namespace LL.User.Snapshots
 {
     internal sealed class UserRewardClaimsSnapshot
     {
-        internal static UserRewardClaimsSnapshot Empty { get; } = new(Array.Empty<RewardBundleId>());
+        internal static UserRewardClaimsSnapshot Empty { get; } = new(Array.Empty<RewardId>());
 
-        internal IReadOnlyList<RewardBundleId> ClaimedIds { get; }
+        internal IReadOnlyList<RewardId> ClaimedIds { get; }
 
-        internal UserRewardClaimsSnapshot(IEnumerable<RewardBundleId> claimedIds)
+        internal UserRewardClaimsSnapshot(IEnumerable<RewardId> claimedIds)
         {
-            var copy = claimedIds?.ToArray() ?? Array.Empty<RewardBundleId>();
+            var copy = claimedIds?.ToArray() ?? Array.Empty<RewardId>();
 
             IdentifierCollectionValidator.EnsureValid(
                 copy,

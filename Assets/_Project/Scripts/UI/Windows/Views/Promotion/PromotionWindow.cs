@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Items;
 using LL.Game.Promotions;
 using LL.Game.Promotions.Services;
 using LL.Game.Ranks;
-using LL.Game.Rewards;
 using LL.Presentation.Payments;
 using LL.UI.Controls;
 using LL.UI.Typography;
@@ -96,9 +96,9 @@ namespace LL.UI.Windows.Views.Promotion
                 RefreshActions);
         }
 
-        private void CompletePromotion(IReadOnlyList<IReward> rewards)
+        private void CompletePromotion(IReadOnlyList<ItemAmount> rewardItems)
         {
-            _upgradeFlow.CompletePromotion(_userProgress.Rank, rewards);
+            _upgradeFlow.CompletePromotion(_userProgress.Rank, rewardItems);
         }
 
         private void RefreshActions()

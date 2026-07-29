@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LL.Game.Rewards;
+using LL.Game.Items;
 using LL.UI.Rewards;
 using TMPro;
 using UnityEngine;
@@ -19,7 +19,7 @@ namespace LL.UI.Windows.Views.Reward
         protected override void OnShow()
         {
             _rankLabel.text = Parameters.Rank.ToString();
-            _rewardContainer.SetRewards(Parameters.Rewards);
+            _rewardContainer.SetItems(Parameters.Items);
             _animation.Play();
         }
 
@@ -34,12 +34,12 @@ namespace LL.UI.Windows.Views.Reward
     internal sealed class RewardWindowParameters : IWindowParameters
     {
         internal int Rank { get; }
-        internal IReadOnlyList<IReward> Rewards { get; }
+        internal IReadOnlyList<ItemAmount> Items { get; }
 
-        internal RewardWindowParameters(int rank, IReadOnlyList<IReward> rewards)
+        internal RewardWindowParameters(int rank, IReadOnlyList<ItemAmount> items)
         {
             Rank = rank;
-            Rewards = Array.AsReadOnly(rewards?.ToArray() ?? Array.Empty<IReward>());
+            Items = Array.AsReadOnly(items?.ToArray() ?? Array.Empty<ItemAmount>());
         }
     }
 }

@@ -22,7 +22,7 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_1_promotion
+    _rewardId: rank_1_promotion
   - _rank: 2
     _durationMinutes: 1440
     _requirementId: headshots
@@ -32,7 +32,7 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_2_promotion
+    _rewardId: rank_2_promotion
   - _rank: 3
     _durationMinutes: 1440
     _requirementId: headshots
@@ -42,7 +42,7 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_3_promotion
+    _rewardId: rank_3_promotion
   - _rank: 4
     _durationMinutes: 1440
     _requirementId: headshots
@@ -52,7 +52,7 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_4_promotion
+    _rewardId: rank_4_promotion
   - _rank: 5
     _durationMinutes: 1440
     _requirementId: headshots
@@ -62,7 +62,7 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_5_promotion
+    _rewardId: rank_5_promotion
   - _rank: 6
     _durationMinutes: 1440
     _requirementId: headshots
@@ -72,7 +72,7 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_6_promotion
+    _rewardId: rank_6_promotion
   - _rank: 7
     _durationMinutes: 1440
     _requirementId: headshots
@@ -82,7 +82,7 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_7_promotion
+    _rewardId: rank_7_promotion
   - _rank: 8
     _durationMinutes: 1440
     _requirementId: headshots
@@ -92,4 +92,4 @@ MonoBehaviour:
     _targetLocalizationKey: Game/heroes.soldier
     _softPrice: 99900
     _hardPrice: 999
-    _rewardBundleId: rank_8_promotion
+    _rewardId: rank_8_promotion

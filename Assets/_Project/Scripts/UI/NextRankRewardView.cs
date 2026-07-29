@@ -21,7 +21,7 @@ namespace LL.UI
         private const string RankVariable = "rank";
 
         private RankPromotionCatalog _promotionCatalog;
-        private RewardBundleCatalog _rewardBundleCatalog;
+        private RewardCatalog _rewardCatalog;
         private ILocalizationService _localization;
         private int _nextRank;
         private bool _hasPreview;
@@ -29,11 +29,11 @@ namespace LL.UI
         [Inject]
         private void Construct(
             RankPromotionCatalog promotionCatalog,
-            RewardBundleCatalog rewardBundleCatalog,
+            RewardCatalog rewardCatalog,
             ILocalizationService localization)
         {
             _promotionCatalog = promotionCatalog ?? throw new ArgumentNullException(nameof(promotionCatalog));
-            _rewardBundleCatalog = rewardBundleCatalog ?? throw new ArgumentNullException(nameof(rewardBundleCatalog));
+            _rewardCatalog = rewardCatalog ?? throw new ArgumentNullException(nameof(rewardCatalog));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
 
@@ -50,9 +50,9 @@ namespace LL.UI
                 return;
             }
 
-            if (_rewardBundleCatalog.TryGetBundle(promotion.RewardBundleId, out var bundle) is false)
+            if (_rewardCatalog.TryGetReward(promotion.RewardId, out var reward) is false)
             {
-                Debug.LogError($"Missing reward bundle for rank promotion: {promotion.RewardBundleId}", this);
+                Debug.LogError($"Missing reward for rank promotion: {promotion.RewardId}", this);
                 Clear();
                 return;
             }
@@ -61,7 +61,7 @@ namespace LL.UI
             _hasPreview = true;
             gameObject.SetActive(true);
             RefreshTitle();
-            _rewardContainer.SetRewards(bundle.Rewards);
+            _rewardContainer.SetItems(reward.Items);
         }
 
         internal void Clear()

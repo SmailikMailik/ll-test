@@ -75,8 +75,8 @@ namespace LL.Game.Promotions.Configuration
                     HardPriceCode);
 
                 IdentifierValidator.Validate(
-                    promotion.RewardBundleId,
-                    promotionContext.At(nameof(RankPromotionEntry.RewardBundleId)));
+                    promotion.RewardId,
+                    promotionContext.At(nameof(RankPromotionEntry.RewardId)));
             }
         }
     }

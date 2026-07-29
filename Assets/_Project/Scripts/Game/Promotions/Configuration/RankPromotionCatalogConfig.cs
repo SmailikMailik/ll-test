@@ -7,6 +7,7 @@ using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace LL.Game.Promotions.Configuration
 {
@@ -93,7 +94,8 @@ namespace LL.Game.Promotions.Configuration
 
         [BoxGroup("Columns/Economy")]
         [LabelText("Reward")]
-        [SerializeField] private string _rewardBundleId;
+        [FormerlySerializedAs("_rewardBundleId")]
+        [SerializeField] private string _rewardId;
 
         internal int Rank => _rank;
         internal int DurationMinutes => _durationMinutes;
@@ -104,7 +106,7 @@ namespace LL.Game.Promotions.Configuration
         internal string TargetLocalizationKey => _targetLocalizationKey;
         internal int SoftPrice => _softPrice;
         internal int HardPrice => _hardPrice;
-        internal RewardBundleId RewardBundleId => new(_rewardBundleId);
+        internal RewardId RewardId => new(_rewardId);
 
         internal RankPromotion ToPromotion()
         {
@@ -119,7 +121,7 @@ namespace LL.Game.Promotions.Configuration
                 TimeSpan.FromMinutes(DurationMinutes),
                 new Payment(ItemIds.Soft, SoftPrice),
                 new Payment(ItemIds.Hard, HardPrice),
-                RewardBundleId);
+                RewardId);
         }
     }
 }

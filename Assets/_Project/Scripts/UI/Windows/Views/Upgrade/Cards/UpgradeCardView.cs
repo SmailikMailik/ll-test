@@ -40,16 +40,16 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         private readonly Subject<int> _availableAmountChanged = new();
 
         private IUserItems _userItems;
-        private IIconProvider<ItemId> _iconProvider;
+        private IconCatalog<ItemId> _iconCatalog;
         private bool _isInitialized;
 
         [Inject]
         private void Construct(
             IUserItems userItems,
-            IIconProvider<ItemId> iconProvider)
+            IconCatalog<ItemId> iconCatalog)
         {
             _userItems = userItems ?? throw new ArgumentNullException(nameof(userItems));
-            _iconProvider = iconProvider ?? throw new ArgumentNullException(nameof(iconProvider));
+            _iconCatalog = iconCatalog ?? throw new ArgumentNullException(nameof(iconCatalog));
         }
 
         internal void Initialize(ICard card)
@@ -63,7 +63,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             if (string.IsNullOrWhiteSpace(card.Id.Value))
                 throw new ArgumentException("Card Id cannot be empty.", nameof(card));
 
-            if (_iconProvider.TryGetIcon(card.Id, out var icon) is false)
+            if (_iconCatalog.TryGetIcon(card.Id, out var icon) is false)
                 throw new KeyNotFoundException($"Missing icon for Card Id: {card.Id}");
 
             _isInitialized = true;

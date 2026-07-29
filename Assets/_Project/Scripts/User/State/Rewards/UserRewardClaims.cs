@@ -9,11 +9,11 @@ namespace LL.User.State.Rewards
 {
     internal sealed class UserRewardClaims : IUserRewardClaims, IDisposable
     {
-        public IReadOnlyCollection<RewardBundleId> ClaimedIds => _claimedIds;
-        public Observable<RewardBundleId> RewardClaimed => _rewardClaimed;
+        public IReadOnlyCollection<RewardId> ClaimedIds => _claimedIds;
+        public Observable<RewardId> RewardClaimed => _rewardClaimed;
 
-        private readonly HashSet<RewardBundleId> _claimedIds;
-        private readonly Subject<RewardBundleId> _rewardClaimed = new();
+        private readonly HashSet<RewardId> _claimedIds;
+        private readonly Subject<RewardId> _rewardClaimed = new();
 
         [Inject]
         internal UserRewardClaims(UserRewardClaimsSnapshot snapshot)
@@ -21,12 +21,12 @@ namespace LL.User.State.Rewards
             if (snapshot == null)
                 throw new ArgumentNullException(nameof(snapshot));
 
-            _claimedIds = new HashSet<RewardBundleId>(snapshot.ClaimedIds);
+            _claimedIds = new HashSet<RewardId>(snapshot.ClaimedIds);
         }
 
-        public bool Contains(RewardBundleId id) => _claimedIds.Contains(id);
+        public bool Contains(RewardId id) => _claimedIds.Contains(id);
 
-        public bool TryClaim(RewardBundleId id)
+        public bool TryClaim(RewardId id)
         {
             if (string.IsNullOrWhiteSpace(id.Value) || _claimedIds.Add(id) is false)
                 return false;

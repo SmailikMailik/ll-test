@@ -19,7 +19,7 @@ namespace LLEditor.Validation.Sources
             typeof(CardCatalogConfig),
             typeof(RankCatalogConfig),
             typeof(RankPromotionCatalogConfig),
-            typeof(RewardBundleCatalogConfig),
+            typeof(RewardCatalogConfig),
             typeof(ItemIconCatalogConfig),
             typeof(UserDefaultsConfig)
         };

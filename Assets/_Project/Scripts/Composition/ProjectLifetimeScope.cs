@@ -1,7 +1,6 @@
 using System;
 using LL.Composition.Persistence;
 using LL.Game.Cards.Configuration;
-using LL.Game.Identifiers;
 using LL.Game.Payments;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Ranks.Configuration;
@@ -26,6 +25,7 @@ using LL.User.State.Promotions;
 using LL.User.State.Rewards;
 using LL.Validation.Reporting;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer.Unity;
 using VContainer;
 
@@ -40,7 +40,9 @@ namespace LL.Composition
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private CardCatalogConfig _cardCatalogConfig;
         [SerializeField] private RankPromotionCatalogConfig _rankPromotionCatalogConfig;
-        [SerializeField] private RewardBundleCatalogConfig _rewardBundleCatalogConfig;
+
+        [FormerlySerializedAs("_rewardBundleCatalogConfig")]
+        [SerializeField] private RewardCatalogConfig _rewardCatalogConfig;
 
         [Header("Presentation")]
         [SerializeField] private ItemIconCatalogConfig _itemIconCatalogConfig;
@@ -83,13 +85,12 @@ namespace LL.Composition
             RegisterLoadedData(builder, _rankCatalogConfig);
             RegisterLoadedData(builder, _cardCatalogConfig);
             RegisterLoadedData(builder, _rankPromotionCatalogConfig);
-            RegisterLoadedData(builder, _rewardBundleCatalogConfig);
+            RegisterLoadedData(builder, _rewardCatalogConfig);
         }
 
         private void RegisterPresentation(IContainerBuilder builder)
         {
-            RegisterIconCatalog(builder, _itemIconCatalogConfig);
-            builder.Register<RewardIconProvider>(Lifetime.Singleton);
+            RegisterLoadedData(builder, _itemIconCatalogConfig);
         }
 
         private void RegisterUserPersistence(IContainerBuilder builder)
@@ -121,8 +122,6 @@ namespace LL.Composition
         {
             builder.Register<PaymentService>(Lifetime.Singleton).As<IPaymentService>();
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
-            builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
-            builder.Register<RewardGrantPolicy>(Lifetime.Singleton);
             builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();
         }
 
@@ -135,17 +134,6 @@ namespace LL.Composition
         private static void RegisterLoadedData<TData>(IContainerBuilder builder)
         {
             builder.Register(resolver => resolver.Resolve<IDataLoader<TData>>().Load(), Lifetime.Singleton);
-        }
-
-        private static void RegisterIconCatalog<TId>(
-            IContainerBuilder builder,
-            IDataLoader<IconCatalog<TId>> loader)
-            where TId : struct, IIdentifier
-        {
-            builder.RegisterInstance(loader);
-            builder
-                .Register(resolver => resolver.Resolve<IDataLoader<IconCatalog<TId>>>().Load(), Lifetime.Singleton)
-                .As<IIconProvider<TId>>();
         }
 
         private static void RegisterUserSnapshotPart<TData>(

@@ -17,10 +17,10 @@ namespace LLEditor.Validation.References.Items
             ProjectDataSources sources,
             ValidationContext context)
         {
-            var config = sources.GetSingle<RewardBundleCatalogConfig>();
-            var bundles = config?.Bundles;
+            var config = sources.GetSingle<RewardCatalogConfig>();
+            var rewards = config?.Rewards;
 
-            if (bundles == null)
+            if (rewards == null)
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
@@ -40,30 +40,30 @@ namespace LLEditor.Validation.References.Items
 
             var configContext = context.At(AssetDatabase.GetAssetPath(config));
 
-            for (var bundleIndex = 0; bundleIndex < bundles.Length; bundleIndex++)
+            for (var rewardIndex = 0; rewardIndex < rewards.Length; rewardIndex++)
             {
-                var rewards = bundles[bundleIndex]?.Rewards;
+                var items = rewards[rewardIndex]?.Items;
 
-                if (rewards == null)
+                if (items == null)
                     continue;
 
-                for (var rewardIndex = 0; rewardIndex < rewards.Length; rewardIndex++)
+                for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
                 {
-                    var reward = rewards[rewardIndex];
+                    var item = items[itemIndex];
 
-                    if (reward == null || IdentifierValidator.IsValid(reward.Id) is false)
+                    if (item == null || IdentifierValidator.IsValid(item.Id) is false)
                         continue;
 
                     var idContext = configContext
-                        .At(bundleIndex)
-                        .At(nameof(RewardBundleEntry.Rewards))
                         .At(rewardIndex)
-                        .At(nameof(ItemRewardEntry.Id));
+                        .At(nameof(RewardEntry.Items))
+                        .At(itemIndex)
+                        .At(nameof(RewardItemEntry.Id));
 
                     if (hasUserItems)
                     {
                         ValidationRules.ReferenceExists(
-                            reward.Id,
+                            item.Id,
                             userItemIds,
                             idContext,
                             UserItemCode);
@@ -72,7 +72,7 @@ namespace LLEditor.Validation.References.Items
                     if (hasIcons)
                     {
                         ValidationRules.ReferenceExists(
-                            reward.Id,
+                            item.Id,
                             iconIds,
                             idContext,
                             IconCode);

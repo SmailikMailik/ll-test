@@ -26,7 +26,7 @@ namespace LL.User.Persistence
                     saveData.PromotionOrder.DeadlineUnixMilliseconds,
                     saveData.PromotionOrder.IsCompleted),
                 new UserRewardClaimsSnapshot(
-                    saveData.ClaimedRewardIds.Select(id => new RewardBundleId(id))));
+                    saveData.ClaimedRewardIds.Select(id => new RewardId(id))));
         }
 
         internal static UserSaveData ToSaveData(UserSnapshot snapshot)

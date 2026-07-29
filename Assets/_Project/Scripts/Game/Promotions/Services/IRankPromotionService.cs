@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Rewards;
+using LL.Game.Items;
 
 namespace LL.Game.Promotions.Services
 {
@@ -10,7 +10,7 @@ namespace LL.Game.Promotions.Services
 
         void Promote(
             PromotionPaymentType paymentType,
-            Action<IReadOnlyList<IReward>> onSucceeded,
+            Action<IReadOnlyList<ItemAmount>> onSucceeded,
             Action onFailed);
     }
 }

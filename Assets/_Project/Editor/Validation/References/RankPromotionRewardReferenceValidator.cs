@@ -11,38 +11,38 @@ namespace LLEditor.Validation.References
 {
     internal sealed class RankPromotionRewardReferenceValidator : IProjectDataReferenceValidation
     {
-        private const string RewardBundleExistsCode = "rank-promotion.reward-bundle.exists";
+        private const string RewardExistsCode = "rank-promotion.reward.exists";
 
         public void Validate(
             ProjectDataSources sources,
             ValidationContext context)
         {
             var promotions = sources.GetSingle<RankPromotionCatalogConfig>();
-            var rewards = sources.GetSingle<RewardBundleCatalogConfig>();
+            var rewards = sources.GetSingle<RewardCatalogConfig>();
 
             if (promotions == null || rewards == null)
                 return;
 
             ValidateReferences(
                 promotions.Promotions,
-                rewards.Bundles,
+                rewards.Rewards,
                 context.At(AssetDatabase.GetAssetPath(promotions)));
         }
 
         private static void ValidateReferences(
             IReadOnlyList<RankPromotionEntry> promotions,
-            IEnumerable<RewardBundleEntry> bundles,
+            IEnumerable<RewardEntry> rewards,
             ValidationContext context)
         {
-            if (promotions == null || bundles == null)
+            if (promotions == null || rewards == null)
                 return;
 
-            var bundleIds = new HashSet<RewardBundleId>();
+            var rewardIds = new HashSet<RewardId>();
 
-            foreach (var bundle in bundles)
+            foreach (var reward in rewards)
             {
-                if (bundle != null && IdentifierValidator.IsValid(bundle.Id))
-                    bundleIds.Add(bundle.Id);
+                if (reward != null && IdentifierValidator.IsValid(reward.Id))
+                    rewardIds.Add(reward.Id);
             }
 
             for (var index = 0; index < promotions.Count; index++)
@@ -50,16 +50,16 @@ namespace LLEditor.Validation.References
                 var promotion = promotions[index];
 
                 if (promotion == null ||
-                    IdentifierValidator.IsValid(promotion.RewardBundleId) is false)
+                    IdentifierValidator.IsValid(promotion.RewardId) is false)
                 {
                     continue;
                 }
 
                 ValidationRules.ReferenceExists(
-                    promotion.RewardBundleId,
-                    bundleIds,
-                    context.At(index).At(nameof(RankPromotionEntry.RewardBundleId)),
-                    RewardBundleExistsCode);
+                    promotion.RewardId,
+                    rewardIds,
+                    context.At(index).At(nameof(RankPromotionEntry.RewardId)),
+                    RewardExistsCode);
             }
         }
     }

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Rewards;
+using LL.Game.Items;
 using LL.Presentation.Collections;
 using LL.Presentation.Icons;
 using UnityEngine;
@@ -15,12 +15,12 @@ namespace LL.UI.Rewards
         [SerializeField] private RectTransform _viewContainer;
 
         private ReusableComponentCollection<RewardView> _views;
-        private RewardIconProvider _iconProvider;
+        private IconCatalog<ItemId> _icons;
 
         [Inject]
-        private void Construct(RewardIconProvider iconProvider)
+        private void Construct(IconCatalog<ItemId> icons)
         {
-            _iconProvider = iconProvider ?? throw new ArgumentNullException(nameof(iconProvider));
+            _icons = icons ?? throw new ArgumentNullException(nameof(icons));
         }
 
         private void Awake()
@@ -28,25 +28,27 @@ namespace LL.UI.Rewards
             _views = new ReusableComponentCollection<RewardView>(_viewPrefab, _viewContainer);
         }
 
-        internal void SetRewards(IReadOnlyList<IReward> rewards)
+        internal void SetItems(IReadOnlyList<ItemAmount> items)
         {
-            if (rewards is null)
+            if (items is null)
             {
                 Clear();
                 return;
             }
 
-            var rewardCount = rewards.Count;
-            _views.EnsureCapacity(rewardCount);
+            _views.EnsureCapacity(items.Count);
 
-            for (var index = 0; index < rewardCount; index++)
+            for (var index = 0; index < items.Count; index++)
             {
-                var reward = rewards[index];
-                var icon = _iconProvider.GetIcon(reward);
-                _views[index].UpdateView(icon, reward.Amount);
+                var item = items[index];
+
+                if (_icons.TryGetIcon(item.Id, out var icon) is false)
+                    throw new KeyNotFoundException($"Missing reward item icon: {item.Id}.");
+
+                _views[index].UpdateView(icon, item.Amount);
             }
 
-            _views.SetActiveCount(rewardCount);
+            _views.SetActiveCount(items.Count);
         }
 
         internal void Clear()
