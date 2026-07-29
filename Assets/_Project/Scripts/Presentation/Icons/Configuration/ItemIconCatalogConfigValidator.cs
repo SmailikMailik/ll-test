@@ -5,19 +5,20 @@ namespace LL.Presentation.Icons.Configuration
 {
     internal sealed class ItemIconCatalogConfigValidator : IDataValidator<ItemIconEntry[]>
     {
+        private const string EntriesCode = "item-icon.entries.required";
         private const string IconCode = "item-icon.sprite.required";
 
         public void Validate(
             ItemIconEntry[] icons,
             ValidationContext context)
         {
+            if (ValidationRules.NotNull(icons, context, EntriesCode) is false)
+                return;
+
             IdentifierCollectionValidator.Validate(
                 icons,
                 entry => entry.Id,
                 context);
-
-            if (icons == null)
-                return;
 
             for (var index = 0; index < icons.Length; index++)
             {

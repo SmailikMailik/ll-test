@@ -5,19 +5,20 @@ namespace LL.Game.Cards.Configuration
 {
     internal sealed class CardCatalogConfigValidator : IDataValidator<CardDefinitionEntry[]>
     {
+        private const string CardsCode = "card.entries.required";
         private const string ExperienceAmountCode = "card.experience.positive";
 
         public void Validate(
             CardDefinitionEntry[] cards,
             ValidationContext context)
         {
+            if (ValidationRules.NotNull(cards, context, CardsCode) is false)
+                return;
+
             IdentifierCollectionValidator.Validate(
                 cards,
                 card => card.Id,
                 context);
-
-            if (cards == null)
-                return;
 
             for (var index = 0; index < cards.Length; index++)
             {

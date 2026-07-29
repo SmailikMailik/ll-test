@@ -1,4 +1,5 @@
 using LL.Validation;
+using LLEditor.Validation.References.Items;
 using LLEditor.Validation.Sources;
 
 namespace LLEditor.Validation.References
@@ -10,7 +11,9 @@ namespace LLEditor.Validation.References
             new RankPromotionRankReferenceValidator(),
             new RankPromotionRewardReferenceValidator(),
             new UserProgressRankReferenceValidator(),
-            new ProjectItemReferenceValidator()
+            new BuiltInUserItemReferenceValidator(),
+            new CardItemReferenceValidator(),
+            new RewardItemReferenceValidator()
         };
 
         internal void Validate(

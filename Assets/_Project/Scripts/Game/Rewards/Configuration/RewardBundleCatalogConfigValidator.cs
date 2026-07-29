@@ -5,6 +5,7 @@ namespace LL.Game.Rewards.Configuration
 {
     internal sealed class RewardBundleCatalogConfigValidator : IDataValidator<RewardBundleEntry[]>
     {
+        private const string BundlesCode = "reward-bundle.entries.required";
         private const string GrantModeCode = "reward-bundle.grant-mode.defined";
         private const string RewardsCode = "reward-bundle.rewards.not-empty";
         private const string RewardAmountCode = "reward.amount.positive";
@@ -13,13 +14,13 @@ namespace LL.Game.Rewards.Configuration
             RewardBundleEntry[] bundles,
             ValidationContext context)
         {
+            if (ValidationRules.NotNull(bundles, context, BundlesCode) is false)
+                return;
+
             IdentifierCollectionValidator.Validate(
                 bundles,
                 bundle => bundle.Id,
                 context);
-
-            if (bundles == null)
-                return;
 
             for (var bundleIndex = 0; bundleIndex < bundles.Length; bundleIndex++)
             {
