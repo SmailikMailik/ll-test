@@ -30,9 +30,9 @@ namespace LL.User.Configuration
             if (ValidationRules.NotNull(defaults, context, ConfigCode) is false)
                 return;
 
-            ValidateIdentity(defaults.Identity, context.At("Identity"));
-            ValidateProgress(defaults.Progress, context.At("Progress"));
-            _itemsValidator.Validate(defaults.Items, context.At("Items"));
+            ValidateIdentity(defaults.Identity, context.At(nameof(UserDefaultsConfig.Identity)));
+            ValidateProgress(defaults.Progress, context.At(nameof(UserDefaultsConfig.Progress)));
+            _itemsValidator.Validate(defaults.Items, context.At(nameof(UserDefaultsConfig.Items)));
         }
 
         private static void ValidateIdentity(
@@ -44,27 +44,27 @@ namespace LL.User.Configuration
 
             ValidationRules.NotEmpty(
                 identity.UserId,
-                context.At("UserId"),
+                context.At(nameof(UserIdentityDefaults.UserId)),
                 UserIdCode);
 
             ValidationRules.Trimmed(
                 identity.UserId,
-                context.At("UserId"),
+                context.At(nameof(UserIdentityDefaults.UserId)),
                 UserIdWhitespaceCode);
 
             ValidationRules.NotEmpty(
                 identity.RegionCode,
-                context.At("RegionCode"),
+                context.At(nameof(UserIdentityDefaults.RegionCode)),
                 RegionCodeCode);
 
             ValidationRules.Trimmed(
                 identity.RegionCode,
-                context.At("RegionCode"),
+                context.At(nameof(UserIdentityDefaults.RegionCode)),
                 RegionWhitespaceCode);
 
             ValidationRules.Uppercase(
                 identity.RegionCode,
-                context.At("RegionCode"),
+                context.At(nameof(UserIdentityDefaults.RegionCode)),
                 RegionCaseCode);
         }
 
@@ -77,12 +77,12 @@ namespace LL.User.Configuration
 
             ValidationRules.Positive(
                 progress.Rank,
-                context.At("Rank"),
+                context.At(nameof(UserProgressDefaults.Rank)),
                 RankCode);
 
             ValidationRules.NonNegative(
                 progress.Experience,
-                context.At("Experience"),
+                context.At(nameof(UserProgressDefaults.Experience)),
                 ExperienceCode);
         }
     }

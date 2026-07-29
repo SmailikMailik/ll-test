@@ -28,8 +28,7 @@ namespace LL.Presentation.Icons.Configuration
 
         public IconCatalog<ItemId> Load()
         {
-            var result = ValidationRunner.Run(this);
-            ValidationResultGuard.EnsureValid(result, nameof(_icons));
+            ValidationRunner.EnsureValid(this, nameof(_icons));
 
             var icons = _icons?.Select(entry => entry.ToPair());
 
@@ -38,7 +37,7 @@ namespace LL.Presentation.Icons.Configuration
 
         private static bool HasValidIcons(ItemIconEntry[] icons)
         {
-            return ValidationRunner.Run(icons, _validator).IsValid;
+            return ValidationRunner.IsValid(icons, _validator);
         }
 
         void IValidationSource.Validate(ValidationContext context)

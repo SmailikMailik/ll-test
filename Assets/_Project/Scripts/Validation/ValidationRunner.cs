@@ -25,5 +25,19 @@ namespace LL.Validation
             validator.Validate(value, new ValidationContext(result));
             return result;
         }
+
+        internal static void EnsureValid(
+            IValidationSource source,
+            string parameterName = null)
+        {
+            ValidationResultGuard.EnsureValid(Run(source), parameterName);
+        }
+
+        internal static bool IsValid<T>(
+            T value,
+            IDataValidator<T> validator)
+        {
+            return Run(value, validator).IsValid;
+        }
     }
 }

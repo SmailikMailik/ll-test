@@ -30,14 +30,15 @@ namespace LL.Game.Ranks.Configuration
                 if (requirement.Rank != expectedRank)
                 {
                     requirementContext
-                        .At("Rank")
+                        .At(nameof(RankExperienceRequirementEntry.Rank))
                         .Report(
                             ValidationSeverity.Error,
                             RankSequenceCode,
                             $"Rank must be {expectedRank} at index {index}.");
                 }
 
-                var experienceContext = requirementContext.At("RequiredExperience");
+                var experienceContext = requirementContext.At(
+                    nameof(RankExperienceRequirementEntry.RequiredExperience));
 
                 if (index == 0)
                 {

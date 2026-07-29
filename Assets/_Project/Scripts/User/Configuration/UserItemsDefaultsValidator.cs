@@ -29,7 +29,7 @@ namespace LL.User.Configuration
 
                 ValidationRules.NonNegative(
                     item.Amount,
-                    context.At(index).At("Amount"),
+                    context.At(index).At(nameof(ItemAmountEntry.Amount)),
                     AmountCode);
             }
         }

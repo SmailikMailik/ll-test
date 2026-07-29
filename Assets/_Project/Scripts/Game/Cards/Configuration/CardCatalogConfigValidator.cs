@@ -29,7 +29,7 @@ namespace LL.Game.Cards.Configuration
 
                 ValidationRules.Positive(
                     card.ExperienceAmount,
-                    context.At(index).At("ExperienceAmount"),
+                    context.At(index).At(nameof(CardDefinitionEntry.ExperienceAmount)),
                     ExperienceAmountCode);
             }
         }

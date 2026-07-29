@@ -39,8 +39,7 @@ namespace LL.User.Configuration
 
         UserSnapshot IUserDefaultsProvider.GetDefaultSnapshot()
         {
-            var result = ValidationRunner.Run(this);
-            ValidationResultGuard.EnsureValid(result);
+            ValidationRunner.EnsureValid(this);
 
             return new UserSnapshot(
                 Identity.ToSnapshot(),
@@ -52,7 +51,7 @@ namespace LL.User.Configuration
 
         private static bool HasValidItems(ItemAmountEntry[] entries)
         {
-            return ValidationRunner.Run(entries, _itemsValidator).IsValid;
+            return ValidationRunner.IsValid(entries, _itemsValidator);
         }
 
         void IValidationSource.Validate(ValidationContext context)

@@ -30,15 +30,14 @@ namespace LL.Game.Promotions.Configuration
 
         public RankPromotionCatalog Load()
         {
-            var result = ValidationRunner.Run(this);
-            ValidationResultGuard.EnsureValid(result, nameof(_promotions));
+            ValidationRunner.EnsureValid(this, nameof(_promotions));
 
             return new RankPromotionCatalog(_promotions?.Select(entry => entry.ToPromotion()));
         }
 
         private static bool HasValidPromotions(RankPromotionEntry[] promotions)
         {
-            return ValidationRunner.Run(promotions, _validator).IsValid;
+            return ValidationRunner.IsValid(promotions, _validator);
         }
 
         void IValidationSource.Validate(ValidationContext context)

@@ -60,7 +60,7 @@ namespace LLEditor.Validation.References
                 if (ValidationRules.ReferenceExists(
                         promotion.Rank,
                         ranks,
-                        context.At(index).At("Rank"),
+                        context.At(index).At(nameof(RankPromotionEntry.Rank)),
                         RankExistsCode) is false)
                 {
                     continue;
@@ -70,7 +70,7 @@ namespace LLEditor.Validation.References
                 {
                     context
                         .At(index)
-                        .At("Rank")
+                        .At(nameof(RankPromotionEntry.Rank))
                         .Report(
                             ValidationSeverity.Error,
                             FinalRankCode,

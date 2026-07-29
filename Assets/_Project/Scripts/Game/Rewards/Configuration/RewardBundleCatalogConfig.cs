@@ -28,15 +28,14 @@ namespace LL.Game.Rewards.Configuration
 
         public RewardBundleCatalog Load()
         {
-            var result = ValidationRunner.Run(this);
-            ValidationResultGuard.EnsureValid(result, nameof(_bundles));
+            ValidationRunner.EnsureValid(this, nameof(_bundles));
 
             return new RewardBundleCatalog(_bundles?.Select(entry => entry.ToBundle()));
         }
 
         private static bool HasValidBundles(RewardBundleEntry[] bundles)
         {
-            return ValidationRunner.Run(bundles, _validator).IsValid;
+            return ValidationRunner.IsValid(bundles, _validator);
         }
 
         void IValidationSource.Validate(ValidationContext context)

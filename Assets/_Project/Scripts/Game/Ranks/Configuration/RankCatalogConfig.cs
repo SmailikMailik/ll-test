@@ -25,15 +25,14 @@ namespace LL.Game.Ranks.Configuration
 
         public RankCatalog Load()
         {
-            var result = ValidationRunner.Run(this);
-            ValidationResultGuard.EnsureValid(result, nameof(_rankRequirements));
+            ValidationRunner.EnsureValid(this, nameof(_rankRequirements));
 
             return new RankCatalog(_rankRequirements.Select(requirement => requirement.RequiredExperience));
         }
 
         private static bool HasValidRequirements(RankExperienceRequirementEntry[] requirements)
         {
-            return ValidationRunner.Run(requirements, _validator).IsValid;
+            return ValidationRunner.IsValid(requirements, _validator);
         }
 
         void IValidationSource.Validate(ValidationContext context)

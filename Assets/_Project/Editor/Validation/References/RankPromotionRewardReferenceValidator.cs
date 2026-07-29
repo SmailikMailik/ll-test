@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LL.Game.Identifiers;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Rewards;
 using LL.Game.Rewards.Configuration;
@@ -40,7 +41,7 @@ namespace LLEditor.Validation.References
 
             foreach (var bundle in bundles)
             {
-                if (bundle != null)
+                if (bundle != null && IdentifierValidator.IsValid(bundle.Id))
                     bundleIds.Add(bundle.Id);
             }
 
@@ -48,13 +49,16 @@ namespace LLEditor.Validation.References
             {
                 var promotion = promotions[index];
 
-                if (promotion == null || promotion.RewardBundleId.IsEmpty)
+                if (promotion == null ||
+                    IdentifierValidator.IsValid(promotion.RewardBundleId) is false)
+                {
                     continue;
+                }
 
                 ValidationRules.ReferenceExists(
                     promotion.RewardBundleId,
                     bundleIds,
-                    context.At(index).At("RewardBundleId"),
+                    context.At(index).At(nameof(RankPromotionEntry.RewardBundleId)),
                     RewardBundleExistsCode);
             }
         }

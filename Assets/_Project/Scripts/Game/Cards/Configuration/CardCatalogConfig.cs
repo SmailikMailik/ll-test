@@ -25,15 +25,14 @@ namespace LL.Game.Cards.Configuration
 
         public CardCatalog Load()
         {
-            var result = ValidationRunner.Run(this);
-            ValidationResultGuard.EnsureValid(result, nameof(_cards));
+            ValidationRunner.EnsureValid(this, nameof(_cards));
 
             return new CardCatalog(_cards?.Select(card => card.ToCard()));
         }
 
         private static bool HasValidCards(CardDefinitionEntry[] cards)
         {
-            return ValidationRunner.Run(cards, _validator).IsValid;
+            return ValidationRunner.IsValid(cards, _validator);
         }
 
         void IValidationSource.Validate(ValidationContext context)

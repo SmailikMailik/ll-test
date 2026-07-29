@@ -33,11 +33,11 @@ namespace LL.Game.Rewards.Configuration
 
                 ValidationRules.DefinedEnum(
                     bundle.GrantMode,
-                    bundleContext.At("GrantMode"),
+                    bundleContext.At(nameof(RewardBundleEntry.GrantMode)),
                     GrantModeCode);
 
                 var rewards = bundle.Rewards;
-                var rewardsContext = bundleContext.At("Rewards");
+                var rewardsContext = bundleContext.At(nameof(RewardBundleEntry.Rewards));
 
                 if (ValidationRules.NotEmpty(rewards, rewardsContext, RewardsCode) is false)
                     continue;
@@ -56,7 +56,7 @@ namespace LL.Game.Rewards.Configuration
 
                     ValidationRules.Positive(
                         reward.Amount,
-                        rewardsContext.At(rewardIndex).At("Amount"),
+                        rewardsContext.At(rewardIndex).At(nameof(ItemRewardEntry.Amount)),
                         RewardAmountCode);
                 }
             }

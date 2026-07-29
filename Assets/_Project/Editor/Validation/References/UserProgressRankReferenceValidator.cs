@@ -29,7 +29,7 @@ namespace LLEditor.Validation.References
                 ranks.RankRequirements,
                 context
                     .At(AssetDatabase.GetAssetPath(userDefaults))
-                    .At("Progress"));
+                    .At(nameof(UserDefaultsConfig.Progress)));
         }
 
         private static void ValidateReferences(
@@ -37,8 +37,13 @@ namespace LLEditor.Validation.References
             IReadOnlyList<RankExperienceRequirementEntry> rankRequirements,
             ValidationContext context)
         {
-            if (progress == null || rankRequirements == null || rankRequirements.Count == 0)
+            if (progress == null ||
+                progress.Rank <= 0 ||
+                rankRequirements == null ||
+                rankRequirements.Count == 0)
+            {
                 return;
+            }
 
             var ranks = new HashSet<int>(
                 rankRequirements
@@ -48,11 +53,14 @@ namespace LLEditor.Validation.References
             if (ValidationRules.ReferenceExists(
                     progress.Rank,
                     ranks,
-                    context.At("Rank"),
+                    context.At(nameof(UserProgressDefaults.Rank)),
                     RankExistsCode) is false)
             {
                 return;
             }
+
+            if (progress.Experience < 0)
+                return;
 
             var nextRank = rankRequirements.FirstOrDefault(
                 requirement => requirement != null && requirement.Rank == progress.Rank + 1);
@@ -62,7 +70,7 @@ namespace LLEditor.Validation.References
                 if (progress.Experience != 0)
                 {
                     context
-                        .At("Experience")
+                        .At(nameof(UserProgressDefaults.Experience))
                         .Report(
                             ValidationSeverity.Error,
                             FinalRankExperienceCode,
@@ -75,7 +83,7 @@ namespace LLEditor.Validation.References
             if (progress.Experience > nextRank.RequiredExperience)
             {
                 context
-                    .At("Experience")
+                    .At(nameof(UserProgressDefaults.Experience))
                     .Report(
                         ValidationSeverity.Error,
                         ExperienceMaximumCode,

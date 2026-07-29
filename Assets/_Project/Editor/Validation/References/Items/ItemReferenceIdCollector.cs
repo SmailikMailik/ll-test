@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Identifiers;
 using LL.Game.Items;
 
 namespace LLEditor.Validation.References.Items
@@ -25,8 +26,13 @@ namespace LLEditor.Validation.References.Items
 
             foreach (var entry in entries)
             {
-                if (entry != null)
-                    ids.Add(getId(entry));
+                if (entry == null)
+                    continue;
+
+                var id = getId(entry);
+
+                if (IdentifierValidator.IsValid(id))
+                    ids.Add(id);
             }
 
             return true;

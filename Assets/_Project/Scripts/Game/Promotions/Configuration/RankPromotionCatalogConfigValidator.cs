@@ -5,6 +5,7 @@ namespace LL.Game.Promotions.Configuration
 {
     internal sealed class RankPromotionCatalogConfigValidator : IDataValidator<RankPromotionEntry[]>
     {
+        private const string PromotionsCode = "rank-promotion.entries.required";
         private const string DurationCode = "rank-promotion.duration.positive";
         private const string RequiredAmountCode = "rank-promotion.requirement.amount.positive";
         private const string TitleKeyCode = "rank-promotion.localization.title.not-empty";
@@ -17,13 +18,13 @@ namespace LL.Game.Promotions.Configuration
             RankPromotionEntry[] promotions,
             ValidationContext context)
         {
+            if (ValidationRules.NotNull(promotions, context, PromotionsCode) is false)
+                return;
+
             RankPromotionCatalogValidator.Validate(
                 promotions,
                 promotion => promotion.Rank,
                 context);
-
-            if (promotions == null)
-                return;
 
             for (var index = 0; index < promotions.Length; index++)
             {
@@ -36,46 +37,46 @@ namespace LL.Game.Promotions.Configuration
 
                 ValidationRules.Positive(
                     promotion.DurationMinutes,
-                    promotionContext.At("DurationMinutes"),
+                    promotionContext.At(nameof(RankPromotionEntry.DurationMinutes)),
                     DurationCode);
 
                 IdentifierValidator.Validate(
                     promotion.RequirementId,
-                    promotionContext.At("RequirementId"));
+                    promotionContext.At(nameof(RankPromotionEntry.RequirementId)));
 
                 ValidationRules.Positive(
                     promotion.RequiredAmount,
-                    promotionContext.At("RequiredAmount"),
+                    promotionContext.At(nameof(RankPromotionEntry.RequiredAmount)),
                     RequiredAmountCode);
 
                 ValidationRules.NotEmpty(
                     promotion.TitleLocalizationKey,
-                    promotionContext.At("TitleLocalizationKey"),
+                    promotionContext.At(nameof(RankPromotionEntry.TitleLocalizationKey)),
                     TitleKeyCode);
 
                 ValidationRules.NotEmpty(
                     promotion.DescriptionLocalizationKey,
-                    promotionContext.At("DescriptionLocalizationKey"),
+                    promotionContext.At(nameof(RankPromotionEntry.DescriptionLocalizationKey)),
                     DescriptionKeyCode);
 
                 ValidationRules.NotEmpty(
                     promotion.TargetLocalizationKey,
-                    promotionContext.At("TargetLocalizationKey"),
+                    promotionContext.At(nameof(RankPromotionEntry.TargetLocalizationKey)),
                     TargetKeyCode);
 
                 ValidationRules.Positive(
                     promotion.SoftPrice,
-                    promotionContext.At("SoftPrice"),
+                    promotionContext.At(nameof(RankPromotionEntry.SoftPrice)),
                     SoftPriceCode);
 
                 ValidationRules.Positive(
                     promotion.HardPrice,
-                    promotionContext.At("HardPrice"),
+                    promotionContext.At(nameof(RankPromotionEntry.HardPrice)),
                     HardPriceCode);
 
                 IdentifierValidator.Validate(
                     promotion.RewardBundleId,
-                    promotionContext.At("RewardBundleId"));
+                    promotionContext.At(nameof(RankPromotionEntry.RewardBundleId)));
             }
         }
     }

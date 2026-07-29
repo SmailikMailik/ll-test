@@ -1,4 +1,5 @@
 using LL.Game.Rewards.Configuration;
+using LL.Game.Identifiers;
 using LL.Presentation.Icons.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
@@ -50,14 +51,14 @@ namespace LLEditor.Validation.References.Items
                 {
                     var reward = rewards[rewardIndex];
 
-                    if (reward == null || reward.Id.IsEmpty)
+                    if (reward == null || IdentifierValidator.IsValid(reward.Id) is false)
                         continue;
 
                     var idContext = configContext
                         .At(bundleIndex)
-                        .At("Rewards")
+                        .At(nameof(RewardBundleEntry.Rewards))
                         .At(rewardIndex)
-                        .At("Id");
+                        .At(nameof(ItemRewardEntry.Id));
 
                     if (hasUserItems)
                     {

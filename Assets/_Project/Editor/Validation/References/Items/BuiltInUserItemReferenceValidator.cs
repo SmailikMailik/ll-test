@@ -26,7 +26,7 @@ namespace LLEditor.Validation.References.Items
 
             var itemsContext = context
                 .At(AssetDatabase.GetAssetPath(userDefaults))
-                .At("Items");
+                .At(nameof(UserDefaultsConfig.Items));
 
             foreach (var id in ItemIds.All)
             {

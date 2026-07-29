@@ -1,4 +1,5 @@
 using LL.Game.Cards.Configuration;
+using LL.Game.Identifiers;
 using LL.Presentation.Icons.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
@@ -43,10 +44,10 @@ namespace LLEditor.Validation.References.Items
             {
                 var card = cards[index];
 
-                if (card == null || card.Id.IsEmpty)
+                if (card == null || IdentifierValidator.IsValid(card.Id) is false)
                     continue;
 
-                var idContext = configContext.At(index).At("Id");
+                var idContext = configContext.At(index).At(nameof(CardDefinitionEntry.Id));
 
                 if (hasUserItems)
                 {

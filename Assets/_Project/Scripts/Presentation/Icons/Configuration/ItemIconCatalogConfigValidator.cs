@@ -29,7 +29,7 @@ namespace LL.Presentation.Icons.Configuration
 
                 ValidationRules.NotNull(
                     entry.Icon,
-                    context.At(index).At("Icon"),
+                    context.At(index).At(nameof(ItemIconEntry.Icon)),
                     IconCode);
             }
         }
