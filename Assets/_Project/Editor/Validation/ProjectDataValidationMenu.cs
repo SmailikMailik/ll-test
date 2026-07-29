@@ -2,6 +2,8 @@ using System.Linq;
 using LL.Infrastructure.Validation;
 using LL.Validation;
 using LLEditor.Menu;
+using LLEditor.Validation.References;
+using LLEditor.Validation.Sources;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,9 +26,10 @@ namespace LLEditor.Validation
 
             var result = new ValidationResult();
             var context = new ValidationContext(result);
+            var sources = new ProjectDataSources(assets);
             var sourceValidator = new ProjectDataSourceValidator();
 
-            sourceValidator.Validate(assets, context.At("ProjectData"));
+            sourceValidator.Validate(sources, context.At("ProjectData"));
 
             foreach (var asset in assets)
             {
@@ -36,7 +39,7 @@ namespace LLEditor.Validation
             }
 
             var referenceValidator = new ProjectDataReferenceValidator();
-            referenceValidator.Validate(assets, context);
+            referenceValidator.Validate(sources, context);
 
             var reporter = new UnityConsoleValidationReporter();
             reporter.Report(result);

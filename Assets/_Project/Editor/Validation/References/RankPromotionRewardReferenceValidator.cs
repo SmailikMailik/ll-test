@@ -1,15 +1,34 @@
 using System.Collections.Generic;
-using LL.Game.Rewards.Configuration;
+using LL.Game.Promotions.Configuration;
 using LL.Game.Rewards;
+using LL.Game.Rewards.Configuration;
 using LL.Validation;
+using LLEditor.Validation.Sources;
+using UnityEditor;
 
-namespace LL.Game.Promotions.Configuration
+namespace LLEditor.Validation.References
 {
-    internal sealed class RankPromotionRewardReferenceValidator
+    internal sealed class RankPromotionRewardReferenceValidator : IProjectDataReferenceValidation
     {
         private const string RewardBundleExistsCode = "rank-promotion.reward-bundle.exists";
 
-        internal void Validate(
+        public void Validate(
+            ProjectDataSources sources,
+            ValidationContext context)
+        {
+            var promotions = sources.GetSingle<RankPromotionCatalogConfig>();
+            var rewards = sources.GetSingle<RewardBundleCatalogConfig>();
+
+            if (promotions == null || rewards == null)
+                return;
+
+            ValidateReferences(
+                promotions.Promotions,
+                rewards.Bundles,
+                context.At(AssetDatabase.GetAssetPath(promotions)));
+        }
+
+        private static void ValidateReferences(
             IReadOnlyList<RankPromotionEntry> promotions,
             IEnumerable<RewardBundleEntry> bundles,
             ValidationContext context)

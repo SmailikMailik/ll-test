@@ -1,16 +1,35 @@
 using System.Collections.Generic;
+using LL.Game.Promotions.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Validation;
+using LLEditor.Validation.Sources;
+using UnityEditor;
 
-namespace LL.Game.Promotions.Configuration
+namespace LLEditor.Validation.References
 {
-    internal sealed class RankPromotionRankReferenceValidator
+    internal sealed class RankPromotionRankReferenceValidator : IProjectDataReferenceValidation
     {
         private const string RankExistsCode = "rank-promotion.rank.exists";
         private const string FinalRankCode = "rank-promotion.rank.not-final";
         private const string PromotionRequiredCode = "rank-promotion.rank.required";
 
-        internal void Validate(
+        public void Validate(
+            ProjectDataSources sources,
+            ValidationContext context)
+        {
+            var promotions = sources.GetSingle<RankPromotionCatalogConfig>();
+            var ranks = sources.GetSingle<RankCatalogConfig>();
+
+            if (promotions == null || ranks == null)
+                return;
+
+            ValidateReferences(
+                promotions.Promotions,
+                ranks.RankRequirements,
+                context.At(AssetDatabase.GetAssetPath(promotions)));
+        }
+
+        private static void ValidateReferences(
             IReadOnlyList<RankPromotionEntry> promotions,
             IReadOnlyList<RankExperienceRequirementEntry> rankRequirements,
             ValidationContext context)

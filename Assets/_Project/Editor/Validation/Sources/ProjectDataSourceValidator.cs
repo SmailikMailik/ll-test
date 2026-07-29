@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System;
 using LL.Game.Cards.Configuration;
 using LL.Game.Promotions.Configuration;
@@ -8,9 +6,8 @@ using LL.Game.Rewards.Configuration;
 using LL.Presentation.Icons.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
-using UnityEngine;
 
-namespace LLEditor.Validation
+namespace LLEditor.Validation.Sources
 {
     internal sealed class ProjectDataSourceValidator
     {
@@ -28,12 +25,12 @@ namespace LLEditor.Validation
         };
 
         internal void Validate(
-            IReadOnlyCollection<ScriptableObject> assets,
+            ProjectDataSources sources,
             ValidationContext context)
         {
             foreach (var sourceType in _requiredSourceTypes)
             {
-                var count = assets.Count(sourceType.IsInstanceOfType);
+                var count = sources.Count(sourceType);
                 var sourceContext = context.At(sourceType.Name);
 
                 if (count == 0)

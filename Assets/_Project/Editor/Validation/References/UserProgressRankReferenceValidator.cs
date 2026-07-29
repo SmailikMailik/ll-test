@@ -1,17 +1,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Ranks.Configuration;
+using LL.User.Configuration;
 using LL.Validation;
+using LLEditor.Validation.Sources;
+using UnityEditor;
 
-namespace LL.User.Configuration
+namespace LLEditor.Validation.References
 {
-    internal sealed class UserProgressRankReferenceValidator
+    internal sealed class UserProgressRankReferenceValidator : IProjectDataReferenceValidation
     {
         private const string RankExistsCode = "user-defaults.progress.rank.exists";
         private const string ExperienceMaximumCode = "user-defaults.progress.experience.maximum";
         private const string FinalRankExperienceCode = "user-defaults.progress.final-rank-experience.zero";
 
-        internal void Validate(
+        public void Validate(
+            ProjectDataSources sources,
+            ValidationContext context)
+        {
+            var ranks = sources.GetSingle<RankCatalogConfig>();
+            var userDefaults = sources.GetSingle<UserDefaultsConfig>();
+
+            if (ranks == null || userDefaults == null)
+                return;
+
+            ValidateReferences(
+                userDefaults.Progress,
+                ranks.RankRequirements,
+                context
+                    .At(AssetDatabase.GetAssetPath(userDefaults))
+                    .At("Progress"));
+        }
+
+        private static void ValidateReferences(
             UserProgressDefaults progress,
             IReadOnlyList<RankExperienceRequirementEntry> rankRequirements,
             ValidationContext context)

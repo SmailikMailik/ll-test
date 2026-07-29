@@ -1,16 +1,17 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using LL.Game.Cards.Configuration;
 using LL.Game.Items;
 using LL.Game.Rewards.Configuration;
 using LL.Presentation.Icons.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
+using LLEditor.Validation.Sources;
 using UnityEditor;
 
-namespace LLEditor.Validation
+namespace LLEditor.Validation.References
 {
-    internal sealed class ProjectItemReferenceValidator
+    internal sealed class ProjectItemReferenceValidator : IProjectDataReferenceValidation
     {
         private const string BuiltInUserItemCode = "user-defaults.item.built-in.exists";
         private const string CardUserItemCode = "card.user-item.exists";
@@ -18,31 +19,24 @@ namespace LLEditor.Validation
         private const string RewardUserItemCode = "reward.user-item.exists";
         private const string RewardIconCode = "reward.icon.exists";
 
-        internal void Validate(
-            CardCatalogConfig cards,
-            RewardBundleCatalogConfig bundles,
-            ItemIconCatalogConfig icons,
-            UserDefaultsConfig userDefaults,
+        public void Validate(
+            ProjectDataSources sources,
             ValidationContext context)
         {
-            if (cards == null)
-                throw new ArgumentNullException(nameof(cards));
+            var cards = sources.GetSingle<CardCatalogConfig>();
+            var icons = sources.GetSingle<ItemIconCatalogConfig>();
+            var rewards = sources.GetSingle<RewardBundleCatalogConfig>();
+            var userDefaults = sources.GetSingle<UserDefaultsConfig>();
 
-            if (bundles == null)
-                throw new ArgumentNullException(nameof(bundles));
-
-            if (icons == null)
-                throw new ArgumentNullException(nameof(icons));
-
-            if (userDefaults == null)
-                throw new ArgumentNullException(nameof(userDefaults));
+            if (cards == null || icons == null || rewards == null || userDefaults == null)
+                return;
 
             var userItemIds = CollectUserItemIds(userDefaults);
             var iconIds = CollectIconIds(icons);
 
             ValidateBuiltInItems(userDefaults, userItemIds, context);
             ValidateCards(cards, userItemIds, iconIds, context);
-            ValidateRewards(bundles, userItemIds, iconIds, context);
+            ValidateRewards(rewards, userItemIds, iconIds, context);
         }
 
         private static HashSet<ItemId> CollectUserItemIds(UserDefaultsConfig config)
