@@ -2245,7 +2245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _experienceView: {fileID: 992138905137388495}
-  _nextRankRewardPreview: {fileID: 1227277508406563781}
+  _nextRankRewardView: {fileID: 1227277508406563781}
   _cardSelector: {fileID: 7412463965733997236}
   _amountStepper: {fileID: 1788652015322902590}
   _useButton: {fileID: 9106313432551566551}

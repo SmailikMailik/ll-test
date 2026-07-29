@@ -4,15 +4,16 @@ using LL.Game.Promotions;
 using LL.Presentation.Localization;
 using LL.Presentation.Promotions;
 using LL.Rewards.Models;
+using LL.UI.Rewards;
 using R3;
 using TMPro;
 using UnityEngine;
 using VContainer;
 
-namespace LL.UI.Rewards
+namespace LL.UI
 {
     [DisallowMultipleComponent]
-    internal sealed class NextRankRewardPreview : MonoBehaviour
+    internal sealed class NextRankRewardView : MonoBehaviour
     {
         [SerializeField] private TMP_Text _titleLabel;
         [SerializeField] private RewardContainerView _rewardContainer;
