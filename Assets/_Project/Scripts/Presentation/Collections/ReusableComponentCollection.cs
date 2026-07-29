@@ -22,6 +22,13 @@ namespace LL.Presentation.Collections
             _parent = parent != null
                 ? parent
                 : throw new ArgumentNullException(nameof(parent));
+
+            if (_parent.childCount > 0)
+            {
+                throw new ArgumentException(
+                    "Reusable collection container must be empty.",
+                    nameof(parent));
+            }
         }
 
         internal void EnsureCapacity(int count)
