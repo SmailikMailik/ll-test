@@ -112,6 +112,7 @@ namespace LL.Composition
             builder.Register<PaymentService>(Lifetime.Singleton).As<IPaymentService>();
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
+            builder.Register<RewardGrantPolicy>(Lifetime.Singleton);
             builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();
             builder.Register<RewardIconProvider>(Lifetime.Singleton);
         }

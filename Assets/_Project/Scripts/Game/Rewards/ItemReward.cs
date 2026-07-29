@@ -1,3 +1,4 @@
+using System;
 using LL.Game.Items;
 
 namespace LL.Game.Rewards
@@ -9,6 +10,15 @@ namespace LL.Game.Rewards
 
         internal ItemReward(ItemId itemId, int amount)
         {
+            if (itemId.IsEmpty)
+                throw new ArgumentException("Reward item ID must be non-empty.", nameof(itemId));
+
+            if (amount <= 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(amount),
+                    amount,
+                    "Reward amount must be greater than zero.");
+
             ItemId = itemId;
             Amount = amount;
         }

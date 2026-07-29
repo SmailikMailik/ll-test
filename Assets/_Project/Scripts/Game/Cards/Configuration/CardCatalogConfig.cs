@@ -39,7 +39,7 @@ namespace LL.Game.Cards.Configuration
 
         private static bool HasValidCardIds(CardDefinitionEntry[] cards)
         {
-            return IdentifierCatalogValidator.HasValidIds(cards, card => new ItemId(card.Id));
+            return IdentifierCollectionValidator.IsValid(cards, card => new ItemId(card.Id));
         }
     }
 

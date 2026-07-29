@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Rewards;
-using LL.User.State.Rewards;
 using VContainer;
 
 namespace LL.Game.Rewards.Services
@@ -11,17 +10,17 @@ namespace LL.Game.Rewards.Services
     {
         private readonly RewardBundleCatalog _catalog;
         private readonly IRewardService _rewardService;
-        private readonly IUserRewardClaims _claims;
+        private readonly RewardGrantPolicy _grantPolicy;
 
         [Inject]
         internal RewardGrantService(
             RewardBundleCatalog catalog,
             IRewardService rewardService,
-            IUserRewardClaims claims)
+            RewardGrantPolicy grantPolicy)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _rewardService = rewardService ?? throw new ArgumentNullException(nameof(rewardService));
-            _claims = claims ?? throw new ArgumentNullException(nameof(claims));
+            _grantPolicy = grantPolicy ?? throw new ArgumentNullException(nameof(grantPolicy));
         }
 
         public bool CanGrant(RewardBundleId id)
@@ -46,7 +45,7 @@ namespace LL.Game.Rewards.Services
                     return false;
             }
 
-            if (bundle.GrantMode == RewardGrantMode.Once && _claims.TryClaim(id) is false)
+            if (_grantPolicy.TryRegisterGrant(bundle) is false)
                 return false;
 
             rewards = bundle.Rewards;
@@ -55,7 +54,7 @@ namespace LL.Game.Rewards.Services
 
         private bool CanGrant(RewardBundle bundle)
         {
-            return (bundle.GrantMode != RewardGrantMode.Once || _claims.Contains(bundle.Id) is false) &&
+            return _grantPolicy.CanGrant(bundle) &&
                    bundle.Rewards.All(_rewardService.CanApply);
         }
     }

@@ -29,10 +29,9 @@ namespace LL.User.Configuration
 
         UserSnapshot IUserDefaultsProvider.GetDefaultSnapshot()
         {
-            IdentifierCatalogValidator.EnsureValidIds(
+            IdentifierCollectionValidator.Validate(
                 _items,
                 entry => entry.Id,
-                "Default item amounts",
                 nameof(_items));
             return new UserSnapshot(
                 _identity.ToSnapshot(),
@@ -44,7 +43,7 @@ namespace LL.User.Configuration
 
         private static bool HasValidItemIds(ItemAmountEntry[] entries)
         {
-            return IdentifierCatalogValidator.HasValidIds(entries, entry => entry.Id);
+            return IdentifierCollectionValidator.IsValid(entries, entry => entry.Id);
         }
     }
 

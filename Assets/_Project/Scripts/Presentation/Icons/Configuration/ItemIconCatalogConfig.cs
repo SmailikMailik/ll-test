@@ -21,10 +21,9 @@ namespace LL.Presentation.Icons.Configuration
 
         public IconCatalog<ItemId> Load()
         {
-            IdentifierCatalogValidator.EnsureValidIds(
+            IdentifierCollectionValidator.Validate(
                 _icons,
                 entry => entry.Id,
-                nameof(ItemIconCatalogConfig),
                 nameof(_icons));
 
             var icons = _icons?.Select(entry => entry.ToPair());
@@ -34,7 +33,7 @@ namespace LL.Presentation.Icons.Configuration
 
         private static bool HasValidIconIds(ItemIconEntry[] icons)
         {
-            return IdentifierCatalogValidator.HasValidIds(icons, entry => entry.Id);
+            return IdentifierCollectionValidator.IsValid(icons, entry => entry.Id);
         }
     }
 

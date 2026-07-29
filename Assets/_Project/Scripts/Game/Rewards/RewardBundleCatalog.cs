@@ -13,10 +13,9 @@ namespace LL.Game.Rewards
         {
             var copy = bundles?.ToArray() ?? Array.Empty<RewardBundle>();
 
-            IdentifierCatalogValidator.EnsureValidIds(
+            IdentifierCollectionValidator.Validate(
                 copy,
                 bundle => bundle.Id,
-                nameof(RewardBundleCatalog),
                 nameof(bundles));
 
             _bundles = copy.ToDictionary(bundle => bundle.Id);

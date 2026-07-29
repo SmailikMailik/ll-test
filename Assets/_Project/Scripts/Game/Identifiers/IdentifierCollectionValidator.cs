@@ -3,37 +3,36 @@ using System.Collections.Generic;
 
 namespace LL.Game.Identifiers
 {
-    internal static class IdentifierCatalogValidator
+    internal static class IdentifierCollectionValidator
     {
-        internal static bool HasValidIds<TEntry, TId>(
+        internal static bool IsValid<TEntry, TId>(
             IEnumerable<TEntry> entries,
-            Func<TEntry, TId> idSelector)
+            Func<TEntry, TId> getId)
             where TId : struct, IIdentifier
         {
-            return TryValidateIds(entries, idSelector, out _);
+            return TryValidate(entries, getId, out _);
         }
 
-        internal static void EnsureValidIds<TEntry, TId>(
+        internal static void Validate<TEntry, TId>(
             IEnumerable<TEntry> entries,
-            Func<TEntry, TId> idSelector,
-            string catalogName,
+            Func<TEntry, TId> getId,
             string parameterName)
             where TId : struct, IIdentifier
         {
-            if (TryValidateIds(entries, idSelector, out var error))
+            if (TryValidate(entries, getId, out var error))
                 return;
 
-            throw new ArgumentException($"{catalogName} {error}", parameterName);
+            throw new ArgumentException(error, parameterName);
         }
 
-        private static bool TryValidateIds<TEntry, TId>(
+        private static bool TryValidate<TEntry, TId>(
             IEnumerable<TEntry> entries,
-            Func<TEntry, TId> idSelector,
+            Func<TEntry, TId> getId,
             out string error)
             where TId : struct, IIdentifier
         {
-            if (idSelector == null)
-                throw new ArgumentNullException(nameof(idSelector));
+            if (getId == null)
+                throw new ArgumentNullException(nameof(getId));
 
             var usedIds = new HashSet<TId>();
             var index = 0;
@@ -44,21 +43,21 @@ namespace LL.Game.Identifiers
                 {
                     if (entry is null)
                     {
-                        error = $"contains a null entry at index {index}.";
+                        error = $"Collection contains a null entry at index {index}.";
                         return false;
                     }
 
-                    var id = idSelector(entry);
+                    var id = getId(entry);
 
                     if (id.IsEmpty)
                     {
-                        error = $"contains an empty ID at index {index}.";
+                        error = $"Collection contains an empty ID at index {index}.";
                         return false;
                     }
 
                     if (usedIds.Add(id) is false)
                     {
-                        error = $"contains duplicate ID: {id}.";
+                        error = $"Collection contains duplicate ID: {id}.";
                         return false;
                     }
 

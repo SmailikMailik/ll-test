@@ -16,10 +16,9 @@ namespace LL.Presentation.Icons
             var copy = icons?.ToArray()
                 ?? Array.Empty<KeyValuePair<TId, Sprite>>();
 
-            IdentifierCatalogValidator.EnsureValidIds(
+            IdentifierCollectionValidator.Validate(
                 copy,
                 icon => icon.Key,
-                $"{typeof(TId).Name} icon catalog",
                 nameof(icons));
 
             foreach (var icon in copy)

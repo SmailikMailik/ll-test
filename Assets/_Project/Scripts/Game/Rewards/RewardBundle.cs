@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Items;
 
 namespace LL.Game.Rewards
 {
@@ -18,35 +19,42 @@ namespace LL.Game.Rewards
             if (id.IsEmpty)
                 throw new ArgumentException("Reward bundle ID must be non-empty.", nameof(id));
 
-            var copy = rewards?.ToArray() ?? Array.Empty<IReward>();
-
-            if (copy.Length == 0 || copy.All(IsValidReward) is false)
-            {
-                throw new ArgumentException(
-                    "A reward bundle must contain valid rewards with positive amounts.",
-                    nameof(rewards));
-            }
-
-            if (copy.Select(GetRewardKey).Distinct().Count() != copy.Length)
-                throw new ArgumentException("A reward bundle must not contain duplicate rewards.", nameof(rewards));
+            if (Enum.IsDefined(typeof(RewardGrantMode), grantMode) is false)
+                throw new ArgumentOutOfRangeException(
+                    nameof(grantMode),
+                    grantMode,
+                    "Reward grant mode is not supported.");
 
             Id = id;
             GrantMode = grantMode;
-            Rewards = Array.AsReadOnly(copy);
+            Rewards = CreateRewards(rewards);
         }
 
-        private static bool IsValidReward(IReward reward)
+        private static IReadOnlyList<IReward> CreateRewards(IEnumerable<IReward> rewards)
         {
-            return reward != null &&
-                   reward.Amount > 0 &&
-                   reward is ItemReward item &&
-                   item.ItemId.IsEmpty is false;
-        }
+            var copy = rewards?.ToArray() ?? Array.Empty<IReward>();
 
-        private static string GetRewardKey(IReward reward) => reward switch
-        {
-            ItemReward item => $"{nameof(ItemReward)}:{item.ItemId}",
-            _ => string.Empty
-        };
+            if (copy.Length == 0)
+                throw new ArgumentException(
+                    "Reward bundle must contain at least one reward.",
+                    nameof(rewards));
+
+            var itemIds = new HashSet<ItemId>();
+
+            for (var index = 0; index < copy.Length; index++)
+            {
+                if (copy[index] is not ItemReward item)
+                    throw new ArgumentException(
+                        $"Reward at index {index} must be an {nameof(ItemReward)}.",
+                        nameof(rewards));
+
+                if (itemIds.Add(item.ItemId) is false)
+                    throw new ArgumentException(
+                        $"Duplicate item reward ID '{item.ItemId}' at index {index}.",
+                        nameof(rewards));
+            }
+
+            return Array.AsReadOnly(copy);
+        }
     }
 }

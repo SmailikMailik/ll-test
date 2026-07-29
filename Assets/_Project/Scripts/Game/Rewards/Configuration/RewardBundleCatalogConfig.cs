@@ -21,10 +21,9 @@ namespace LL.Game.Rewards.Configuration
 
         public RewardBundleCatalog Load()
         {
-            IdentifierCatalogValidator.EnsureValidIds(
+            IdentifierCollectionValidator.Validate(
                 _bundles,
                 entry => entry.Id,
-                nameof(RewardBundleCatalogConfig),
                 nameof(_bundles));
 
             return new RewardBundleCatalog(_bundles?.Select(entry => entry.ToBundle()));
@@ -32,7 +31,7 @@ namespace LL.Game.Rewards.Configuration
 
         private static bool HasValidBundleIds(RewardBundleEntry[] bundles)
         {
-            return IdentifierCatalogValidator.HasValidIds(bundles, entry => entry.Id);
+            return IdentifierCollectionValidator.IsValid(bundles, entry => entry.Id);
         }
     }
 

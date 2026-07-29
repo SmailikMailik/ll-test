@@ -13,10 +13,9 @@ namespace LL.Game.Cards
         internal CardCatalog(IEnumerable<ICard> cards)
         {
             var copy = cards?.ToArray() ?? Array.Empty<ICard>();
-            IdentifierCatalogValidator.EnsureValidIds(
+            IdentifierCollectionValidator.Validate(
                 copy,
                 card => card.Id,
-                nameof(CardCatalog),
                 nameof(cards));
 
             _cardsById = copy.ToDictionary(card => card.Id);
