@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Items;
-using LL.Game.Rewards;
 using LL.Infrastructure.Saving;
 using LL.User.Snapshots;
 using LL.User.State.Items;
 using LL.User.State.Progress;
 using LL.User.State.Promotions;
-using LL.User.State.Rewards;
 using R3;
 using VContainer;
 using VContainer.Unity;
@@ -20,12 +18,10 @@ namespace LL.User.Persistence
         private readonly IUserItems _items;
         private readonly IUserProgress _progress;
         private readonly IUserPromotionOrder _promotionOrder;
-        private readonly IUserRewardClaims _rewardClaims;
         private readonly ISaveService _saveService;
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<ItemId, int> _itemAmounts;
-        private readonly HashSet<RewardId> _claimedRewardIds;
         private UserProgressSnapshot _progressSnapshot;
         private UserPromotionOrderSnapshot _promotionOrderSnapshot;
 
@@ -35,7 +31,6 @@ namespace LL.User.Persistence
             IUserItems items,
             IUserProgress progress,
             IUserPromotionOrder promotionOrder,
-            IUserRewardClaims rewardClaims,
             ISaveService saveService)
         {
             if (initialSnapshot == null)
@@ -45,7 +40,6 @@ namespace LL.User.Persistence
             _items = items ?? throw new ArgumentNullException(nameof(items));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
-            _rewardClaims = rewardClaims ?? throw new ArgumentNullException(nameof(rewardClaims));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
 
             _itemAmounts = new Dictionary<ItemId, int>();
@@ -58,7 +52,6 @@ namespace LL.User.Persistence
                 _promotionOrder.RequirementId,
                 _promotionOrder.DeadlineUnixMilliseconds,
                 _promotionOrder.IsCompleted);
-            _claimedRewardIds = new HashSet<RewardId>(_rewardClaims.ClaimedIds);
         }
 
         public void Initialize()
@@ -68,7 +61,6 @@ namespace LL.User.Persistence
             _subscriptions.Add(_progress.RankChanged.Subscribe(_ => OnProgressChanged()));
             _subscriptions.Add(_progress.ExperienceChanged.Subscribe(_ => OnProgressChanged()));
             _subscriptions.Add(_promotionOrder.Changed.Subscribe(_ => OnPromotionOrderChanged()));
-            _subscriptions.Add(_rewardClaims.RewardClaimed.Subscribe(OnRewardClaimed));
         }
 
         public void Dispose()
@@ -96,12 +88,6 @@ namespace LL.User.Persistence
 
             _itemAmounts[itemId] = amount;
             Save();
-        }
-
-        private void OnRewardClaimed(RewardId rewardId)
-        {
-            if (_claimedRewardIds.Add(rewardId))
-                Save();
         }
 
         private void OnPromotionOrderChanged()
@@ -150,8 +136,7 @@ namespace LL.User.Persistence
                 _identity,
                 new UserItemsSnapshot(GetItemAmounts()),
                 _progressSnapshot,
-                _promotionOrderSnapshot,
-                new UserRewardClaimsSnapshot(_claimedRewardIds));
+                _promotionOrderSnapshot);
         }
 
         private IEnumerable<ItemAmount> GetItemAmounts()

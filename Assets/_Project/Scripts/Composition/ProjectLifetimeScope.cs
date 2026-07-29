@@ -22,7 +22,6 @@ using LL.User.Snapshots;
 using LL.User.State.Items;
 using LL.User.State.Progress;
 using LL.User.State.Promotions;
-using LL.User.State.Rewards;
 using LL.Validation.Reporting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -104,7 +103,6 @@ namespace LL.Composition
             RegisterUserSnapshotPart(builder, snapshot => snapshot.Items);
             RegisterUserSnapshotPart(builder, snapshot => snapshot.Progress);
             RegisterUserSnapshotPart(builder, snapshot => snapshot.PromotionOrder);
-            RegisterUserSnapshotPart(builder, snapshot => snapshot.RewardClaims);
 
             builder.RegisterEntryPoint<UserSaveController>();
         }
@@ -113,7 +111,6 @@ namespace LL.Composition
         {
             builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
             builder.Register<UserPromotionOrder>(Lifetime.Singleton).As<IUserPromotionOrder>();
-            builder.Register<UserRewardClaims>(Lifetime.Singleton).As<IUserRewardClaims>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
         }

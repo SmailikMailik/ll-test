@@ -9,25 +9,16 @@ namespace LL.Game.Rewards
     internal sealed class Reward
     {
         internal RewardId Id { get; }
-        internal RewardGrantMode GrantMode { get; }
         internal IReadOnlyList<ItemAmount> Items { get; }
 
         internal Reward(
             RewardId id,
-            RewardGrantMode grantMode,
             IEnumerable<ItemAmount> items)
         {
             if (string.IsNullOrWhiteSpace(id.Value))
                 throw new ArgumentException("Reward ID must be non-empty.", nameof(id));
 
-            if (Enum.IsDefined(typeof(RewardGrantMode), grantMode) is false)
-                throw new ArgumentOutOfRangeException(
-                    nameof(grantMode),
-                    grantMode,
-                    "Reward grant mode is not supported.");
-
             Id = id;
-            GrantMode = grantMode;
             Items = CreateItems(items);
         }
 

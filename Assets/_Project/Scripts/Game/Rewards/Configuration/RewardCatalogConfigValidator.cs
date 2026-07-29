@@ -6,7 +6,6 @@ namespace LL.Game.Rewards.Configuration
     internal sealed class RewardCatalogConfigValidator : IDataValidator<RewardEntry[]>
     {
         private const string RewardsCode = "reward.entries.required";
-        private const string GrantModeCode = "reward.grant-mode.defined";
         private const string ItemsCode = "reward.items.not-empty";
         private const string ItemAmountCode = "reward.item.amount.positive";
 
@@ -30,11 +29,6 @@ namespace LL.Game.Rewards.Configuration
                     continue;
 
                 var rewardContext = context.At(rewardIndex);
-
-                ValidationRules.DefinedEnum(
-                    reward.GrantMode,
-                    rewardContext.At(nameof(RewardEntry.GrantMode)),
-                    GrantModeCode);
 
                 var items = reward.Items;
                 var itemsContext = rewardContext.At(nameof(RewardEntry.Items));

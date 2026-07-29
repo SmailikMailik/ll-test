@@ -54,24 +54,18 @@ namespace LL.Game.Rewards.Configuration
         [LabelText("ID")]
         [SerializeField] private string _id;
 
-        [BoxGroup("Columns/Reward")]
-        [LabelText("Grant mode")]
-        [SerializeField] private RewardGrantMode _grantMode;
-
         [FormerlySerializedAs("_rewards")]
         [BoxGroup("Columns/Items")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false, HideToolbar = false)]
         [SerializeField] private RewardItemEntry[] _items;
 
         internal RewardId Id => new(_id);
-        internal RewardGrantMode GrantMode => _grantMode;
         internal RewardItemEntry[] Items => _items;
 
         internal Reward ToReward()
         {
             return new Reward(
                 Id,
-                GrantMode,
                 Items?.Select(item => item.ToItemAmount()));
         }
     }

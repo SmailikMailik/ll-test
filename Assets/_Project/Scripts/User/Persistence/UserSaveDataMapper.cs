@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using LL.Game.Items;
 using LL.Game.Promotions;
-using LL.Game.Rewards;
 using LL.User.Persistence.SaveData;
 using LL.User.Snapshots;
 
@@ -24,9 +23,7 @@ namespace LL.User.Persistence
                 new UserPromotionOrderSnapshot(
                     new PromotionRequirementId(saveData.PromotionOrder.RequirementId),
                     saveData.PromotionOrder.DeadlineUnixMilliseconds,
-                    saveData.PromotionOrder.IsCompleted),
-                new UserRewardClaimsSnapshot(
-                    saveData.ClaimedRewardIds.Select(id => new RewardId(id))));
+                    saveData.PromotionOrder.IsCompleted));
         }
 
         internal static UserSaveData ToSaveData(UserSnapshot snapshot)
@@ -44,9 +41,6 @@ namespace LL.User.Persistence
                     snapshot.PromotionOrder.IsCompleted),
                 snapshot.Items.Amounts
                     .Select(item => new ItemAmountSaveData(item.Id.Value, item.Amount))
-                    .ToArray(),
-                snapshot.RewardClaims.ClaimedIds
-                    .Select(id => id.Value)
                     .ToArray());
         }
     }
