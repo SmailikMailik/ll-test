@@ -32,19 +32,19 @@ namespace LL.User.Configuration
 
         internal const string CreationPath = "LL/User/User Defaults Config";
 
-        UserInitialData IUserDefaultsProvider.GetDefaults()
+        UserData IUserDefaultsProvider.GetDefaults()
         {
             IdentifierCatalogValidator.EnsureValidIds(
                 _items,
                 entry => entry.Id,
                 "Default item amounts",
                 nameof(_items));
-            return new UserInitialData(
+            return new UserData(
                 _identity.ToData(),
-                new UserItemsInitialData(_items?.Select(item => item.ToData())),
+                new UserItemsData(_items?.Select(item => item.ToData())),
                 _progress.ToData(),
-                new UserPromotionOrderInitialData(default, 0L, false),
-                new UserRewardClaimsInitialData(null));
+                new UserPromotionOrderData(default, 0L, false),
+                new UserRewardClaimsData(null));
         }
 
         private static bool HasValidItemIds(ItemAmountEntry[] entries)
@@ -79,7 +79,7 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _experience;
 
-        internal UserProgressInitialData ToData() => new(_rank, _experience);
+        internal UserProgressData ToData() => new(_rank, _experience);
     }
 
     [Serializable]

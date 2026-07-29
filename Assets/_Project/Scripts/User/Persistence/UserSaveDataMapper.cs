@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
 using LL.Game.Promotions;
@@ -15,71 +14,41 @@ namespace LL.User.Persistence
 {
     internal static class UserSaveDataMapper
     {
-        internal static UserInitialData ToInitialData(UserSaveData data)
+        internal static UserData ToUserData(UserSaveData saveData)
         {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
+            if (saveData == null)
+                throw new ArgumentNullException(nameof(saveData));
 
-            return new UserInitialData(
-                new UserIdentity(data.Identity.UserId, data.Identity.RegionCode),
-                new UserItemsInitialData(
-                    data.Items.Select(item =>
+            return new UserData(
+                new UserIdentity(saveData.Identity.UserId, saveData.Identity.RegionCode),
+                new UserItemsData(
+                    saveData.Items.Select(item =>
                         new ItemAmount(new ItemId(item.Id), item.Amount))),
-                new UserProgressInitialData(data.Progress.Rank, data.Progress.Experience),
-                new UserPromotionOrderInitialData(
-                    new PromotionRequirementId(data.PromotionOrder.RequirementId),
-                    data.PromotionOrder.DeadlineUnixMilliseconds,
-                    data.PromotionOrder.IsCompleted),
-                new UserRewardClaimsInitialData(
-                    data.ClaimedRewardIds.Select(id => new RewardBundleId(id))));
+                new UserProgressData(saveData.Progress.Rank, saveData.Progress.Experience),
+                new UserPromotionOrderData(
+                    new PromotionRequirementId(saveData.PromotionOrder.RequirementId),
+                    saveData.PromotionOrder.DeadlineUnixMilliseconds,
+                    saveData.PromotionOrder.IsCompleted),
+                new UserRewardClaimsData(
+                    saveData.ClaimedRewardIds.Select(id => new RewardBundleId(id))));
         }
 
-        internal static UserSaveData ToSaveData(UserInitialData data)
+        internal static UserSaveData ToSaveData(UserData userData)
         {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-
-            return ToSaveData(
-                data.Identity,
-                data.Progress,
-                data.Items.Amounts,
-                data.PromotionOrder,
-                data.RewardClaims.ClaimedIds);
-        }
-
-        internal static UserSaveData ToSaveData(
-            UserIdentity identity,
-            UserProgressInitialData progress,
-            IEnumerable<ItemAmount> items,
-            UserPromotionOrderInitialData promotionOrder,
-            IEnumerable<RewardBundleId> claimedRewardIds)
-        {
-            if (identity == null)
-                throw new ArgumentNullException(nameof(identity));
-
-            if (progress == null)
-                throw new ArgumentNullException(nameof(progress));
-
-            if (items == null)
-                throw new ArgumentNullException(nameof(items));
-
-            if (promotionOrder == null)
-                throw new ArgumentNullException(nameof(promotionOrder));
-
-            if (claimedRewardIds == null)
-                throw new ArgumentNullException(nameof(claimedRewardIds));
+            if (userData == null)
+                throw new ArgumentNullException(nameof(userData));
 
             return new UserSaveData(
-                new UserIdentitySaveData(identity.UserId, identity.RegionCode),
-                new UserProgressSaveData(progress.Rank, progress.Experience),
+                new UserIdentitySaveData(userData.Identity.UserId, userData.Identity.RegionCode),
+                new UserProgressSaveData(userData.Progress.Rank, userData.Progress.Experience),
                 new UserPromotionOrderSaveData(
-                    promotionOrder.RequirementId.Value,
-                    promotionOrder.DeadlineUnixMilliseconds,
-                    promotionOrder.IsCompleted),
-                items
+                    userData.PromotionOrder.RequirementId.Value,
+                    userData.PromotionOrder.DeadlineUnixMilliseconds,
+                    userData.PromotionOrder.IsCompleted),
+                userData.Items.Amounts
                     .Select(item => new ItemAmountSaveData(item.Id.Value, item.Amount))
                     .ToArray(),
-                claimedRewardIds
+                userData.RewardClaims.ClaimedIds
                     .Where(id => id.IsEmpty is false)
                     .Select(id => id.Value)
                     .ToArray());

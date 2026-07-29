@@ -13,7 +13,7 @@ namespace LLEditor.User
         [MenuItem(MenuPath)]
         private static void DeleteSavedData()
         {
-            const string saveKey = UserInitialDataLoader.SaveKey;
+            const string saveKey = UserDataLoader.SaveKey;
             ISaveService saveService = new JsonFileSaveService();
 
             if (saveService.Exists(saveKey) is false)

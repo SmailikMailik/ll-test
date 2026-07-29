@@ -15,12 +15,12 @@ namespace LL.User.Core.Rewards
         private readonly Subject<RewardBundleId> _rewardClaimed = new();
 
         [Inject]
-        internal UserRewardClaims(UserRewardClaimsInitialData initialData)
+        internal UserRewardClaims(UserRewardClaimsData rewardClaimsData)
         {
-            if (initialData == null)
-                throw new ArgumentNullException(nameof(initialData));
+            if (rewardClaimsData == null)
+                throw new ArgumentNullException(nameof(rewardClaimsData));
 
-            _claimedIds = new HashSet<RewardBundleId>(initialData.ClaimedIds);
+            _claimedIds = new HashSet<RewardBundleId>(rewardClaimsData.ClaimedIds);
         }
 
         public bool Contains(RewardBundleId id) => _claimedIds.Contains(id);

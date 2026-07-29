@@ -12,12 +12,12 @@ namespace LL.User.Core.Items
         private readonly IReadOnlyDictionary<ItemId, ReactiveProperty<int>> _amounts;
 
         [Inject]
-        internal UserItems(UserItemsInitialData initialData)
+        internal UserItems(UserItemsData itemsData)
         {
-            if (initialData == null)
-                throw new ArgumentNullException(nameof(initialData));
+            if (itemsData == null)
+                throw new ArgumentNullException(nameof(itemsData));
 
-            _amounts = initialData.Amounts.ToDictionary(
+            _amounts = itemsData.Amounts.ToDictionary(
                 amount => amount.Id,
                 amount => new ReactiveProperty<int>(amount.Amount));
         }

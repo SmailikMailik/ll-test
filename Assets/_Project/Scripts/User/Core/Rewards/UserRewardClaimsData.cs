@@ -5,11 +5,11 @@ using LL.Rewards.Models;
 
 namespace LL.User.Core.Rewards
 {
-    internal sealed class UserRewardClaimsInitialData
+    internal sealed class UserRewardClaimsData
     {
         internal IReadOnlyList<RewardBundleId> ClaimedIds { get; }
 
-        internal UserRewardClaimsInitialData(IEnumerable<RewardBundleId> claimedIds)
+        internal UserRewardClaimsData(IEnumerable<RewardBundleId> claimedIds)
         {
             var copy = claimedIds?
                 .Where(id => id.IsEmpty is false)

@@ -5,11 +5,11 @@ using LL.Game.Items;
 
 namespace LL.User.Core.Items
 {
-    internal sealed class UserItemsInitialData
+    internal sealed class UserItemsData
     {
         internal IReadOnlyList<ItemAmount> Amounts { get; }
 
-        internal UserItemsInitialData(IEnumerable<ItemAmount> entries)
+        internal UserItemsData(IEnumerable<ItemAmount> entries)
         {
             var amounts = new Dictionary<ItemId, long>();
 

@@ -20,15 +20,15 @@ namespace LL.User.Core.Progress
 
         [Inject]
         internal UserProgress(
-            UserProgressInitialData initialData,
+            UserProgressData progressData,
             IRankProgression rankProgression)
         {
-            if (initialData == null)
-                throw new ArgumentNullException(nameof(initialData));
+            if (progressData == null)
+                throw new ArgumentNullException(nameof(progressData));
 
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
 
-            var progress = _rankProgression.GetProgress(initialData.Rank, initialData.Experience);
+            var progress = _rankProgression.GetProgress(progressData.Rank, progressData.Experience);
 
             Rank = progress.Rank;
             Experience = progress.HasNextRank

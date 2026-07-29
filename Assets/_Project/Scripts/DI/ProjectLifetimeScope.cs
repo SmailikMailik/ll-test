@@ -84,14 +84,14 @@ namespace LL.DI
         {
             builder.RegisterInstance<IUserDefaultsProvider>(_userDefaultsConfig);
             builder.Register<JsonFileSaveService>(Lifetime.Singleton).As<ISaveService>();
-            builder.Register<UserInitialDataLoader>(Lifetime.Singleton).As<IDataLoader<UserInitialData>>();
+            builder.Register<UserDataLoader>(Lifetime.Singleton).As<IDataLoader<UserData>>();
 
-            RegisterLoadedData<UserInitialData>(builder);
-            RegisterInitialDataPart(builder, data => data.Identity);
-            RegisterInitialDataPart(builder, data => data.Items);
-            RegisterInitialDataPart(builder, data => data.Progress);
-            RegisterInitialDataPart(builder, data => data.PromotionOrder);
-            RegisterInitialDataPart(builder, data => data.RewardClaims);
+            RegisterLoadedData<UserData>(builder);
+            RegisterUserDataPart(builder, userData => userData.Identity);
+            RegisterUserDataPart(builder, userData => userData.Items);
+            RegisterUserDataPart(builder, userData => userData.Progress);
+            RegisterUserDataPart(builder, userData => userData.PromotionOrder);
+            RegisterUserDataPart(builder, userData => userData.RewardClaims);
         }
 
         private static void RegisterUserState(IContainerBuilder builder)
@@ -134,11 +134,11 @@ namespace LL.DI
                 .As<IIconProvider<TId>>();
         }
 
-        private static void RegisterInitialDataPart<TData>(
+        private static void RegisterUserDataPart<TData>(
             IContainerBuilder builder,
-            Func<UserInitialData, TData> selector)
+            Func<UserData, TData> selector)
         {
-            builder.Register(resolver => selector(resolver.Resolve<UserInitialData>()), Lifetime.Singleton);
+            builder.Register(resolver => selector(resolver.Resolve<UserData>()), Lifetime.Singleton);
         }
     }
 }

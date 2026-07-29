@@ -24,14 +24,14 @@ namespace LL.User.Core.Promotions
         private bool HasOrder => _requirementId.IsEmpty is false && _deadlineUnixMilliseconds > NoDeadline;
 
         [Inject]
-        internal UserPromotionOrder(UserPromotionOrderInitialData initialData)
+        internal UserPromotionOrder(UserPromotionOrderData promotionOrderData)
         {
-            if (initialData == null)
-                throw new ArgumentNullException(nameof(initialData));
+            if (promotionOrderData == null)
+                throw new ArgumentNullException(nameof(promotionOrderData));
 
-            _requirementId = initialData.RequirementId;
-            _deadlineUnixMilliseconds = initialData.DeadlineUnixMilliseconds;
-            _isCompleted = initialData.IsCompleted;
+            _requirementId = promotionOrderData.RequirementId;
+            _deadlineUnixMilliseconds = promotionOrderData.DeadlineUnixMilliseconds;
+            _isCompleted = promotionOrderData.IsCompleted;
         }
 
         public TimeSpan GetRemainingTime()

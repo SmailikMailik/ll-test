@@ -3,13 +3,13 @@ using LL.Game.Promotions;
 
 namespace LL.User.Core.Promotions
 {
-    internal sealed class UserPromotionOrderInitialData
+    internal sealed class UserPromotionOrderData
     {
         internal PromotionRequirementId RequirementId { get; }
         internal long DeadlineUnixMilliseconds { get; }
         internal bool IsCompleted { get; }
 
-        internal UserPromotionOrderInitialData(
+        internal UserPromotionOrderData(
             PromotionRequirementId requirementId,
             long deadlineUnixMilliseconds,
             bool isCompleted)
