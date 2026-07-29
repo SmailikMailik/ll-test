@@ -43,8 +43,8 @@ namespace LL.User.Configuration
                 _identity.ToData(),
                 new UserItemsInitialData(_items?.Select(item => item.ToData())),
                 _progress.ToData(),
-                new PromotionOrderInitialData(default, 0L, false),
-                new RewardClaimsInitialData(null));
+                new UserPromotionOrderInitialData(default, 0L, false),
+                new UserRewardClaimsInitialData(null));
         }
 
         private static bool HasValidItemIds(ItemAmountEntry[] entries)
@@ -79,7 +79,7 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _experience;
 
-        internal ProgressInitialData ToData() => new(_rank, _experience);
+        internal UserProgressInitialData ToData() => new(_rank, _experience);
     }
 
     [Serializable]

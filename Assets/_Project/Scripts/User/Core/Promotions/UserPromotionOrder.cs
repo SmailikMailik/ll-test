@@ -24,7 +24,7 @@ namespace LL.User.Core.Promotions
         private bool HasOrder => _requirementId.IsEmpty is false && _deadlineUnixMilliseconds > NoDeadline;
 
         [Inject]
-        internal UserPromotionOrder(PromotionOrderInitialData initialData)
+        internal UserPromotionOrder(UserPromotionOrderInitialData initialData)
         {
             if (initialData == null)
                 throw new ArgumentNullException(nameof(initialData));

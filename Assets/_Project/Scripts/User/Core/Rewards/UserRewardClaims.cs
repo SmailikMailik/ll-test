@@ -15,7 +15,7 @@ namespace LL.User.Core.Rewards
         private readonly Subject<RewardBundleId> _rewardClaimed = new();
 
         [Inject]
-        internal UserRewardClaims(RewardClaimsInitialData initialData)
+        internal UserRewardClaims(UserRewardClaimsInitialData initialData)
         {
             if (initialData == null)
                 throw new ArgumentNullException(nameof(initialData));

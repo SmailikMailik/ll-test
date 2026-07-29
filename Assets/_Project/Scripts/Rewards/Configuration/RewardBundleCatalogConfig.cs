@@ -50,7 +50,7 @@ namespace LL.Rewards.Configuration
 
         [BoxGroup("Columns/Rewards")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false, HideToolbar = false)]
-        [SerializeField] private RewardEntry[] _rewards;
+        [SerializeField] private ItemRewardEntry[] _rewards;
 
         internal RewardBundleId Id => new(_id);
 
@@ -64,7 +64,7 @@ namespace LL.Rewards.Configuration
     }
 
     [Serializable]
-    internal sealed class RewardEntry
+    internal sealed class ItemRewardEntry
     {
         [TableColumnWidth(120, Resizable = false)]
         [HideLabel]
@@ -75,6 +75,6 @@ namespace LL.Rewards.Configuration
         [MinValue(1)]
         [SerializeField] private int _amount = 1;
 
-        internal IReward ToReward() => new ItemReward(new ItemId(_id), _amount);
+        internal ItemReward ToReward() => new(new ItemId(_id), _amount);
     }
 }

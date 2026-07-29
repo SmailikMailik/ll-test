@@ -12,16 +12,16 @@ namespace LL.User.Core
     {
         internal UserIdentity Identity { get; }
         internal UserItemsInitialData Items { get; }
-        internal ProgressInitialData Progress { get; }
-        internal PromotionOrderInitialData PromotionOrder { get; }
-        internal RewardClaimsInitialData RewardClaims { get; }
+        internal UserProgressInitialData Progress { get; }
+        internal UserPromotionOrderInitialData PromotionOrder { get; }
+        internal UserRewardClaimsInitialData RewardClaims { get; }
 
         internal UserInitialData(
             UserIdentity identity,
             UserItemsInitialData items,
-            ProgressInitialData progress,
-            PromotionOrderInitialData promotionOrder,
-            RewardClaimsInitialData rewardClaims)
+            UserProgressInitialData progress,
+            UserPromotionOrderInitialData promotionOrder,
+            UserRewardClaimsInitialData rewardClaims)
         {
             Identity = identity ?? throw new ArgumentNullException(nameof(identity));
             Items = items ?? throw new ArgumentNullException(nameof(items));

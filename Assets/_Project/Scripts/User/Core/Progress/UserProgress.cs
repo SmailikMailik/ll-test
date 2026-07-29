@@ -20,7 +20,7 @@ namespace LL.User.Core.Progress
 
         [Inject]
         internal UserProgress(
-            ProgressInitialData initialData,
+            UserProgressInitialData initialData,
             IRankProgression rankProgression)
         {
             if (initialData == null)

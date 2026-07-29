@@ -27,14 +27,14 @@ namespace LL.User.Persistence
 
         private readonly Dictionary<ItemId, int> _itemAmounts;
         private readonly HashSet<RewardBundleId> _claimedRewardIds;
-        private ProgressInitialData _progressData;
-        private PromotionOrderInitialData _promotionOrderData;
+        private UserProgressInitialData _progressData;
+        private UserPromotionOrderInitialData _promotionOrderData;
 
         [Inject]
         internal UserSaveController(
             UserIdentity identity,
             UserItemsInitialData itemAmounts,
-            PromotionOrderInitialData promotionOrderData,
+            UserPromotionOrderInitialData promotionOrderData,
             IUserItems items,
             IUserProgress progress,
             IUserPromotionOrder promotionOrder,
@@ -49,7 +49,7 @@ namespace LL.User.Persistence
             _promotionOrderData = promotionOrderData ?? throw new ArgumentNullException(nameof(promotionOrderData));
             _items = items ?? throw new ArgumentNullException(nameof(items));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            _progressData = new ProgressInitialData(progress.Rank, progress.Experience);
+            _progressData = new UserProgressInitialData(progress.Rank, progress.Experience);
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
             _rewardClaims = rewardClaims ?? throw new ArgumentNullException(nameof(rewardClaims));
             _claimedRewardIds = new HashSet<RewardBundleId>(rewardClaims.ClaimedIds);
@@ -102,7 +102,7 @@ namespace LL.User.Persistence
 
         private void UpdatePromotionOrderAndSave()
         {
-            var data = new PromotionOrderInitialData(
+            var data = new UserPromotionOrderInitialData(
                 _promotionOrder.RequirementId,
                 _promotionOrder.DeadlineUnixMilliseconds,
                 _promotionOrder.IsCompleted);
@@ -120,7 +120,7 @@ namespace LL.User.Persistence
 
         private void UpdateProgressAndSave()
         {
-            var data = new ProgressInitialData(
+            var data = new UserProgressInitialData(
                 _progress.Rank,
                 _progress.Experience);
 

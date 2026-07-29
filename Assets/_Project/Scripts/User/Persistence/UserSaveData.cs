@@ -8,42 +8,42 @@ namespace LL.User.Persistence
     internal sealed class UserSaveData
     {
         [JsonProperty] private int _version;
-        [JsonProperty] private IdentitySaveData _identity;
-        [JsonProperty] private ProgressSaveData _progress;
-        [JsonProperty] private PromotionOrderSaveData _promotionOrder;
-        [JsonProperty] private AmountSaveData[] _items;
+        [JsonProperty] private UserIdentitySaveData _identity;
+        [JsonProperty] private UserProgressSaveData _progress;
+        [JsonProperty] private UserPromotionOrderSaveData _promotionOrder;
+        [JsonProperty] private ItemAmountSaveData[] _items;
         [JsonProperty] private string[] _claimedRewardIds;
 
         internal const int CurrentVersion = 2;
 
         internal int Version => _version;
-        internal IdentitySaveData Identity => _identity;
-        internal ProgressSaveData Progress => _progress;
-        internal PromotionOrderSaveData PromotionOrder => _promotionOrder;
-        internal IReadOnlyList<AmountSaveData> Items => _items;
+        internal UserIdentitySaveData Identity => _identity;
+        internal UserProgressSaveData Progress => _progress;
+        internal UserPromotionOrderSaveData PromotionOrder => _promotionOrder;
+        internal IReadOnlyList<ItemAmountSaveData> Items => _items;
         internal IReadOnlyList<string> ClaimedRewardIds => _claimedRewardIds;
 
         [JsonConstructor]
         private UserSaveData() { }
 
         internal UserSaveData(
-            IdentitySaveData identity,
-            ProgressSaveData progress,
-            PromotionOrderSaveData promotionOrder,
-            AmountSaveData[] items,
+            UserIdentitySaveData identity,
+            UserProgressSaveData progress,
+            UserPromotionOrderSaveData promotionOrder,
+            ItemAmountSaveData[] items,
             string[] claimedRewardIds)
         {
             _version = CurrentVersion;
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
-            _items = items ?? Array.Empty<AmountSaveData>();
+            _items = items ?? Array.Empty<ItemAmountSaveData>();
             _claimedRewardIds = claimedRewardIds ?? Array.Empty<string>();
         }
     }
 
     [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
-    internal sealed class IdentitySaveData
+    internal sealed class UserIdentitySaveData
     {
         [JsonProperty] private string _userId;
         [JsonProperty] private string _regionCode;
@@ -52,9 +52,9 @@ namespace LL.User.Persistence
         internal string RegionCode => _regionCode;
 
         [JsonConstructor]
-        private IdentitySaveData() { }
+        private UserIdentitySaveData() { }
 
-        internal IdentitySaveData(string userId, string regionCode)
+        internal UserIdentitySaveData(string userId, string regionCode)
         {
             _userId = userId;
             _regionCode = regionCode;
@@ -62,7 +62,7 @@ namespace LL.User.Persistence
     }
 
     [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
-    internal sealed class ProgressSaveData
+    internal sealed class UserProgressSaveData
     {
         [JsonProperty] private int _rank;
         [JsonProperty] private int _experience;
@@ -71,9 +71,9 @@ namespace LL.User.Persistence
         internal int Experience => _experience;
 
         [JsonConstructor]
-        private ProgressSaveData() { }
+        private UserProgressSaveData() { }
 
-        internal ProgressSaveData(int rank, int experience)
+        internal UserProgressSaveData(int rank, int experience)
         {
             _rank = rank;
             _experience = experience;
@@ -81,7 +81,7 @@ namespace LL.User.Persistence
     }
 
     [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
-    internal sealed class AmountSaveData
+    internal sealed class ItemAmountSaveData
     {
         [JsonProperty] private string _id;
         [JsonProperty] private int _amount;
@@ -90,9 +90,9 @@ namespace LL.User.Persistence
         internal int Amount => _amount;
 
         [JsonConstructor]
-        private AmountSaveData() { }
+        private ItemAmountSaveData() { }
 
-        internal AmountSaveData(string id, int amount)
+        internal ItemAmountSaveData(string id, int amount)
         {
             _id = id;
             _amount = amount;
@@ -100,7 +100,7 @@ namespace LL.User.Persistence
     }
 
     [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
-    internal sealed class PromotionOrderSaveData
+    internal sealed class UserPromotionOrderSaveData
     {
         [JsonProperty] private string _requirementId;
         [JsonProperty] private long _deadlineUnixMilliseconds;
@@ -111,9 +111,9 @@ namespace LL.User.Persistence
         internal bool IsCompleted => _isCompleted;
 
         [JsonConstructor]
-        private PromotionOrderSaveData() { }
+        private UserPromotionOrderSaveData() { }
 
-        internal PromotionOrderSaveData(
+        internal UserPromotionOrderSaveData(
             string requirementId,
             long deadlineUnixMilliseconds,
             bool isCompleted)
