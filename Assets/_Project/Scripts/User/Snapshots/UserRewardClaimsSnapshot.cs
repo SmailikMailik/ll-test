@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Rewards;
 
-namespace LL.User.Snapshots.Rewards
+namespace LL.User.Snapshots
 {
     internal sealed class UserRewardClaimsSnapshot
     {

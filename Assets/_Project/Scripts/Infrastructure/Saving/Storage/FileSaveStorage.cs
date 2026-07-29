@@ -1,31 +1,18 @@
 using System;
 using System.IO;
-using System.Text;
-using Newtonsoft.Json;
 using UnityEngine;
-using VContainer;
 
-namespace LL.Infrastructure.Saving
+namespace LL.Infrastructure.Saving.Storage
 {
-    internal sealed class JsonFileSaveService : ISaveService
+    internal sealed class FileSaveStorage : ISaveStorage
     {
-        private const string FileExtension = ".json";
-
-        private static readonly Encoding _encoding = new UTF8Encoding(false);
-
-        private static readonly JsonSerializerSettings _serializerSettings = new()
-        {
-            Formatting = Formatting.Indented,
-            MissingMemberHandling = MissingMemberHandling.Error,
-            TypeNameHandling = TypeNameHandling.None
-        };
+        private const string FileExtension = ".save";
 
         private readonly string _directoryPath;
 
-        [Inject]
-        internal JsonFileSaveService() : this(Path.Combine(Application.persistentDataPath, "Saves")) { }
+        internal FileSaveStorage() : this(Path.Combine(Application.persistentDataPath, "Saves")) { }
 
-        internal JsonFileSaveService(string directoryPath)
+        internal FileSaveStorage(string directoryPath)
         {
             if (string.IsNullOrWhiteSpace(directoryPath))
                 throw new ArgumentException("Save directory path cannot be empty", nameof(directoryPath));
@@ -38,7 +25,7 @@ namespace LL.Infrastructure.Saving
             return File.Exists(GetFilePath(key));
         }
 
-        public bool TrySave<T>(string key, T data) where T : class
+        public bool TryWrite(string key, byte[] data)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -50,22 +37,21 @@ namespace LL.Infrastructure.Saving
             {
                 Directory.CreateDirectory(_directoryPath);
 
-                var json = JsonConvert.SerializeObject(data, _serializerSettings);
-                File.WriteAllText(temporaryPath, json, _encoding);
+                File.WriteAllBytes(temporaryPath, data);
                 File.Copy(temporaryPath, filePath, true);
                 File.Delete(temporaryPath);
 
                 return true;
             }
-            catch (Exception exception) when (IsStorageException(exception))
+            catch (Exception exception) when (IsFileSystemException(exception))
             {
                 TryDeleteTemporaryFile(temporaryPath);
-                Debug.LogError($"Failed to save '{key}': {exception.Message}");
+                Debug.LogError($"Failed to write save '{key}': {exception.Message}");
                 return false;
             }
         }
 
-        public bool TryLoad<T>(string key, out T data) where T : class
+        public bool TryRead(string key, out byte[] data)
         {
             var filePath = GetFilePath(key);
             data = null;
@@ -75,13 +61,12 @@ namespace LL.Infrastructure.Saving
 
             try
             {
-                var json = File.ReadAllText(filePath, _encoding);
-                data = JsonConvert.DeserializeObject<T>(json, _serializerSettings);
-                return data != null;
+                data = File.ReadAllBytes(filePath);
+                return true;
             }
-            catch (Exception exception) when (IsStorageException(exception))
+            catch (Exception exception) when (IsFileSystemException(exception))
             {
-                Debug.LogError($"Failed to load '{key}': {exception.Message}");
+                Debug.LogError($"Failed to read save '{key}': {exception.Message}");
                 return false;
             }
         }
@@ -97,7 +82,7 @@ namespace LL.Infrastructure.Saving
 
                 return true;
             }
-            catch (Exception exception) when (IsStorageException(exception))
+            catch (Exception exception) when (IsFileSystemException(exception))
             {
                 Debug.LogError($"Failed to delete '{key}': {exception.Message}");
                 return false;
@@ -133,18 +118,17 @@ namespace LL.Infrastructure.Saving
                 if (File.Exists(temporaryPath))
                     File.Delete(temporaryPath);
             }
-            catch (Exception exception) when (IsStorageException(exception))
+            catch (Exception exception) when (IsFileSystemException(exception))
             {
                 Debug.LogWarning($"Failed to delete temporary save file: {exception.Message}");
             }
         }
 
-        private static bool IsStorageException(Exception exception)
+        private static bool IsFileSystemException(Exception exception)
         {
             return exception is IOException
                 or UnauthorizedAccessException
                 or ArgumentException
-                or JsonException
                 or NotSupportedException;
         }
     }

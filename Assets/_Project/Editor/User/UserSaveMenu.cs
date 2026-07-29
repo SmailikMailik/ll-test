@@ -1,4 +1,4 @@
-using LL.Infrastructure.Saving;
+using LL.Composition.Persistence;
 using LL.User.Persistence;
 using LLEditor.Configuration;
 using UnityEditor;
@@ -14,7 +14,7 @@ namespace LLEditor.User
         private static void DeleteSavedData()
         {
             const string saveKey = UserSnapshotLoader.SaveKey;
-            ISaveService saveService = new JsonFileSaveService();
+            var saveService = PersistenceComposition.CreateDefaultSaveService();
 
             if (saveService.Exists(saveKey) is false)
             {

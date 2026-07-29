@@ -1,4 +1,5 @@
 using System;
+using LL.Composition.Persistence;
 using LL.Game.Cards.Configuration;
 using LL.Game.Payments;
 using LL.Game.Promotions.Configuration;
@@ -86,7 +87,7 @@ namespace LL.Composition
         private void RegisterUserPersistence(IContainerBuilder builder)
         {
             builder.RegisterInstance<IUserDefaultsProvider>(_userDefaultsConfig);
-            builder.Register<JsonFileSaveService>(Lifetime.Singleton).As<ISaveService>();
+            builder.RegisterInstance<ISaveService>(PersistenceComposition.CreateDefaultSaveService());
             builder.Register<UserSnapshotLoader>(Lifetime.Singleton).As<IDataLoader<UserSnapshot>>();
 
             RegisterLoadedData<UserSnapshot>(builder);

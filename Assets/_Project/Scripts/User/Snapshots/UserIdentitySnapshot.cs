@@ -1,4 +1,4 @@
-namespace LL.User.Snapshots.Identity
+namespace LL.User.Snapshots
 {
     internal sealed class UserIdentitySnapshot
     {

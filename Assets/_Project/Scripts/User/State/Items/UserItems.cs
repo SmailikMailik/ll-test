@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
-using LL.User.Snapshots.Items;
+using LL.User.Snapshots;
 using R3;
 using VContainer;
 

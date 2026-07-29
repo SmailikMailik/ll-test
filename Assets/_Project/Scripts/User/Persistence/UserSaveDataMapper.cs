@@ -3,13 +3,8 @@ using System.Linq;
 using LL.Game.Items;
 using LL.Game.Promotions;
 using LL.Game.Rewards;
-using LL.User.Snapshots;
-using LL.User.Snapshots.Identity;
-using LL.User.Snapshots.Items;
-using LL.User.Snapshots.Progress;
-using LL.User.Snapshots.Promotions;
-using LL.User.Snapshots.Rewards;
 using LL.User.Persistence.SaveData;
+using LL.User.Snapshots;
 
 namespace LL.User.Persistence
 {
@@ -40,6 +35,7 @@ namespace LL.User.Persistence
                 throw new ArgumentNullException(nameof(snapshot));
 
             return new UserSaveData(
+                UserSaveData.CurrentVersion,
                 new UserIdentitySaveData(snapshot.Identity.UserId, snapshot.Identity.RegionCode),
                 new UserProgressSaveData(snapshot.Progress.Rank, snapshot.Progress.Experience),
                 new UserPromotionOrderSaveData(

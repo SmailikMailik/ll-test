@@ -1,7 +1,7 @@
 using System;
 using LL.Game.Promotions;
 
-namespace LL.User.Snapshots.Promotions
+namespace LL.User.Snapshots
 {
     internal sealed class UserPromotionOrderSnapshot
     {

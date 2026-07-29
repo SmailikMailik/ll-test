@@ -1,6 +1,6 @@
 using System;
 using LL.Game.Promotions;
-using LL.User.Snapshots.Promotions;
+using LL.User.Snapshots;
 using R3;
 using VContainer;
 

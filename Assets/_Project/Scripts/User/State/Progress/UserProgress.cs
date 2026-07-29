@@ -1,6 +1,6 @@
 using System;
 using LL.Game.Ranks;
-using LL.User.Snapshots.Progress;
+using LL.User.Snapshots;
 using R3;
 using VContainer;
 

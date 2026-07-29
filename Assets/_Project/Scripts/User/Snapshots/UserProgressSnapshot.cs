@@ -1,6 +1,6 @@
 using System;
 
-namespace LL.User.Snapshots.Progress
+namespace LL.User.Snapshots
 {
     internal sealed class UserProgressSnapshot
     {

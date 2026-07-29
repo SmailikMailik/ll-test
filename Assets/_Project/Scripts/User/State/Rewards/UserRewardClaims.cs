@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Rewards;
-using LL.User.Snapshots.Rewards;
+using LL.User.Snapshots;
 using R3;
 using VContainer;
 

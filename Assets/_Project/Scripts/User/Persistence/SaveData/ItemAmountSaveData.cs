@@ -1,23 +1,14 @@
-using Newtonsoft.Json;
-
 namespace LL.User.Persistence.SaveData
 {
-    [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class ItemAmountSaveData
     {
-        [JsonProperty] private string _id;
-        [JsonProperty] private int _amount;
+        public string Id { get; }
+        public int Amount { get; }
 
-        internal string Id => _id;
-        internal int Amount => _amount;
-
-        [JsonConstructor]
-        private ItemAmountSaveData() { }
-
-        internal ItemAmountSaveData(string id, int amount)
+        public ItemAmountSaveData(string id, int amount)
         {
-            _id = id;
-            _amount = amount;
+            Id = id;
+            Amount = amount;
         }
     }
 }

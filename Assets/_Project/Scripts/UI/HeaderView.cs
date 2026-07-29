@@ -3,7 +3,7 @@ using LL.Presentation.Items;
 using LL.UI.Controls;
 using LL.UI.Windows;
 using LL.User.State.Items;
-using LL.User.Snapshots.Identity;
+using LL.User.Snapshots;
 using R3;
 using TMPro;
 using UnityEngine;

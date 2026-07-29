@@ -1,9 +1,4 @@
 using System;
-using LL.User.Snapshots.Identity;
-using LL.User.Snapshots.Items;
-using LL.User.Snapshots.Progress;
-using LL.User.Snapshots.Promotions;
-using LL.User.Snapshots.Rewards;
 
 namespace LL.User.Snapshots
 {
