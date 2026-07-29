@@ -7,6 +7,7 @@ namespace LL.User.Persistence
     [JsonObject(MemberSerialization.OptIn, ItemRequired = Required.AllowNull)]
     internal sealed class UserSaveData
     {
+        [JsonProperty] private int _version;
         [JsonProperty] private IdentitySaveData _identity;
         [JsonProperty] private ProgressSaveData _progress;
         [JsonProperty] private PromotionOrderSaveData _promotionOrder;
@@ -14,6 +15,9 @@ namespace LL.User.Persistence
         [JsonProperty] private AmountSaveData[] _cards;
         [JsonProperty] private string[] _claimedRewardIds;
 
+        internal const int CurrentVersion = 1;
+
+        internal int Version => _version;
         internal IdentitySaveData Identity => _identity;
         internal ProgressSaveData Progress => _progress;
         internal PromotionOrderSaveData PromotionOrder => _promotionOrder;
@@ -32,6 +36,7 @@ namespace LL.User.Persistence
             AmountSaveData[] cards,
             string[] claimedRewardIds)
         {
+            _version = CurrentVersion;
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));

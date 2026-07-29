@@ -3,6 +3,7 @@ using LL.Loading;
 using LL.Saving;
 using LL.User.Configuration;
 using LL.User.Core;
+using UnityEngine;
 using VContainer;
 
 namespace LL.User.Persistence
@@ -26,7 +27,14 @@ namespace LL.User.Persistence
         public UserInitialData Load()
         {
             if (_saveService.TryLoad<UserSaveData>(SaveKey, out var savedData))
-                return UserSaveDataMapper.ToInitialData(savedData);
+            {
+                if (savedData.Version == UserSaveData.CurrentVersion)
+                    return UserSaveDataMapper.ToInitialData(savedData);
+
+                Debug.LogWarning(
+                    $"Unsupported user save version {savedData.Version}. " +
+                    $"Expected {UserSaveData.CurrentVersion}. Resetting user data.");
+            }
 
             var defaultData = _defaults.GetDefaults();
             _saveService.TrySave(SaveKey, UserSaveDataMapper.ToSaveData(defaultData));
