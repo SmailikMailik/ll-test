@@ -5,10 +5,10 @@ namespace LL.Game.Promotions
 {
     internal readonly struct PromotionRequirementId : IIdentifier, IEquatable<PromotionRequirementId>
     {
-        internal string Value { get; }
-        public bool IsEmpty => string.IsNullOrEmpty(Value);
+        public string Value { get; }
+        public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
-        internal PromotionRequirementId(string value) => Value = IdentifierNormalizer.Normalize(value);
+        internal PromotionRequirementId(string value) => Value = value;
 
         public bool Equals(PromotionRequirementId other) => StringComparer.Ordinal.Equals(Value, other.Value);
 

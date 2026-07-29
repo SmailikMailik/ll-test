@@ -46,7 +46,6 @@ namespace LL.User.Persistence
                     .Select(item => new ItemAmountSaveData(item.Id.Value, item.Amount))
                     .ToArray(),
                 snapshot.RewardClaims.ClaimedIds
-                    .Where(id => id.IsEmpty is false)
                     .Select(id => id.Value)
                     .ToArray());
         }

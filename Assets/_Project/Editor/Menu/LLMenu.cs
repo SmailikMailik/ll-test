@@ -6,6 +6,7 @@ namespace LLEditor.Menu
 
         internal const string OpenMainScenePath = RootPath + "Open Main Scene";
         internal const string DeleteSavedUserDataPath = RootPath + "Delete Saved User Data";
+        internal const string ValidateProjectDataPath = RootPath + "Validate Project Data";
 
         internal const string GamePath = RootPath + "Game/";
         internal const string UserPath = RootPath + "User/";
@@ -14,6 +15,7 @@ namespace LLEditor.Menu
 
         internal const int OpenMainScenePriority = 0;
         internal const int DeleteSavedUserDataPriority = 1;
+        internal const int ValidateProjectDataPriority = 2;
         internal const int ContentPriority = 100;
     }
 }

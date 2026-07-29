@@ -1,0 +1,89 @@
+using System;
+using LL.Game.Data.Validation;
+
+namespace LL.User.Configuration
+{
+    internal sealed class UserDefaultsConfigValidator : IDataValidator<UserDefaultsConfig>
+    {
+        private const string ConfigCode = "user-defaults.config.required";
+        private const string IdentityCode = "user-defaults.identity.required";
+        private const string UserIdCode = "user-defaults.identity.user-id.not-empty";
+        private const string UserIdWhitespaceCode = "user-defaults.identity.user-id.trimmed";
+        private const string RegionCodeCode = "user-defaults.identity.region-code.not-empty";
+        private const string RegionWhitespaceCode = "user-defaults.identity.region-code.trimmed";
+        private const string RegionCaseCode = "user-defaults.identity.region-code.uppercase";
+        private const string ProgressCode = "user-defaults.progress.required";
+        private const string RankCode = "user-defaults.progress.rank.positive";
+        private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
+
+        private readonly IDataValidator<ItemAmountEntry[]> _itemsValidator;
+
+        internal UserDefaultsConfigValidator(IDataValidator<ItemAmountEntry[]> itemsValidator)
+        {
+            _itemsValidator = itemsValidator ?? throw new ArgumentNullException(nameof(itemsValidator));
+        }
+
+        public void Validate(
+            UserDefaultsConfig defaults,
+            ValidationContext context)
+        {
+            if (ValidationRules.NotNull(defaults, context, ConfigCode) is false)
+                return;
+
+            ValidateIdentity(defaults.Identity, context.At("Identity"));
+            ValidateProgress(defaults.Progress, context.At("Progress"));
+            _itemsValidator.Validate(defaults.Items, context.At("Items"));
+        }
+
+        private static void ValidateIdentity(
+            UserIdentityDefaults identity,
+            ValidationContext context)
+        {
+            if (ValidationRules.NotNull(identity, context, IdentityCode) is false)
+                return;
+
+            ValidationRules.NotEmpty(
+                identity.UserId,
+                context.At("UserId"),
+                UserIdCode);
+
+            ValidationRules.Trimmed(
+                identity.UserId,
+                context.At("UserId"),
+                UserIdWhitespaceCode);
+
+            ValidationRules.NotEmpty(
+                identity.RegionCode,
+                context.At("RegionCode"),
+                RegionCodeCode);
+
+            ValidationRules.Trimmed(
+                identity.RegionCode,
+                context.At("RegionCode"),
+                RegionWhitespaceCode);
+
+            ValidationRules.Uppercase(
+                identity.RegionCode,
+                context.At("RegionCode"),
+                RegionCaseCode);
+        }
+
+        private static void ValidateProgress(
+            UserProgressDefaults progress,
+            ValidationContext context)
+        {
+            if (ValidationRules.NotNull(progress, context, ProgressCode) is false)
+                return;
+
+            ValidationRules.Positive(
+                progress.Rank,
+                context.At("Rank"),
+                RankCode);
+
+            ValidationRules.NonNegative(
+                progress.Experience,
+                context.At("Experience"),
+                ExperienceCode);
+        }
+    }
+}

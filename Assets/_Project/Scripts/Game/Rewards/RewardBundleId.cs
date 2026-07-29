@@ -5,10 +5,10 @@ namespace LL.Game.Rewards
 {
     internal readonly struct RewardBundleId : IIdentifier, IEquatable<RewardBundleId>
     {
-        internal string Value { get; }
-        public bool IsEmpty => string.IsNullOrEmpty(Value);
+        public string Value { get; }
+        public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
-        internal RewardBundleId(string value) => Value = IdentifierNormalizer.Normalize(value);
+        internal RewardBundleId(string value) => Value = value;
 
         public bool Equals(RewardBundleId other) => StringComparer.Ordinal.Equals(Value, other.Value);
 

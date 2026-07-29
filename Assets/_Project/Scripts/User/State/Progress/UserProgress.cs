@@ -32,9 +32,7 @@ namespace LL.User.State.Progress
             var progress = _rankProgression.GetProgress(snapshot.Rank, snapshot.Experience);
 
             Rank = progress.Rank;
-            Experience = progress.HasNextRank
-                ? Math.Min(progress.Experience, progress.RequiredExperience)
-                : 0;
+            Experience = progress.Experience;
         }
 
         public int GetApplicableExperience(int amount)

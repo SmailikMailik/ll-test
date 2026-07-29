@@ -13,7 +13,7 @@ namespace LL.Game.Rewards
         {
             var copy = bundles?.ToArray() ?? Array.Empty<RewardBundle>();
 
-            IdentifierCollectionValidator.Validate(
+            IdentifierCollectionValidator.EnsureValid(
                 copy,
                 bundle => bundle.Id,
                 nameof(bundles));

@@ -1,48 +1,81 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Data.Validation;
 
 namespace LL.Game.Promotions
 {
     internal static class RankPromotionCatalogValidator
     {
-        internal static bool HasValidRanks<TPromotion>(
+        private const string MissingEntryCode = "rank-promotion.entry.required";
+        private const string InvalidRankCode = "rank-promotion.rank.positive";
+        private const string DuplicateRankCode = "rank-promotion.rank.duplicate";
+
+        internal static ValidationResult Validate<TPromotion>(
             IEnumerable<TPromotion> promotions,
-            Func<TPromotion, int> rankSelector)
-            where TPromotion : class
+            Func<TPromotion, int> getRank)
         {
-            if (rankSelector == null)
-                throw new ArgumentNullException(nameof(rankSelector));
+            var result = new ValidationResult();
+            Validate(promotions, getRank, new ValidationContext(result));
+            return result;
+        }
+
+        internal static void Validate<TPromotion>(
+            IEnumerable<TPromotion> promotions,
+            Func<TPromotion, int> getRank,
+            ValidationContext context)
+        {
+            if (getRank == null)
+                throw new ArgumentNullException(nameof(getRank));
+
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            var usedRanks = new HashSet<int>();
+            var index = 0;
 
             if (promotions == null)
-                return true;
-
-            var ranks = new HashSet<int>();
+                return;
 
             foreach (var promotion in promotions)
             {
-                if (promotion == null)
-                    return false;
+                var entryContext = context.At(index);
 
-                var rank = rankSelector(promotion);
+                if (ValidationRules.NotNull(promotion, entryContext, MissingEntryCode) is false)
+                {
+                    index++;
+                    continue;
+                }
 
-                if (rank < 1 || ranks.Add(rank) is false)
-                    return false;
+                var rank = getRank(promotion);
+                var rankContext = entryContext.At("Rank");
+
+                if (ValidationRules.Positive(rank, rankContext, InvalidRankCode)
+                    && usedRanks.Add(rank) is false)
+                {
+                    rankContext.Report(
+                        ValidationSeverity.Error,
+                        DuplicateRankCode,
+                        $"Rank '{rank}' must be unique.");
+                }
+
+                index++;
             }
-
-            return true;
         }
 
-        internal static void EnsureValidRanks<TPromotion>(
+        internal static bool IsValid<TPromotion>(
             IEnumerable<TPromotion> promotions,
-            Func<TPromotion, int> rankSelector,
-            string parameterName)
-            where TPromotion : class
+            Func<TPromotion, int> getRank)
         {
-            if (HasValidRanks(promotions, rankSelector))
-                return;
+            return Validate(promotions, getRank).IsValid;
+        }
 
-            throw new ArgumentException(
-                "Rank promotion entries must be non-null and have unique positive ranks.",
+        internal static void EnsureValid<TPromotion>(
+            IEnumerable<TPromotion> promotions,
+            Func<TPromotion, int> getRank,
+            string parameterName)
+        {
+            ValidationResultGuard.EnsureValid(
+                Validate(promotions, getRank),
                 parameterName);
         }
     }

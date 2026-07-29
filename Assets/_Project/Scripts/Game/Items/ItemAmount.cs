@@ -9,8 +9,17 @@ namespace LL.Game.Items
 
         internal ItemAmount(ItemId id, int amount)
         {
+            if (id.IsEmpty)
+                throw new ArgumentException("Item amount ID must be non-empty.", nameof(id));
+
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(amount),
+                    amount,
+                    "Item amount must not be negative.");
+
             Id = id;
-            Amount = Math.Max(0, amount);
+            Amount = amount;
         }
     }
 }

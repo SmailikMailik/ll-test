@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
+using LL.Game.Data.Validation;
 using LL.Game.Items;
-using LL.Game.Identifiers;
 using LL.Infrastructure.Loading;
 using LL.Presentation.Icons;
 using Sirenix.OdinInspector;
@@ -11,29 +11,40 @@ namespace LL.Presentation.Icons.Configuration
 {
     [CreateAssetMenu(fileName = nameof(ItemIconCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class ItemIconCatalogConfig : ScriptableObject, IDataLoader<IconCatalog<ItemId>>
+    internal sealed class ItemIconCatalogConfig :
+        ScriptableObject,
+        IDataLoader<IconCatalog<ItemId>>,
+        IValidationSource
     {
-        [ValidateInput(nameof(HasValidIconIds), "Item icon IDs must be non-empty and unique.")]
+        [ValidateInput(nameof(HasValidIcons), "Item icon data is invalid.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ItemIconEntry[] _icons;
 
         internal const string CreationPath = "LL/Presentation/Item Icon Catalog";
 
+        private static readonly IDataValidator<ItemIconEntry[]> _validator =
+            new ItemIconCatalogConfigValidator();
+
+        internal ItemIconEntry[] Icons => _icons;
+
         public IconCatalog<ItemId> Load()
         {
-            IdentifierCollectionValidator.Validate(
-                _icons,
-                entry => entry.Id,
-                nameof(_icons));
+            var result = ValidationRunner.Run(this);
+            ValidationResultGuard.EnsureValid(result, nameof(_icons));
 
             var icons = _icons?.Select(entry => entry.ToPair());
 
             return new IconCatalog<ItemId>(icons);
         }
 
-        private static bool HasValidIconIds(ItemIconEntry[] icons)
+        private static bool HasValidIcons(ItemIconEntry[] icons)
         {
-            return IdentifierCollectionValidator.IsValid(icons, entry => entry.Id);
+            return ValidationRunner.Run(icons, _validator).IsValid;
+        }
+
+        void IValidationSource.Validate(ValidationContext context)
+        {
+            _validator.Validate(_icons, context);
         }
     }
 

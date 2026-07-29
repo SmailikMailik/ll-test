@@ -1,6 +1,7 @@
 using System;
 using LL.Composition.Persistence;
 using LL.Game.Cards.Configuration;
+using LL.Game.Data.Validation;
 using LL.Game.Payments;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Ranks;
@@ -11,6 +12,7 @@ using LL.Game.Upgrades;
 using LL.Game.Identifiers;
 using LL.Infrastructure.Loading;
 using LL.Infrastructure.Saving;
+using LL.Infrastructure.Validation;
 using LL.Presentation.Icons;
 using LL.Presentation.Icons.Configuration;
 using LL.Presentation.Localization;
@@ -50,6 +52,7 @@ namespace LL.Composition
         {
             RegisterWindows(builder);
             RegisterLocalization(builder);
+            RegisterValidationReporting(builder);
             RegisterGameData(builder);
             RegisterPresentationData(builder);
             RegisterUserPersistence(builder);
@@ -69,6 +72,12 @@ namespace LL.Composition
         private static void RegisterLocalization(IContainerBuilder builder)
         {
             builder.Register<UnityLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
+        }
+
+        private static void RegisterValidationReporting(IContainerBuilder builder)
+        {
+            builder.RegisterInstance<IValidationIssueFormatter>(new ValidationIssueFormatter());
+            builder.Register<UnityConsoleValidationReporter>(Lifetime.Singleton).As<IValidationReporter>();
         }
 
         private void RegisterGameData(IContainerBuilder builder)

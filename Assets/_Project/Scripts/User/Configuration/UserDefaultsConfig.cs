@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
+using LL.Game.Data.Validation;
 using LL.Game.Items;
-using LL.Game.Identifiers;
 using LL.User.Snapshots;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -10,7 +10,7 @@ namespace LL.User.Configuration
 {
     [CreateAssetMenu(fileName = nameof(UserDefaultsConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsProvider
+    internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsProvider, IValidationSource
     {
         [BoxGroup("Identity")]
         [HideLabel]
@@ -21,29 +21,43 @@ namespace LL.User.Configuration
         [SerializeField] private UserProgressDefaults _progress = new();
 
         [BoxGroup("Items")]
-        [ValidateInput(nameof(HasValidItemIds), "Item IDs must be non-empty and unique.")]
+        [ValidateInput(nameof(HasValidItems), "User item defaults are invalid.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private ItemAmountEntry[] _items;
 
         internal const string CreationPath = "LL/User/User Defaults Config";
 
+        private static readonly IDataValidator<ItemAmountEntry[]> _itemsValidator =
+            new UserItemsDefaultsValidator();
+
+        private static readonly IDataValidator<UserDefaultsConfig> _validator =
+            new UserDefaultsConfigValidator(_itemsValidator);
+
+        internal UserIdentityDefaults Identity => _identity;
+        internal UserProgressDefaults Progress => _progress;
+        internal ItemAmountEntry[] Items => _items;
+
         UserSnapshot IUserDefaultsProvider.GetDefaultSnapshot()
         {
-            IdentifierCollectionValidator.Validate(
-                _items,
-                entry => entry.Id,
-                nameof(_items));
+            var result = ValidationRunner.Run(this);
+            ValidationResultGuard.EnsureValid(result);
+
             return new UserSnapshot(
-                _identity.ToSnapshot(),
-                new UserItemsSnapshot(_items?.Select(item => item.ToItemAmount())),
-                _progress.ToSnapshot(),
+                Identity.ToSnapshot(),
+                new UserItemsSnapshot(Items?.Select(item => item.ToItemAmount())),
+                Progress.ToSnapshot(),
                 new UserPromotionOrderSnapshot(default, 0L, false),
                 new UserRewardClaimsSnapshot(null));
         }
 
-        private static bool HasValidItemIds(ItemAmountEntry[] entries)
+        private static bool HasValidItems(ItemAmountEntry[] entries)
         {
-            return IdentifierCollectionValidator.IsValid(entries, entry => entry.Id);
+            return ValidationRunner.Run(entries, _itemsValidator).IsValid;
+        }
+
+        void IValidationSource.Validate(ValidationContext context)
+        {
+            _validator.Validate(this, context);
         }
     }
 
@@ -57,7 +71,10 @@ namespace LL.User.Configuration
         [LabelText("Region Code")]
         [SerializeField] private string _regionCode;
 
-        internal UserIdentitySnapshot ToSnapshot() => new(_userId, _regionCode);
+        internal string UserId => _userId;
+        internal string RegionCode => _regionCode;
+
+        internal UserIdentitySnapshot ToSnapshot() => new(UserId, RegionCode);
     }
 
     [Serializable]
@@ -73,7 +90,10 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _experience;
 
-        internal UserProgressSnapshot ToSnapshot() => new(_rank, _experience);
+        internal int Rank => _rank;
+        internal int Experience => _experience;
+
+        internal UserProgressSnapshot ToSnapshot() => new(Rank, Experience);
     }
 
     [Serializable]
@@ -87,7 +107,8 @@ namespace LL.User.Configuration
         [SerializeField] private int _amount;
 
         internal ItemId Id => new(_id);
+        internal int Amount => _amount;
 
-        internal ItemAmount ToItemAmount() => new(Id, _amount);
+        internal ItemAmount ToItemAmount() => new(Id, Amount);
     }
 }

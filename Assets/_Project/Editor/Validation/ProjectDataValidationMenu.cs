@@ -1,0 +1,55 @@
+using System.Linq;
+using LL.Game.Data.Validation;
+using LL.Infrastructure.Validation;
+using LLEditor.Menu;
+using UnityEditor;
+using UnityEngine;
+
+namespace LLEditor.Validation
+{
+    internal static class ProjectDataValidationMenu
+    {
+        private const string ProjectDataPath = "Assets/_Project/ScriptableObjects";
+
+        [MenuItem(LLMenu.ValidateProjectDataPath, false, LLMenu.ValidateProjectDataPriority)]
+        private static void ValidateProjectData()
+        {
+            var assets = AssetDatabase
+                .FindAssets(string.Empty, new[] { ProjectDataPath })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .OrderBy(path => path)
+                .Select(path => AssetDatabase.LoadAssetAtPath<ScriptableObject>(path))
+                .Where(asset => asset is IValidationSource)
+                .ToArray();
+
+            var result = new ValidationResult();
+            var context = new ValidationContext(result);
+            var sourceValidator = new ProjectDataSourceValidator();
+
+            sourceValidator.Validate(assets, context.At("ProjectData"));
+
+            foreach (var asset in assets)
+            {
+                var source = (IValidationSource)asset;
+                var assetPath = AssetDatabase.GetAssetPath(asset);
+                source.Validate(context.At(assetPath));
+            }
+
+            var referenceValidator = new ProjectDataReferenceValidator();
+            referenceValidator.Validate(assets, context);
+
+            var reporter = new UnityConsoleValidationReporter();
+            reporter.Report(result);
+
+            if (result.IsValid)
+            {
+                Debug.Log($"Project data validation succeeded. Checked {assets.Length} assets.");
+                return;
+            }
+
+            Debug.LogError(
+                $"Project data validation failed with {result.Issues.Count} issues " +
+                $"across {assets.Length} assets.");
+        }
+    }
+}

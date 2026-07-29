@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
+using LL.Game.Data.Validation;
 using LL.Game.Items;
-using LL.Game.Promotions;
-using LL.Infrastructure.Loading;
 using LL.Game.Payments;
+using LL.Game.Promotions;
 using LL.Game.Rewards;
+using LL.Infrastructure.Loading;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -12,33 +13,38 @@ namespace LL.Game.Promotions.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankPromotionCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class RankPromotionCatalogConfig : ScriptableObject, IDataLoader<RankPromotionCatalog>
+    internal sealed class RankPromotionCatalogConfig :
+        ScriptableObject,
+        IDataLoader<RankPromotionCatalog>,
+        IValidationSource
     {
-        [ValidateInput(nameof(HasValidPromotions), "Promotion ranks must be positive and unique.")]
+        [ValidateInput(nameof(HasValidPromotions), "Rank promotion data is invalid.")]
         [ListDrawerSettings(ShowFoldout = false, ShowPaging = false)]
         [SerializeField] private RankPromotionEntry[] _promotions;
 
         internal const string CreationPath = "LL/Game Data/Rank Promotion Catalog";
 
+        private static readonly IDataValidator<RankPromotionEntry[]> _validator =
+            new RankPromotionCatalogConfigValidator();
+
+        internal RankPromotionEntry[] Promotions => _promotions;
+
         public RankPromotionCatalog Load()
         {
-            return new RankPromotionCatalog(_promotions?.Select(entry => entry?.ToPromotion()));
-        }
+            var result = ValidationRunner.Run(this);
+            ValidationResultGuard.EnsureValid(result, nameof(_promotions));
 
-        private void OnValidate()
-        {
-            if (_promotions == null)
-                return;
-
-            foreach (var promotion in _promotions)
-                promotion?.Normalize();
+            return new RankPromotionCatalog(_promotions?.Select(entry => entry.ToPromotion()));
         }
 
         private static bool HasValidPromotions(RankPromotionEntry[] promotions)
         {
-            return RankPromotionCatalogValidator.HasValidRanks(
-                promotions,
-                promotion => promotion.Rank);
+            return ValidationRunner.Run(promotions, _validator).IsValid;
+        }
+
+        void IValidationSource.Validate(ValidationContext context)
+        {
+            _validator.Validate(_promotions, context);
         }
     }
 
@@ -92,30 +98,30 @@ namespace LL.Game.Promotions.Configuration
         [SerializeField] private string _rewardBundleId;
 
         internal int Rank => _rank;
+        internal int DurationMinutes => _durationMinutes;
+        internal PromotionRequirementId RequirementId => new(_requirementId);
+        internal int RequiredAmount => _requiredAmount;
+        internal string TitleLocalizationKey => _titleLocalizationKey;
+        internal string DescriptionLocalizationKey => _descriptionLocalizationKey;
+        internal string TargetLocalizationKey => _targetLocalizationKey;
+        internal int SoftPrice => _softPrice;
+        internal int HardPrice => _hardPrice;
+        internal RewardBundleId RewardBundleId => new(_rewardBundleId);
 
         internal RankPromotion ToPromotion()
         {
             return new RankPromotion(
-                _rank,
+                Rank,
                 new RankPromotionRequirement(
-                    new PromotionRequirementId(_requirementId),
-                    _titleLocalizationKey,
-                    _descriptionLocalizationKey,
-                    _targetLocalizationKey,
-                    _requiredAmount),
-                TimeSpan.FromMinutes(_durationMinutes),
-                new Payment(ItemIds.Soft, _softPrice),
-                new Payment(ItemIds.Hard, _hardPrice),
-                new RewardBundleId(_rewardBundleId));
-        }
-
-        internal void Normalize()
-        {
-            _rank = Math.Max(1, _rank);
-            _durationMinutes = Math.Max(1, _durationMinutes);
-            _requiredAmount = Math.Max(1, _requiredAmount);
-            _softPrice = Math.Max(1, _softPrice);
-            _hardPrice = Math.Max(1, _hardPrice);
+                    RequirementId,
+                    TitleLocalizationKey,
+                    DescriptionLocalizationKey,
+                    TargetLocalizationKey,
+                    RequiredAmount),
+                TimeSpan.FromMinutes(DurationMinutes),
+                new Payment(ItemIds.Soft, SoftPrice),
+                new Payment(ItemIds.Hard, HardPrice),
+                RewardBundleId);
         }
     }
 }

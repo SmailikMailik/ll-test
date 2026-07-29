@@ -11,7 +11,7 @@ namespace LL.Game.Promotions
         internal RankPromotionCatalog(IEnumerable<RankPromotion> promotions)
         {
             var copy = promotions?.ToArray() ?? Array.Empty<RankPromotion>();
-            RankPromotionCatalogValidator.EnsureValidRanks(
+            RankPromotionCatalogValidator.EnsureValid(
                 copy,
                 promotion => promotion.Rank,
                 nameof(promotions));

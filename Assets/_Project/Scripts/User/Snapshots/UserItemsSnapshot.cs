@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Identifiers;
 using LL.Game.Items;
 
 namespace LL.User.Snapshots
@@ -11,21 +12,13 @@ namespace LL.User.Snapshots
 
         internal UserItemsSnapshot(IEnumerable<ItemAmount> entries)
         {
-            var amounts = new Dictionary<ItemId, long>();
+            var copy = entries?.ToArray() ?? Array.Empty<ItemAmount>();
 
-            if (entries != null)
-            {
-                foreach (var entry in entries)
-                {
-                    if (entry.Id.IsEmpty)
-                        continue;
+            IdentifierCollectionValidator.EnsureValid(
+                copy,
+                entry => entry.Id,
+                nameof(entries));
 
-                    amounts.TryGetValue(entry.Id, out var current);
-                    amounts[entry.Id] = Math.Min(current + entry.Amount, int.MaxValue);
-                }
-            }
-
-            var copy = amounts.Select(pair => new ItemAmount(pair.Key, (int)pair.Value)).ToArray();
             Amounts = Array.AsReadOnly(copy);
         }
     }

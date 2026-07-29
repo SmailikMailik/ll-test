@@ -9,8 +9,17 @@ namespace LL.User.Snapshots
 
         internal UserProgressSnapshot(int rank, int experience)
         {
-            Rank = Math.Max(1, rank);
-            Experience = Math.Max(0, experience);
+            if (rank <= 0)
+                throw new ArgumentOutOfRangeException(nameof(rank), rank, "User rank must be greater than zero.");
+
+            if (experience < 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(experience),
+                    experience,
+                    "User experience must not be negative.");
+
+            Rank = rank;
+            Experience = experience;
         }
     }
 }

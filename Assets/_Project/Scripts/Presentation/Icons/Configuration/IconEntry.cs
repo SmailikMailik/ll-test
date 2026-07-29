@@ -18,8 +18,9 @@ namespace LL.Presentation.Icons.Configuration
         [SerializeField] private Sprite _icon;
 
         internal TId Id => CreateId(_id);
+        internal Sprite Icon => _icon;
 
-        internal KeyValuePair<TId, Sprite> ToPair() => new(Id, _icon);
+        internal KeyValuePair<TId, Sprite> ToPair() => new(Id, Icon);
 
         protected abstract TId CreateId(string value);
     }

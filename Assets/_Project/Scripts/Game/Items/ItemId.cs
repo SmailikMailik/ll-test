@@ -5,10 +5,10 @@ namespace LL.Game.Items
 {
     internal readonly struct ItemId : IIdentifier, IEquatable<ItemId>
     {
-        internal string Value { get; }
-        public bool IsEmpty => string.IsNullOrEmpty(Value);
+        public string Value { get; }
+        public bool IsEmpty => string.IsNullOrWhiteSpace(Value);
 
-        internal ItemId(string value) => Value = IdentifierNormalizer.Normalize(value);
+        internal ItemId(string value) => Value = value;
 
         public bool Equals(ItemId other) => StringComparer.Ordinal.Equals(Value, other.Value);
 

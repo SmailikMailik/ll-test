@@ -1,0 +1,29 @@
+using System;
+
+namespace LL.Game.Data.Validation
+{
+    internal static class ValidationRunner
+    {
+        internal static ValidationResult Run(IValidationSource source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            var result = new ValidationResult();
+            source.Validate(new ValidationContext(result));
+            return result;
+        }
+
+        internal static ValidationResult Run<T>(
+            T value,
+            IDataValidator<T> validator)
+        {
+            if (validator == null)
+                throw new ArgumentNullException(nameof(validator));
+
+            var result = new ValidationResult();
+            validator.Validate(value, new ValidationContext(result));
+            return result;
+        }
+    }
+}

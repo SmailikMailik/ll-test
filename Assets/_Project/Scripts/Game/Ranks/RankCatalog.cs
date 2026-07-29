@@ -10,15 +10,28 @@ namespace LL.Game.Ranks
 
         internal RankCatalog(IEnumerable<int> experienceRequirements)
         {
-            var requirements = experienceRequirements?.ToArray() ?? Array.Empty<int>();
+            if (experienceRequirements == null)
+                throw new ArgumentNullException(nameof(experienceRequirements));
+
+            var requirements = experienceRequirements.ToArray();
 
             if (requirements.Length == 0)
-                requirements = new[] { 0 };
+                throw new ArgumentException(
+                    "Rank catalog must contain at least one experience requirement.",
+                    nameof(experienceRequirements));
 
-            requirements[0] = 0;
+            if (requirements[0] != 0)
+                throw new ArgumentException(
+                    "Rank 1 required experience must be zero.",
+                    nameof(experienceRequirements));
 
             for (var index = 1; index < requirements.Length; index++)
-                requirements[index] = Math.Max(1, requirements[index]);
+            {
+                if (requirements[index] <= 0)
+                    throw new ArgumentException(
+                        $"Rank {index + 1} required experience must be greater than zero.",
+                        nameof(experienceRequirements));
+            }
 
             ExperienceRequirements = Array.AsReadOnly(requirements);
         }

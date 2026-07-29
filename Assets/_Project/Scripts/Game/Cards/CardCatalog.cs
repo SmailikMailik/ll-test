@@ -13,7 +13,7 @@ namespace LL.Game.Cards
         internal CardCatalog(IEnumerable<ICard> cards)
         {
             var copy = cards?.ToArray() ?? Array.Empty<ICard>();
-            IdentifierCollectionValidator.Validate(
+            IdentifierCollectionValidator.EnsureValid(
                 copy,
                 card => card.Id,
                 nameof(cards));

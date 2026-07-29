@@ -1,72 +1,90 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Data.Validation;
 
 namespace LL.Game.Identifiers
 {
     internal static class IdentifierCollectionValidator
     {
-        internal static bool IsValid<TEntry, TId>(
+        private const string MissingEntryCode = "identifier.entry.required";
+        private const string DuplicateIdentifierCode = "identifier.duplicate";
+
+        internal static ValidationResult Validate<TEntry, TId>(
             IEnumerable<TEntry> entries,
             Func<TEntry, TId> getId)
             where TId : struct, IIdentifier
         {
-            return TryValidate(entries, getId, out _);
+            var result = new ValidationResult();
+            Validate(entries, getId, new ValidationContext(result));
+            return result;
         }
 
         internal static void Validate<TEntry, TId>(
             IEnumerable<TEntry> entries,
             Func<TEntry, TId> getId,
-            string parameterName)
-            where TId : struct, IIdentifier
-        {
-            if (TryValidate(entries, getId, out var error))
-                return;
-
-            throw new ArgumentException(error, parameterName);
-        }
-
-        private static bool TryValidate<TEntry, TId>(
-            IEnumerable<TEntry> entries,
-            Func<TEntry, TId> getId,
-            out string error)
+            ValidationContext context)
             where TId : struct, IIdentifier
         {
             if (getId == null)
                 throw new ArgumentNullException(nameof(getId));
 
-            var usedIds = new HashSet<TId>();
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            var usedValues = new HashSet<string>(StringComparer.Ordinal);
             var index = 0;
 
-            if (entries != null)
+            if (entries == null)
+                return;
+
+            foreach (var entry in entries)
             {
-                foreach (var entry in entries)
+                var entryContext = context.At(index);
+
+                if (ValidationRules.NotNull(entry, entryContext, MissingEntryCode) is false)
                 {
-                    if (entry is null)
-                    {
-                        error = $"Collection contains a null entry at index {index}.";
-                        return false;
-                    }
-
-                    var id = getId(entry);
-
-                    if (id.IsEmpty)
-                    {
-                        error = $"Collection contains an empty ID at index {index}.";
-                        return false;
-                    }
-
-                    if (usedIds.Add(id) is false)
-                    {
-                        error = $"Collection contains duplicate ID: {id}.";
-                        return false;
-                    }
-
                     index++;
+                    continue;
                 }
-            }
 
-            error = string.Empty;
-            return true;
+                var id = getId(entry);
+                var idContext = entryContext.At("Id");
+                IdentifierValidator.Validate(id, idContext);
+
+                if (string.IsNullOrWhiteSpace(id.Value) is false)
+                {
+                    var comparisonValue = id.Value.Trim().ToLowerInvariant();
+
+                    if (usedValues.Add(comparisonValue) is false)
+                    {
+                        idContext.Report(
+                            ValidationSeverity.Error,
+                            DuplicateIdentifierCode,
+                            $"Identifier '{id}' must be unique.");
+                    }
+                }
+
+                index++;
+            }
+        }
+
+        internal static bool IsValid<TEntry, TId>(
+            IEnumerable<TEntry> entries,
+            Func<TEntry, TId> getId)
+            where TId : struct, IIdentifier
+        {
+            return Validate(entries, getId).IsValid;
+        }
+
+        internal static void EnsureValid<TEntry, TId>(
+            IEnumerable<TEntry> entries,
+            Func<TEntry, TId> getId,
+            string parameterName)
+            where TId : struct, IIdentifier
+        {
+            ValidationResultGuard.EnsureValid(
+                Validate(entries, getId),
+                parameterName);
         }
     }
 }

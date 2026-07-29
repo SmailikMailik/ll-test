@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using LL.Game.Data.Validation;
 using LL.Game.Ranks;
 using LL.Infrastructure.Loading;
 using Sirenix.OdinInspector;
@@ -9,77 +10,52 @@ namespace LL.Game.Ranks.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class RankCatalogConfig : ScriptableObject, IDataLoader<RankCatalog>
+    internal sealed class RankCatalogConfig : ScriptableObject, IDataLoader<RankCatalog>, IValidationSource
     {
+        [ValidateInput(nameof(HasValidRequirements), "Rank catalog data is invalid.")]
         [InfoBox("Local experience required to reach each rank. Rank 1 always requires 0 XP.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private RankExperienceRequirementEntry[] _rankRequirements;
 
         internal const string CreationPath = "LL/Game Data/Rank Catalog";
 
-        public RankCatalog Load() => new
-        (
-            _rankRequirements?.Select(requirement => requirement?.RequiredExperience ?? 0)
-        );
+        private static readonly IDataValidator<RankExperienceRequirementEntry[]> _validator =
+            new RankCatalogConfigValidator();
 
-        private void OnValidate()
+        internal RankExperienceRequirementEntry[] RankRequirements => _rankRequirements;
+
+        public RankCatalog Load()
         {
-            if (_rankRequirements == null || _rankRequirements.Length == 0)
-            {
-                _rankRequirements = new[] { new RankExperienceRequirementEntry(1, 0) };
-                return;
-            }
+            var result = ValidationRunner.Run(this);
+            ValidationResultGuard.EnsureValid(result, nameof(_rankRequirements));
 
-            for (var index = 0; index < _rankRequirements.Length; index++)
-            {
-                var rank = index + 1;
-                var minimumExperience = index == 0
-                    ? 0
-                    : 1;
+            return new RankCatalog(_rankRequirements.Select(requirement => requirement.RequiredExperience));
+        }
 
-                var requirement = RankExperienceRequirementEntry.CreateOrNormalize(
-                    _rankRequirements[index],
-                    rank,
-                    minimumExperience);
+        private static bool HasValidRequirements(RankExperienceRequirementEntry[] requirements)
+        {
+            return ValidationRunner.Run(requirements, _validator).IsValid;
+        }
 
-                _rankRequirements[index] = requirement;
-            }
+        void IValidationSource.Validate(ValidationContext context)
+        {
+            _validator.Validate(_rankRequirements, context);
         }
     }
 
     [Serializable]
     internal sealed class RankExperienceRequirementEntry
     {
-        [ReadOnly]
+        [MinValue(1)]
         [TableColumnWidth(40, Resizable = false)]
-        [SerializeField] private int _rank;
+        [SerializeField] private int _rank = 1;
 
         [LabelText("Required Experience")]
         [SuffixLabel("XP", true)]
         [MinValue(0)]
         [SerializeField] private int _requiredExperience;
 
+        internal int Rank => _rank;
         internal int RequiredExperience => _requiredExperience;
-
-        internal RankExperienceRequirementEntry(int rank, int requiredExperience)
-        {
-            _rank = rank;
-            _requiredExperience = requiredExperience;
-        }
-
-        internal static RankExperienceRequirementEntry CreateOrNormalize(
-            RankExperienceRequirementEntry requirement,
-            int rank,
-            int minimumExperience)
-        {
-            requirement ??= new RankExperienceRequirementEntry(rank, minimumExperience);
-
-            requirement._rank = rank;
-            requirement._requiredExperience = rank == 1
-                ? 0
-                : Math.Max(requirement._requiredExperience, minimumExperience);
-
-            return requirement;
-        }
     }
 }

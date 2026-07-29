@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using LL.Game.Cards;
+using LL.Game.Data.Validation;
 using LL.Game.Items;
-using LL.Game.Identifiers;
 using LL.Infrastructure.Loading;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -11,35 +11,35 @@ namespace LL.Game.Cards.Configuration
 {
     [CreateAssetMenu(fileName = nameof(CardCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class CardCatalogConfig : ScriptableObject, IDataLoader<CardCatalog>
+    internal sealed class CardCatalogConfig : ScriptableObject, IDataLoader<CardCatalog>, IValidationSource
     {
-        [ValidateInput(nameof(HasValidCardIds), "Card IDs must be non-empty and unique.")]
+        [ValidateInput(nameof(HasValidCards), "Card data is invalid.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private CardDefinitionEntry[] _cards;
 
         internal const string CreationPath = "LL/Game Data/Card Catalog";
 
-        public CardCatalog Load() => new
-        (
-            _cards?.Select(card => card?.ToCard())
-        );
+        private static readonly IDataValidator<CardDefinitionEntry[]> _validator =
+            new CardCatalogConfigValidator();
 
-        private void OnValidate()
+        internal CardDefinitionEntry[] Cards => _cards;
+
+        public CardCatalog Load()
         {
-            if (_cards == null)
-                return;
+            var result = ValidationRunner.Run(this);
+            ValidationResultGuard.EnsureValid(result, nameof(_cards));
 
-            for (var index = 0; index < _cards.Length; index++)
-            {
-                var entry = _cards[index] ?? new CardDefinitionEntry(string.Empty, 1);
-                entry.Normalize();
-                _cards[index] = entry;
-            }
+            return new CardCatalog(_cards?.Select(card => card.ToCard()));
         }
 
-        private static bool HasValidCardIds(CardDefinitionEntry[] cards)
+        private static bool HasValidCards(CardDefinitionEntry[] cards)
         {
-            return IdentifierCollectionValidator.IsValid(cards, card => new ItemId(card.Id));
+            return ValidationRunner.Run(cards, _validator).IsValid;
+        }
+
+        void IValidationSource.Validate(ValidationContext context)
+        {
+            _validator.Validate(_cards, context);
         }
     }
 
@@ -54,23 +54,13 @@ namespace LL.Game.Cards.Configuration
         [MinValue(1)]
         [SerializeField] private int _experienceAmount;
 
-        internal string Id => _id;
-
-        internal CardDefinitionEntry(string id, int experienceAmount)
-        {
-            _id = id;
-            _experienceAmount = experienceAmount;
-        }
+        internal ItemId Id => new(_id);
+        internal int ExperienceAmount => _experienceAmount;
 
         internal ICard ToCard() => new Card
         (
-            new ItemId(_id),
-            _experienceAmount
+            Id,
+            ExperienceAmount
         );
-
-        internal void Normalize()
-        {
-            _experienceAmount = Math.Max(1, _experienceAmount);
-        }
     }
 }

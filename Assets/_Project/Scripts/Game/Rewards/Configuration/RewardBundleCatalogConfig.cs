@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
+using LL.Game.Data.Validation;
 using LL.Game.Items;
-using LL.Game.Identifiers;
-using LL.Infrastructure.Loading;
 using LL.Game.Rewards;
+using LL.Infrastructure.Loading;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,27 +11,38 @@ namespace LL.Game.Rewards.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RewardBundleCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class RewardBundleCatalogConfig : ScriptableObject, IDataLoader<RewardBundleCatalog>
+    internal sealed class RewardBundleCatalogConfig :
+        ScriptableObject,
+        IDataLoader<RewardBundleCatalog>,
+        IValidationSource
     {
-        [ValidateInput(nameof(HasValidBundleIds), "Reward bundle IDs must be non-empty and unique.")]
+        [ValidateInput(nameof(HasValidBundles), "Reward bundle data is invalid.")]
         [ListDrawerSettings(ShowFoldout = false, ShowPaging = false)]
         [SerializeField] private RewardBundleEntry[] _bundles;
 
         internal const string CreationPath = "LL/Game Data/Reward Bundle Catalog";
 
+        private static readonly IDataValidator<RewardBundleEntry[]> _validator =
+            new RewardBundleCatalogConfigValidator();
+
+        internal RewardBundleEntry[] Bundles => _bundles;
+
         public RewardBundleCatalog Load()
         {
-            IdentifierCollectionValidator.Validate(
-                _bundles,
-                entry => entry.Id,
-                nameof(_bundles));
+            var result = ValidationRunner.Run(this);
+            ValidationResultGuard.EnsureValid(result, nameof(_bundles));
 
             return new RewardBundleCatalog(_bundles?.Select(entry => entry.ToBundle()));
         }
 
-        private static bool HasValidBundleIds(RewardBundleEntry[] bundles)
+        private static bool HasValidBundles(RewardBundleEntry[] bundles)
         {
-            return IdentifierCollectionValidator.IsValid(bundles, entry => entry.Id);
+            return ValidationRunner.Run(bundles, _validator).IsValid;
+        }
+
+        void IValidationSource.Validate(ValidationContext context)
+        {
+            _validator.Validate(_bundles, context);
         }
     }
 
@@ -52,13 +63,15 @@ namespace LL.Game.Rewards.Configuration
         [SerializeField] private ItemRewardEntry[] _rewards;
 
         internal RewardBundleId Id => new(_id);
+        internal RewardGrantMode GrantMode => _grantMode;
+        internal ItemRewardEntry[] Rewards => _rewards;
 
         internal RewardBundle ToBundle()
         {
             return new RewardBundle(
                 Id,
-                _grantMode,
-                _rewards?.Select(reward => reward.ToReward()));
+                GrantMode,
+                Rewards?.Select(reward => reward.ToReward()));
         }
     }
 
@@ -74,6 +87,9 @@ namespace LL.Game.Rewards.Configuration
         [MinValue(1)]
         [SerializeField] private int _amount = 1;
 
-        internal ItemReward ToReward() => new(new ItemId(_id), _amount);
+        internal ItemId Id => new(_id);
+        internal int Amount => _amount;
+
+        internal ItemReward ToReward() => new(Id, Amount);
     }
 }

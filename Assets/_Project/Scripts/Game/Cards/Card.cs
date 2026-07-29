@@ -10,8 +10,17 @@ namespace LL.Game.Cards
 
         internal Card(ItemId id, int experienceAmount)
         {
+            if (id.IsEmpty)
+                throw new ArgumentException("Card ID must be non-empty.", nameof(id));
+
+            if (experienceAmount <= 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(experienceAmount),
+                    experienceAmount,
+                    "Card experience amount must be greater than zero.");
+
             Id = id;
-            ExperienceAmount = Math.Max(1, experienceAmount);
+            ExperienceAmount = experienceAmount;
         }
     }
 }
