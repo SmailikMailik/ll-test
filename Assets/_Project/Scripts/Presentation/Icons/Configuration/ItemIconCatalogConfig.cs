@@ -3,7 +3,6 @@ using System.Linq;
 using LL.Game.Data.Validation;
 using LL.Game.Items;
 using LL.Infrastructure.Loading;
-using LL.Presentation.Icons;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Promotions;
-using LL.Game.Ranks;
-using LL.Presentation.Payments;
 using LL.Game.Promotions.Services;
+using LL.Game.Ranks;
 using LL.Game.Rewards;
+using LL.Presentation.Payments;
 using LL.UI.Controls;
 using LL.UI.Typography;
 using LL.UI.Windows.Flows;

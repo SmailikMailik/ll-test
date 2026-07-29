@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using LL.Game.Cards;
 using LL.Game.Data.Validation;
 using LL.Game.Items;
 using LL.Infrastructure.Loading;

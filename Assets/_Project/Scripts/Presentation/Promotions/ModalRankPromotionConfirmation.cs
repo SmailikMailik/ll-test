@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Payments;
+using LL.Game.Promotions.Services;
 using LL.Presentation.Localization;
 using LL.Presentation.Payments;
-using LL.Game.Promotions.Services;
 using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.UI.Windows.Views;

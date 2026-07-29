@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Upgrades;
 using LL.Presentation.Localization;
 using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.UI.Windows.Views;
-using LL.Game.Upgrades;
 using VContainer;
 
 namespace LL.Presentation.Upgrades

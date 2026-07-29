@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Promotions;
 using LL.Game.Payments;
 using LL.Game.Rewards;
 using LL.Game.Rewards.Services;

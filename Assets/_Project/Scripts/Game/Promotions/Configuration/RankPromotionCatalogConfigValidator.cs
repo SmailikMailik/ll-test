@@ -1,6 +1,5 @@
 using LL.Game.Data.Validation;
 using LL.Game.Identifiers;
-using LL.Game.Promotions;
 
 namespace LL.Game.Promotions.Configuration
 {

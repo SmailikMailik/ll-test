@@ -3,7 +3,6 @@ using System.Linq;
 using LL.Game.Data.Validation;
 using LL.Game.Items;
 using LL.Game.Payments;
-using LL.Game.Promotions;
 using LL.Game.Rewards;
 using LL.Infrastructure.Loading;
 using Sirenix.OdinInspector;
