@@ -1,5 +1,6 @@
 using System;
-using LL.Game.Data.Validation;
+using LL.Validation.Reporting;
+using LL.Validation;
 using UnityEngine;
 using VContainer;
 

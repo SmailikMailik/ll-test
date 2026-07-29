@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System;
 
-namespace LL.Game.Data.Validation
+namespace LL.Validation
 {
     internal sealed class ValidationResult
     {

@@ -1,5 +1,5 @@
 using System;
-using LL.Game.Data.Validation;
+using LL.Validation;
 
 namespace LL.User.Configuration
 {

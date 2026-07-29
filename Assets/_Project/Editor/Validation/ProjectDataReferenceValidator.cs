@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards.Configuration;
-using LL.Game.Data.Validation;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using LL.Presentation.Icons.Configuration;
 using LL.User.Configuration;
+using LL.Validation;
 using UnityEditor;
 using UnityEngine;
 

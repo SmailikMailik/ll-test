@@ -1,4 +1,4 @@
-namespace LL.Game.Data.Validation
+namespace LL.Validation
 {
     internal enum ValidationSeverity : byte
     {

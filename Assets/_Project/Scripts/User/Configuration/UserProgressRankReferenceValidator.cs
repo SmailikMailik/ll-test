@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using LL.Game.Data.Validation;
 using LL.Game.Ranks.Configuration;
+using LL.Validation;
 
 namespace LL.User.Configuration
 {

@@ -1,6 +1,7 @@
 using System;
+using LL.Validation.Reporting;
 
-namespace LL.Game.Data.Validation
+namespace LL.Validation
 {
     internal static class ValidationResultGuard
     {

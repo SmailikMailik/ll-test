@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using LL.Game.Data.Validation;
 using LL.Game.Ranks.Configuration;
+using LL.Validation;
 
 namespace LL.Game.Promotions.Configuration
 {

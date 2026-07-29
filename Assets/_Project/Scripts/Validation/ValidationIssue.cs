@@ -1,6 +1,6 @@
 using System;
 
-namespace LL.Game.Data.Validation
+namespace LL.Validation
 {
     internal sealed class ValidationIssue
     {

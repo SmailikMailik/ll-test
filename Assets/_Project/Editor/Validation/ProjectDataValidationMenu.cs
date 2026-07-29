@@ -1,6 +1,6 @@
 using System.Linq;
-using LL.Game.Data.Validation;
 using LL.Infrastructure.Validation;
+using LL.Validation;
 using LLEditor.Menu;
 using UnityEditor;
 using UnityEngine;

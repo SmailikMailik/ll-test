@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using LL.Game.Data.Validation;
-using LL.Game.Rewards;
 using LL.Game.Rewards.Configuration;
+using LL.Game.Rewards;
+using LL.Validation;
 
 namespace LL.Game.Promotions.Configuration
 {

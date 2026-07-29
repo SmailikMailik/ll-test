@@ -1,5 +1,5 @@
-using LL.Game.Data.Validation;
 using LL.Game.Identifiers;
+using LL.Validation;
 
 namespace LL.Presentation.Icons.Configuration
 {

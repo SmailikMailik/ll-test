@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
+using System;
 using LL.Game.Cards.Configuration;
-using LL.Game.Data.Validation;
 using LL.Game.Items;
 using LL.Game.Rewards.Configuration;
 using LL.Presentation.Icons.Configuration;
 using LL.User.Configuration;
+using LL.Validation;
 using UnityEditor;
 
 namespace LLEditor.Validation

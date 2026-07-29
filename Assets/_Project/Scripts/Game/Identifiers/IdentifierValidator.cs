@@ -1,4 +1,4 @@
-using LL.Game.Data.Validation;
+using LL.Validation;
 
 namespace LL.Game.Identifiers
 {
