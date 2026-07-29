@@ -1176,8 +1176,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c89eb5c052e41ee9a5b96d445988d33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rewardPrefab: {fileID: 6473695976906507445, guid: dbd845df6b3c92a47acb8b42d1178efb, type: 3}
-  _content: {fileID: 884361337249009554}
+  _viewPrefab: {fileID: 6473695976906507445, guid: dbd845df6b3c92a47acb8b42d1178efb, type: 3}
+  _viewContainer: {fileID: 884361337249009554}
 --- !u!1 &4548920960423095560
 GameObject:
   m_ObjectHideFlags: 0
@@ -2376,7 +2376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rankLabel: {fileID: 2528028720688273509}
-  _rewardLayout: {fileID: 7217458698008029988}
+  _rewardContainer: {fileID: 7217458698008029988}
   _animation: {fileID: 2177353712141565244}
 --- !u!114 &2177353712141565244
 MonoBehaviour:

@@ -13,13 +13,13 @@ namespace LL.UI.Windows.Views.Reward
     internal sealed class RewardWindow : Window<RewardWindowParameters>, IPointerClickHandler
     {
         [SerializeField] private TMP_Text _rankLabel;
-        [SerializeField] private RewardLayout _rewardLayout;
+        [SerializeField] private RewardContainerView _rewardContainer;
         [SerializeField] private RewardWindowAnimation _animation;
 
         protected override void OnShow()
         {
             _rankLabel.text = Parameters.Rank.ToString();
-            _rewardLayout.SetRewards(Parameters.Rewards);
+            _rewardContainer.SetRewards(Parameters.Rewards);
             _animation.Play();
         }
 

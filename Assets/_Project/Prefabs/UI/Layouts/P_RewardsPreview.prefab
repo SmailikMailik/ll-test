@@ -90,8 +90,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c89eb5c052e41ee9a5b96d445988d33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rewardPrefab: {fileID: 6473695976906507445, guid: c26aece0e9ec3574491cd67bdd5623de, type: 3}
-  _content: {fileID: 3776166205619380262}
+  _viewPrefab: {fileID: 6473695976906507445, guid: c26aece0e9ec3574491cd67bdd5623de, type: 3}
+  _viewContainer: {fileID: 3776166205619380262}
 --- !u!1 &3499451583367664948
 GameObject:
   m_ObjectHideFlags: 0
@@ -743,4 +743,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _titleLabel: {fileID: 1319718805753866188}
-  _rewardLayout: {fileID: 3000102401174466985}
+  _rewardContainer: {fileID: 3000102401174466985}

@@ -12,17 +12,17 @@ using VContainer;
 namespace LL.UI.Rewards
 {
     [DisallowMultipleComponent]
-    internal sealed class RewardPreview : MonoBehaviour
+    internal sealed class NextRankRewardPreview : MonoBehaviour
     {
         [SerializeField] private TMP_Text _titleLabel;
-        [SerializeField] private RewardLayout _rewardLayout;
+        [SerializeField] private RewardContainerView _rewardContainer;
 
         private const string RankVariable = "rank";
 
         private RankPromotionCatalog _promotionCatalog;
         private RewardBundleCatalog _rewardBundleCatalog;
         private ILocalizationService _localization;
-        private int _currentRank;
+        private int _nextRank;
         private bool _hasPreview;
 
         [Inject]
@@ -43,26 +43,31 @@ namespace LL.UI.Rewards
 
         internal void ShowNextRank(int currentRank)
         {
-            if (_promotionCatalog.TryGetPromotion(currentRank, out var promotion) is false ||
-                promotion.RewardBundleId.IsEmpty ||
-                _rewardBundleCatalog.TryGetBundle(promotion.RewardBundleId, out var bundle) is false)
+            if (_promotionCatalog.TryGetPromotion(currentRank, out var promotion) is false)
             {
                 Clear();
                 return;
             }
 
-            _currentRank = currentRank;
+            if (_rewardBundleCatalog.TryGetBundle(promotion.RewardBundleId, out var bundle) is false)
+            {
+                Debug.LogError($"Missing reward bundle for rank promotion: {promotion.RewardBundleId}", this);
+                Clear();
+                return;
+            }
+
+            _nextRank = currentRank + 1;
             _hasPreview = true;
             gameObject.SetActive(true);
             RefreshTitle();
-            _rewardLayout.SetRewards(bundle.Rewards);
+            _rewardContainer.SetRewards(bundle.Rewards);
         }
 
         internal void Clear()
         {
             _hasPreview = false;
             _titleLabel.text = string.Empty;
-            _rewardLayout.Clear();
+            _rewardContainer.Clear();
             gameObject.SetActive(false);
         }
 
@@ -78,7 +83,7 @@ namespace LL.UI.Rewards
                 RankPromotionLocalizationKeys.RewardsAtRank,
                 new Dictionary<string, object>
                 {
-                    [RankVariable] = _currentRank + 1
+                    [RankVariable] = _nextRank
                 });
         }
     }

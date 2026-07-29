@@ -1,5 +1,3 @@
-using LL.Presentation.Icons;
-using LL.Rewards.Models;
 using LL.UI.Typography;
 using TMPro;
 using UnityEngine;
@@ -13,10 +11,10 @@ namespace LL.UI.Rewards
         [SerializeField] private Image _iconImage;
         [SerializeField] private TMP_Text _amountLabel;
 
-        internal void UpdateView(IReward reward, RewardIconProvider iconProvider)
+        internal void UpdateView(Sprite icon, int amount)
         {
-            _iconImage.sprite = iconProvider.GetIcon(reward);
-            _amountLabel.text = reward.Amount > 1 ? TextFormatter.Amount(reward.Amount) : string.Empty;
+            _iconImage.sprite = icon;
+            _amountLabel.text = TextFormatter.Amount(amount);
         }
     }
 }

@@ -1380,7 +1380,7 @@ MonoBehaviour:
   _softButton: {fileID: 5026556986183734536}
   _hardPriceLabel: {fileID: 7552061282649467504}
   _hardButton: {fileID: 4127851390835802154}
-  _rewardPreview: {fileID: 2547094923437266544}
+  _nextRankRewardPreview: {fileID: 2547094923437266544}
   _orderView: {fileID: 5198742301845612770}
 --- !u!1001 &791393746731214815
 PrefabInstance:

@@ -28,7 +28,7 @@ namespace LL.UI.Windows.Views.Promotion
         [SerializeField] private TMP_Text _hardPriceLabel;
         [SerializeField] private InteractiveButton _hardButton;
 
-        [SerializeField] private RewardPreview _rewardPreview;
+        [SerializeField] private NextRankRewardPreview _nextRankRewardPreview;
         [SerializeField] private PromotionOrderView _orderView;
 
         private IUserProgress _userProgress;
@@ -65,7 +65,7 @@ namespace LL.UI.Windows.Views.Promotion
 
             _currentRankLabel.text = TextFormatter.Number(rank);
             _nextRankLabel.text = TextFormatter.Number(nextRank);
-            _rewardPreview.ShowNextRank(rank);
+            _nextRankRewardPreview.ShowNextRank(rank);
 
             if (_promotionService.TryGetPromotion(out _promotion))
             {

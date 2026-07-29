@@ -19,7 +19,7 @@ namespace LL.UI.Windows.Views.Upgrade
     internal sealed class UpgradeWindow : Window<UpgradeWindowParameters>
     {
         [SerializeField] private UpgradeExperienceView _experienceView;
-        [SerializeField] private RewardPreview _rewardPreview;
+        [SerializeField] private NextRankRewardPreview _nextRankRewardPreview;
         [SerializeField] private UpgradeCardSelector _cardSelector;
         [SerializeField] private AmountStepper _amountStepper;
 
@@ -49,8 +49,10 @@ namespace LL.UI.Windows.Views.Upgrade
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _cardExperienceService = cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
-            _overflowConfirmation = overflowConfirmation ?? throw new ArgumentNullException(nameof(overflowConfirmation));
+            _cardExperienceService = cardExperienceService
+                ?? throw new ArgumentNullException(nameof(cardExperienceService));
+            _overflowConfirmation = overflowConfirmation
+                ?? throw new ArgumentNullException(nameof(overflowConfirmation));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
@@ -58,7 +60,7 @@ namespace LL.UI.Windows.Views.Upgrade
         protected override void OnShow()
         {
             InitializeComponents();
-            _rewardPreview.ShowNextRank(_userProgress.Rank);
+            _nextRankRewardPreview.ShowNextRank(_userProgress.Rank);
             ResetPendingChanges();
         }
 

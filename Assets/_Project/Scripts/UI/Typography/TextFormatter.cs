@@ -18,7 +18,7 @@ namespace LL.UI.Typography
 
         internal static string Amount(int value)
         {
-            return $"x{Number(value)}";
+            return value > 1 ? $"x{Number(value)}" : string.Empty;
         }
 
         internal static string Progress(int current, int target)
