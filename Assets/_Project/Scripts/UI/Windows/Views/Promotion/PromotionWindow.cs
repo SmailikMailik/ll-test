@@ -51,8 +51,8 @@ namespace LL.UI.Windows.Views.Promotion
 
         private void Start()
         {
-            _softButton.Clicked.Subscribe(_ => PurchasePromotion(PromotionPaymentType.Soft)).AddTo(this);
-            _hardButton.Clicked.Subscribe(_ => PurchasePromotion(PromotionPaymentType.Hard)).AddTo(this);
+            _softButton.Clicked.Subscribe(_ => PromoteRank(PromotionPaymentType.Soft)).AddTo(this);
+            _hardButton.Clicked.Subscribe(_ => PromoteRank(PromotionPaymentType.Hard)).AddTo(this);
             _orderView.Completed.Subscribe(_ => RefreshActions()).AddTo(this);
         }
 
@@ -69,11 +69,11 @@ namespace LL.UI.Windows.Views.Promotion
             if (_promotionService.TryGetPromotion(out _promotion))
             {
                 _softPriceLabel.text = TextFormatter.ItemAmount(
-                    _promotion.SoftPurchase.ItemId,
-                    _promotion.SoftPurchase.Price);
+                    _promotion.SoftPayment.ItemId,
+                    _promotion.SoftPayment.Amount);
                 _hardPriceLabel.text = TextFormatter.ItemAmount(
-                    _promotion.HardPurchase.ItemId,
-                    _promotion.HardPurchase.Price);
+                    _promotion.HardPayment.ItemId,
+                    _promotion.HardPayment.Amount);
                 _orderView.Refresh(
                     _promotion.Requirement,
                     _promotion.OrderDuration,
@@ -89,21 +89,19 @@ namespace LL.UI.Windows.Views.Promotion
             RefreshActions();
         }
 
-        private void PurchasePromotion(PromotionPaymentType paymentType)
+        private void PromoteRank(PromotionPaymentType paymentType)
         {
             if (_promotion == null || _userProgress.CanPromoteRank is false)
                 return;
 
-            _promotionService.Purchase(
+            _promotionService.Promote(
                 paymentType,
-                _orderView.IsCompleted,
                 CompletePromotion,
                 RefreshActions);
         }
 
         private void CompletePromotion(IReadOnlyList<IReward> rewards)
         {
-            _orderView.ClearOrder();
             _upgradeFlow.CompletePromotion(_userProgress.Rank, rewards);
         }
 

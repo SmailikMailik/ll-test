@@ -1,10 +1,13 @@
 using System;
 using LL.Game.Cards;
-using LL.Game.Configuration;
+using LL.Game.Cards.Configuration;
 using LL.Game.Items;
+using LL.Game.Promotions.Configuration;
 using LL.Game.Ranks;
+using LL.Game.Ranks.Configuration;
 using LL.Identifiers;
 using LL.Loading;
+using LL.Payments;
 using LL.Presentation.Configuration;
 using LL.Presentation.Icons;
 using LL.Presentation.Localization;
@@ -108,6 +111,7 @@ namespace LL.DI
 
         private static void RegisterGameServices(IContainerBuilder builder)
         {
+            builder.Register<PaymentService>(Lifetime.Singleton).As<IPaymentService>();
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardService>(Lifetime.Singleton).As<IRewardService>();
             builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();

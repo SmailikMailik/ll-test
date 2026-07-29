@@ -1,4 +1,6 @@
-using LL.Game.Configuration;
+using LL.Game.Cards.Configuration;
+using LL.Game.Promotions.Configuration;
+using LL.Game.Ranks.Configuration;
 using LL.Rewards.Configuration;
 using LLEditor.Configuration;
 using UnityEditor;

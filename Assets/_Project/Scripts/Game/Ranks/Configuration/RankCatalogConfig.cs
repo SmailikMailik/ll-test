@@ -5,7 +5,7 @@ using LL.Loading;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.Game.Configuration
+namespace LL.Game.Ranks.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]

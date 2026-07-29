@@ -2,7 +2,6 @@ using LL.Presentation.Orders;
 using LL.Presentation.Promotions;
 using LL.Presentation.Upgrades;
 using LL.Promotions;
-using LL.Purchasing;
 using LL.Upgrades;
 using LL.UI.Windows;
 using LL.UI.Windows.Flows;
@@ -37,7 +36,7 @@ namespace LL.DI
                 .As<IOrderCompletionConfirmation>();
             builder
                 .Register<ModalRankPromotionConfirmation>(Lifetime.Scoped)
-                .As<IPurchaseConfirmation>();
+                .As<IRankPromotionConfirmation>();
             builder
                 .Register<ModalExperienceOverflowConfirmation>(Lifetime.Scoped)
                 .As<IExperienceOverflowConfirmation>();
@@ -45,7 +44,6 @@ namespace LL.DI
 
         private static void RegisterPromotionServices(IContainerBuilder builder)
         {
-            builder.Register<PurchaseService>(Lifetime.Scoped).As<IPurchaseService>();
             builder.Register<RankPromotionService>(Lifetime.Scoped).As<IRankPromotionService>();
         }
 

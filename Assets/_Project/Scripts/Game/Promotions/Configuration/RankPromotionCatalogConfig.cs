@@ -1,12 +1,14 @@
 using System;
 using System.Linq;
+using LL.Game.Items;
 using LL.Game.Promotions;
 using LL.Loading;
+using LL.Payments;
 using LL.Rewards.Models;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.Game.Configuration
+namespace LL.Game.Promotions.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankPromotionCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
@@ -102,8 +104,8 @@ namespace LL.Game.Configuration
                     _targetLocalizationKey,
                     _requiredAmount),
                 TimeSpan.FromMinutes(_durationMinutes),
-                _softPrice,
-                _hardPrice,
+                new Payment(ItemIds.Soft, _softPrice),
+                new Payment(ItemIds.Hard, _hardPrice),
                 new RewardBundleId(_rewardBundleId));
         }
 

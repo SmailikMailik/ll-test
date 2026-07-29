@@ -24,13 +24,18 @@ namespace LL.Rewards.Services
             _claims = claims ?? throw new ArgumentNullException(nameof(claims));
         }
 
+        public bool CanGrant(RewardBundleId id)
+        {
+            return _catalog.TryGetBundle(id, out var bundle) &&
+                   CanGrant(bundle);
+        }
+
         public bool TryGrant(RewardBundleId id, out IReadOnlyList<IReward> rewards)
         {
             rewards = Array.Empty<IReward>();
 
             if (_catalog.TryGetBundle(id, out var bundle) is false ||
-                bundle.GrantMode == RewardGrantMode.Once && _claims.Contains(id) ||
-                bundle.Rewards.All(_rewardService.CanApply) is false)
+                CanGrant(bundle) is false)
             {
                 return false;
             }
@@ -46,6 +51,12 @@ namespace LL.Rewards.Services
 
             rewards = bundle.Rewards;
             return true;
+        }
+
+        private bool CanGrant(RewardBundle bundle)
+        {
+            return (bundle.GrantMode != RewardGrantMode.Once || _claims.Contains(bundle.Id) is false) &&
+                   bundle.Rewards.All(_rewardService.CanApply);
         }
     }
 }

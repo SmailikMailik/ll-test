@@ -6,7 +6,7 @@ using LL.Loading;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.Game.Configuration
+namespace LL.Game.Cards.Configuration
 {
     [CreateAssetMenu(fileName = nameof(CardCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]

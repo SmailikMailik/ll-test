@@ -1,6 +1,5 @@
 using System;
-using LL.Game.Items;
-using LL.Purchasing;
+using LL.Payments;
 using LL.Rewards.Models;
 
 namespace LL.Game.Promotions
@@ -16,16 +15,16 @@ namespace LL.Game.Promotions
         internal int Rank { get; }
         internal RankPromotionRequirement Requirement { get; }
         internal TimeSpan OrderDuration { get; }
-        internal IPurchase SoftPurchase { get; }
-        internal IPurchase HardPurchase { get; }
+        internal Payment SoftPayment { get; }
+        internal Payment HardPayment { get; }
         internal RewardBundleId RewardBundleId { get; }
 
         internal RankPromotion(
             int rank,
             RankPromotionRequirement requirement,
             TimeSpan orderDuration,
-            int softPrice,
-            int hardPrice,
+            Payment softPayment,
+            Payment hardPayment,
             RewardBundleId rewardBundleId)
         {
             if (rank < 1)
@@ -34,27 +33,21 @@ namespace LL.Game.Promotions
             if (orderDuration <= TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(orderDuration));
 
-            if (softPrice <= 0)
-                throw new ArgumentOutOfRangeException(nameof(softPrice));
-
-            if (hardPrice <= 0)
-                throw new ArgumentOutOfRangeException(nameof(hardPrice));
-
             if (rewardBundleId.IsEmpty)
                 throw new ArgumentException("Promotion reward bundle ID must be non-empty.", nameof(rewardBundleId));
 
             Rank = rank;
             Requirement = requirement ?? throw new ArgumentNullException(nameof(requirement));
             OrderDuration = orderDuration;
-            SoftPurchase = new Purchase(ItemIds.Soft, softPrice);
-            HardPurchase = new Purchase(ItemIds.Hard, hardPrice);
+            SoftPayment = softPayment;
+            HardPayment = hardPayment;
             RewardBundleId = rewardBundleId;
         }
 
-        internal IPurchase GetPurchase(PromotionPaymentType paymentType) => paymentType switch
+        internal Payment GetPayment(PromotionPaymentType paymentType) => paymentType switch
         {
-            PromotionPaymentType.Soft => SoftPurchase,
-            PromotionPaymentType.Hard => HardPurchase,
+            PromotionPaymentType.Soft => SoftPayment,
+            PromotionPaymentType.Hard => HardPayment,
             _ => throw new ArgumentOutOfRangeException(nameof(paymentType))
         };
     }

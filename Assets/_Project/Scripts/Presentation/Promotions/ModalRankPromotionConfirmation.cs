@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using LL.Payments;
 using LL.Presentation.Localization;
-using LL.Purchasing;
+using LL.Promotions;
 using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.UI.Windows.Views;
@@ -9,7 +10,7 @@ using VContainer;
 
 namespace LL.Presentation.Promotions
 {
-    internal sealed class ModalRankPromotionConfirmation : IPurchaseConfirmation
+    internal sealed class ModalRankPromotionConfirmation : IRankPromotionConfirmation
     {
         private const string PriceVariable = "price";
         private const string HeroVariable = "hero";
@@ -26,12 +27,9 @@ namespace LL.Presentation.Promotions
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
 
-        public void Confirm(IPurchase purchase, Action onConfirmed, Action onRejected)
+        public void Confirm(Payment payment, Action onConfirmed, Action onRejected)
         {
-            if (purchase == null)
-                throw new ArgumentNullException(nameof(purchase));
-
-            var priceText = TextFormatter.ItemAmount(purchase.ItemId, purchase.Price);
+            var priceText = TextFormatter.ItemAmount(payment.ItemId, payment.Amount);
             var priceLabel = TextTags.Style(
                 _localization.GetText(RankPromotionLocalizationKeys.PriceLabel),
                 TextStyle.Muted);

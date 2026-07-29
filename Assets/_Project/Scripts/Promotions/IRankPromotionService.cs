@@ -9,9 +9,8 @@ namespace LL.Promotions
     {
         bool TryGetPromotion(out RankPromotion promotion);
 
-        void Purchase(
+        void Promote(
             PromotionPaymentType paymentType,
-            bool requirementCompleted,
             Action<IReadOnlyList<IReward>> onSucceeded,
             Action onFailed);
     }
