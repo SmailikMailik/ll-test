@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Items;
-using LL.Rewards.Models;
-using LL.Saving;
-using LL.User.Core;
-using LL.User.Core.Items;
-using LL.User.Core.Identity;
-using LL.User.Core.Progress;
-using LL.User.Core.Promotions;
-using LL.User.Core.Rewards;
+using LL.Game.Rewards;
+using LL.Infrastructure.Saving;
+using LL.User.Snapshots;
+using LL.User.Snapshots.Identity;
+using LL.User.Snapshots.Items;
+using LL.User.Snapshots.Progress;
+using LL.User.Snapshots.Promotions;
+using LL.User.Snapshots.Rewards;
+using LL.User.State.Items;
+using LL.User.State.Progress;
+using LL.User.State.Promotions;
+using LL.User.State.Rewards;
 using R3;
 using VContainer;
 using VContainer.Unity;
@@ -17,7 +21,7 @@ namespace LL.User.Persistence
 {
     internal sealed class UserSaveController : IInitializable, IDisposable
     {
-        private readonly UserIdentity _identity;
+        private readonly UserIdentitySnapshot _identity;
         private readonly IUserItems _items;
         private readonly IUserProgress _progress;
         private readonly IUserPromotionOrder _promotionOrder;
@@ -25,41 +29,41 @@ namespace LL.User.Persistence
         private readonly ISaveService _saveService;
         private readonly List<IDisposable> _subscriptions = new();
 
-        private readonly Dictionary<ItemId, int> _savedItemAmounts;
-        private readonly HashSet<RewardBundleId> _savedClaimedRewardIds;
-        private UserProgressData _savedProgress;
-        private UserPromotionOrderData _savedPromotionOrder;
+        private readonly Dictionary<ItemId, int> _itemAmounts;
+        private readonly HashSet<RewardBundleId> _claimedRewardIds;
+        private UserProgressSnapshot _progressSnapshot;
+        private UserPromotionOrderSnapshot _promotionOrderSnapshot;
 
         [Inject]
         internal UserSaveController(
-            UserData userData,
+            UserSnapshot initialSnapshot,
             IUserItems items,
             IUserProgress progress,
             IUserPromotionOrder promotionOrder,
             IUserRewardClaims rewardClaims,
             ISaveService saveService)
         {
-            if (userData == null)
-                throw new ArgumentNullException(nameof(userData));
+            if (initialSnapshot == null)
+                throw new ArgumentNullException(nameof(initialSnapshot));
 
-            _identity = userData.Identity;
+            _identity = initialSnapshot.Identity;
             _items = items ?? throw new ArgumentNullException(nameof(items));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
             _rewardClaims = rewardClaims ?? throw new ArgumentNullException(nameof(rewardClaims));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
 
-            _savedItemAmounts = new Dictionary<ItemId, int>();
+            _itemAmounts = new Dictionary<ItemId, int>();
 
-            foreach (var item in userData.Items.Amounts)
-                _savedItemAmounts.Add(item.Id, item.Amount);
+            foreach (var item in initialSnapshot.Items.Amounts)
+                _itemAmounts.Add(item.Id, item.Amount);
 
-            _savedProgress = new UserProgressData(_progress.Rank, _progress.Experience);
-            _savedPromotionOrder = new UserPromotionOrderData(
+            _progressSnapshot = new UserProgressSnapshot(_progress.Rank, _progress.Experience);
+            _promotionOrderSnapshot = new UserPromotionOrderSnapshot(
                 _promotionOrder.RequirementId,
                 _promotionOrder.DeadlineUnixMilliseconds,
                 _promotionOrder.IsCompleted);
-            _savedClaimedRewardIds = new HashSet<RewardBundleId>(_rewardClaims.ClaimedIds);
+            _claimedRewardIds = new HashSet<RewardBundleId>(_rewardClaims.ClaimedIds);
         }
 
         public void Initialize()
@@ -82,7 +86,7 @@ namespace LL.User.Persistence
 
         private void SubscribeToItemChanges()
         {
-            foreach (var itemId in _savedItemAmounts.Keys)
+            foreach (var itemId in _itemAmounts.Keys)
             {
                 _subscriptions.Add(_items
                     .ObserveAmount(itemId)
@@ -92,72 +96,72 @@ namespace LL.User.Persistence
 
         private void OnItemAmountChanged(ItemId itemId, int amount)
         {
-            if (_savedItemAmounts[itemId] == amount)
+            if (_itemAmounts[itemId] == amount)
                 return;
 
-            _savedItemAmounts[itemId] = amount;
+            _itemAmounts[itemId] = amount;
             Save();
         }
 
         private void OnRewardClaimed(RewardBundleId rewardId)
         {
-            if (_savedClaimedRewardIds.Add(rewardId))
+            if (_claimedRewardIds.Add(rewardId))
                 Save();
         }
 
         private void OnPromotionOrderChanged()
         {
-            var promotionOrderData = new UserPromotionOrderData(
+            var snapshot = new UserPromotionOrderSnapshot(
                 _promotionOrder.RequirementId,
                 _promotionOrder.DeadlineUnixMilliseconds,
                 _promotionOrder.IsCompleted);
 
-            if (_savedPromotionOrder.RequirementId.Equals(promotionOrderData.RequirementId) &&
-                _savedPromotionOrder.DeadlineUnixMilliseconds == promotionOrderData.DeadlineUnixMilliseconds &&
-                _savedPromotionOrder.IsCompleted == promotionOrderData.IsCompleted)
+            if (_promotionOrderSnapshot.RequirementId.Equals(snapshot.RequirementId) &&
+                _promotionOrderSnapshot.DeadlineUnixMilliseconds == snapshot.DeadlineUnixMilliseconds &&
+                _promotionOrderSnapshot.IsCompleted == snapshot.IsCompleted)
             {
                 return;
             }
 
-            _savedPromotionOrder = promotionOrderData;
+            _promotionOrderSnapshot = snapshot;
             Save();
         }
 
         private void OnProgressChanged()
         {
-            var progressData = new UserProgressData(
+            var snapshot = new UserProgressSnapshot(
                 _progress.Rank,
                 _progress.Experience);
 
-            if (_savedProgress.Rank == progressData.Rank &&
-                _savedProgress.Experience == progressData.Experience)
+            if (_progressSnapshot.Rank == snapshot.Rank &&
+                _progressSnapshot.Experience == snapshot.Experience)
             {
                 return;
             }
 
-            _savedProgress = progressData;
+            _progressSnapshot = snapshot;
             Save();
         }
 
         private void Save()
         {
-            var saveData = UserSaveDataMapper.ToSaveData(CreateUserData());
-            _saveService.TrySave(UserDataLoader.SaveKey, saveData);
+            var saveData = UserSaveDataMapper.ToSaveData(CreateSnapshot());
+            _saveService.TrySave(UserSnapshotLoader.SaveKey, saveData);
         }
 
-        private UserData CreateUserData()
+        private UserSnapshot CreateSnapshot()
         {
-            return new UserData(
+            return new UserSnapshot(
                 _identity,
-                new UserItemsData(GetItemAmounts()),
-                _savedProgress,
-                _savedPromotionOrder,
-                new UserRewardClaimsData(_savedClaimedRewardIds));
+                new UserItemsSnapshot(GetItemAmounts()),
+                _progressSnapshot,
+                _promotionOrderSnapshot,
+                new UserRewardClaimsSnapshot(_claimedRewardIds));
         }
 
         private IEnumerable<ItemAmount> GetItemAmounts()
         {
-            foreach (var item in _savedItemAmounts)
+            foreach (var item in _itemAmounts)
                 yield return new ItemAmount(item.Key, item.Value);
         }
     }

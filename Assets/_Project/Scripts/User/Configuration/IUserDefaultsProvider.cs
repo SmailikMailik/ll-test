@@ -1,9 +1,9 @@
-using LL.User.Core;
+using LL.User.Snapshots;
 
 namespace LL.User.Configuration
 {
     internal interface IUserDefaultsProvider
     {
-        UserData GetDefaults();
+        UserSnapshot GetDefaultSnapshot();
     }
 }

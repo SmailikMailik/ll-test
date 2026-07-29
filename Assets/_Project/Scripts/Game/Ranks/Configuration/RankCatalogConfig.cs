@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using LL.Game.Ranks;
-using LL.Loading;
+using LL.Infrastructure.Loading;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

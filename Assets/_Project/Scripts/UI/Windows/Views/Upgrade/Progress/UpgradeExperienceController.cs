@@ -1,6 +1,6 @@
 using System;
 using LL.Game.Ranks;
-using LL.User.Core.Progress;
+using LL.User.State.Progress;
 
 namespace LL.UI.Windows.Views.Upgrade.Progress
 {

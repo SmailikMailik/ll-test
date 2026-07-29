@@ -1,4 +1,4 @@
-using LL.Presentation.Configuration;
+using LL.Presentation.Icons.Configuration;
 using LLEditor.Configuration;
 using UnityEditor;
 

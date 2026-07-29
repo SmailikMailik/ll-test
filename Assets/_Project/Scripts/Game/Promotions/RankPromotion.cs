@@ -1,6 +1,6 @@
 using System;
-using LL.Payments;
-using LL.Rewards.Models;
+using LL.Game.Payments;
+using LL.Game.Rewards;
 
 namespace LL.Game.Promotions
 {

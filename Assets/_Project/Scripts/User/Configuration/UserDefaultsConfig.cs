@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using LL.Game.Items;
 using LL.Identifiers;
-using LL.User.Core;
-using LL.User.Core.Items;
-using LL.User.Core.Identity;
-using LL.User.Core.Promotions;
-using LL.User.Core.Progress;
-using LL.User.Core.Rewards;
+using LL.User.Snapshots;
+using LL.User.Snapshots.Identity;
+using LL.User.Snapshots.Items;
+using LL.User.Snapshots.Progress;
+using LL.User.Snapshots.Promotions;
+using LL.User.Snapshots.Rewards;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -32,19 +32,19 @@ namespace LL.User.Configuration
 
         internal const string CreationPath = "LL/User/User Defaults Config";
 
-        UserData IUserDefaultsProvider.GetDefaults()
+        UserSnapshot IUserDefaultsProvider.GetDefaultSnapshot()
         {
             IdentifierCatalogValidator.EnsureValidIds(
                 _items,
                 entry => entry.Id,
                 "Default item amounts",
                 nameof(_items));
-            return new UserData(
-                _identity.ToData(),
-                new UserItemsData(_items?.Select(item => item.ToData())),
-                _progress.ToData(),
-                new UserPromotionOrderData(default, 0L, false),
-                new UserRewardClaimsData(null));
+            return new UserSnapshot(
+                _identity.ToSnapshot(),
+                new UserItemsSnapshot(_items?.Select(item => item.ToItemAmount())),
+                _progress.ToSnapshot(),
+                new UserPromotionOrderSnapshot(default, 0L, false),
+                new UserRewardClaimsSnapshot(null));
         }
 
         private static bool HasValidItemIds(ItemAmountEntry[] entries)
@@ -63,7 +63,7 @@ namespace LL.User.Configuration
         [LabelText("Region Code")]
         [SerializeField] private string _regionCode;
 
-        internal UserIdentity ToData() => new(_userId, _regionCode);
+        internal UserIdentitySnapshot ToSnapshot() => new(_userId, _regionCode);
     }
 
     [Serializable]
@@ -79,7 +79,7 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _experience;
 
-        internal UserProgressData ToData() => new(_rank, _experience);
+        internal UserProgressSnapshot ToSnapshot() => new(_rank, _experience);
     }
 
     [Serializable]
@@ -94,6 +94,6 @@ namespace LL.User.Configuration
 
         internal ItemId Id => new(_id);
 
-        internal ItemAmount ToData() => new(Id, _amount);
+        internal ItemAmount ToItemAmount() => new(Id, _amount);
     }
 }

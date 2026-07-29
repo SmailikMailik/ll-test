@@ -1,4 +1,4 @@
-using LL.Saving;
+using LL.Infrastructure.Saving;
 using LL.User.Persistence;
 using LLEditor.Configuration;
 using UnityEditor;
@@ -13,7 +13,7 @@ namespace LLEditor.User
         [MenuItem(MenuPath)]
         private static void DeleteSavedData()
         {
-            const string saveKey = UserDataLoader.SaveKey;
+            const string saveKey = UserSnapshotLoader.SaveKey;
             ISaveService saveService = new JsonFileSaveService();
 
             if (saveService.Exists(saveKey) is false)

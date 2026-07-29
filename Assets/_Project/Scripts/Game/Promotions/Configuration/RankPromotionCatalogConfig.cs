@@ -2,9 +2,9 @@ using System;
 using System.Linq;
 using LL.Game.Items;
 using LL.Game.Promotions;
-using LL.Loading;
-using LL.Payments;
-using LL.Rewards.Models;
+using LL.Infrastructure.Loading;
+using LL.Game.Payments;
+using LL.Game.Rewards;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

@@ -11,7 +11,8 @@ namespace LL.Game.Ranks
         [Inject]
         internal RankProgression(RankCatalog catalog)
         {
-            _experienceRequirements = catalog?.ExperienceRequirements ?? throw new ArgumentNullException(nameof(catalog));
+            _experienceRequirements = catalog?.ExperienceRequirements
+                ?? throw new ArgumentNullException(nameof(catalog));
         }
 
         public RankProgress GetProgress(int rank, int experience)

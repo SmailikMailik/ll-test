@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Items;
 using LL.Game.Ranks;
+using LL.Game.Upgrades;
 using LL.UI.Controls;
-using LL.Upgrades;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;
-using LL.User.Core.Items;
-using LL.User.Core.Progress;
+using LL.User.State.Progress;
 using R3;
 using UnityEngine;
 using VContainer;

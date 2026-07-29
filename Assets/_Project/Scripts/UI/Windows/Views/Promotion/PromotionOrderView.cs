@@ -7,7 +7,7 @@ using LL.Presentation.Promotions;
 using LL.UI.Controls;
 using LL.UI.Localization;
 using LL.UI.Typography;
-using LL.User.Core.Promotions;
+using LL.User.State.Promotions;
 using R3;
 using TMPro;
 using UnityEngine;

@@ -6,7 +6,7 @@ using LL.Presentation.Icons;
 using LL.UI.Controls;
 using LL.UI.Typography;
 using LL.UI.VisualStates.Sources;
-using LL.User.Core.Items;
+using LL.User.State.Items;
 using R3;
 using TMPro;
 using UnityEngine;

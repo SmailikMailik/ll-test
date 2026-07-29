@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using LL.Rewards.Models;
+using LL.Game.Rewards;
 using LL.UI.Windows.Views.Promotion;
 using LL.UI.Windows.Views.Reward;
 using LL.UI.Windows.Views.Upgrade;
-using LL.User.Core.Progress;
+using LL.User.State.Progress;
 using VContainer;
 using VContainer.Unity;
 

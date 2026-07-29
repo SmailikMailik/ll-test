@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using DG.Tweening;
-using LL.Extensions;
+using LL.UI.Extensions;
 using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;

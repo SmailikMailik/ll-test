@@ -2,53 +2,54 @@ using System;
 using System.Linq;
 using LL.Game.Items;
 using LL.Game.Promotions;
-using LL.Rewards.Models;
-using LL.User.Core;
-using LL.User.Core.Items;
-using LL.User.Core.Identity;
-using LL.User.Core.Promotions;
-using LL.User.Core.Progress;
-using LL.User.Core.Rewards;
+using LL.Game.Rewards;
+using LL.User.Snapshots;
+using LL.User.Snapshots.Identity;
+using LL.User.Snapshots.Items;
+using LL.User.Snapshots.Progress;
+using LL.User.Snapshots.Promotions;
+using LL.User.Snapshots.Rewards;
+using LL.User.Persistence.SaveData;
 
 namespace LL.User.Persistence
 {
     internal static class UserSaveDataMapper
     {
-        internal static UserData ToUserData(UserSaveData saveData)
+        internal static UserSnapshot ToSnapshot(UserSaveData saveData)
         {
             if (saveData == null)
                 throw new ArgumentNullException(nameof(saveData));
 
-            return new UserData(
-                new UserIdentity(saveData.Identity.UserId, saveData.Identity.RegionCode),
-                new UserItemsData(
+            return new UserSnapshot(
+                new UserIdentitySnapshot(saveData.Identity.UserId, saveData.Identity.RegionCode),
+                new UserItemsSnapshot(
                     saveData.Items.Select(item =>
                         new ItemAmount(new ItemId(item.Id), item.Amount))),
-                new UserProgressData(saveData.Progress.Rank, saveData.Progress.Experience),
-                new UserPromotionOrderData(
+                new UserProgressSnapshot(saveData.Progress.Rank, saveData.Progress.Experience),
+                new UserPromotionOrderSnapshot(
                     new PromotionRequirementId(saveData.PromotionOrder.RequirementId),
                     saveData.PromotionOrder.DeadlineUnixMilliseconds,
                     saveData.PromotionOrder.IsCompleted),
-                new UserRewardClaimsData(
+                new UserRewardClaimsSnapshot(
                     saveData.ClaimedRewardIds.Select(id => new RewardBundleId(id))));
         }
 
-        internal static UserSaveData ToSaveData(UserData userData)
+        internal static UserSaveData ToSaveData(UserSnapshot snapshot)
         {
-            if (userData == null)
-                throw new ArgumentNullException(nameof(userData));
+            if (snapshot == null)
+                throw new ArgumentNullException(nameof(snapshot));
 
             return new UserSaveData(
-                new UserIdentitySaveData(userData.Identity.UserId, userData.Identity.RegionCode),
-                new UserProgressSaveData(userData.Progress.Rank, userData.Progress.Experience),
+                new UserIdentitySaveData(snapshot.Identity.UserId, snapshot.Identity.RegionCode),
+                new UserProgressSaveData(snapshot.Progress.Rank, snapshot.Progress.Experience),
                 new UserPromotionOrderSaveData(
-                    userData.PromotionOrder.RequirementId.Value,
-                    userData.PromotionOrder.DeadlineUnixMilliseconds,
-                    userData.PromotionOrder.IsCompleted),
-                userData.Items.Amounts
+                    snapshot.PromotionOrder.RequirementId.Value,
+                    snapshot.PromotionOrder.DeadlineUnixMilliseconds,
+                    snapshot.PromotionOrder.IsCompleted),
+                snapshot.Items.Amounts
                     .Select(item => new ItemAmountSaveData(item.Id.Value, item.Amount))
                     .ToArray(),
-                userData.RewardClaims.ClaimedIds
+                snapshot.RewardClaims.ClaimedIds
                     .Where(id => id.IsEmpty is false)
                     .Select(id => id.Value)
                     .ToArray());

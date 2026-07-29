@@ -1,6 +1,6 @@
 using System;
 using LL.Game.Items;
-using LL.Rewards.Models;
+using LL.Game.Rewards;
 using UnityEngine;
 using VContainer;
 

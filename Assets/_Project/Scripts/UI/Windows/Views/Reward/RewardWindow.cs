@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LL.Rewards.Models;
+using LL.Game.Rewards;
 using LL.UI.Rewards;
 using TMPro;
 using UnityEngine;

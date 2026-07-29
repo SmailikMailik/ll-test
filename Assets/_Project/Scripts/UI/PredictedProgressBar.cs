@@ -1,4 +1,4 @@
-using LL.Extensions;
+using LL.UI.Extensions;
 using UnityEngine;
 
 namespace LL.UI
