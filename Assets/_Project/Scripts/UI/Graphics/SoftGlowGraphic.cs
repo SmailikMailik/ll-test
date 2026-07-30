@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 namespace LL.UI.Graphics
 {
+    [DisallowMultipleComponent]
     internal sealed class SoftGlowGraphic : MaskableGraphic
     {
         [SerializeField] private Vector2 _spread = new(12f, 8f);

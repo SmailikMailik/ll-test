@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using LL.Game.Items;
-using LL.UI.Typography;
+using LL.Presentation.Typography;
 
 namespace LL.Presentation.Items
 {

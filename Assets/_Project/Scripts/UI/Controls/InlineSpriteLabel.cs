@@ -1,4 +1,4 @@
-using LL.UI.Typography;
+using LL.Presentation.Typography;
 using TMPro;
 using UnityEngine;
 

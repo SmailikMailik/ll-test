@@ -7,6 +7,24 @@ The rules describe the intended architecture, not merely the current directory t
 When existing code is changed substantially, move it toward this standard when that can be done safely within the
 task scope.
 
+## Scope and enforcement
+
+The project-owned runtime code is the `LL.Runtime` assembly rooted at `Assets/_Project/Scripts`. Its top-level
+folders are logical modules inside one physical assembly. The single assembly keeps iteration and Unity integration
+simple, but it does not enforce module boundaries by itself; `tools/Validate-Architecture.ps1` therefore treats
+paths, namespaces, and `using LL...` directives as enforceable architecture.
+
+Split a logical module into another runtime assembly only when at least one of these conditions is true:
+
+- Unity must compile or load the module independently.
+- A platform or optional-package boundary requires separate references.
+- The dependency boundary is stable enough that assembly-level enforcement is worth the added compilation and
+  integration cost.
+- A separately testable pure-C# core can avoid Unity references without duplicating contracts.
+
+Do not create an assembly solely to mirror a folder. A new assembly requires an explicit dependency update in this
+document, an `.asmdef`, tests for its boundary, and an update to the UML document.
+
 ## Core principles
 
 1. Organize by ownership first and technical role second.
@@ -30,6 +48,24 @@ Before creating or moving a type, answer these questions in order:
 Place a core feature type at the feature root. Create a technical-role subfolder only for a coherent boundary or a
 group of closely related types. Do not create a one-type folder merely to make the tree look symmetrical.
 
+## Runtime module map
+
+`LL.Runtime` contains exactly these top-level areas:
+
+| Area | Owns | Representative capabilities |
+| --- | --- | --- |
+| `Bootstrap` | First-scene startup coordination | Localization readiness, minimum display time, scene activation |
+| `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
+| `Game` | Game rules and reference data | Cards, items, payments, promotions, quests, ranks, rewards, upgrades |
+| `Infrastructure` | Reusable technical adapters | Loading, serialization, save services, storage, console reporting |
+| `Presentation` | Display meaning without visual lifecycle | Icons, localization, display formatting, text tokens, confirmations |
+| `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
+| `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, promotion quest |
+| `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
+
+`AssemblyInfo.cs` and `LL.Runtime.asmdef` are the only files allowed directly at the runtime root. Adding another
+top-level area is an architecture change, not a local folder choice.
+
 ## Top-level ownership
 
 ### `Composition`
@@ -38,7 +74,7 @@ Owns application assembly: concrete implementation selection, manual object cons
 lifetime configuration.
 
 - `Scopes` contains VContainer lifetime scopes. A scope stores serialized Unity references, defines a lifetime
-  boundary, and orchestrates installers plus only small local registrations.
+  boundary, and orchestrates installers.
 - `Installers` contains cohesive registration modules that implement VContainer's `IInstaller`. Construct installers
   manually from a scope; do not resolve them through DI.
 - `Factories` contains concrete construction policies that are reused by installers, scopes, or editor tooling.
@@ -49,6 +85,9 @@ lifetime configuration.
 - Runtime areas must never depend on `Composition`.
 - Composition contains no domain decisions, mapping, validation rules, I/O implementation, or mutable application
   state.
+- A scope must not call `Register`, `RegisterInstance`, `RegisterComponent`, or `RegisterEntryPoint` directly.
+  Registrations belong to an installer, including a single serialized scene component when it participates in a
+  larger scene module.
 - An installer owns one cohesive registration module, such as game-data loading or the user lifecycle. Do not create
   an installer for a single trivial registration.
 - A factory method exposes its concrete policy in its name, such as `CreateFromJsonFile` or `CreateJsonFile`.
@@ -103,8 +142,13 @@ Owns reusable technical mechanisms such as loading contracts, serialization, sto
 Owns transformations and adapters that turn domain meaning into display meaning: localization, formatting, display
 catalogs, and presentation-facing confirmations.
 
-- Presentation may depend on `Game`, `User`, and generic UI primitives needed to implement an adapter.
+- Presentation may depend on `Game`, `User`, `Infrastructure.Loading`, and `Validation`.
+- `Typography` owns pure rich-text tokens, tags, symbols, styles, and formatting. These types produce display strings
+  and must not depend on TMPro, Unity components, windows, or concrete views.
+- Confirmation interfaces and their localization keys belong to the presentation capability that defines the user
+  decision. A concrete confirmation implemented with a window belongs to `UI/Windows`.
 - Presentation must not own reusable visual controls, concrete feature views, navigation, or game rules.
+- Presentation must not depend on `UI`.
 - Presentation-specific configuration stays with its presentation capability.
 
 ### `UI`
@@ -118,7 +162,7 @@ Owns concrete visual behavior: views, windows, controls, graphics, navigation, v
 - `Views` owns composed visual blocks that present a specific UI concept and can be embedded in more than one screen.
   Feature-owned views stay with their feature instead of moving to a generic shared folder.
 - Specialized rendering and visual-state behavior belongs in role folders such as `Graphics` or `VisualStates`.
-- `Typography` owns reusable rich-text tokens, tags, symbols, and UI-specific text formatting.
+- UI consumes `Presentation/Typography`; it does not define a second text-token vocabulary.
 - `Localization` owns concrete localized UI components; localization services and presentation wording remain under
   `Presentation`.
 - `Windows` owns window definitions, navigation, window flows, and concrete windows. Place each concrete window and
@@ -164,7 +208,7 @@ Use these names only with the stated meaning:
 - `Views`: concrete visual representations.
 - `Controls`: self-contained reusable interactive or display-only UI elements; only under `UI`.
 - `Graphics`: reusable custom rendering components; only under `UI`.
-- `Typography`: reusable UI-specific rich-text vocabulary and formatting; only under `UI`.
+- `Typography`: pure display text vocabulary and formatting; only under `Presentation`.
 - `VisualStates`: reusable visual-state sources, effects, and state values; only under `UI`.
 - `Flows`: multi-step application or UI workflows.
 - `Extensions`: extension methods only.
@@ -255,22 +299,90 @@ snapshot or its owned parts, never the concrete source adapter.
 - Use `Layouts` only for reusable components whose responsibility is arranging children. Do not classify a composed
   display block as a layout merely because it contains several visual elements.
 
-## Dependency rules
+## Lifetime and composition model
 
-The required direction is:
+The application has three composition boundaries:
+
+| Boundary | Lifetime | Responsibilities |
+| --- | --- | --- |
+| `ProjectLifetimeScope` | Whole process | Window catalog/provider, presentation services, validation reporting, game data, user state, game services |
+| `BootstrapLifetimeScope` | Bootstrap scene | Progress view, bootstrap operations, transition to `Main` |
+| `MainLifetimeScope` | Main scene | Scene window controller, modal adapters, promotion flow, upgrade flow |
+
+Every scope constructs installers manually with `new` and calls `Install`. Installers are not DI services and their
+constructors do not use `[Inject]`. Runtime services, controllers, flows, and MonoBehaviour injection methods resolved
+by VContainer do use `[Inject]`.
+
+The project scope is auto-created from `VContainerSettings`; the bootstrap scene must not create another project
+scope. Scene scopes inherit project registrations through the configured parent relationship.
+
+## Runtime data flows
+
+### Game reference data
 
 ```text
-Composition -> UI / Presentation / User / Game / Infrastructure / Validation
-Editor      -> runtime assemblies
-UI          -> Presentation / User / Game
-Presentation-> User / Game / generic UI primitives
-User        -> Game value objects / Infrastructure / Validation
-Game services -> Game core / focused User state contracts
-Game adapters  -> Game core / Infrastructure / Validation
-Game config -> Game / Infrastructure / Validation / Unity authoring APIs
-Game core   -> stable framework APIs and generic Validation only
-Infrastructure and Validation -> stable framework APIs
+Config assets -> capability IDataLoader<Catalog>
+              -> ScriptableObjectGameDataLoader
+              -> GameDataSnapshot
+              -> catalog snapshot parts registered once
 ```
+
+The alternative serialized path is:
+
+```text
+ISaveStorage -> ISaveService -> SerializedGameDataLoader
+             -> GameDataDocument -> GameDataDocumentMapper -> GameDataSnapshot
+```
+
+### User state
+
+```text
+UserDefaultsConfig or saved UserSaveData
+    -> UserSnapshotLoader -> UserSnapshot
+    -> UserItems / UserProgress / UserPromotionQuest
+    -> UserSaveController -> UserSaveDataMapper -> ISaveService
+```
+
+Snapshots are immutable load-boundary values. State objects are the only long-lived mutable representation.
+
+### UI navigation and flows
+
+```text
+WindowCatalogConfig -> WindowCatalog -> WindowProvider
+    -> WindowNavigator -> WindowController -> Window<TParameters>
+```
+
+`RankPromotionFlow` and `UpgradeFlow` coordinate use cases and windows. Game services own rule execution; flows own
+sequencing and presentation decisions; windows own visual behavior.
+
+## Dependency rules
+
+The top-level project dependency matrix is:
+
+| From | May depend on |
+| --- | --- |
+| `Composition` | Every runtime area |
+| `Bootstrap` | `UI.Controls` and stable framework APIs |
+| `UI` | `Presentation`, `User`, `Game`; `UI.Windows.Configuration` may also use `Infrastructure.Loading` and `Validation` |
+| `Presentation` | `Game`, `User`; configuration adapters may also use `Infrastructure.Loading` and `Validation` |
+| `User` | `Game`, `Infrastructure`, `Validation` |
+| `Game` core | Other `Game` capabilities and generic `Validation` |
+| `Game` services | `Game` core and focused `User.State` contracts |
+| `Game` configuration/data adapters | `Game` core, `Infrastructure`, and `Validation` |
+| `Infrastructure` | Stable framework APIs and generic `Validation` reporting contracts |
+| `Validation` | Stable framework APIs |
+| `Editor` | Runtime assemblies and Unity Editor APIs |
+
+The matrix is a maximum permission, not a reason to add a dependency. Folder-specific exceptions do not grant the
+same dependency to the rest of their top-level area.
+
+The following directions are always forbidden:
+
+- Any runtime area to `Composition` or `Editor`.
+- `Presentation` to `UI`.
+- `Game` core models, definitions, catalogs, identifiers, and calculations to `User`, `Presentation`, or `UI`.
+- `Infrastructure` or `Validation` to game, user, presentation, or UI policy.
+- `User` to `Presentation` or `UI`.
 
 Avoid bidirectional feature dependencies. If two features need the same concept, move that concept to the feature
 that semantically owns it or introduce a small contract at the consumer-facing boundary.
@@ -282,9 +394,46 @@ that semantically owns it or introduce a small contract at the consumer-facing b
 - Prefer one primary type per file. Small DTOs or entries may share a file only when they form one inseparable
   serialized contract and are not reused independently.
 - Keep configuration types with the subsystem whose data they author or construct.
-- Moving a serialized Unity type requires preserving its `.meta` GUID and evaluating whether `MovedFrom` or
-  `FormerlySerializedAs` is needed.
+- Moving or renaming a serialized Unity type requires preserving its `.meta` GUID and adding `MovedFrom` when Unity
+  needs the old assembly, namespace, or type identity.
+- Renaming a serialized field requires explicitly migrating its key in every scene, prefab, and asset, then verifying
+  that the old key no longer exists. Do not use `FormerlySerializedAs`.
 - Do not introduce a new top-level area or architectural role folder without updating this document.
+
+## Code and lifecycle invariants
+
+- Constructors selected by VContainer and injection methods named `Construct` have `[Inject]`. Manually constructed
+  installer, factory-product, DTO, snapshot, definition, and value-object constructors do not.
+- A `Construct` method only validates and assigns dependencies. Subscription, initialization, UI refresh, and other
+  side effects start in the appropriate lifecycle method.
+- A MonoBehaviour creates long-lived R3 subscriptions in `Start` and binds them with `AddTo(this)`. Dynamically
+  replaced subscriptions have an explicit active lifetime and are still disposed on destruction.
+- Event and reactive callbacks use `On...`; `Handle...` is reserved for command or workflow processing.
+- A concrete MonoBehaviour has `[DisallowMultipleComponent]` when a second instance on one GameObject has no defined
+  behavior. Abstract component bases need not declare it.
+- Serialized fields are declared first. Constants follow serialized fields. Other fields, properties, constructors,
+  lifecycle methods, public/internal behavior, and private helpers follow in that order when practical.
+- Every project enum uses `byte`, assigns explicit sequential values starting at `0`, and preserves existing numeric
+  values when serialized or persisted.
+- C# attributes occupy separate lines except a serialized field's constraints and decorators, which share its
+  `[SerializeField, ...]` list.
+- Empty bodies are inline as `{ }`. C# lines do not exceed 120 characters. A C# file ends immediately after its final
+  non-empty line without a trailing CR or LF.
+
+## Changing the architecture
+
+An architectural change is any new top-level area, role folder, dependency direction, assembly, lifetime boundary,
+type suffix, or project-wide naming convention. Make such a change in this order:
+
+1. Identify the semantic owner and the consumers.
+2. Update this document with the new boundary and allowed direction.
+3. Move or add code while preserving Unity GUIDs and serialized keys.
+4. Extend `tools/Validate-Architecture.ps1` for every mechanically enforceable part.
+5. Update the UML PDF and its generation source.
+6. Run architecture validation, compile the assemblies, and run the relevant tests.
+
+Exceptions must be narrow, named by folder or type, and documented beside the rule they qualify. Do not weaken a
+top-level dependency rule to accommodate one adapter.
 
 ## Review checklist
 
@@ -298,6 +447,7 @@ For every new or moved type, verify:
 - Domain code does not know its persistence or authoring format.
 - Configuration remains beside its owning subsystem.
 - Composition contains wiring only and uses only the documented `Scopes`, `Installers`, and `Factories` roles.
+- Lifetime scopes delegate registrations to installers.
 - No vague catch-all folder or type name was introduced.
 - External representations are versioned where compatibility matters.
 - Unity asset GUIDs and serialized references remain valid after moves.

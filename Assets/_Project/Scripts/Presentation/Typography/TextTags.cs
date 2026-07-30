@@ -1,4 +1,4 @@
-namespace LL.UI.Typography
+namespace LL.Presentation.Typography
 {
     internal static class TextTags
     {

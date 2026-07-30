@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 namespace LL.UI.Graphics
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(CanvasRenderer))]
     [AddComponentMenu("LL/UI/Graphics/Gradient")]
     internal sealed class GradientGraphic : MaskableGraphic

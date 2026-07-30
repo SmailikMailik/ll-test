@@ -1,5 +1,5 @@
 using System;
-using LL.UI.Typography;
+using LL.Presentation.Typography;
 using R3;
 using TMPro;
 using UnityEngine;

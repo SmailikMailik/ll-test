@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using LL.Presentation.Localization;
-using LL.UI.Typography;
-using LL.UI.Windows;
-using LL.UI.Windows.Modal;
+using LL.Presentation.Typography;
+using LL.Presentation.Upgrades;
 using VContainer;
 
-namespace LL.Presentation.Upgrades
+namespace LL.UI.Windows.Modal
 {
     internal sealed class ModalExperienceOverflowConfirmation : IExperienceOverflowConfirmation
     {

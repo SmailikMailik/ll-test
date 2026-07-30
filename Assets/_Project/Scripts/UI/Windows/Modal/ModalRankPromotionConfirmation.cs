@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using LL.Game.Payments;
 using LL.Presentation.Localization;
 using LL.Presentation.Payments;
-using LL.UI.Typography;
-using LL.UI.Windows;
-using LL.UI.Windows.Modal;
+using LL.Presentation.Promotions;
+using LL.Presentation.Typography;
 using VContainer;
 
-namespace LL.Presentation.Promotions
+namespace LL.UI.Windows.Modal
 {
     internal sealed class ModalRankPromotionConfirmation : IRankPromotionConfirmation
     {

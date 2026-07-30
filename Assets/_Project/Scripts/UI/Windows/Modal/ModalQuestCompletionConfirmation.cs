@@ -1,10 +1,9 @@
 using System;
 using LL.Presentation.Localization;
-using LL.UI.Windows;
-using LL.UI.Windows.Modal;
+using LL.Presentation.Quests;
 using VContainer;
 
-namespace LL.Presentation.Quests
+namespace LL.UI.Windows.Modal
 {
     internal sealed class ModalQuestCompletionConfirmation : IQuestCompletionConfirmation
     {
