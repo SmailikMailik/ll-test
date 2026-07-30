@@ -5,7 +5,7 @@ namespace LLEditor.Menu
 {
     internal static class PresentationConfigMenu
     {
-        [MenuItem(LastLevelMenu.PresentationPath + "Icons/Item Icon Catalog", false, LastLevelMenu.ContentPriority)]
+        [MenuItem(LastLevelMenu.ContentPath + "Item Icon Catalog", false, LastLevelMenu.ProjectContentPriority)]
         private static void SelectItemIconCatalog()
         {
             ProjectAssetSelector.Select<ItemIconCatalogConfig>(ItemIconCatalogConfig.CreationPath);

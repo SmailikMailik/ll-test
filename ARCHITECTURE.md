@@ -131,6 +131,8 @@ Owns Unity Editor-only tooling, menus, inspectors, build checks, and asset-datab
 - Runtime code must never depend on `Editor`.
 - Mirror a runtime capability below `Editor` when the tool is feature-specific.
 - Keep project-wide editor workflows in a role folder such as `Menu`, `Creation`, or `Validation`.
+- `Toolbar` contains compact controls for frequently used project workflows in Unity's main or window toolbars.
+  Unity-version-specific toolbar integration stays isolated here and delegates behavior to editor workflow commands.
 - `CI` contains provider-independent batch-mode entry points for validation, tests, and player builds. Provider
   configuration calls these entry points and must not duplicate their project rules.
 

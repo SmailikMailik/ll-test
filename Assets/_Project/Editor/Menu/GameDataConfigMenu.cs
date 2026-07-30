@@ -9,31 +9,31 @@ namespace LLEditor.Menu
 {
     internal static class GameDataConfigMenu
     {
-        [MenuItem(LastLevelMenu.GamePath + "Ranks/Rank Catalog", false, LastLevelMenu.ContentPriority)]
+        [MenuItem(LastLevelMenu.ContentPath + "Rank Catalog", false, LastLevelMenu.GameContentPriority + 2)]
         private static void SelectRankCatalog()
         {
             ProjectAssetSelector.Select<RankCatalogConfig>(RankCatalogConfig.CreationPath);
         }
 
-        [MenuItem(LastLevelMenu.GamePath + "Promotions/Rank Promotion Catalog", false, LastLevelMenu.ContentPriority)]
+        [MenuItem(LastLevelMenu.ContentPath + "Rank Promotion Catalog", false, LastLevelMenu.GameContentPriority + 3)]
         private static void SelectRankPromotionCatalog()
         {
             ProjectAssetSelector.Select<RankPromotionCatalogConfig>(RankPromotionCatalogConfig.CreationPath);
         }
 
-        [MenuItem(LastLevelMenu.GamePath + "Quests/Quest Catalog", false, LastLevelMenu.ContentPriority)]
+        [MenuItem(LastLevelMenu.ContentPath + "Quest Catalog", false, LastLevelMenu.GameContentPriority + 1)]
         private static void SelectQuestCatalog()
         {
             ProjectAssetSelector.Select<QuestCatalogConfig>(QuestCatalogConfig.CreationPath);
         }
 
-        [MenuItem(LastLevelMenu.GamePath + "Cards/Card Catalog", false, LastLevelMenu.ContentPriority)]
+        [MenuItem(LastLevelMenu.ContentPath + "Card Catalog", false, LastLevelMenu.GameContentPriority)]
         private static void SelectCardCatalog()
         {
             ProjectAssetSelector.Select<CardCatalogConfig>(CardCatalogConfig.CreationPath);
         }
 
-        [MenuItem(LastLevelMenu.GamePath + "Rewards/Reward Catalog", false, LastLevelMenu.ContentPriority)]
+        [MenuItem(LastLevelMenu.ContentPath + "Reward Catalog", false, LastLevelMenu.GameContentPriority + 4)]
         private static void SelectRewardCatalog()
         {
             ProjectAssetSelector.Select<RewardCatalogConfig>(RewardCatalogConfig.CreationPath);
