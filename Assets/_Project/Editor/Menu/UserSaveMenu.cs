@@ -1,14 +1,13 @@
 using LL.Composition.Persistence;
 using LL.User.Persistence;
-using LLEditor.Menu;
 using UnityEditor;
 using UnityEngine;
 
-namespace LLEditor.User
+namespace LLEditor.Menu
 {
     internal static class UserSaveMenu
     {
-        [MenuItem(LLMenu.DeleteSavedUserDataPath, false, LLMenu.DeleteSavedUserDataPriority)]
+        [MenuItem(LastLevelMenu.DeleteSavedUserDataPath, false, LastLevelMenu.DeleteSavedUserDataPriority)]
         private static void DeleteSavedUserData()
         {
             const string saveKey = UserSnapshotLoader.SaveKey;
@@ -33,7 +32,7 @@ namespace LLEditor.User
                 Debug.Log("Saved user data was deleted.");
         }
 
-        [MenuItem(LLMenu.DeleteSavedUserDataPath, true, LLMenu.DeleteSavedUserDataPriority)]
+        [MenuItem(LastLevelMenu.DeleteSavedUserDataPath, true, LastLevelMenu.DeleteSavedUserDataPriority)]
         private static bool CanDeleteSavedUserData() => EditorApplication.isPlayingOrWillChangePlaymode is false;
     }
 }

@@ -1,11 +1,11 @@
-using LLEditor.Menu;
+using LLEditor.Validation;
 using UnityEditor;
 
-namespace LLEditor.Validation
+namespace LLEditor.Menu
 {
     internal static class ProjectDataValidationMenu
     {
-        [MenuItem(LLMenu.ValidateProjectDataPath, false, LLMenu.ValidateProjectDataPriority)]
+        [MenuItem(LastLevelMenu.ValidateProjectDataPath, false, LastLevelMenu.ValidateProjectDataPriority)]
         private static void ValidateProjectData()
         {
             var result = ProjectDataValidationRunner.Run(out var assetCount);

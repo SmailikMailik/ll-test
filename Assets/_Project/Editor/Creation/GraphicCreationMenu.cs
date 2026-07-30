@@ -3,9 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LLEditor.UI.Graphics
+namespace LLEditor.Creation
 {
-    internal static class GraphicMenu
+    internal static class GraphicCreationMenu
     {
         private const int MenuPriority = 2048;
         private static readonly Vector2 _defaultSize = new(100f, 100f);

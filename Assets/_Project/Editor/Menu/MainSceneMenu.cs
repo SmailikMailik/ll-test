@@ -1,10 +1,9 @@
-using LLEditor.Menu;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace LLEditor.Scenes
+namespace LLEditor.Menu
 {
     internal static class MainSceneMenu
     {
@@ -20,10 +19,10 @@ namespace LLEditor.Scenes
             EditorApplication.delayCall += OnEditorReady;
         }
 
-        [MenuItem(LLMenu.OpenMainScenePath, false, LLMenu.OpenMainScenePriority)]
+        [MenuItem(LastLevelMenu.OpenMainScenePath, false, LastLevelMenu.OpenMainScenePriority)]
         private static void OpenMainScene() => TryOpenMainScene();
 
-        [MenuItem(LLMenu.OpenMainScenePath, true, LLMenu.OpenMainScenePriority)]
+        [MenuItem(LastLevelMenu.OpenMainScenePath, true, LastLevelMenu.OpenMainScenePriority)]
         private static bool CanOpenMainScene() => EditorApplication.isPlayingOrWillChangePlaymode is false;
 
         private static void OnEditorReady()
