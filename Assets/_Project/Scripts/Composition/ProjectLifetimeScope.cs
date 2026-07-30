@@ -3,8 +3,8 @@ using LL.Composition.Persistence;
 using LL.Game.Cards.Configuration;
 using LL.Game.Payments;
 using LL.Game.Promotions.Configuration;
-using LL.Game.Ranks.Configuration;
 using LL.Game.Ranks;
+using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using LL.Game.Rewards.Services;
 using LL.Game.Upgrades;
@@ -12,10 +12,9 @@ using LL.Infrastructure.Loading;
 using LL.Infrastructure.Saving;
 using LL.Infrastructure.Validation;
 using LL.Presentation.Icons.Configuration;
-using LL.Presentation.Icons;
 using LL.Presentation.Localization;
-using LL.UI.Windows.Configuration;
 using LL.UI.Windows;
+using LL.UI.Windows.Configuration;
 using LL.User.Configuration;
 using LL.User.Persistence;
 using LL.User.Snapshots;
@@ -25,8 +24,8 @@ using LL.User.State.Promotions;
 using LL.Validation.Reporting;
 using UnityEngine;
 using UnityEngine.Serialization;
-using VContainer.Unity;
 using VContainer;
+using VContainer.Unity;
 
 namespace LL.Composition
 {

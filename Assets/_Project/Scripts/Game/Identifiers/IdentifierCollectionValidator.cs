@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using LL.Validation;
 
 namespace LL.Game.Identifiers

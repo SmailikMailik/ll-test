@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace LL.UI.Windows.Configuration
 {
-    [CreateAssetMenu(fileName = nameof(WindowCatalog), menuName = WindowCatalog.CreationPath)]
+    [CreateAssetMenu(fileName = nameof(WindowCatalog), menuName = CreationPath)]
     [HideMonoScript]
     internal sealed class WindowCatalog : ScriptableObject
     {

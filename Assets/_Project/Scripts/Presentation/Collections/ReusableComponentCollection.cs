@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace LL.Presentation.Collections
 {
@@ -38,7 +39,7 @@ namespace LL.Presentation.Collections
 
             while (_components.Count < count)
             {
-                var component = UnityEngine.Object.Instantiate(_prefab, _parent);
+                var component = Object.Instantiate(_prefab, _parent);
                 component.gameObject.SetActive(false);
                 _components.Add(component);
             }
