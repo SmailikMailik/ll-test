@@ -10,7 +10,6 @@ using LL.Game.Upgrades;
 using LL.Infrastructure.Validation;
 using LL.Presentation.Icons.Configuration;
 using LL.Presentation.Localization;
-using LL.UI.Windows;
 using LL.UI.Windows.Configuration;
 using LL.User.Configuration;
 using LL.Validation.Reporting;
@@ -25,6 +24,7 @@ namespace LL.Composition.Scopes
     [DisallowMultipleComponent]
     internal sealed class ProjectLifetimeScope : LifetimeScope
     {
+        [Header("Windows")]
         [SerializeField] private WindowCatalog _windowCatalog;
 
         [Header("Game Data")]
@@ -32,7 +32,6 @@ namespace LL.Composition.Scopes
         [SerializeField] private CardCatalogConfig _cardCatalogConfig;
         [SerializeField] private QuestCatalogConfig _questCatalogConfig;
         [SerializeField] private RankPromotionCatalogConfig _rankPromotionCatalogConfig;
-
         [SerializeField] private RewardCatalogConfig _rewardCatalogConfig;
 
         [Header("Presentation")]
@@ -43,7 +42,7 @@ namespace LL.Composition.Scopes
 
         protected override void Configure(IContainerBuilder builder)
         {
-            RegisterWindows(builder);
+            new WindowInstaller(_windowCatalog).Install(builder);
             RegisterLocalization(builder);
             RegisterValidationReporting(builder);
             new GameDataInstaller(
@@ -56,13 +55,6 @@ namespace LL.Composition.Scopes
             RegisterPresentation(builder);
             new UserInstaller(_userDefaultsConfig).Install(builder);
             RegisterGameServices(builder);
-        }
-
-        private void RegisterWindows(IContainerBuilder builder)
-        {
-            builder.RegisterInstance(_windowCatalog);
-            builder.Register<WindowProvider>(Lifetime.Scoped);
-            builder.Register<WindowNavigator>(Lifetime.Scoped);
         }
 
         private static void RegisterLocalization(IContainerBuilder builder)

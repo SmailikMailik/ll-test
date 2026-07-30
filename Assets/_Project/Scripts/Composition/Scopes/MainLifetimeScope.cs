@@ -6,15 +6,13 @@ using LL.UI.Promotions;
 using LL.UI.Windows;
 using LL.UI.Windows.Flows;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
 using VContainer;
 using VContainer.Unity;
 
 namespace LL.Composition.Scopes
 {
-    [MovedFrom(true, "LL.Composition")]
     [DisallowMultipleComponent]
-    internal sealed class SceneLifetimeScope : LifetimeScope
+    internal sealed class MainLifetimeScope : LifetimeScope
     {
         [SerializeField] private WindowController _windowController;
 

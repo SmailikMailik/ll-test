@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 1001}
   - component: {fileID: 1002}
   m_Layer: 0
-  m_Name: Bootstrap
+  m_Name: Controllers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,6 +166,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5dc14255365b6f4bb2e82d3ad83363f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects: []
   _progressBar: {fileID: 425541466}
   _minDisplaySeconds: 2
 --- !u!1 &31202264

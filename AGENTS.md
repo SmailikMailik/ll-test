@@ -25,6 +25,9 @@
   that the old key no longer exists, and do not use `FormerlySerializedAs`.
 - Use `Min` and `Max` instead of `Minimum` and `Maximum` in identifiers that represent lower and upper bounds.
   Keep unabbreviated words in user-facing text.
+- Write every empty C# body inline as `{ }` after its declaration. This applies to types, methods, constructors,
+  local functions, operators, and accessors. For a multiline declaration, place `{ }` after its final signature
+  line. Do not expand an empty body across separate lines.
 - Add `[DisallowMultipleComponent]` to `MonoBehaviour` components when multiple instances on one `GameObject` have no valid use.
 - Declare serialized fields first in a type, without `[Required]` by default; place constants immediately after them.
 - Declare every project enum with `byte` as its underlying type and assign explicit sequential values starting at `0`.

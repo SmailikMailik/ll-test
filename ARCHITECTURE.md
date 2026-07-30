@@ -59,6 +59,8 @@ Owns the application's first-scene startup flow and temporary loading presentati
 
 - The Bootstrap scene is the first enabled build scene and transitions to the first application scene.
 - The bootstrap flow may display initialization progress and coordinate scene activation.
+- Independent startup work is modeled as parallel bootstrap operations collected and coordinated by one bootstrap
+  flow.
 - It must not create a second project lifetime scope when VContainer already auto-creates the configured root scope.
 - It must not own game rules, user persistence, or long-lived application state.
 
@@ -185,6 +187,8 @@ Use the most specific applicable suffix:
 - `Service`: cohesive domain or application operation that does not fit a more specific role.
 - `Controller`: coordinates lifecycle, commands, and side effects for an owned process.
 - `Flow`: coordinates a multi-step user or application workflow.
+- `BootstrapOperation`: one independently started and polled unit of temporary bootstrap work that reports progress,
+  readiness, and failure without coordinating other operations.
 - `View`: concrete visual representation.
 - `Validator`: checks input and reports issues without changing it.
 - `Formatter`: converts a value into presentation text or tokens without I/O.
