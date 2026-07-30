@@ -1454,7 +1454,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9155715139616769718, guid: 39cebd890946e9543a22d53e5ba8c212, type: 3}
       propertyPath: m_Name
-      value: P_RewardsPreview
+      value: P_NextRankRewardView
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

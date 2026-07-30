@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.UI;
+using LL.UI.Controls;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;

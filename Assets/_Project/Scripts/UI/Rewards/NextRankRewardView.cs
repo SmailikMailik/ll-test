@@ -11,7 +11,7 @@ using TMPro;
 using UnityEngine;
 using VContainer;
 
-namespace LL.UI
+namespace LL.UI.Rewards
 {
     [DisallowMultipleComponent]
     internal sealed class NextRankRewardView : MonoBehaviour

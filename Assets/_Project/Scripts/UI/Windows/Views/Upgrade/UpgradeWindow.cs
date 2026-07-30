@@ -6,6 +6,7 @@ using LL.Game.Upgrades;
 using LL.Game.Upgrades.Services;
 using LL.Presentation.Upgrades;
 using LL.UI.Controls;
+using LL.UI.Rewards;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;
 using LL.UI.Windows.Views.Upgrade.Progress;

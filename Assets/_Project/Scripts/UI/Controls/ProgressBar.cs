@@ -2,7 +2,7 @@ using LL.UI.Extensions;
 using TMPro;
 using UnityEngine;
 
-namespace LL.UI
+namespace LL.UI.Controls
 {
     [DisallowMultipleComponent]
     internal sealed class ProgressBar : MonoBehaviour

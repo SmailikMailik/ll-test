@@ -2,7 +2,7 @@ using LL.UI.Typography;
 using TMPro;
 using UnityEngine;
 
-namespace LL.UI
+namespace LL.UI.Controls
 {
     [DisallowMultipleComponent]
     [AddComponentMenu("LL/UI/Inline Sprite Label")]
