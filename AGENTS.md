@@ -17,7 +17,14 @@
 - Create long-lived R3 subscriptions in a `MonoBehaviour`'s `Start` method and bind them to the component lifetime with `AddTo(this)`. For subscriptions created dynamically, control their active lifetime explicitly and still ensure they are disposed when the component is destroyed.
 - Name event and reactive-notification callback methods with the `On...` prefix;
   reserve `Handle...` for non-event command or workflow processing.
-- Place each C# attribute on its own line; keep `[SerializeField]` and `[JsonProperty]` inline with the field declaration.
+- Place each C# attribute on its own line, except serialized-field constraints and decorators such as `Min`, `Max`,
+  `Range`, and `Tooltip`: keep them in the same attribute list after `SerializeField`, for example
+  `[SerializeField, Min(0f)] private float _duration;`. Keep `[SerializeField]` and `[JsonProperty]` inline with
+  the field declaration.
+- When renaming a serialized field, explicitly migrate its key in every affected scene, prefab, and asset, verify
+  that the old key no longer exists, and do not use `FormerlySerializedAs`.
+- Use `Min` and `Max` instead of `Minimum` and `Maximum` in identifiers that represent lower and upper bounds.
+  Keep unabbreviated words in user-facing text.
 - Add `[DisallowMultipleComponent]` to `MonoBehaviour` components when multiple instances on one `GameObject` have no valid use.
 - Declare serialized fields first in a type, without `[Required]` by default; place constants immediately after them.
 - Declare every project enum with `byte` as its underlying type and assign explicit sequential values starting at `0`.

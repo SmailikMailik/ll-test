@@ -22,24 +22,28 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-ru
+    - Preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4d152a1385ad4a06919d5066eb101402
     m_Address: Game_ru
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-ru
+    - Preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0b07f16159ed4e149826fac209420863
     m_Address: Upgrade_ru
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-ru
+    - Preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9fbcb659eae2438b978d211156629b11
     m_Address: RankUp_ru
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-ru
+    - Preload
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: d4b68a79e413eb54fb0ffe2909baecac, type: 2}
