@@ -113,7 +113,18 @@ Owns concrete visual behavior: views, windows, controls, graphics, navigation, v
 
 - UI may depend on `Presentation`, `Game`, and `User`.
 - `MonoBehaviour`, visual components, and window implementations normally belong here.
-- Reusable controls belong in a role folder such as `Controls`, `Graphics`, or `VisualStates`.
+- `Controls` owns self-contained reusable UI elements, including both interactive controls and display-only elements
+  such as progress bars and formatted labels.
+- `Views` owns composed visual blocks that present a specific UI concept and can be embedded in more than one screen.
+  Feature-owned views stay with their feature instead of moving to a generic shared folder.
+- Specialized rendering and visual-state behavior belongs in role folders such as `Graphics` or `VisualStates`.
+- `Typography` owns reusable rich-text tokens, tags, symbols, and UI-specific text formatting.
+- `Localization` owns concrete localized UI components; localization services and presentation wording remain under
+  `Presentation`.
+- `Windows` owns window definitions, navigation, window flows, and concrete windows. Place each concrete window and
+  its feature-specific parts directly under a feature folder such as `Windows/Promotion` or `Windows/Upgrade`.
+- Keep only foundational UI mechanisms at the `UI` root. A reusable element with a recognized role must use its role
+  folder.
 - Feature-specific views stay under their feature or window view hierarchy.
 - UI must not contain persistence, storage, or domain rules.
 
@@ -151,6 +162,10 @@ Use these names only with the stated meaning:
 - `Storage`: raw byte or text access to a medium, addressed without domain knowledge.
 - `Services`: cohesive domain or application operations with no more specific feature role.
 - `Views`: concrete visual representations.
+- `Controls`: self-contained reusable interactive or display-only UI elements; only under `UI`.
+- `Graphics`: reusable custom rendering components; only under `UI`.
+- `Typography`: reusable UI-specific rich-text vocabulary and formatting; only under `UI`.
+- `VisualStates`: reusable visual-state sources, effects, and state values; only under `UI`.
 - `Flows`: multi-step application or UI workflows.
 - `Extensions`: extension methods only.
 - `Reporting`: formatting or delivery of diagnostic and validation results.
@@ -231,6 +246,14 @@ snapshot or its owned parts, never the concrete source adapter.
 - Keep shared Unity swatch and preset libraries under `Assets/_Project/Presets`.
 - Place Unity project preset-library files in a nested `Editor` folder so Unity discovers them without mixing them
   with the editor-tooling source assembly.
+- Organize UI prefabs by the same ownership vocabulary as UI code: reusable controls under `Controls`, composed
+  display blocks under `Views`, feature-owned views under their feature, and window roots under `Windows`.
+- Name prefab assets `P_<SemanticName>`. The prefab root object must match the asset name, while an instance override
+  may use a more specific contextual name.
+- Prefab names must describe purpose or visual role. Do not use sequence-only variants such as `_01`; use a semantic
+  variant such as `Primary`, `Outlined`, or `Timed`, and add dimensions only when they distinguish intentional sizes.
+- Use `Layouts` only for reusable components whose responsibility is arranging children. Do not classify a composed
+  display block as a layout merely because it contains several visual elements.
 
 ## Dependency rules
 

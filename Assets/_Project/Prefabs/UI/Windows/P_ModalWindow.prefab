@@ -1443,7 +1443,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1715821048103907228, guid: df309a36a0487a44ea6a3a79b5e856d6, type: 3}
       propertyPath: m_Name
-      value: P_Background
+      value: P_WindowBackground
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

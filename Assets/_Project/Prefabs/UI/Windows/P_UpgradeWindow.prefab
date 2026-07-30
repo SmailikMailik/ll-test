@@ -2006,7 +2006,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2558973126156217518, guid: 67f226be776ddbd4392e9a3b7d4c9c3a, type: 3}
       propertyPath: m_Name
-      value: P_Rank
+      value: P_RankView
       objectReference: {fileID: 0}
     - target: {fileID: 4068564970032377297, guid: 67f226be776ddbd4392e9a3b7d4c9c3a, type: 3}
       propertyPath: m_Pivot.x
@@ -2437,7 +2437,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 232170048491682585, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_Name
-      value: P_Card_2
+      value: P_UpgradeCardView_2
       objectReference: {fileID: 0}
     - target: {fileID: 1525261692928005945, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_fontSize
@@ -2826,7 +2826,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5673383858613290886, guid: 6c6668896fd2d664e97793ef625e135c, type: 3}
       propertyPath: m_Name
-      value: P_Header
+      value: P_HeaderView
       objectReference: {fileID: 0}
     - target: {fileID: 6176704270360347780, guid: 6c6668896fd2d664e97793ef625e135c, type: 3}
       propertyPath: m_AnchorMax.y
@@ -3449,7 +3449,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1906222952465833792, guid: 451b6f692b931fb40bc5686bf360e512, type: 3}
       propertyPath: m_Name
-      value: P_Bar
+      value: P_PredictedProgressBar
       objectReference: {fileID: 0}
     - target: {fileID: 1906222952465833792, guid: 451b6f692b931fb40bc5686bf360e512, type: 3}
       propertyPath: m_IsActive
@@ -3662,7 +3662,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 232170048491682585, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_Name
-      value: P_Card_3
+      value: P_UpgradeCardView_3
       objectReference: {fileID: 0}
     - target: {fileID: 1525261692928005945, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_fontSize
@@ -3779,7 +3779,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 232170048491682585, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_Name
-      value: P_Card_1
+      value: P_UpgradeCardView_1
       objectReference: {fileID: 0}
     - target: {fileID: 1525261692928005945, guid: f765985d6fd80cf48a6c6170a20bd90f, type: 3}
       propertyPath: m_fontSize
@@ -4358,7 +4358,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 409117881327649629, guid: 742589c37b71e3641bb710222d788c87, type: 3}
       propertyPath: m_Name
-      value: P_Character
+      value: P_CharacterView
       objectReference: {fileID: 0}
     - target: {fileID: 3590696994899624306, guid: 742589c37b71e3641bb710222d788c87, type: 3}
       propertyPath: m_Pivot.x

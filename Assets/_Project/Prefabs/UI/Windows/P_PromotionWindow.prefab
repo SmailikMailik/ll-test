@@ -1883,7 +1883,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5673383858613290886, guid: 6c6668896fd2d664e97793ef625e135c, type: 3}
       propertyPath: m_Name
-      value: P_Header
+      value: P_HeaderView
       objectReference: {fileID: 0}
     - target: {fileID: 6176704270360347780, guid: 6c6668896fd2d664e97793ef625e135c, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2189,7 +2189,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 409117881327649629, guid: 742589c37b71e3641bb710222d788c87, type: 3}
       propertyPath: m_Name
-      value: P_Character
+      value: P_CharacterView
       objectReference: {fileID: 0}
     - target: {fileID: 3590696994899624306, guid: 742589c37b71e3641bb710222d788c87, type: 3}
       propertyPath: m_Pivot.x

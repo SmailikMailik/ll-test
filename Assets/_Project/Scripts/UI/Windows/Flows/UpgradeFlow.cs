@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Items;
-using LL.UI.Windows.Views.Promotion;
-using LL.UI.Windows.Views.Reward;
-using LL.UI.Windows.Views.Upgrade;
+using LL.UI.Windows.Promotion;
+using LL.UI.Windows.Reward;
+using LL.UI.Windows.Upgrade;
 using LL.User.State.Progress;
 using VContainer;
-using VContainer.Unity;
 
 namespace LL.UI.Windows.Flows
 {
@@ -44,22 +43,6 @@ namespace LL.UI.Windows.Flows
         {
             ReplaceCurrent();
             _windowController.Show(new RewardWindowParameters(rank, rewardItems));
-        }
-    }
-
-    internal sealed class UpgradeFlowStartup : IStartable
-    {
-        private readonly UpgradeFlow _flow;
-
-        [Inject]
-        internal UpgradeFlowStartup(UpgradeFlow flow)
-        {
-            _flow = flow ?? throw new ArgumentNullException(nameof(flow));
-        }
-
-        public void Start()
-        {
-            _flow.Open();
         }
     }
 }

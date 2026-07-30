@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LL.Presentation.Localization;
 using LL.UI.Typography;
 using LL.UI.Windows;
-using LL.UI.Windows.Views;
+using LL.UI.Windows.Modal;
 using VContainer;
 
 namespace LL.Presentation.Upgrades
