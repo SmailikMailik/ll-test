@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
 using LL.Infrastructure.Loading;
@@ -24,13 +25,13 @@ namespace LL.Presentation.Icons.Configuration
         private static readonly IDataValidator<ItemIconEntry[]> _validator =
             new ItemIconCatalogConfigValidator();
 
-        internal ItemIconEntry[] Icons => _icons;
+        internal IReadOnlyList<ItemIconEntry> Icons => _icons;
 
         public IconCatalog<ItemId> Load()
         {
             ValidationRunner.EnsureValid(this, nameof(_icons));
 
-            var icons = _icons?.Select(entry => entry.ToPair());
+            var icons = _icons.Select(entry => entry.ToPair());
 
             return new IconCatalog<ItemId>(icons);
         }
@@ -47,8 +48,18 @@ namespace LL.Presentation.Icons.Configuration
     }
 
     [Serializable]
-    internal sealed class ItemIconEntry : IconEntry<ItemId>
+    internal sealed class ItemIconEntry
     {
-        protected override ItemId CreateId(string value) => new(value);
+        [LabelText("ID")]
+        [SerializeField] private string _id;
+
+        [Required]
+        [PreviewField(64, ObjectFieldAlignment.Center)]
+        [SerializeField] private Sprite _icon;
+
+        internal ItemId Id => new(_id);
+        internal Sprite Icon => _icon;
+
+        internal KeyValuePair<ItemId, Sprite> ToPair() => new(Id, Icon);
     }
 }

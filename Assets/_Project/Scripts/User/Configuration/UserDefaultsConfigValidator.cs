@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LL.Validation;
 
 namespace LL.User.Configuration
@@ -16,9 +17,9 @@ namespace LL.User.Configuration
         private const string RankCode = "user-defaults.progress.rank.positive";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
 
-        private readonly IDataValidator<ItemAmountEntry[]> _itemsValidator;
+        private readonly IDataValidator<IReadOnlyList<ItemAmountEntry>> _itemsValidator;
 
-        internal UserDefaultsConfigValidator(IDataValidator<ItemAmountEntry[]> itemsValidator)
+        internal UserDefaultsConfigValidator(IDataValidator<IReadOnlyList<ItemAmountEntry>> itemsValidator)
         {
             _itemsValidator = itemsValidator ?? throw new ArgumentNullException(nameof(itemsValidator));
         }

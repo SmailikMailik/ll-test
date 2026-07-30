@@ -13,21 +13,12 @@ MonoBehaviour:
   m_Name: RankCatalogConfig
   m_EditorClassIdentifier: 
   _rankRequirements:
-  - _rank: 1
-    _requiredExperience: 0
-  - _rank: 2
-    _requiredExperience: 5000
-  - _rank: 3
-    _requiredExperience: 10000
-  - _rank: 4
-    _requiredExperience: 15000
-  - _rank: 5
-    _requiredExperience: 20000
-  - _rank: 6
-    _requiredExperience: 25000
-  - _rank: 7
-    _requiredExperience: 30000
-  - _rank: 8
-    _requiredExperience: 35000
-  - _rank: 9
-    _requiredExperience: 40000
+  - _requiredExperience: 0
+  - _requiredExperience: 5000
+  - _requiredExperience: 10000
+  - _requiredExperience: 15000
+  - _requiredExperience: 20000
+  - _requiredExperience: 25000
+  - _requiredExperience: 30000
+  - _requiredExperience: 35000
+  - _requiredExperience: 40000

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
 using LL.Infrastructure.Loading;
@@ -26,13 +27,13 @@ namespace LL.Game.Rewards.Configuration
         private static readonly IDataValidator<RewardEntry[]> _validator =
             new RewardCatalogConfigValidator();
 
-        internal RewardEntry[] Rewards => _rewards;
+        internal IReadOnlyList<RewardEntry> Rewards => _rewards;
 
         public RewardCatalog Load()
         {
             ValidationRunner.EnsureValid(this, nameof(_rewards));
 
-            return new RewardCatalog(_rewards?.Select(entry => entry.ToReward()));
+            return new RewardCatalog(_rewards.Select(entry => entry.ToReward()));
         }
 
         private static bool HasValidRewards(RewardEntry[] rewards)
@@ -60,13 +61,13 @@ namespace LL.Game.Rewards.Configuration
         [SerializeField] private RewardItemEntry[] _items;
 
         internal RewardId Id => new(_id);
-        internal RewardItemEntry[] Items => _items;
+        internal IReadOnlyList<RewardItemEntry> Items => _items;
 
         internal Reward ToReward()
         {
             return new Reward(
                 Id,
-                Items?.Select(item => item.ToItemAmount()));
+                Items.Select(item => item.ToItemAmount()));
         }
     }
 

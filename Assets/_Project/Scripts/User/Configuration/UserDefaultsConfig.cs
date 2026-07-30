@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
 using LL.User.Snapshots;
@@ -27,7 +28,7 @@ namespace LL.User.Configuration
 
         internal const string CreationPath = "LL/User/User Defaults Config";
 
-        private static readonly IDataValidator<ItemAmountEntry[]> _itemsValidator =
+        private static readonly IDataValidator<IReadOnlyList<ItemAmountEntry>> _itemsValidator =
             new UserItemsDefaultsValidator();
 
         private static readonly IDataValidator<UserDefaultsConfig> _validator =
@@ -35,7 +36,7 @@ namespace LL.User.Configuration
 
         internal UserIdentityDefaults Identity => _identity;
         internal UserProgressDefaults Progress => _progress;
-        internal ItemAmountEntry[] Items => _items;
+        internal IReadOnlyList<ItemAmountEntry> Items => _items;
 
         UserSnapshot IUserDefaultsProvider.GetDefaultSnapshot()
         {

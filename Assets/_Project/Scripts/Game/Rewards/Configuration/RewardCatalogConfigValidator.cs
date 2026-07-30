@@ -41,7 +41,7 @@ namespace LL.Game.Rewards.Configuration
                     item => item.Id,
                     itemsContext);
 
-                for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
+                for (var itemIndex = 0; itemIndex < items.Count; itemIndex++)
                 {
                     var item = items[itemIndex];
 

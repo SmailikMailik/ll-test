@@ -1,15 +1,16 @@
+using System.Collections.Generic;
 using LL.Game.Identifiers;
 using LL.Validation;
 
 namespace LL.User.Configuration
 {
-    internal sealed class UserItemsDefaultsValidator : IDataValidator<ItemAmountEntry[]>
+    internal sealed class UserItemsDefaultsValidator : IDataValidator<IReadOnlyList<ItemAmountEntry>>
     {
         private const string ItemsCode = "user-defaults.items.required";
         private const string AmountCode = "user-defaults.item.amount.non-negative";
 
         public void Validate(
-            ItemAmountEntry[] items,
+            IReadOnlyList<ItemAmountEntry> items,
             ValidationContext context)
         {
             if (ValidationRules.NotNull(items, context, ItemsCode) is false)
@@ -20,7 +21,7 @@ namespace LL.User.Configuration
                 item => item.Id,
                 context);
 
-            for (var index = 0; index < items.Length; index++)
+            for (var index = 0; index < items.Count; index++)
             {
                 var item = items[index];
 

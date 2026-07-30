@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
 using LL.Game.Payments;
@@ -27,13 +28,13 @@ namespace LL.Game.Promotions.Configuration
         private static readonly IDataValidator<RankPromotionEntry[]> _validator =
             new RankPromotionCatalogConfigValidator();
 
-        internal RankPromotionEntry[] Promotions => _promotions;
+        internal IReadOnlyList<RankPromotionEntry> Promotions => _promotions;
 
         public RankPromotionCatalog Load()
         {
             ValidationRunner.EnsureValid(this, nameof(_promotions));
 
-            return new RankPromotionCatalog(_promotions?.Select(entry => entry.ToPromotion()));
+            return new RankPromotionCatalog(_promotions.Select(entry => entry.ToPromotion()));
         }
 
         private static bool HasValidPromotions(RankPromotionEntry[] promotions)

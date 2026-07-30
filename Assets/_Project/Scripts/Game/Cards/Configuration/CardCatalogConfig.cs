@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
 using LL.Infrastructure.Loading;
@@ -21,13 +22,13 @@ namespace LL.Game.Cards.Configuration
         private static readonly IDataValidator<CardDefinitionEntry[]> _validator =
             new CardCatalogConfigValidator();
 
-        internal CardDefinitionEntry[] Cards => _cards;
+        internal IReadOnlyList<CardDefinitionEntry> Cards => _cards;
 
         public CardCatalog Load()
         {
             ValidationRunner.EnsureValid(this, nameof(_cards));
 
-            return new CardCatalog(_cards?.Select(card => card.ToCard()));
+            return new CardCatalog(_cards.Select(card => card.ToCard()));
         }
 
         private static bool HasValidCards(CardDefinitionEntry[] cards)

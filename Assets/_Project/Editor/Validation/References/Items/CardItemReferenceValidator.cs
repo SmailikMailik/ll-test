@@ -40,7 +40,7 @@ namespace LLEditor.Validation.References.Items
 
             var configContext = context.At(AssetDatabase.GetAssetPath(config));
 
-            for (var index = 0; index < cards.Length; index++)
+            for (var index = 0; index < cards.Count; index++)
             {
                 var card = cards[index];
 

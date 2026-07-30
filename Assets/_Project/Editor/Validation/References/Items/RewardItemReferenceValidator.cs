@@ -40,14 +40,14 @@ namespace LLEditor.Validation.References.Items
 
             var configContext = context.At(AssetDatabase.GetAssetPath(config));
 
-            for (var rewardIndex = 0; rewardIndex < rewards.Length; rewardIndex++)
+            for (var rewardIndex = 0; rewardIndex < rewards.Count; rewardIndex++)
             {
                 var items = rewards[rewardIndex]?.Items;
 
                 if (items == null)
                     continue;
 
-                for (var itemIndex = 0; itemIndex < items.Length; itemIndex++)
+                for (var itemIndex = 0; itemIndex < items.Count; itemIndex++)
                 {
                     var item = items[itemIndex];
 

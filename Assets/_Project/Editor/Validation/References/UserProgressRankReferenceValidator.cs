@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using LL.Game.Ranks.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
@@ -45,10 +44,13 @@ namespace LLEditor.Validation.References
                 return;
             }
 
-            var ranks = new HashSet<int>(
-                rankRequirements
-                    .Where(requirement => requirement != null)
-                    .Select(requirement => requirement.Rank));
+            var ranks = new HashSet<int>();
+
+            for (var index = 0; index < rankRequirements.Count; index++)
+            {
+                if (rankRequirements[index] != null)
+                    ranks.Add(index + 1);
+            }
 
             if (ValidationRules.ReferenceExists(
                     progress.Rank,
@@ -62,8 +64,9 @@ namespace LLEditor.Validation.References
             if (progress.Experience < 0)
                 return;
 
-            var nextRank = rankRequirements.FirstOrDefault(
-                requirement => requirement != null && requirement.Rank == progress.Rank + 1);
+            var nextRank = progress.Rank < rankRequirements.Count
+                ? rankRequirements[progress.Rank]
+                : null;
 
             if (nextRank == null)
             {

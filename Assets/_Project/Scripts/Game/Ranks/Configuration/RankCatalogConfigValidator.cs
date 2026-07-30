@@ -6,7 +6,6 @@ namespace LL.Game.Ranks.Configuration
     {
         private const string RequirementsCode = "rank-catalog.requirements.not-empty";
         private const string EntryCode = "rank-catalog.entry.required";
-        private const string RankSequenceCode = "rank-catalog.rank.sequential";
         private const string InitialExperienceCode = "rank-catalog.initial-experience.zero";
         private const string ExperienceCode = "rank-catalog.experience.positive";
 
@@ -24,18 +23,6 @@ namespace LL.Game.Ranks.Configuration
 
                 if (ValidationRules.NotNull(requirement, requirementContext, EntryCode) is false)
                     continue;
-
-                var expectedRank = index + 1;
-
-                if (requirement.Rank != expectedRank)
-                {
-                    requirementContext
-                        .At(nameof(RankExperienceRequirementEntry.Rank))
-                        .Report(
-                            ValidationSeverity.Error,
-                            RankSequenceCode,
-                            $"Rank must be {expectedRank} at index {index}.");
-                }
 
                 var experienceContext = requirementContext.At(
                     nameof(RankExperienceRequirementEntry.RequiredExperience));

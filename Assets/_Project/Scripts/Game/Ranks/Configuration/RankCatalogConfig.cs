@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LL.Infrastructure.Loading;
 using LL.Validation;
@@ -21,7 +22,7 @@ namespace LL.Game.Ranks.Configuration
         private static readonly IDataValidator<RankExperienceRequirementEntry[]> _validator =
             new RankCatalogConfigValidator();
 
-        internal RankExperienceRequirementEntry[] RankRequirements => _rankRequirements;
+        internal IReadOnlyList<RankExperienceRequirementEntry> RankRequirements => _rankRequirements;
 
         public RankCatalog Load()
         {
@@ -44,16 +45,11 @@ namespace LL.Game.Ranks.Configuration
     [Serializable]
     internal sealed class RankExperienceRequirementEntry
     {
-        [MinValue(1)]
-        [TableColumnWidth(40, Resizable = false)]
-        [SerializeField] private int _rank = 1;
-
         [LabelText("Required Experience")]
         [SuffixLabel("XP", true)]
         [MinValue(0)]
         [SerializeField] private int _requiredExperience;
 
-        internal int Rank => _rank;
         internal int RequiredExperience => _requiredExperience;
     }
 }

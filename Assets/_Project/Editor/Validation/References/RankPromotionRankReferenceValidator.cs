@@ -39,10 +39,10 @@ namespace LLEditor.Validation.References
 
             var ranks = new HashSet<int>();
 
-            foreach (var requirement in rankRequirements)
+            for (var index = 0; index < rankRequirements.Count; index++)
             {
-                if (requirement != null)
-                    ranks.Add(requirement.Rank);
+                if (rankRequirements[index] != null)
+                    ranks.Add(index + 1);
             }
 
             var promotionRanks = new HashSet<int>();
@@ -78,11 +78,14 @@ namespace LLEditor.Validation.References
                 }
             }
 
-            foreach (var requirement in rankRequirements)
+            for (var index = 0; index < rankRequirements.Count; index++)
             {
+                var requirement = rankRequirements[index];
+                var rank = index + 1;
+
                 if (requirement == null ||
-                    ranks.Contains(requirement.Rank + 1) is false ||
-                    promotionRanks.Contains(requirement.Rank))
+                    ranks.Contains(rank + 1) is false ||
+                    promotionRanks.Contains(rank))
                 {
                     continue;
                 }
@@ -90,7 +93,7 @@ namespace LLEditor.Validation.References
                 context.Report(
                     ValidationSeverity.Error,
                     PromotionRequiredCode,
-                    $"Rank '{requirement.Rank}' must have a promotion to the next rank.");
+                    $"Rank '{rank}' must have a promotion to the next rank.");
             }
         }
     }
