@@ -1,5 +1,16 @@
 # Project Rules
 
+- Treat `ARCHITECTURE.md` as the source of truth for architecture, file placement, dependency direction, folder
+  vocabulary, and type suffixes. Apply its placement procedure before creating or moving a type.
+- Keep composition code under exactly one of `Assets/_Project/Scripts/Composition/Scopes`, `Installers`, or
+  `Factories`. Scopes define lifetime boundaries, installers implement cohesive `IInstaller` registration modules,
+  and factories construct concrete policies without performing registration.
+- Do not introduce vague architectural folders or names such as `Common`, `Misc`, `Helpers`, `Managers`, `Runtime`,
+  or an unqualified `Data`. If no documented category fits, resolve ownership first and update `ARCHITECTURE.md`
+  when establishing a genuinely new project-wide convention.
+- Keep `ARCHITECTURE.md` consistent when a change introduces a new top-level area, architectural role, dependency
+  direction, or naming convention.
+- Run `tools/Validate-Architecture.ps1` after adding or moving project code; resolve every reported violation.
 - C# (`.cs`) files must end immediately after the final non-empty line, with no trailing newline character (`LF` or `CRLF`) at end of file.
 - Mark every constructor invoked by the DI container with `[Inject]`, even when it is the type's only constructor or a parameterless constructor. Constructors called explicitly with `new` are manual composition and must not be marked with `[Inject]`.
 - DI `Construct` methods must only validate and assign dependencies; do not subscribe, initialize state, update UI, or perform other side effects in them.

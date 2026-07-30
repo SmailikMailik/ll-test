@@ -8,6 +8,8 @@ namespace LL.Game.Promotions
 {
     internal sealed class RankPromotionCatalog
     {
+        internal IReadOnlyList<RankPromotion> Promotions { get; }
+
         private readonly IReadOnlyDictionary<RankId, RankPromotion> _promotionsByRankId;
 
         internal RankPromotionCatalog(IEnumerable<RankPromotion> promotions)
@@ -18,6 +20,7 @@ namespace LL.Game.Promotions
                 promotion => promotion.RankId,
                 nameof(promotions));
 
+            Promotions = Array.AsReadOnly(entries);
             _promotionsByRankId = entries.ToDictionary(promotion => promotion.RankId);
         }
 

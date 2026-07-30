@@ -1,0 +1,19 @@
+{
+    "name": "LL.Tests.PlayMode",
+    "rootNamespace": "LL.Tests.PlayMode",
+    "references": [
+        "GUID:e6ee496562861634486131d5509e68e3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

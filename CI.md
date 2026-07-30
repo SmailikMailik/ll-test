@@ -1,0 +1,48 @@
+# Local CI Commands
+
+The repository exposes provider-independent CI entry points. Run them from the project root with the Unity Editor
+closed. Set `UNITY_EDITOR_PATH` when Unity is not installed in one of the paths detected by `tools/ci/Common.ps1`.
+
+## Validate
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Validate.ps1
+```
+
+Runs structural architecture validation, imports and compiles the Unity project, validates enabled build scenes, and
+runs project-data validation. Logs are written to `artifacts/unity-validation.log`.
+
+## Test
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Test.ps1 -Platform EditMode
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Test.ps1 -Platform PlayMode
+```
+
+Writes NUnit-compatible XML and Unity logs to `artifacts`.
+
+## Build
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Build.ps1 `
+  -Target StandaloneWindows64 `
+  -Output Builds/Windows/LL-Test.exe `
+  -Version 1.0.0 `
+  -BuildNumber 1
+```
+
+Supported default output paths exist for `StandaloneWindows64`, `Android`, and `WebGL`. Other targets must pass an
+explicit output path. Build scenes are read from `EditorBuildSettings`; `Bootstrap` must be the first enabled scene.
+
+## CI environment
+
+The pipeline should publish the complete `artifacts` directory even when a Unity command fails. The following
+environment variables are supported:
+
+- `UNITY_EDITOR_PATH`: full path to the Unity executable.
+- `LL_BUILD_OUTPUT`: player build output path; set by `Build.ps1`.
+- `LL_BUILD_VERSION`: `PlayerSettings.bundleVersion`; set by `Build.ps1`.
+- `LL_BUILD_NUMBER`: positive Android version code; set by `Build.ps1`.
+
+Do not store Unity activation data, signing credentials, or store credentials in the repository. Supply them through
+the selected CI provider's secret storage.

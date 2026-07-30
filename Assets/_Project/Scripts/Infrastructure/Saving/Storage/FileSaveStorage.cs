@@ -6,18 +6,25 @@ namespace LL.Infrastructure.Saving.Storage
 {
     internal sealed class FileSaveStorage : ISaveStorage
     {
-        private const string FileExtension = ".save";
+        private const string DefaultFileExtension = ".save";
 
         private readonly string _directoryPath;
+        private readonly string _fileExtension;
 
         internal FileSaveStorage() : this(Path.Combine(Application.persistentDataPath, "Saves")) { }
 
-        internal FileSaveStorage(string directoryPath)
+        internal FileSaveStorage(string directoryPath) : this(directoryPath, DefaultFileExtension) { }
+
+        internal FileSaveStorage(string directoryPath, string fileExtension)
         {
             if (string.IsNullOrWhiteSpace(directoryPath))
                 throw new ArgumentException("Save directory path cannot be empty", nameof(directoryPath));
 
+            if (string.IsNullOrWhiteSpace(fileExtension) || fileExtension[0] != '.')
+                throw new ArgumentException("File extension must start with a dot.", nameof(fileExtension));
+
             _directoryPath = directoryPath;
+            _fileExtension = fileExtension;
         }
 
         public bool Exists(string key)
@@ -92,7 +99,7 @@ namespace LL.Infrastructure.Saving.Storage
         private string GetFilePath(string key)
         {
             ValidateKey(key);
-            return Path.Combine(_directoryPath, key + FileExtension);
+            return Path.Combine(_directoryPath, key + _fileExtension);
         }
 
         private static void ValidateKey(string key)

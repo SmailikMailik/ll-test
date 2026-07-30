@@ -1,34 +1,27 @@
-using System;
-using LL.Composition.Persistence;
+using LL.Composition.Installers;
 using LL.Game.Cards.Configuration;
 using LL.Game.Payments;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Quests.Configuration;
-using LL.Game.Ranks;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using LL.Game.Rewards.Services;
 using LL.Game.Upgrades;
-using LL.Infrastructure.Loading;
-using LL.Infrastructure.Saving;
 using LL.Infrastructure.Validation;
 using LL.Presentation.Icons.Configuration;
 using LL.Presentation.Localization;
 using LL.UI.Windows;
 using LL.UI.Windows.Configuration;
 using LL.User.Configuration;
-using LL.User.Persistence;
-using LL.User.Snapshots;
-using LL.User.State.Items;
-using LL.User.State.Progress;
-using LL.User.State.Promotions;
 using LL.Validation.Reporting;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 using VContainer;
 using VContainer.Unity;
 
-namespace LL.Composition
+namespace LL.Composition.Scopes
 {
+    [MovedFrom(true, "LL.Composition")]
     [DisallowMultipleComponent]
     internal sealed class ProjectLifetimeScope : LifetimeScope
     {
@@ -53,10 +46,15 @@ namespace LL.Composition
             RegisterWindows(builder);
             RegisterLocalization(builder);
             RegisterValidationReporting(builder);
-            RegisterGameData(builder);
+            new GameDataInstaller(
+                    _rankCatalogConfig,
+                    _cardCatalogConfig,
+                    _questCatalogConfig,
+                    _rankPromotionCatalogConfig,
+                    _rewardCatalogConfig)
+                .Install(builder);
             RegisterPresentation(builder);
-            RegisterUserPersistence(builder);
-            RegisterUserState(builder);
+            new UserInstaller(_userDefaultsConfig).Install(builder);
             RegisterGameServices(builder);
         }
 
@@ -78,41 +76,9 @@ namespace LL.Composition
             builder.Register<UnityConsoleValidationReporter>(Lifetime.Singleton).As<IValidationReporter>();
         }
 
-        private void RegisterGameData(IContainerBuilder builder)
-        {
-            RegisterLoadedData(builder, _rankCatalogConfig);
-            RegisterLoadedData(builder, _cardCatalogConfig);
-            RegisterLoadedData(builder, _questCatalogConfig);
-            RegisterLoadedData(builder, _rankPromotionCatalogConfig);
-            RegisterLoadedData(builder, _rewardCatalogConfig);
-        }
-
         private void RegisterPresentation(IContainerBuilder builder)
         {
-            RegisterLoadedData(builder, _itemIconCatalogConfig);
-        }
-
-        private void RegisterUserPersistence(IContainerBuilder builder)
-        {
-            builder.RegisterInstance<IUserDefaultsProvider>(_userDefaultsConfig);
-            builder.RegisterInstance<ISaveService>(PersistenceComposition.CreateDefaultSaveService());
-            builder.Register<UserSnapshotLoader>(Lifetime.Singleton).As<IDataLoader<UserSnapshot>>();
-
-            RegisterLoadedData<UserSnapshot>(builder);
-            RegisterUserSnapshotPart(builder, snapshot => snapshot.Identity);
-            RegisterUserSnapshotPart(builder, snapshot => snapshot.Items);
-            RegisterUserSnapshotPart(builder, snapshot => snapshot.Progress);
-            RegisterUserSnapshotPart(builder, snapshot => snapshot.PromotionQuest);
-
-            builder.RegisterEntryPoint<UserSaveController>();
-        }
-
-        private static void RegisterUserState(IContainerBuilder builder)
-        {
-            builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
-            builder.Register<UserPromotionQuest>(Lifetime.Singleton).As<IUserPromotionQuest>();
-            builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
-            builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
+            builder.RegisterLoadedData(_itemIconCatalogConfig);
         }
 
         private static void RegisterGameServices(IContainerBuilder builder)
@@ -120,24 +86,6 @@ namespace LL.Composition
             builder.Register<PaymentService>(Lifetime.Singleton).As<IPaymentService>();
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();
-        }
-
-        private static void RegisterLoadedData<TData>(IContainerBuilder builder, IDataLoader<TData> loader)
-        {
-            builder.RegisterInstance(loader);
-            RegisterLoadedData<TData>(builder);
-        }
-
-        private static void RegisterLoadedData<TData>(IContainerBuilder builder)
-        {
-            builder.Register(resolver => resolver.Resolve<IDataLoader<TData>>().Load(), Lifetime.Singleton);
-        }
-
-        private static void RegisterUserSnapshotPart<TData>(
-            IContainerBuilder builder,
-            Func<UserSnapshot, TData> selector)
-        {
-            builder.Register(resolver => selector(resolver.Resolve<UserSnapshot>()), Lifetime.Singleton);
         }
     }
 }

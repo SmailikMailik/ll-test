@@ -1,0 +1,21 @@
+{
+    "name": "LL.Tests.EditMode",
+    "rootNamespace": "LL.Tests.EditMode",
+    "references": [
+        "GUID:97079467a8534dfa976ea5269c68411f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
