@@ -53,9 +53,7 @@ namespace LL.Presentation.Icons.Configuration
         [LabelText("ID")]
         [SerializeField] private string _id;
 
-        [Required]
-        [PreviewField(64, ObjectFieldAlignment.Center)]
-        [SerializeField] private Sprite _icon;
+        [SerializeField, Required, PreviewField(64, ObjectFieldAlignment.Center)] private Sprite _icon;
 
         internal ItemId Id => new(_id);
         internal Sprite Icon => _icon;

@@ -10,8 +10,7 @@ namespace LL.UI.VisualStates.Effects
     [HideMonoScript]
     internal sealed class CanvasGroupAlphaEffect : TweenStateEffect
     {
-        [Required]
-        [SerializeField] private CanvasGroup _target;
+        [SerializeField, Required] private CanvasGroup _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<AlphaStateValue> _states = new();

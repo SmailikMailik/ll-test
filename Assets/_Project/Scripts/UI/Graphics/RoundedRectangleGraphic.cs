@@ -8,13 +8,11 @@ namespace LL.UI.Graphics
     [AddComponentMenu("LL/UI/Graphics/Rounded Rectangle")]
     internal sealed class RoundedRectangleGraphic : MaskableGraphic
     {
-        [Min(0f)]
-        [SerializeField] private float _cornerRadius = 16f;
-        [Range(MinimumCornerSegments, MaximumCornerSegments)]
-        [SerializeField] private int _cornerSegments = 6;
+        [SerializeField, Min(0f)] private float _cornerRadius = 16f;
+        [SerializeField, Range(MinCornerSegments, MaxCornerSegments)] private int _cornerSegments = 6;
 
-        private const int MinimumCornerSegments = 1;
-        private const int MaximumCornerSegments = 16;
+        private const int MinCornerSegments = 1;
+        private const int MaxCornerSegments = 16;
 
         protected override void OnPopulateMesh(VertexHelper vertexHelper)
         {
@@ -41,8 +39,8 @@ namespace LL.UI.Graphics
                 radius,
                 Mathf.Clamp(
                     _cornerSegments,
-                    MinimumCornerSegments,
-                    MaximumCornerSegments));
+                    MinCornerSegments,
+                    MaxCornerSegments));
         }
 
         private void AddRoundedRectangle(
@@ -130,8 +128,8 @@ namespace LL.UI.Graphics
             _cornerRadius = Mathf.Max(0f, _cornerRadius);
             _cornerSegments = Mathf.Clamp(
                 _cornerSegments,
-                MinimumCornerSegments,
-                MaximumCornerSegments);
+                MinCornerSegments,
+                MaxCornerSegments);
             SetVerticesDirty();
         }
 #endif

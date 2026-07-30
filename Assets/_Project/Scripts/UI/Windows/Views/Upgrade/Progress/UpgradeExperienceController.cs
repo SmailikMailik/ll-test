@@ -6,7 +6,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 {
     internal sealed class UpgradeExperienceController
     {
-        private const int MinimumAmount = 0;
+        private const int MinAmount = 0;
 
         internal int RemainingExperience
         {
@@ -18,7 +18,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         }
 
         internal bool CanApplyPendingExperience =>
-            _pendingExperience > MinimumAmount &&
+            _pendingExperience > MinAmount &&
             _userProgress.CanAddExperience(_pendingExperience);
 
         private readonly UpgradeExperienceView _view;
@@ -48,34 +48,34 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         internal void ClearPreview()
         {
-            _pendingExperience = MinimumAmount;
+            _pendingExperience = MinAmount;
             RefreshView();
         }
 
         internal void SetPendingExperience(int amount)
         {
-            if (amount < MinimumAmount)
+            if (amount < MinAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            if (amount > MinimumAmount && _userProgress.CanAddExperience(amount) is false)
+            if (amount > MinAmount && _userProgress.CanAddExperience(amount) is false)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
             _pendingExperience = amount;
             RefreshView();
         }
 
-        internal int GetMaximumApplicableAmount(
+        internal int GetMaxApplicableAmount(
             int experiencePerItem,
             int reservedExperience)
         {
             if (experiencePerItem <= 0)
-                return MinimumAmount;
+                return MinAmount;
 
-            if (reservedExperience < MinimumAmount)
+            if (reservedExperience < MinAmount)
                 throw new ArgumentOutOfRangeException(nameof(reservedExperience));
 
             if (reservedExperience >= RemainingExperience)
-                return MinimumAmount;
+                return MinAmount;
 
             var requiredExperience = RemainingExperience - reservedExperience;
             return (requiredExperience - 1) / experiencePerItem + 1;

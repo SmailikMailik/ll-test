@@ -266,7 +266,7 @@ MonoBehaviour:
   _rankLabel: {fileID: 2233690373681334854}
   _experienceLabel: {fileID: 4271382970874411002}
   _addedExperienceLabel: {fileID: 1815875750463363878}
-  _maximumExperienceMarker: {fileID: 930584259608280456}
+  _maxExperienceMarker: {fileID: 930584259608280456}
 --- !u!1 &930584259608280456
 GameObject:
   m_ObjectHideFlags: 0

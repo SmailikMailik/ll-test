@@ -47,9 +47,7 @@ namespace LL.Game.Ranks.Configuration
     internal sealed class RankEntry
     {
         [SerializeField] private string _id;
-
-        [MinValue(0)]
-        [SerializeField] private int _requiredExperience;
+        [SerializeField, MinValue(0)] private int _requiredExperience;
 
         internal RankId Id => new(_id);
         internal int RequiredExperience => _requiredExperience;

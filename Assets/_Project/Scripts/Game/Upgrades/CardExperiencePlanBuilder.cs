@@ -6,7 +6,7 @@ namespace LL.Game.Upgrades
 {
     internal static class CardExperiencePlanBuilder
     {
-        private const int MinimumAmount = 0;
+        private const int MinAmount = 0;
 
         internal static IReadOnlyList<ItemAmount> Build(
             IReadOnlyList<ExperienceCardOption> cards,
@@ -35,15 +35,15 @@ namespace LL.Game.Upgrades
             if (cards == null)
                 throw new ArgumentNullException(nameof(cards));
 
-            if (requiredExperience <= MinimumAmount)
+            if (requiredExperience <= MinAmount)
                 return false;
 
             var missingExperience = requiredExperience;
 
             foreach (var card in cards)
             {
-                if (card.AvailableAmount <= MinimumAmount ||
-                    card.ExperienceAmount <= MinimumAmount)
+                if (card.AvailableAmount <= MinAmount ||
+                    card.ExperienceAmount <= MinAmount)
                 {
                     continue;
                 }
@@ -65,19 +65,19 @@ namespace LL.Game.Upgrades
             IReadOnlyList<ExperienceCardOption> cards,
             int requiredExperience)
         {
-            var maximumCardExperience = MinimumAmount;
+            var maxCardExperience = MinAmount;
 
             foreach (var card in cards)
             {
-                if (card.AvailableAmount > MinimumAmount)
+                if (card.AvailableAmount > MinAmount)
                 {
-                    maximumCardExperience = Math.Max(
-                        maximumCardExperience,
+                    maxCardExperience = Math.Max(
+                        maxCardExperience,
                         card.ExperienceAmount);
                 }
             }
 
-            var overflowAllowance = maximumCardExperience - 1;
+            var overflowAllowance = maxCardExperience - 1;
 
             return requiredExperience <= int.MaxValue - overflowAllowance
                 ? requiredExperience + overflowAllowance
@@ -87,7 +87,7 @@ namespace LL.Game.Upgrades
         private static Plan[] CreatePlans(int cardTypesCount, int experienceLimit)
         {
             var plans = new Plan[experienceLimit + 1];
-            plans[MinimumAmount] = new Plan(cardTypesCount);
+            plans[MinAmount] = new Plan(cardTypesCount);
 
             return plans;
         }
@@ -98,15 +98,15 @@ namespace LL.Game.Upgrades
             int cardIndex,
             int experienceLimit)
         {
-            if (card.AvailableAmount <= MinimumAmount ||
-                card.ExperienceAmount <= MinimumAmount)
+            if (card.AvailableAmount <= MinAmount ||
+                card.ExperienceAmount <= MinAmount)
             {
                 return;
             }
 
             var plansWithoutCurrentCard = (Plan[])plans.Clone();
 
-            for (var experience = MinimumAmount; experience <= experienceLimit; experience++)
+            for (var experience = MinAmount; experience <= experienceLimit; experience++)
             {
                 var currentPlan = plansWithoutCurrentCard[experience];
 
@@ -132,11 +132,11 @@ namespace LL.Game.Upgrades
             int experienceLimit)
         {
             var availableExperience = experienceLimit - currentExperience;
-            var maximumAmount = Math.Min(
+            var maxAmount = Math.Min(
                 card.AvailableAmount,
                 availableExperience / card.ExperienceAmount);
 
-            for (var amount = 1; amount <= maximumAmount; amount++)
+            for (var amount = 1; amount <= maxAmount; amount++)
             {
                 var targetExperience =
                     currentExperience + amount * card.ExperienceAmount;
@@ -193,7 +193,7 @@ namespace LL.Game.Upgrades
             {
                 var amount = plan.Amounts[index];
 
-                if (amount > MinimumAmount)
+                if (amount > MinAmount)
                     cardAmounts.Add(new ItemAmount(cards[index].Id, amount));
             }
 

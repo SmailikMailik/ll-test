@@ -12,11 +12,11 @@ namespace LL.UI.Windows.Views.Reward
         [SerializeField] private Image _topEdge;
         [SerializeField] private Image[] _feathers;
 
-        [Min(0f)] [SerializeField] private float _baseFadeSeconds = 0.16f;
-        [Min(0f)] [SerializeField] private float _topEdgeDelaySeconds = 0.03f;
-        [Min(0f)] [SerializeField] private float _featherDelaySeconds = 0.035f;
-        [Min(0f)] [SerializeField] private float _featherStartSeconds = 0.08f;
-        [Min(0f)] [SerializeField] private float _unfoldSeconds = 0.3f;
+        [SerializeField, Min(0f)] private float _baseFadeSeconds = 0.16f;
+        [SerializeField, Min(0f)] private float _topEdgeDelaySeconds = 0.03f;
+        [SerializeField, Min(0f)] private float _featherDelaySeconds = 0.035f;
+        [SerializeField, Min(0f)] private float _featherStartSeconds = 0.08f;
+        [SerializeField, Min(0f)] private float _unfoldSeconds = 0.3f;
 
         protected override void BuildSequence(Sequence sequence)
         {

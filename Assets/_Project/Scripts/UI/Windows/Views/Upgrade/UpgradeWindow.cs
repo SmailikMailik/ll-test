@@ -26,7 +26,7 @@ namespace LL.UI.Windows.Views.Upgrade
         [SerializeField] private InteractiveButton _resetButton;
 
         private const int AmountDelta = 1;
-        private const int MinimumAmount = 0;
+        private const int MinAmount = 0;
 
         private IUserProgress _userProgress;
         private ICardExperienceService _cardExperienceService;
@@ -65,7 +65,7 @@ namespace LL.UI.Windows.Views.Upgrade
         protected override void OnHide()
         {
             _cardSelector.ClearPlan();
-            _amountStepper.SetValue(MinimumAmount, MinimumAmount);
+            _amountStepper.SetValue(MinAmount, MinAmount);
             _experienceController.ClearPreview();
         }
 
@@ -85,7 +85,7 @@ namespace LL.UI.Windows.Views.Upgrade
             _cardSelector.Changed.Subscribe(_ => OnCardSelectionChanged()).AddTo(this);
             _amountStepper.ValueChanged.Subscribe(OnPlannedAmountChanged).AddTo(this);
             _useButton.Clicked.Subscribe(_ => ApplyCards()).AddTo(this);
-            _maxButton.Clicked.Subscribe(_ => SetMaximumPlan()).AddTo(this);
+            _maxButton.Clicked.Subscribe(_ => SetMaxPlan()).AddTo(this);
             _resetButton.Clicked.Subscribe(_ => ResetPendingChanges()).AddTo(this);
         }
 
@@ -101,7 +101,7 @@ namespace LL.UI.Windows.Views.Upgrade
             if (_isApplying)
                 return;
 
-            _amountStepper.SetValue(_cardSelector.SelectedPlannedAmount, GetMaximumAmount());
+            _amountStepper.SetValue(_cardSelector.SelectedPlannedAmount, GetMaxAmount());
             _experienceController.SetPendingExperience(_cardSelector.PlannedExperience);
             RefreshActions();
         }
@@ -113,12 +113,12 @@ namespace LL.UI.Windows.Views.Upgrade
             RefreshActions();
         }
 
-        private void SetMaximumPlan()
+        private void SetMaxPlan()
         {
-            if (_cardSelector.PlannedExperience > MinimumAmount)
+            if (_cardSelector.PlannedExperience > MinAmount)
                 return;
 
-            _cardSelector.SetMaximumPlan(_experienceController.RemainingExperience);
+            _cardSelector.SetMaxPlan(_experienceController.RemainingExperience);
         }
 
         private void ApplyCards()
@@ -162,24 +162,24 @@ namespace LL.UI.Windows.Views.Upgrade
                 _upgradeFlow.ReplaceCurrent();
         }
 
-        private int GetMaximumAmount()
+        private int GetMaxAmount()
         {
             if (_cardSelector.HasSelection is false)
-                return MinimumAmount;
+                return MinAmount;
 
             var experiencePerItem = _cardSelector.SelectedCard.ExperienceAmount;
             var selectedExperience = _cardSelector.SelectedPlannedAmount * experiencePerItem;
             var reservedExperience = _cardSelector.PlannedExperience - selectedExperience;
-            var maximumExperienceAmount = _experienceController.GetMaximumApplicableAmount(
+            var maxExperienceAmount = _experienceController.GetMaxApplicableAmount(
                 experiencePerItem,
                 reservedExperience);
 
-            return Math.Min(_cardSelector.SelectedAvailableAmount, maximumExperienceAmount);
+            return Math.Min(_cardSelector.SelectedAvailableAmount, maxExperienceAmount);
         }
 
         private void RefreshActions()
         {
-            var hasPlan = _cardSelector.PlannedExperience > MinimumAmount;
+            var hasPlan = _cardSelector.PlannedExperience > MinAmount;
 
             _maxButton.gameObject.SetActive(hasPlan is false);
             _resetButton.gameObject.SetActive(hasPlan);
@@ -191,7 +191,7 @@ namespace LL.UI.Windows.Views.Upgrade
         }
 
         private bool CanUse() =>
-            _cardSelector.PlannedExperience > MinimumAmount &&
+            _cardSelector.PlannedExperience > MinAmount &&
             _experienceController.CanApplyPendingExperience;
     }
 

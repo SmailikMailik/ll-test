@@ -11,8 +11,7 @@ namespace LL.UI.VisualStates.Effects
     [HideMonoScript]
     internal sealed class ScaleEffect : TweenStateEffect
     {
-        [Required]
-        [SerializeField] private RectTransform _target;
+        [SerializeField, Required] private RectTransform _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<ScaleStateValue> _states = new();

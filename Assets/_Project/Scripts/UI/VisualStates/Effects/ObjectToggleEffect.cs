@@ -10,9 +10,8 @@ namespace LL.UI.VisualStates.Effects
     [HideMonoScript]
     internal sealed class ObjectToggleEffect : VisualStateEffect
     {
-        [Required]
         [ValidateInput(nameof(IsValidTarget), "Target cannot be this GameObject or one of its parents.")]
-        [SerializeField] private GameObject _target;
+        [SerializeField, Required] private GameObject _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<ActiveStateValue> _states = new();

@@ -9,11 +9,11 @@ namespace LL.UI.Windows.Configuration
     [HideMonoScript]
     internal sealed class WindowCatalog : ScriptableObject
     {
-        internal const string CreationPath = "LL/Window Catalog";
-
         [ValidateInput(nameof(HasValidDefinitions), "Assign every prefab and remove duplicate parameter types.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<WindowDefinition> _definitions = new();
+
+        internal const string CreationPath = "LL/Window Catalog";
 
         internal IReadOnlyList<WindowDefinition> Definitions => _definitions;
 
@@ -40,12 +40,11 @@ namespace LL.UI.Windows.Configuration
     [Serializable]
     internal sealed class WindowDefinition
     {
-        [Required]
         [AssetsOnly]
         [HideLabel]
         [PropertyOrder(0)]
         [TableColumnWidth(280)]
-        [SerializeField] private WindowBase _prefab;
+        [SerializeField, Required] private WindowBase _prefab;
 
         [ShowInInspector]
         [DisplayAsString]

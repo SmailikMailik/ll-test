@@ -15,12 +15,12 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
     {
         [SerializeField] private UpgradeCardSlot[] _slots;
 
-        private const int MinimumAmount = 0;
+        private const int MinAmount = 0;
 
         internal bool HasSelection => _selectedView != null;
         internal ICard SelectedCard => _selectedView?.Card;
-        internal int SelectedAvailableAmount => _selectedView?.AvailableAmount ?? MinimumAmount;
-        internal int SelectedPlannedAmount => _selectedView?.PlannedAmount ?? MinimumAmount;
+        internal int SelectedAvailableAmount => _selectedView?.AvailableAmount ?? MinAmount;
+        internal int SelectedPlannedAmount => _selectedView?.PlannedAmount ?? MinAmount;
         internal int PlannedExperience => _slots.Sum(slot => slot.View.PlannedAmount * slot.View.Card.ExperienceAmount);
 
         internal Observable<Unit> Changed => _changed;
@@ -91,7 +91,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
                 requiredExperience);
         }
 
-        internal void SetMaximumPlan(int requiredExperience)
+        internal void SetMaxPlan(int requiredExperience)
         {
             var cards = CreateExperienceOptions();
             var plan = CardExperiencePlanBuilder.Build(cards, requiredExperience);
@@ -113,7 +113,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
             foreach (var slot in _slots)
             {
-                if (slot.View.PlannedAmount > MinimumAmount)
+                if (slot.View.PlannedAmount > MinAmount)
                     plannedCards.Add(new ItemAmount(slot.Id, slot.View.PlannedAmount));
             }
 
@@ -123,7 +123,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         internal void ClearPlan()
         {
             foreach (var slot in _slots)
-                slot.View.SetPlannedAmount(MinimumAmount);
+                slot.View.SetPlannedAmount(MinAmount);
         }
 
         private ExperienceCardOption[] CreateExperienceOptions()
@@ -138,7 +138,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         private void Select(UpgradeCardView card)
         {
-            if (card.AvailableAmount <= MinimumAmount)
+            if (card.AvailableAmount <= MinAmount)
                 return;
 
             foreach (var slot in _slots)
@@ -156,7 +156,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             if (card != _selectedView)
                 return;
 
-            if (card.AvailableAmount <= MinimumAmount)
+            if (card.AvailableAmount <= MinAmount)
             {
                 card.SetSelected(false);
                 _selectedView = null;

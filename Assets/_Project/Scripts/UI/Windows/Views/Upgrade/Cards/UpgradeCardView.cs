@@ -26,7 +26,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
         [SerializeField] private InteractiveButton _addButton;
 
         private const int AddAmount = 1;
-        private const int MinimumAmount = 0;
+        private const int MinAmount = 0;
 
         internal ICard Card { get; private set; }
 
@@ -69,7 +69,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
             _isInitialized = true;
 
             Card = card;
-            PlannedAmount = MinimumAmount;
+            PlannedAmount = MinAmount;
             _iconImage.sprite = icon;
 
             SetSelected(false);
@@ -80,7 +80,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         public void OnPointerClick(PointerEventData _)
         {
-            if (AvailableAmount > MinimumAmount)
+            if (AvailableAmount > MinAmount)
                 _clicked.OnNext(Unit.Default);
         }
 
@@ -92,7 +92,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         internal void SetPlannedAmount(int amount)
         {
-            PlannedAmount = Math.Clamp(amount, MinimumAmount, AvailableAmount);
+            PlannedAmount = Math.Clamp(amount, MinAmount, AvailableAmount);
             _progressLabel.text = TextFormatter.Progress(PlannedAmount, AvailableAmount);
         }
 
@@ -103,7 +103,7 @@ namespace LL.UI.Windows.Views.Upgrade.Cards
 
         private void UpdateProgress(int availableAmount)
         {
-            AvailableAmount = Math.Max(MinimumAmount, availableAmount);
+            AvailableAmount = Math.Max(MinAmount, availableAmount);
             SetPlannedAmount(PlannedAmount);
             _addButton.SetInteractable(AvailableAmount < int.MaxValue);
             _availableAmountChanged.OnNext(AvailableAmount);

@@ -10,8 +10,7 @@ namespace LL.UI.VisualStates.Effects
 {
     internal abstract class VisualStateEffect : MonoBehaviour
     {
-        [Required]
-        [SerializeField] private VisualStateSource _source;
+        [SerializeField, Required] private VisualStateSource _source;
 
         private bool _isStarted;
 

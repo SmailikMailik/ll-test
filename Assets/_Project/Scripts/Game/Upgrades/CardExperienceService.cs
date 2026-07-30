@@ -16,7 +16,7 @@ namespace LL.Game.Upgrades
 
     internal sealed class CardExperienceService : ICardExperienceService
     {
-        private const int MinimumAmount = 0;
+        private const int MinAmount = 0;
 
         private readonly IUserItems _userItems;
         private readonly IUserProgress _userProgress;
@@ -70,7 +70,7 @@ namespace LL.Game.Upgrades
 
             var appliedExperience = _userProgress.GetApplicableExperience(grantedExperience);
 
-            if (appliedExperience <= MinimumAmount)
+            if (appliedExperience <= MinAmount)
                 return false;
 
             application = new ExperienceApplication(grantedExperience, appliedExperience);
@@ -79,30 +79,30 @@ namespace LL.Game.Upgrades
 
         private bool TryCalculateExperience(IReadOnlyList<ItemAmount> cards, out int experience)
         {
-            experience = MinimumAmount;
+            experience = MinAmount;
 
-            if (cards == null || cards.Count == MinimumAmount)
+            if (cards == null || cards.Count == MinAmount)
                 return false;
 
             foreach (var cardAmount in cards)
             {
-                if (cardAmount.Amount <= MinimumAmount ||
+                if (cardAmount.Amount <= MinAmount ||
                     _cardCatalog.TryGetCard(cardAmount.Id, out var card) is false ||
-                    card.ExperienceAmount <= MinimumAmount)
+                    card.ExperienceAmount <= MinAmount)
                 {
                     return false;
                 }
 
                 var availableExperience = int.MaxValue - experience;
-                var maximumAmount = availableExperience / card.ExperienceAmount;
+                var maxAmount = availableExperience / card.ExperienceAmount;
 
-                if (cardAmount.Amount > maximumAmount)
+                if (cardAmount.Amount > maxAmount)
                     return false;
 
                 experience += cardAmount.Amount * card.ExperienceAmount;
             }
 
-            return experience > MinimumAmount;
+            return experience > MinAmount;
         }
 
         private void RestoreCards(IEnumerable<ItemAmount> cards)

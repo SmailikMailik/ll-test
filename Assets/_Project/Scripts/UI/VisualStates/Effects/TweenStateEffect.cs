@@ -7,8 +7,7 @@ namespace LL.UI.VisualStates.Effects
     internal abstract class TweenStateEffect : VisualStateEffect
     {
         [PropertyOrder(100)]
-        [MinValue(0f)]
-        [SerializeField] private float _transitionSeconds = 0.08f;
+        [SerializeField, MinValue(0f)] private float _transitionSeconds = 0.08f;
 
         [PropertyOrder(101)]
         [SerializeField] private Ease _ease = Ease.OutQuad;

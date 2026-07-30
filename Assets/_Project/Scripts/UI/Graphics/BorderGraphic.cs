@@ -29,7 +29,7 @@ namespace LL.UI.Graphics
 
             var thickness = Mathf.Min(
                 Mathf.Max(0f, _thickness),
-                GetMaximumThickness(rect));
+                GetMaxThickness(rect));
 
             if (thickness <= 0f)
                 return;
@@ -64,14 +64,14 @@ namespace LL.UI.Graphics
             vertexHelper.AddQuad(0, 4, 7, 3);
         }
 
-        private float GetMaximumThickness(Rect rect)
+        private float GetMaxThickness(Rect rect)
         {
-            var minimumSize = Mathf.Min(rect.width, rect.height);
+            var minSize = Mathf.Min(rect.width, rect.height);
 
             return _alignment switch
             {
-                BorderAlignment.Inside => minimumSize * 0.5f,
-                BorderAlignment.Center => minimumSize,
+                BorderAlignment.Inside => minSize * 0.5f,
+                BorderAlignment.Center => minSize,
                 _ => float.MaxValue
             };
         }

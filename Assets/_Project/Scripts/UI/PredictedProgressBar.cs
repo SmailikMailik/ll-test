@@ -12,15 +12,15 @@ namespace LL.UI
         [SerializeField] private RectTransform _currentCap;
         [SerializeField] private RectTransform _predictGlow;
 
-        private const float MinimumVisibleProgress = 0.0001f;
+        private const float MinVisibleProgress = 0.0001f;
 
         internal void SetProgress(float currentProgress, float predictedProgress)
         {
             currentProgress = Mathf.Clamp01(currentProgress);
             predictedProgress = Mathf.Clamp(predictedProgress, currentProgress, 1f);
 
-            var hasCurrentProgress = currentProgress > MinimumVisibleProgress;
-            var hasPrediction = predictedProgress - currentProgress > MinimumVisibleProgress;
+            var hasCurrentProgress = currentProgress > MinVisibleProgress;
+            var hasPrediction = predictedProgress - currentProgress > MinVisibleProgress;
 
             _currentProgressRect.gameObject.SetActive(hasCurrentProgress);
             _currentProgressRect.SetRange(0f, currentProgress);

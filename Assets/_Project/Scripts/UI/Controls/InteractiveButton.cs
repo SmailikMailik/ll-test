@@ -16,8 +16,7 @@ namespace LL.UI.Controls
         IPointerUpHandler,
         IPointerExitHandler
     {
-        [Required]
-        [SerializeField] private InteractiveStateSource _stateSource;
+        [SerializeField, Required] private InteractiveStateSource _stateSource;
 
         internal Observable<Unit> Clicked => _clicked;
 

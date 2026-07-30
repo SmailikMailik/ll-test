@@ -39,8 +39,8 @@ namespace LL.UI.Graphics
             var rect = GetPixelAdjustedRect();
             var resolution = Mathf.Clamp(_resolution, 1, 32);
             var direction = GetDirection();
-            var minimumProjection = GetMinimumProjection(rect, direction);
-            var maximumProjection = GetMaximumProjection(rect, direction);
+            var minProjection = GetMinProjection(rect, direction);
+            var maxProjection = GetMaxProjection(rect, direction);
             var center = rect.center;
             var radius = rect.size * 0.5f;
 
@@ -57,8 +57,8 @@ namespace LL.UI.Graphics
                     var gradientPosition = GetGradientPosition(
                         position,
                         direction,
-                        minimumProjection,
-                        maximumProjection,
+                        minProjection,
+                        maxProjection,
                         center,
                         radius);
                     var gradientColor = _gradient.Evaluate(gradientPosition);
@@ -137,8 +137,8 @@ namespace LL.UI.Graphics
 
             var rect = GetPixelAdjustedRect();
             var direction = GetDirection();
-            var minimumProjection = GetMinimumProjection(rect, direction);
-            var maximumProjection = GetMaximumProjection(rect, direction);
+            var minProjection = GetMinProjection(rect, direction);
+            var maxProjection = GetMaxProjection(rect, direction);
             var center = rect.center;
             var radius = rect.size * 0.5f;
             var pixels = new Color32[textureSize * textureSize];
@@ -156,8 +156,8 @@ namespace LL.UI.Graphics
                     var gradientPosition = GetGradientPosition(
                         position,
                         direction,
-                        minimumProjection,
-                        maximumProjection,
+                        minProjection,
+                        maxProjection,
                         center,
                         radius);
                     var alpha = _gradient.Evaluate(gradientPosition).a;
@@ -187,15 +187,15 @@ namespace LL.UI.Graphics
         private float GetGradientPosition(
             Vector2 position,
             Vector2 direction,
-            float minimumProjection,
-            float maximumProjection,
+            float minProjection,
+            float maxProjection,
             Vector2 center,
             Vector2 radius)
         {
             return _type switch
             {
                 GradientType.Radial => GetRadialGradientPosition(position, center, radius),
-                _ => Mathf.InverseLerp(minimumProjection, maximumProjection, Vector2.Dot(position, direction))
+                _ => Mathf.InverseLerp(minProjection, maxProjection, Vector2.Dot(position, direction))
             };
         }
 
@@ -217,28 +217,28 @@ namespace LL.UI.Graphics
             return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
         }
 
-        private static float GetMinimumProjection(Rect rect, Vector2 direction)
+        private static float GetMinProjection(Rect rect, Vector2 direction)
         {
-            var leftMinimum = Mathf.Min(
+            var leftMin = Mathf.Min(
                 Vector2.Dot(new Vector2(rect.xMin, rect.yMin), direction),
                 Vector2.Dot(new Vector2(rect.xMin, rect.yMax), direction));
-            var rightMinimum = Mathf.Min(
+            var rightMin = Mathf.Min(
                 Vector2.Dot(new Vector2(rect.xMax, rect.yMin), direction),
                 Vector2.Dot(new Vector2(rect.xMax, rect.yMax), direction));
 
-            return Mathf.Min(leftMinimum, rightMinimum);
+            return Mathf.Min(leftMin, rightMin);
         }
 
-        private static float GetMaximumProjection(Rect rect, Vector2 direction)
+        private static float GetMaxProjection(Rect rect, Vector2 direction)
         {
-            var leftMaximum = Mathf.Max(
+            var leftMax = Mathf.Max(
                 Vector2.Dot(new Vector2(rect.xMin, rect.yMin), direction),
                 Vector2.Dot(new Vector2(rect.xMin, rect.yMax), direction));
-            var rightMaximum = Mathf.Max(
+            var rightMax = Mathf.Max(
                 Vector2.Dot(new Vector2(rect.xMax, rect.yMin), direction),
                 Vector2.Dot(new Vector2(rect.xMax, rect.yMax), direction));
 
-            return Mathf.Max(leftMaximum, rightMaximum);
+            return Mathf.Max(leftMax, rightMax);
         }
 
         private static Gradient CreateDefaultGradient()

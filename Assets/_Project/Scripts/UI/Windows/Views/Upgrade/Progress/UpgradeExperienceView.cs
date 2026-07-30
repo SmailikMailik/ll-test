@@ -13,7 +13,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         [SerializeField] private TMP_Text _rankLabel;
         [SerializeField] private TMP_Text _experienceLabel;
         [SerializeField] private TMP_Text _addedExperienceLabel;
-        [SerializeField] private GameObject _maximumExperienceMarker;
+        [SerializeField] private GameObject _maxExperienceMarker;
 
         internal void Show(RankProgress progress, int currentExperience, int addedExperience)
         {
@@ -21,7 +21,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
             if (progress.HasNextRank is false)
             {
-                ShowMaximumRank(progress, currentExperience);
+                ShowMaxRank(progress, currentExperience);
                 return;
             }
 
@@ -34,11 +34,11 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
             ShowPreviewProgress(progress, currentExperience, addedExperience);
         }
 
-        private void ShowMaximumRank(RankProgress progress, int currentExperience)
+        private void ShowMaxRank(RankProgress progress, int currentExperience)
         {
             _experienceLabel.text = TextFormatter.Number(currentExperience);
             _addedExperienceLabel.text = string.Empty;
-            _maximumExperienceMarker.SetActive(true);
+            _maxExperienceMarker.SetActive(true);
             SetBarProgress(progress, currentExperience);
         }
 
@@ -46,7 +46,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         {
             _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.RequiredExperience);
             _addedExperienceLabel.text = string.Empty;
-            _maximumExperienceMarker.SetActive(currentExperience >= progress.RequiredExperience);
+            _maxExperienceMarker.SetActive(currentExperience >= progress.RequiredExperience);
             SetBarProgress(progress, currentExperience);
         }
 
@@ -56,7 +56,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
             _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.RequiredExperience);
             _addedExperienceLabel.text = $"+ {TextFormatter.Number(addedExperience)}";
-            _maximumExperienceMarker.SetActive(previewExperience >= progress.RequiredExperience);
+            _maxExperienceMarker.SetActive(previewExperience >= progress.RequiredExperience);
             SetBarProgress(progress, currentExperience, previewExperience);
         }
 

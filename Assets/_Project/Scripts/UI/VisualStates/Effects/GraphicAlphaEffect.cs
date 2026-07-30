@@ -12,8 +12,7 @@ namespace LL.UI.VisualStates.Effects
     [HideMonoScript]
     internal sealed class GraphicAlphaEffect : TweenStateEffect
     {
-        [Required]
-        [SerializeField] private Graphic _target;
+        [SerializeField, Required] private Graphic _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<AlphaStateValue> _states = new();

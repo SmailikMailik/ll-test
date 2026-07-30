@@ -17,14 +17,14 @@ namespace LL.UI.Controls
 
         [SerializeField] private TMP_Text _valueLabel;
 
-        private const int Minimum = 0;
+        private const int Min = 0;
 
         internal Observable<int> ValueChanged => _valueChanged;
 
         private readonly Subject<int> _valueChanged = new();
 
         private int _value;
-        private int _maximum;
+        private int _max;
         private int _delta;
 
         private bool _isInitialized;
@@ -48,18 +48,18 @@ namespace LL.UI.Controls
             Refresh();
         }
 
-        internal void SetValue(int value, int maximum)
+        internal void SetValue(int value, int max)
         {
-            var nextMaximum = Math.Max(Minimum, maximum);
-            var nextValue = Math.Clamp(value, Minimum, nextMaximum);
+            var nextMax = Math.Max(Min, max);
+            var nextValue = Math.Clamp(value, Min, nextMax);
 
-            if (_value == nextValue && _maximum == nextMaximum)
+            if (_value == nextValue && _max == nextMax)
                 return;
 
             var valueChanged = _value != nextValue;
 
             _value = nextValue;
-            _maximum = nextMaximum;
+            _max = nextMax;
 
             Refresh();
 
@@ -81,7 +81,7 @@ namespace LL.UI.Controls
         private void ChangeValue(int delta)
         {
             if (CanChangeValue(delta))
-                SetValue(_value + delta, _maximum);
+                SetValue(_value + delta, _max);
         }
 
         private void Refresh()
@@ -93,8 +93,8 @@ namespace LL.UI.Controls
 
         private bool CanChangeValue(int delta) => delta switch
         {
-            > 0 => _value <= _maximum - delta,
-            < 0 => _value >= Minimum - delta,
+            > 0 => _value <= _max - delta,
+            < 0 => _value >= Min - delta,
             _ => false
         };
     }
