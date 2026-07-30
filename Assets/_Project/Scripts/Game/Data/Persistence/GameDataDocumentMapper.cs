@@ -46,7 +46,7 @@ namespace LL.Game.Data.Persistence
                                 new ItemAmount(new ItemId(item.Id), item.Amount))))));
         }
 
-        private static RankPromotion ToRankPromotion(RankPromotionData promotion)
+        private static RankPromotion ToRankPromotion(RankPromotionDocumentEntry promotion)
         {
             if (promotion == null)
                 throw new ArgumentException("Rank promotion data cannot contain null entries.");
@@ -63,7 +63,7 @@ namespace LL.Game.Data.Persistence
                 new RewardId(promotion.RewardId));
         }
 
-        private static Payment ToPayment(PaymentData payment)
+        private static Payment ToPayment(PaymentDocumentEntry payment)
         {
             if (payment == null)
                 throw new ArgumentNullException(nameof(payment));

@@ -170,6 +170,7 @@ Use the most specific applicable suffix:
 - `Factory`: constructs a concrete object graph without registering it or retaining its runtime ownership.
 - `Config`: root authoring object, normally a `ScriptableObject`.
 - `Entry`: one serialized authoring row nested under a configuration.
+- `DocumentEntry`: one serialized transport row nested under a `Document`.
 - `Definition`: immutable domain description used by game rules.
 - `Catalog`: immutable indexed collection of definitions or resources.
 - `Snapshot`: immutable, internally consistent point-in-time aggregate.

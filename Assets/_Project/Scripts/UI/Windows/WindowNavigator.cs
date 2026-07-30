@@ -5,12 +5,12 @@ using VContainer;
 
 namespace LL.UI.Windows
 {
-    internal readonly struct WindowHistoryEntry
+    internal readonly struct WindowHistoryItem
     {
         internal WindowBase Window { get; }
         internal IWindowParameters Parameters { get; }
 
-        internal WindowHistoryEntry(WindowBase window, IWindowParameters parameters)
+        internal WindowHistoryItem(WindowBase window, IWindowParameters parameters)
         {
             Window = window;
             Parameters = parameters;
@@ -33,10 +33,10 @@ namespace LL.UI.Windows
             }
         }
 
-        private readonly Stack<WindowHistoryEntry> _history = new();
+        private readonly Stack<WindowHistoryItem> _history = new();
         private readonly HashSet<WindowBase> _knownWindows = new();
 
-        private readonly List<WindowHistoryEntry> _visibleEntries = new();
+        private readonly List<WindowHistoryItem> _visibleEntries = new();
         private readonly HashSet<WindowBase> _visibleWindows = new();
 
         [Inject]
@@ -64,7 +64,7 @@ namespace LL.UI.Windows
         {
             var replacedEntry = _history.Count > 0
                 ? _history.Pop()
-                : (WindowHistoryEntry?)null;
+                : (WindowHistoryItem?)null;
 
             Push(window, parameters);
 
@@ -115,7 +115,7 @@ namespace LL.UI.Windows
             TParameter parameters)
             where TParameter : class, IWindowParameters
         {
-            _history.Push(new WindowHistoryEntry(window, parameters));
+            _history.Push(new WindowHistoryItem(window, parameters));
             _knownWindows.Add(window);
         }
 

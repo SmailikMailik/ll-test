@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c5d2092be75c448fafc6decad19b93f9, type: 3}
-  m_Name: WindowCatalog
+  m_Name: WindowCatalogConfig
   m_EditorClassIdentifier: 
-  _definitions:
+  _entries:
   - _prefab: {fileID: 8980530091766475065, guid: 8ad01bf50e0090048b1fe091e3147f25, type: 3}
     _popup: 1
   - _prefab: {fileID: 1935193051742944739, guid: 01b6b5c7be2c9c541b679466617a2da1, type: 3}

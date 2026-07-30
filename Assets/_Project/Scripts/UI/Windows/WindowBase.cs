@@ -1,5 +1,4 @@
 using System;
-using LL.UI.Windows.Configuration;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -63,7 +62,10 @@ namespace LL.UI.Windows
 
         internal void Initialize(WindowDefinition definition)
         {
-            Definition = definition;
+            if (Definition != null)
+                throw new InvalidOperationException($"{nameof(WindowBase)} is already initialized.");
+
+            Definition = definition ?? throw new ArgumentNullException(nameof(definition));
         }
 
         internal abstract void Show(IWindowParameters parameters);

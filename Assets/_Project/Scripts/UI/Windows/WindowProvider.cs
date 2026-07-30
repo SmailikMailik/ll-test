@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using LL.UI.Windows.Configuration;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -10,7 +9,6 @@ namespace LL.UI.Windows
     internal sealed class WindowProvider
     {
         private readonly Dictionary<Type, WindowBase> _windows = new();
-        private readonly Dictionary<Type, WindowDefinition> _definitions = new();
 
         private readonly WindowCatalog _catalog;
         private readonly IObjectResolver _resolver;
@@ -18,10 +16,8 @@ namespace LL.UI.Windows
         [Inject]
         internal WindowProvider(WindowCatalog catalog, IObjectResolver resolver)
         {
-            _catalog = catalog;
-            _resolver = resolver;
-
-            BuildDefinitions();
+            _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
         }
 
         internal bool TryGetOrCreate<TParameter>(Transform parent, out Window<TParameter> window)
@@ -30,19 +26,17 @@ namespace LL.UI.Windows
             window = null;
             var parameterType = typeof(TParameter);
 
-            if (_definitions.TryGetValue(parameterType, out var definition) is false)
+            if (_catalog.TryGetDefinition(parameterType, out var definition) is false)
             {
                 Debug.LogError(
-                    $"[WindowProvider::TryGet] Window for {parameterType.Name} is not configured",
-                    _catalog);
+                    $"[WindowProvider::TryGetOrCreate] Window for {parameterType.Name} is not configured");
                 return false;
             }
 
             if (definition.Prefab is not Window<TParameter> typedPrefab)
             {
                 Debug.LogError(
-                    $"[WindowProvider::TryGet] Prefab for {parameterType.Name} has an invalid type",
-                    _catalog);
+                    $"[WindowProvider::TryGetOrCreate] Prefab for {parameterType.Name} has an invalid type");
                 return false;
             }
 
@@ -55,7 +49,7 @@ namespace LL.UI.Windows
                 }
 
                 Debug.LogError(
-                    $"[WindowProvider::TryGet] Cached window for {parameterType.Name} has an invalid type",
+                    $"[WindowProvider::TryGetOrCreate] Cached window for {parameterType.Name} has an invalid type",
                     cachedWindow);
                 return false;
             }
@@ -67,33 +61,6 @@ namespace LL.UI.Windows
             _windows[parameterType] = window;
 
             return true;
-        }
-
-        private void BuildDefinitions()
-        {
-            foreach (var definition in _catalog.Definitions)
-            {
-                if (definition?.Prefab == null)
-                {
-                    Debug.LogError(
-                        "[WindowProvider::BuildDefinitions] Window prefab is not assigned",
-                        _catalog);
-                    continue;
-                }
-
-                var parameterType = definition.Prefab.ParameterType;
-
-                if (_definitions.ContainsKey(parameterType))
-                {
-                    Debug.LogError(
-                        $"[WindowProvider::BuildDefinitions] Multiple windows use " +
-                        $"{parameterType.Name}",
-                        _catalog);
-                    continue;
-                }
-
-                _definitions.Add(parameterType, definition);
-            }
         }
     }
 }

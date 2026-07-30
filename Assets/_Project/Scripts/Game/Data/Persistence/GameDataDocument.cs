@@ -7,60 +7,60 @@ namespace LL.Game.Data.Persistence
         internal const int CurrentVersion = 1;
 
         public int Version { get; }
-        public RankData[] Ranks { get; }
-        public CardData[] Cards { get; }
-        public QuestData[] Quests { get; }
-        public RankPromotionData[] RankPromotions { get; }
-        public RewardData[] Rewards { get; }
+        public RankDocumentEntry[] Ranks { get; }
+        public CardDocumentEntry[] Cards { get; }
+        public QuestDocumentEntry[] Quests { get; }
+        public RankPromotionDocumentEntry[] RankPromotions { get; }
+        public RewardDocumentEntry[] Rewards { get; }
 
         public GameDataDocument(
             int version,
-            RankData[] ranks,
-            CardData[] cards,
-            QuestData[] quests,
-            RankPromotionData[] rankPromotions,
-            RewardData[] rewards)
+            RankDocumentEntry[] ranks,
+            CardDocumentEntry[] cards,
+            QuestDocumentEntry[] quests,
+            RankPromotionDocumentEntry[] rankPromotions,
+            RewardDocumentEntry[] rewards)
         {
             Version = version;
-            Ranks = ranks ?? Array.Empty<RankData>();
-            Cards = cards ?? Array.Empty<CardData>();
-            Quests = quests ?? Array.Empty<QuestData>();
-            RankPromotions = rankPromotions ?? Array.Empty<RankPromotionData>();
-            Rewards = rewards ?? Array.Empty<RewardData>();
+            Ranks = ranks ?? Array.Empty<RankDocumentEntry>();
+            Cards = cards ?? Array.Empty<CardDocumentEntry>();
+            Quests = quests ?? Array.Empty<QuestDocumentEntry>();
+            RankPromotions = rankPromotions ?? Array.Empty<RankPromotionDocumentEntry>();
+            Rewards = rewards ?? Array.Empty<RewardDocumentEntry>();
         }
     }
 
-    internal sealed class RankData
+    internal sealed class RankDocumentEntry
     {
         public string Id { get; }
         public int RequiredExperience { get; }
 
-        public RankData(string id, int requiredExperience)
+        public RankDocumentEntry(string id, int requiredExperience)
         {
             Id = id;
             RequiredExperience = requiredExperience;
         }
     }
 
-    internal sealed class CardData
+    internal sealed class CardDocumentEntry
     {
         public string Id { get; }
         public int ExperienceAmount { get; }
 
-        public CardData(string id, int experienceAmount)
+        public CardDocumentEntry(string id, int experienceAmount)
         {
             Id = id;
             ExperienceAmount = experienceAmount;
         }
     }
 
-    internal sealed class QuestData
+    internal sealed class QuestDocumentEntry
     {
         public string Id { get; }
         public string TitleLocalizationKey { get; }
         public string DescriptionLocalizationKey { get; }
 
-        public QuestData(
+        public QuestDocumentEntry(
             string id,
             string titleLocalizationKey,
             string descriptionLocalizationKey)
@@ -71,25 +71,25 @@ namespace LL.Game.Data.Persistence
         }
     }
 
-    internal sealed class RankPromotionData
+    internal sealed class RankPromotionDocumentEntry
     {
         public string RankId { get; }
         public string QuestId { get; }
         public string HeroLocalizationKey { get; }
         public int RequiredAmount { get; }
         public int DurationMinutes { get; }
-        public PaymentData QuestPayment { get; }
-        public PaymentData InstantPayment { get; }
+        public PaymentDocumentEntry QuestPayment { get; }
+        public PaymentDocumentEntry InstantPayment { get; }
         public string RewardId { get; }
 
-        public RankPromotionData(
+        public RankPromotionDocumentEntry(
             string rankId,
             string questId,
             string heroLocalizationKey,
             int requiredAmount,
             int durationMinutes,
-            PaymentData questPayment,
-            PaymentData instantPayment,
+            PaymentDocumentEntry questPayment,
+            PaymentDocumentEntry instantPayment,
             string rewardId)
         {
             RankId = rankId;
@@ -103,36 +103,36 @@ namespace LL.Game.Data.Persistence
         }
     }
 
-    internal sealed class PaymentData
+    internal sealed class PaymentDocumentEntry
     {
         public string ItemId { get; }
         public int Amount { get; }
 
-        public PaymentData(string itemId, int amount)
+        public PaymentDocumentEntry(string itemId, int amount)
         {
             ItemId = itemId;
             Amount = amount;
         }
     }
 
-    internal sealed class RewardData
+    internal sealed class RewardDocumentEntry
     {
         public string Id { get; }
-        public ItemAmountData[] Items { get; }
+        public ItemAmountDocumentEntry[] Items { get; }
 
-        public RewardData(string id, ItemAmountData[] items)
+        public RewardDocumentEntry(string id, ItemAmountDocumentEntry[] items)
         {
             Id = id;
-            Items = items ?? Array.Empty<ItemAmountData>();
+            Items = items ?? Array.Empty<ItemAmountDocumentEntry>();
         }
     }
 
-    internal sealed class ItemAmountData
+    internal sealed class ItemAmountDocumentEntry
     {
         public string Id { get; }
         public int Amount { get; }
 
-        public ItemAmountData(string id, int amount)
+        public ItemAmountDocumentEntry(string id, int amount)
         {
             Id = id;
             Amount = amount;

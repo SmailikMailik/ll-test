@@ -8,16 +8,16 @@ namespace LL.Composition.Installers
 {
     internal sealed class WindowInstaller : IInstaller
     {
-        private readonly WindowCatalog _windowCatalog;
+        private readonly WindowCatalogConfig _windowCatalogConfig;
 
-        internal WindowInstaller(WindowCatalog windowCatalog)
+        internal WindowInstaller(WindowCatalogConfig windowCatalogConfig)
         {
-            _windowCatalog = windowCatalog ?? throw new ArgumentNullException(nameof(windowCatalog));
+            _windowCatalogConfig = windowCatalogConfig ?? throw new ArgumentNullException(nameof(windowCatalogConfig));
         }
 
         public void Install(IContainerBuilder builder)
         {
-            builder.RegisterInstance(_windowCatalog);
+            builder.RegisterLoadedData(_windowCatalogConfig);
             builder.Register<WindowProvider>(Lifetime.Scoped);
             builder.Register<WindowNavigator>(Lifetime.Scoped);
         }

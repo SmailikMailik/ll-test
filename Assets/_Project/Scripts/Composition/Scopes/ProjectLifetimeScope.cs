@@ -25,7 +25,7 @@ namespace LL.Composition.Scopes
     internal sealed class ProjectLifetimeScope : LifetimeScope
     {
         [Header("Windows")]
-        [SerializeField] private WindowCatalog _windowCatalog;
+        [SerializeField] private WindowCatalogConfig _windowCatalogConfig;
 
         [Header("Game Data")]
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
@@ -42,7 +42,7 @@ namespace LL.Composition.Scopes
 
         protected override void Configure(IContainerBuilder builder)
         {
-            new WindowInstaller(_windowCatalog).Install(builder);
+            new WindowInstaller(_windowCatalogConfig).Install(builder);
             RegisterLocalization(builder);
             RegisterValidationReporting(builder);
             new GameDataInstaller(
