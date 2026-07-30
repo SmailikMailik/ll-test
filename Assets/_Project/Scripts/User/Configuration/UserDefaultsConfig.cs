@@ -12,7 +12,7 @@ namespace LL.User.Configuration
 {
     [CreateAssetMenu(fileName = nameof(UserDefaultsConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsProvider, IValidationSource
+    internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsFactory, IValidationSource
     {
         [BoxGroup("Identity")]
         [HideLabel]
@@ -29,17 +29,15 @@ namespace LL.User.Configuration
 
         internal const string CreationPath = "LL/User/User Defaults Config";
 
-        private static readonly IDataValidator<IReadOnlyList<ItemAmountEntry>> _itemsValidator =
-            new UserItemsDefaultsValidator();
+        private static readonly IDataValidator<IReadOnlyList<ItemAmountEntry>> _itemsValidator = new UserItemsDefaultsValidator();
 
-        private static readonly IDataValidator<UserDefaultsConfig> _validator =
-            new UserDefaultsConfigValidator(_itemsValidator);
+        private static readonly IDataValidator<UserDefaultsConfig> _validator = new UserDefaultsConfigValidator(_itemsValidator);
 
         internal UserIdentityDefaults Identity => _identity;
         internal UserProgressDefaults Progress => _progress;
         internal IReadOnlyList<ItemAmountEntry> Items => _items;
 
-        UserSnapshot IUserDefaultsProvider.GetDefaultSnapshot()
+        UserSnapshot IUserDefaultsFactory.CreateSnapshot()
         {
             ValidationRunner.EnsureValid(this);
 

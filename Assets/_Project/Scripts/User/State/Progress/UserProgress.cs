@@ -15,9 +15,11 @@ namespace LL.User.State.Progress
 
         public Observable<RankId> RankChanged => _rankChanged;
         public Observable<int> ExperienceChanged => _experienceChanged;
+        public Observable<Unit> Changed => _changed;
 
         private readonly Subject<RankId> _rankChanged = new();
         private readonly Subject<int> _experienceChanged = new();
+        private readonly Subject<Unit> _changed = new();
         private readonly IRankProgression _rankProgression;
 
         [Inject]
@@ -48,6 +50,8 @@ namespace LL.User.State.Progress
 
         public bool CanAddExperience(int amount) => GetApplicableExperience(amount) > 0;
 
+        public UserProgressSnapshot CreateSnapshot() => new(RankId, Experience);
+
         public bool TryAddExperience(int amount)
         {
             var appliedExperience = GetApplicableExperience(amount);
@@ -57,6 +61,7 @@ namespace LL.User.State.Progress
 
             Experience += appliedExperience;
             _experienceChanged.OnNext(Experience);
+            _changed.OnNext(Unit.Default);
 
             return true;
         }
@@ -75,6 +80,7 @@ namespace LL.User.State.Progress
 
             _rankChanged.OnNext(RankId);
             _experienceChanged.OnNext(Experience);
+            _changed.OnNext(Unit.Default);
 
             return true;
         }
@@ -83,6 +89,7 @@ namespace LL.User.State.Progress
         {
             _rankChanged.Dispose();
             _experienceChanged.Dispose();
+            _changed.Dispose();
         }
     }
 }

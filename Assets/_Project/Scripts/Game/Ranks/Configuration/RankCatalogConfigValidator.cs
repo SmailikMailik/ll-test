@@ -29,8 +29,7 @@ namespace LL.Game.Ranks.Configuration
                     continue;
 
                 var rankContext = context.At(index);
-                var experienceContext = rankContext.At(
-                    nameof(RankEntry.RequiredExperience));
+                var experienceContext = rankContext.At(nameof(RankEntry.RequiredExperience));
 
                 if (index == 0)
                 {

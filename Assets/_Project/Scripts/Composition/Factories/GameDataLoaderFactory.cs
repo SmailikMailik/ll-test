@@ -1,12 +1,7 @@
 using System;
-using LL.Game.Cards;
 using LL.Game.Data;
-using LL.Game.Data.Persistence;
+using LL.Game.Data.Configuration;
 using LL.Game.Data.Sources;
-using LL.Game.Promotions;
-using LL.Game.Quests;
-using LL.Game.Ranks;
-using LL.Game.Rewards;
 using LL.Infrastructure.Loading;
 using LL.Infrastructure.Saving;
 using LL.Infrastructure.Saving.Serialization;
@@ -16,19 +11,11 @@ namespace LL.Composition.Factories
 {
     internal static class GameDataLoaderFactory
     {
-        internal static IDataLoader<GameDataSnapshot> CreateFromScriptableObjects(
-            IDataLoader<RankCatalog> ranksLoader,
-            IDataLoader<CardCatalog> cardsLoader,
-            IDataLoader<QuestCatalog> questsLoader,
-            IDataLoader<RankPromotionCatalog> rankPromotionsLoader,
-            IDataLoader<RewardCatalog> rewardsLoader)
+        internal static IDataLoader<GameDataSnapshot> CreateFromScriptableObjects(GameDataManifestConfig manifest)
         {
-            return new ScriptableObjectGameDataLoader(
-                ranksLoader,
-                cardsLoader,
-                questsLoader,
-                rankPromotionsLoader,
-                rewardsLoader);
+            return new GameDataLoader(
+                new ScriptableObjectGameDataSource(manifest),
+                new GameDataCompiler());
         }
 
         internal static IDataLoader<GameDataSnapshot> CreateFromJsonFile(string directoryPath)
@@ -49,7 +36,9 @@ namespace LL.Composition.Factories
             var serializer = new JsonSaveSerializer();
             var saveService = new SaveService(serializer, storage);
 
-            return new SerializedGameDataLoader(saveService);
+            return new GameDataLoader(
+                new SerializedGameDataSource(saveService),
+                new GameDataCompiler());
         }
     }
 }

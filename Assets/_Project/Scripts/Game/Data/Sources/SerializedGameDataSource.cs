@@ -1,21 +1,21 @@
 using System;
-using LL.Infrastructure.Loading;
+using LL.Game.Data.Persistence;
 using LL.Infrastructure.Saving;
 
-namespace LL.Game.Data.Persistence
+namespace LL.Game.Data.Sources
 {
-    internal sealed class SerializedGameDataLoader : IDataLoader<GameDataSnapshot>
+    internal sealed class SerializedGameDataSource : IGameDataSource
     {
         internal const string DataKey = "game-data";
 
         private readonly ISaveService _saveService;
 
-        internal SerializedGameDataLoader(ISaveService saveService)
+        internal SerializedGameDataSource(ISaveService saveService)
         {
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
         }
 
-        public GameDataSnapshot Load()
+        public GameDataDeclaration Read()
         {
             if (_saveService.TryLoad<GameDataDocument>(DataKey, out var document) is false)
                 throw new InvalidOperationException($"Game data '{DataKey}' could not be loaded.");
@@ -27,7 +27,7 @@ namespace LL.Game.Data.Persistence
                     $"Expected {GameDataDocument.CurrentVersion}.");
             }
 
-            return GameDataDocumentMapper.ToSnapshot(document);
+            return GameDataDocumentMapper.ToDeclaration(document);
         }
     }
 }

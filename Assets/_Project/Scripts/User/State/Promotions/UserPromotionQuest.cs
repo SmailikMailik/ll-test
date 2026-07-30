@@ -46,6 +46,14 @@ namespace LL.User.State.Promotions
             return TimeSpan.FromMilliseconds(Math.Max(0L, remainingMilliseconds));
         }
 
+        public UserPromotionQuestSnapshot CreateSnapshot()
+        {
+            return new UserPromotionQuestSnapshot(
+                QuestId,
+                DeadlineUnixMilliseconds,
+                IsCompleted);
+        }
+
         public bool TryStart(QuestId questId, TimeSpan duration)
         {
             if (string.IsNullOrWhiteSpace(questId.Value) ||

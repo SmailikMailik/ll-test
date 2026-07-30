@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using LL.Game.Items;
-using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -10,27 +8,16 @@ using UnityEngine;
 namespace LL.Game.Rewards.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RewardCatalogConfig), menuName = CreationPath)]
-    internal sealed class RewardCatalogConfig :
-        ScriptableObject,
-        IDataLoader<RewardCatalog>,
-        IValidationSource
+    internal sealed class RewardCatalogConfig : ScriptableObject, IValidationSource
     {
         [ValidateInput(nameof(HasValidRewards), "Reward data is invalid.")]
         [SerializeField] private RewardEntry[] _rewards;
 
         internal const string CreationPath = "LL/Game Data/Reward Catalog";
 
-        private static readonly IDataValidator<RewardEntry[]> _validator =
-            new RewardCatalogConfigValidator();
+        private static readonly IDataValidator<RewardEntry[]> _validator = new RewardCatalogConfigValidator();
 
         internal IReadOnlyList<RewardEntry> Rewards => _rewards;
-
-        public RewardCatalog Load()
-        {
-            ValidationRunner.EnsureValid(this, nameof(_rewards));
-
-            return new RewardCatalog(_rewards.Select(entry => entry.ToReward()));
-        }
 
         private static bool HasValidRewards(RewardEntry[] rewards)
         {
@@ -52,9 +39,6 @@ namespace LL.Game.Rewards.Configuration
 
         internal RewardId Id => new(_id);
         internal IReadOnlyList<RewardItemEntry> Items => _items;
-
-        internal Reward ToReward() =>
-            new(Id, Items.Select(item => item.ToItemAmount()));
     }
 
     [Serializable]
@@ -65,7 +49,5 @@ namespace LL.Game.Rewards.Configuration
 
         internal ItemId Id => new(_id);
         internal int Amount => _amount;
-
-        internal ItemAmount ToItemAmount() => new(Id, Amount);
     }
 }

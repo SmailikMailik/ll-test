@@ -21,8 +21,7 @@ namespace LL.UI.Windows.Configuration
 
         internal const string CreationPath = "LL/Window Catalog";
 
-        private static readonly IDataValidator<IReadOnlyList<WindowEntry>> _validator =
-            new WindowCatalogConfigValidator();
+        private static readonly IDataValidator<IReadOnlyList<WindowEntry>> _validator = new WindowCatalogConfigValidator();
 
         internal IReadOnlyList<WindowEntry> Entries => _entries;
 

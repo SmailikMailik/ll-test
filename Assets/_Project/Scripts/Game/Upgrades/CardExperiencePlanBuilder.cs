@@ -48,14 +48,12 @@ namespace LL.Game.Upgrades
                     continue;
                 }
 
-                var requiredAmount =
-                    (missingExperience - 1) / card.ExperienceAmount + 1;
+                var requiredAmount = (missingExperience - 1) / card.ExperienceAmount + 1;
 
                 if (card.AvailableAmount >= requiredAmount)
                     return true;
 
-                missingExperience -=
-                    card.AvailableAmount * card.ExperienceAmount;
+                missingExperience -= card.AvailableAmount * card.ExperienceAmount;
             }
 
             return false;
@@ -138,8 +136,7 @@ namespace LL.Game.Upgrades
 
             for (var amount = 1; amount <= maxAmount; amount++)
             {
-                var targetExperience =
-                    currentExperience + amount * card.ExperienceAmount;
+                var targetExperience = currentExperience + amount * card.ExperienceAmount;
                 TryStoreBetterPlan(
                     plans,
                     targetExperience,

@@ -28,15 +28,13 @@ namespace LL.UI.Windows
 
             if (_catalog.TryGetDefinition(parameterType, out var definition) is false)
             {
-                Debug.LogError(
-                    $"[WindowProvider::TryGetOrCreate] Window for {parameterType.Name} is not configured");
+                Debug.LogError($"[WindowProvider::TryGetOrCreate] Window for {parameterType.Name} is not configured");
                 return false;
             }
 
             if (definition.Prefab is not Window<TParameter> typedPrefab)
             {
-                Debug.LogError(
-                    $"[WindowProvider::TryGetOrCreate] Prefab for {parameterType.Name} has an invalid type");
+                Debug.LogError($"[WindowProvider::TryGetOrCreate] Prefab for {parameterType.Name} has an invalid type");
                 return false;
             }
 

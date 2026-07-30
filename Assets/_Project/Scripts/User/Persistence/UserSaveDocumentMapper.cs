@@ -3,14 +3,14 @@ using System.Linq;
 using LL.Game.Items;
 using LL.Game.Quests;
 using LL.Game.Ranks;
-using LL.User.Persistence.SaveData;
+using LL.User.Persistence.Documents;
 using LL.User.Snapshots;
 
 namespace LL.User.Persistence
 {
-    internal static class UserSaveDataMapper
+    internal static class UserSaveDocumentMapper
     {
-        internal static UserSnapshot ToSnapshot(UserSaveData saveData)
+        internal static UserSnapshot ToSnapshot(UserSaveDocument saveData)
         {
             if (saveData == null)
                 throw new ArgumentNullException(nameof(saveData));
@@ -29,23 +29,23 @@ namespace LL.User.Persistence
                     saveData.PromotionQuest.IsCompleted));
         }
 
-        internal static UserSaveData ToSaveData(UserSnapshot snapshot)
+        internal static UserSaveDocument ToDocument(UserSnapshot snapshot)
         {
             if (snapshot == null)
                 throw new ArgumentNullException(nameof(snapshot));
 
-            return new UserSaveData(
-                UserSaveData.CurrentVersion,
-                new UserIdentitySaveData(snapshot.Identity.UserId, snapshot.Identity.RegionCode),
-                new UserProgressSaveData(
+            return new UserSaveDocument(
+                UserSaveDocument.CurrentVersion,
+                new UserIdentityDocumentEntry(snapshot.Identity.UserId, snapshot.Identity.RegionCode),
+                new UserProgressDocumentEntry(
                     snapshot.Progress.RankId.Value,
                     snapshot.Progress.Experience),
-                new UserPromotionQuestSaveData(
+                new UserPromotionQuestDocumentEntry(
                     snapshot.PromotionQuest.QuestId.Value,
                     snapshot.PromotionQuest.DeadlineUnixMilliseconds,
                     snapshot.PromotionQuest.IsCompleted),
                 snapshot.Items.Amounts
-                    .Select(item => new ItemAmountSaveData(item.Id.Value, item.Amount))
+                    .Select(item => new ItemAmountDocumentEntry(item.Id.Value, item.Amount))
                     .ToArray());
         }
     }

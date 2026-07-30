@@ -1,5 +1,4 @@
 using LL.Composition.Factories;
-using LL.User.Persistence;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,10 +9,9 @@ namespace LLEditor.Menu
         [MenuItem(LastLevelMenu.DeleteSavedUserDataPath, false, LastLevelMenu.DeleteSavedUserDataPriority)]
         private static void DeleteSavedUserData()
         {
-            const string saveKey = UserSnapshotLoader.SaveKey;
-            var saveService = UserSaveServiceFactory.CreateJsonFile();
+            var repository = UserSaveRepositoryFactory.CreateJsonFile();
 
-            if (saveService.Exists(saveKey) is false)
+            if (repository.Exists() is false)
             {
                 Debug.Log("Saved user data was not found.");
                 return;
@@ -28,7 +26,7 @@ namespace LLEditor.Menu
             if (confirmed is false)
                 return;
 
-            if (saveService.TryDelete(saveKey))
+            if (repository.Delete())
                 Debug.Log("Saved user data was deleted.");
         }
 

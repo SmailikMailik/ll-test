@@ -22,8 +22,7 @@ namespace LL.Presentation.Icons.Configuration
 
         internal const string CreationPath = "LL/Presentation/Item Icon Catalog";
 
-        private static readonly IDataValidator<ItemIconEntry[]> _validator =
-            new ItemIconCatalogConfigValidator();
+        private static readonly IDataValidator<ItemIconEntry[]> _validator = new ItemIconCatalogConfigValidator();
 
         internal IReadOnlyList<ItemIconEntry> Icons => _icons;
 

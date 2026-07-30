@@ -385,12 +385,12 @@ def render_composition(pdf: canvas.Canvas, page_number: int) -> None:
         "Factories",
         [
             "«factory» GameDataLoaderFactory",
-            "  → ScriptableObjectGameDataLoader",
-            "  → SerializedGameDataLoader",
-            "«factory» UserSaveServiceFactory",
+            "  → ScriptableObjectGameDataSource",
+            "  → SerializedGameDataSource",
+            "«factory» UserSaveRepositoryFactory",
             "  → JsonSaveSerializer",
             "  → FileSaveStorage",
-            "  → SaveService",
+            "  → SerializedUserSaveRepository",
         ],
         colors.HexColor("#F4F0FF"),
         8,
@@ -422,9 +422,10 @@ def render_flows(pdf: canvas.Canvas, page_number: int) -> None:
         (
             "Game reference data",
             [
-                ("Config assets", "IDataLoader<Catalog>"),
-                ("IDataLoader<Catalog>", "ScriptableObjectGameDataLoader"),
-                ("ScriptableObjectGameDataLoader", "GameDataSnapshot"),
+                ("GameDataManifestConfig", "ScriptableObjectGameDataSource"),
+                ("ScriptableObjectGameDataSource", "GameDataDeclaration"),
+                ("GameDataDeclaration", "GameDataCompiler"),
+                ("GameDataCompiler", "GameDataSnapshot"),
                 ("GameDataSnapshot", "Catalog registrations"),
             ],
             620,
@@ -434,10 +435,11 @@ def render_flows(pdf: canvas.Canvas, page_number: int) -> None:
             "Serialized game data",
             [
                 ("ISaveStorage", "ISaveService"),
-                ("ISaveService", "SerializedGameDataLoader"),
-                ("SerializedGameDataLoader", "GameDataDocument"),
-                ("GameDataDocument", "GameDataDocumentMapper"),
-                ("GameDataDocumentMapper", "GameDataSnapshot"),
+                ("ISaveService", "SerializedGameDataSource"),
+                ("SerializedGameDataSource", "GameDataDocument"),
+                ("GameDataDocument", "GameDataDeclaration"),
+                ("GameDataDeclaration", "GameDataCompiler"),
+                ("GameDataCompiler", "GameDataSnapshot"),
             ],
             420,
             AREA_COLORS["Infrastructure"],
@@ -445,11 +447,11 @@ def render_flows(pdf: canvas.Canvas, page_number: int) -> None:
         (
             "User load / live state / save",
             [
-                ("Defaults or UserSaveData", "UserSnapshotLoader"),
-                ("UserSnapshotLoader", "UserSnapshot"),
-                ("UserSnapshot", "User State"),
-                ("User State", "UserSaveController"),
-                ("UserSaveController", "ISaveService"),
+                ("DefaultsFactory / Repository", "UserSessionLoader"),
+                ("UserSessionLoader", "UserSnapshot"),
+                ("UserSnapshot", "UserState"),
+                ("UserState", "UserSaveCoordinator"),
+                ("UserSaveCoordinator", "IUserSaveRepository"),
             ],
             220,
             AREA_COLORS["User"],
@@ -460,7 +462,7 @@ def render_flows(pdf: canvas.Canvas, page_number: int) -> None:
         pdf.setFillColor(colors.HexColor("#263238"))
         pdf.drawString(70, y + 105, title)
         node_count = len(links) + 1
-        node_w = 190 if node_count <= 5 else 165
+        node_w = 190 if node_count <= 5 else 165 if node_count <= 6 else 140
         gap = (PAGE_WIDTH - 140 - node_count * node_w) / max(1, node_count - 1)
         names = [links[0][0]] + [target for _, target in links]
         for index, name in enumerate(names):

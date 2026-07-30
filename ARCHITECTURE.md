@@ -124,7 +124,8 @@ and use-case services.
 Owns user-specific defaults, persisted user representation, immutable loaded snapshots, and live mutable user state.
 
 - `Configuration` owns authored defaults and their validation.
-- `Persistence` owns user save/load orchestration, save DTO mapping, and version handling.
+- `Persistence` owns the user repository, session loading and save coordination, document mapping, and version
+  handling.
 - `Snapshots` owns immutable point-in-time user data.
 - `State` owns long-lived mutable runtime state, grouped by capability.
 - `User` may depend on stable `Game` value objects and definitions.
@@ -201,9 +202,10 @@ Use these names only with the stated meaning:
 
 - `Configuration`: Unity-authored or otherwise author-authored input for one owning capability.
 - `Persistence`: durable/external serialized representation, version handling, mapping, and save/load orchestration.
+- `Documents`: versioned external serialized contracts owned by a `Persistence` boundary.
 - `Snapshots`: immutable point-in-time representation composed at a loading boundary.
 - `State`: live mutable runtime state.
-- `Sources`: source-specific adapters that obtain and construct a model directly.
+- `Sources`: source-specific adapters that read external or authored data into a source-neutral declaration.
 - `Serialization`: object-to-byte or object-to-text format conversion.
 - `Storage`: raw byte or text access to a medium, addressed without domain knowledge.
 - `Services`: cohesive domain or application operations with no more specific feature role.
@@ -230,15 +232,19 @@ Use the most specific applicable suffix:
 - `Installer`: cohesive VContainer registration module implementing `IInstaller`.
 - `Factory`: constructs a concrete object graph without registering it or retaining its runtime ownership.
 - `Config`: root authoring object, normally a `ScriptableObject`.
+- `ManifestConfig`: root authoring object that references every configuration required to build one aggregate.
 - `Entry`: one serialized authoring row nested under a configuration.
 - `DocumentEntry`: one serialized transport row nested under a `Document`.
+- `Declaration`: normalized, source-neutral, not-yet-trusted data prepared for compilation into runtime meaning.
 - `Definition`: immutable domain description used by game rules.
 - `Catalog`: immutable indexed collection of definitions or resources.
 - `Snapshot`: immutable, internally consistent point-in-time aggregate.
-- `Document`: versioned top-level serialized representation of reference or master data.
-- `SaveData`: serialized persisted user-state DTO or one of its owned parts.
+- `Document`: versioned external serialized contract, including both reference data and persisted user state.
+- `Compiler`: validates and resolves an aggregate `Declaration`, then constructs its immutable runtime snapshot.
 - `Mapper`: pure conversion between representations; it performs no I/O and owns no state.
 - `Loader`: performs one load operation and returns a fully constructed result.
+- `Repository`: loads and saves one semantic aggregate without exposing serialization or storage technology.
+- `Coordinator`: owns the lifecycle and side effects of a continuing process but contains no domain rules.
 - `Storage`: reads and writes raw bytes or text to one storage technology.
 - `Serializer`: converts between an object representation and bytes or text.
 - `Provider`: provides access to an already available resource or a stable creation policy without exposing storage
@@ -266,15 +272,21 @@ Event callbacks use the `On...` prefix; `Handle...` remains reserved for non-eve
 Keep the following representations separate:
 
 1. `Config` and `Entry` types optimize authoring and Unity serialization.
-2. `Document` and `SaveData` types define stable external serialization contracts and versions.
-3. `Snapshot`, `Definition`, and `Catalog` types express immutable runtime meaning and enforce invariants.
-4. `State` types represent mutable runtime behavior.
+2. `Document` and `DocumentEntry` types define stable external serialization contracts and versions.
+3. `Declaration` types normalize every source into one source-neutral shape without asserting runtime validity.
+4. `Compiler` types validate declarations, resolve references, and construct runtime meaning.
+5. `Snapshot`, `Definition`, and `Catalog` types express immutable, already-valid runtime meaning.
+6. `State` types represent mutable runtime behavior and can produce an aggregate snapshot.
 
-Loaders and mappers cross these boundaries. Domain and state code must not read JSON, files, PlayerPrefs, or
-`ScriptableObject` fields directly.
+Sources and repositories own I/O. Mappers only convert representations. Compilers own aggregate validation and
+reference resolution. Domain and state code must not read JSON, files, PlayerPrefs, or `ScriptableObject` fields
+directly.
 
-A whole-data load should produce one aggregate snapshot and register that snapshot once. Consumers receive the
-snapshot or its owned parts, never the concrete source adapter.
+For game and user domain data, use `IDataLoader<T>` only for an application-level aggregate snapshot such as
+`GameDataSnapshot` or `UserSnapshot`. Do not implement it on individual domain catalog configs or other partial
+domain data. A whole-data load registers one aggregate snapshot once; consumers receive the snapshot or its owned
+parts, never a concrete source, repository, or compiler. Presentation and UI resource catalogs may retain focused
+loaders because they are independently owned runtime resources rather than partial domain aggregates.
 
 ## Authored asset placement
 
@@ -323,29 +335,44 @@ scope. Scene scopes inherit project registrations through the configured parent 
 ### Game reference data
 
 ```text
-Config assets -> capability IDataLoader<Catalog>
-              -> ScriptableObjectGameDataLoader
-              -> GameDataSnapshot
-              -> catalog snapshot parts registered once
+GameDataManifestConfig -> ScriptableObjectGameDataSource
+                       -> GameDataDeclaration
+                       -> GameDataCompiler
+                       -> GameDataSnapshot
+                       -> immutable catalog parts registered once
 ```
 
 The alternative serialized path is:
 
 ```text
-ISaveStorage -> ISaveService -> SerializedGameDataLoader
-             -> GameDataDocument -> GameDataDocumentMapper -> GameDataSnapshot
+ISaveStorage -> ISaveService -> SerializedGameDataSource
+             -> GameDataDocument -> GameDataDocumentMapper
+             -> GameDataDeclaration -> GameDataCompiler -> GameDataSnapshot
 ```
+
+Both sources end at the same declaration. A source may check transport shape and document version, but only the
+compiler validates aggregate identifiers and references or creates domain definitions and catalogs.
 
 ### User state
 
 ```text
-UserDefaultsConfig or saved UserSaveData
-    -> UserSnapshotLoader -> UserSnapshot
-    -> UserItems / UserProgress / UserPromotionQuest
-    -> UserSaveController -> UserSaveDataMapper -> ISaveService
+IUserDefaultsFactory -----\
+                          -> UserSessionLoader -> UserSnapshot -> UserState
+IUserSaveRepository ------/
+
+UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
+                                         -> UserSaveDocumentMapper
+                                         -> UserSaveDocument
 ```
 
-Snapshots are immutable load-boundary values. State objects are the only long-lived mutable representation.
+The defaults factory creates a fresh valid snapshot. The repository owns the persisted user document and reports a
+semantic load result; it does not decide whether defaults should replace missing, corrupt, or unsupported data.
+`UserSessionLoader` owns that startup policy. `UserState` is the single mutable aggregate, emits one change
+notification per successful logical mutation, and creates the complete snapshot saved by `UserSaveCoordinator`.
+
+Snapshots are immutable load-boundary values. State objects are the only long-lived mutable representation. Current
+user documents start at version `1`; future version changes require explicit migration rather than compatibility
+logic inside the repository or mapper.
 
 ### UI navigation and flows
 
@@ -421,8 +448,10 @@ that semantically owns it or introduce a small contract at the consumer-facing b
   `[SerializeField, ...]` list.
 - Empty bodies are inline as `{ }`. Treat 120 characters as the point at which line wrapping deserves an explicit
   readability decision: lines from 121 through 140 characters may remain intact when the single-line form is clearer,
-  and should be wrapped when the split reads better. The hard limit is 140 characters. A C# file ends immediately
-  after its final non-empty line without a trailing CR or LF.
+  and should be wrapped when the split reads better. Keep simple assignments and expressions on one line when they
+  fit within 120 characters; never break immediately after an assignment operator merely to shorten the line. Keep a
+  simple invocation with one expression or lambda argument on one line under the same condition. The hard limit is
+  140 characters. A C# file ends immediately after its final non-empty line without a trailing CR or LF.
 
 ## Changing the architecture
 

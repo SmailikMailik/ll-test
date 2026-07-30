@@ -14,8 +14,7 @@ namespace LLEditor.Validation
 
             if (result.IsValid is false)
             {
-                throw new BuildFailedException(
-                    $"Project data validation failed with {result.ErrorCount} errors.");
+                throw new BuildFailedException($"Project data validation failed with {result.ErrorCount} errors.");
             }
         }
     }

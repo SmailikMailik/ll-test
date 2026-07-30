@@ -38,8 +38,7 @@ namespace LLEditor.CI
 
                 if (report.summary.result != BuildResult.Succeeded)
                 {
-                    throw new BuildFailedException(
-                        $"Player build failed with result {report.summary.result}.");
+                    throw new BuildFailedException($"Player build failed with result {report.summary.result}.");
                 }
 
                 Debug.Log(

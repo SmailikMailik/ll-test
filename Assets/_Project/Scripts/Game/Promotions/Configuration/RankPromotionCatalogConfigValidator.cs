@@ -10,8 +10,7 @@ namespace LL.Game.Promotions.Configuration
         private const string HeroKeyCode = "rank-promotion.quest.hero.not-empty";
         private const string RequiredAmountCode = "rank-promotion.quest.amount.positive";
         private const string DurationCode = "rank-promotion.quest.duration.positive";
-        private static readonly IDataValidator<PaymentEntry> _paymentValidator =
-            new PaymentEntryValidator();
+        private static readonly IDataValidator<PaymentEntry> _paymentValidator = new PaymentEntryValidator();
 
         public void Validate(
             RankPromotionEntry[] promotions,

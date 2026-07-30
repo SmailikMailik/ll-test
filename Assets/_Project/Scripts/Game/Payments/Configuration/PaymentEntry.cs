@@ -13,7 +13,5 @@ namespace LL.Game.Payments.Configuration
 
         internal ItemId ItemId => new(_itemId);
         internal int Amount => _amount;
-
-        internal Payment ToPayment() => new(ItemId, Amount);
     }
 }

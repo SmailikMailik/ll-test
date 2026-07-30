@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using LL.Game.Payments.Configuration;
 using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
-using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,27 +11,16 @@ using UnityEngine;
 namespace LL.Game.Promotions.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankPromotionCatalogConfig), menuName = CreationPath)]
-    internal sealed class RankPromotionCatalogConfig :
-        ScriptableObject,
-        IDataLoader<RankPromotionCatalog>,
-        IValidationSource
+    internal sealed class RankPromotionCatalogConfig : ScriptableObject, IValidationSource
     {
         [ValidateInput(nameof(HasValidPromotions), "Rank promotion data is invalid.")]
         [SerializeField] private RankPromotionEntry[] _promotions;
 
         internal const string CreationPath = "LL/Game Data/Rank Promotion Catalog";
 
-        private static readonly IDataValidator<RankPromotionEntry[]> _validator =
-            new RankPromotionCatalogConfigValidator();
+        private static readonly IDataValidator<RankPromotionEntry[]> _validator = new RankPromotionCatalogConfigValidator();
 
         internal IReadOnlyList<RankPromotionEntry> Promotions => _promotions;
-
-        public RankPromotionCatalog Load()
-        {
-            ValidationRunner.EnsureValid(this, nameof(_promotions));
-
-            return new RankPromotionCatalog(_promotions.Select(entry => entry.ToPromotion()));
-        }
 
         private static bool HasValidPromotions(RankPromotionEntry[] promotions)
         {
@@ -68,19 +55,5 @@ namespace LL.Game.Promotions.Configuration
         internal PaymentEntry QuestPayment => _questPayment;
         internal PaymentEntry InstantPayment => _instantPayment;
         internal RewardId RewardId => new(_rewardId);
-
-        internal RankPromotion ToPromotion()
-        {
-            return new RankPromotion(
-                RankId,
-                new RankPromotionQuest(
-                    QuestId,
-                    HeroLocalizationKey,
-                    RequiredAmount,
-                    TimeSpan.FromMinutes(DurationMinutes),
-                    QuestPayment.ToPayment()),
-                InstantPayment.ToPayment(),
-                RewardId);
-        }
     }
 }

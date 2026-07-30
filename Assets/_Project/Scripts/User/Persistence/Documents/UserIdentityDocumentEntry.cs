@@ -1,11 +1,11 @@
-namespace LL.User.Persistence.SaveData
+namespace LL.User.Persistence.Documents
 {
-    internal sealed class UserIdentitySaveData
+    internal sealed class UserIdentityDocumentEntry
     {
         public string UserId { get; }
         public string RegionCode { get; }
 
-        public UserIdentitySaveData(string userId, string regionCode)
+        public UserIdentityDocumentEntry(string userId, string regionCode)
         {
             UserId = userId;
             RegionCode = regionCode;

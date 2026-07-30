@@ -10,7 +10,10 @@ namespace LL.User.State.Items
 {
     internal sealed class UserItems : IUserItems, IDisposable
     {
+        public Observable<Unit> Changed => _changed;
+
         private readonly IReadOnlyDictionary<ItemId, ReactiveProperty<int>> _amounts;
+        private readonly Subject<Unit> _changed = new();
 
         [Inject]
         internal UserItems(UserItemsSnapshot snapshot)
@@ -29,6 +32,11 @@ namespace LL.User.State.Items
                 throw new KeyNotFoundException($"Unknown item ID: {id}");
 
             return amount;
+        }
+
+        public UserItemsSnapshot CreateSnapshot()
+        {
+            return new UserItemsSnapshot(_amounts.Select(pair => new ItemAmount(pair.Key, pair.Value.Value)));
         }
 
         public bool CanAdd(ItemId id, int amount)
@@ -60,6 +68,7 @@ namespace LL.User.State.Items
 
             TryGetAmount(id, out var currentAmount);
             currentAmount.Value += amount;
+            _changed.OnNext(Unit.Default);
             return true;
         }
 
@@ -70,6 +79,7 @@ namespace LL.User.State.Items
 
             TryGetAmount(id, out var currentAmount);
             currentAmount.Value -= amount;
+            _changed.OnNext(Unit.Default);
             return true;
         }
 
@@ -77,6 +87,8 @@ namespace LL.User.State.Items
         {
             foreach (var amount in _amounts.Values)
                 amount.Dispose();
+
+            _changed.Dispose();
         }
 
         private bool TryGetAmount(ItemId id, out ReactiveProperty<int> amount)

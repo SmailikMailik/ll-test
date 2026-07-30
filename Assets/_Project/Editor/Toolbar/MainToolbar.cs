@@ -12,8 +12,7 @@ namespace LLEditor.Toolbar
         private const string PlayModeZoneName = "ToolbarZonePlayMode";
 
         private static readonly Type _toolbarType = typeof(Editor).Assembly.GetType("UnityEditor.Toolbar");
-        private static readonly FieldInfo _rootField =
-            _toolbarType?.GetField("m_Root", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly FieldInfo _rootField = _toolbarType?.GetField("m_Root", BindingFlags.Instance | BindingFlags.NonPublic);
 
         internal static bool TryAttachToPlayModeZone(VisualElement element)
         {

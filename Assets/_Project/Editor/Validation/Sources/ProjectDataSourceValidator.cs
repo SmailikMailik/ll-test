@@ -1,5 +1,6 @@
 using System;
 using LL.Game.Cards.Configuration;
+using LL.Game.Data.Configuration;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
@@ -18,6 +19,7 @@ namespace LLEditor.Validation.Sources
 
         private static readonly Type[] _requiredSourceTypes =
         {
+            typeof(GameDataManifestConfig),
             typeof(CardCatalogConfig),
             typeof(QuestCatalogConfig),
             typeof(RankCatalogConfig),

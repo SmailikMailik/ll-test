@@ -36,6 +36,10 @@
   configurations under `Presentation`. Use `Presentation/Configuration` only for presentation-specific data.
 - Treat 120 characters as a readability review threshold, not a mandatory wrap point. For lines from 121 through
   140 characters, keep the line intact when that is clearer and wrap it when the split improves readability. Never
-  exceed the hard limit of 140 characters.
+  exceed the hard limit of 140 characters. Keep simple assignments and expressions on one line when they fit within
+  120 characters; in particular, do not break immediately after an assignment operator unless the multiline form
+  materially clarifies the expression. Apply the same rule to a simple invocation with a single expression or lambda
+  argument: do not leave the opening parenthesis at the end of one line and the entire argument on the next when the
+  invocation fits within 120 characters.
 - When generating code, prioritize readability and clear separation of responsibilities. Reuse existing code wherever possible, and introduce abstractions when they make repeated use simpler without adding unnecessary complexity.
 - When asked for a commit message, output only a concise English imperative phrase as plain text: start with a capital letter and do not use quotation marks, backticks, explanations, conventional prefixes such as `feat:` or `refactor:`, or a trailing period.

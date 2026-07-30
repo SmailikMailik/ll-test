@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,28 +7,16 @@ using UnityEngine;
 namespace LL.Game.Ranks.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankCatalogConfig), menuName = CreationPath)]
-    internal sealed class RankCatalogConfig :
-        ScriptableObject,
-        IDataLoader<RankCatalog>,
-        IValidationSource
+    internal sealed class RankCatalogConfig : ScriptableObject, IValidationSource
     {
         [ValidateInput(nameof(HasValidRanks), "Rank catalog data is invalid.")]
         [SerializeField] private RankEntry[] _ranks;
 
         internal const string CreationPath = "LL/Game Data/Rank Catalog";
 
-        private static readonly IDataValidator<RankEntry[]> _validator =
-            new RankCatalogConfigValidator();
+        private static readonly IDataValidator<RankEntry[]> _validator = new RankCatalogConfigValidator();
 
         internal IReadOnlyList<RankEntry> Ranks => _ranks;
-
-        public RankCatalog Load()
-        {
-            ValidationRunner.EnsureValid(this, nameof(_ranks));
-
-            return new RankCatalog(
-                _ranks.Select((entry, index) => entry.ToRank(index + 1)));
-        }
 
         private static bool HasValidRanks(RankEntry[] ranks)
         {
@@ -51,7 +37,5 @@ namespace LL.Game.Ranks.Configuration
 
         internal RankId Id => new(_id);
         internal int RequiredExperience => _requiredExperience;
-
-        internal RankDefinition ToRank(int number) => new(Id, number, RequiredExperience);
     }
 }

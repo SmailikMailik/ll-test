@@ -230,6 +230,32 @@ function Test-DiRegistrations {
     }
 }
 
+function Test-DomainDataLoaders {
+    foreach ($file in Get-ChildItem -LiteralPath (Join-Path $scriptsRoot "Game") -Recurse -Filter "*.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if (
+            $content -match "IDataLoader<" -and
+            $file.Name -ne "GameDataLoader.cs") {
+            Add-ArchitectureError (
+                "Game domain data may use IDataLoader only at GameDataSnapshot boundary: " +
+                "$($file.FullName)")
+        }
+    }
+
+    foreach ($file in Get-ChildItem -LiteralPath (Join-Path $scriptsRoot "User") -Recurse -Filter "*.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if (
+            $content -match "IDataLoader<" -and
+            $file.Name -ne "UserSessionLoader.cs") {
+            Add-ArchitectureError (
+                "User domain data may use IDataLoader only at UserSnapshot boundary: " +
+                "$($file.FullName)")
+        }
+    }
+}
+
 $allowedCompositionFolders = @("Scopes", "Installers", "Factories")
 $allowedRuntimeFolders = @(
     "Bootstrap",
@@ -303,6 +329,7 @@ Test-NamespaceTree -Root $testsRoot -RootNamespace "LL.Tests"
 Test-RuntimeDependencies
 Test-EnumDeclarations
 Test-DiRegistrations
+Test-DomainDataLoaders
 
 foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recurse -Filter "*.cs") {
     $content = [IO.File]::ReadAllText($file.FullName)
@@ -322,6 +349,37 @@ foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recu
 
     if ($content -match "\)\s*\r?\n\s*\{\s*\r?\n\s*\}") {
         Add-ArchitectureError "Empty C# bodies must be inline: $($file.FullName)"
+    }
+
+    foreach ($assignment in [regex]::Matches(
+        $content,
+        "(?m)^(?<indent>[ \t]*)(?<left>[^\r\n=]+=[ \t]*)\r?\n[ \t]+(?<right>[^\r\n;]+;)")) {
+        $singleLine = (
+            $assignment.Groups["indent"].Value +
+            $assignment.Groups["left"].Value.TrimEnd() +
+            " " +
+            $assignment.Groups["right"].Value.Trim())
+
+        if ($singleLine.Length -le 120) {
+            Add-ArchitectureError (
+                "Simple assignment that fits within 120 characters must remain on one line: " +
+                "$($file.FullName)")
+        }
+    }
+
+    foreach ($invocation in [regex]::Matches(
+        $content,
+        "(?m)^(?<indent>[ \t]*)(?<head>[^\r\n]+\()\r?\n[ \t]+(?<tail>[^\r\n]+?\);)[ \t]*$")) {
+        $singleLine = (
+            $invocation.Groups["indent"].Value +
+            $invocation.Groups["head"].Value.TrimEnd() +
+            $invocation.Groups["tail"].Value.Trim())
+
+        if ($singleLine.Length -le 120) {
+            Add-ArchitectureError (
+                "Simple invocation that fits within 120 characters must remain on one line: " +
+                "$($file.FullName)")
+        }
     }
 
     if (

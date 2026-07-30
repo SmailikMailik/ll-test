@@ -1,4 +1,5 @@
 using LL.Game.Ranks;
+using LL.User.Snapshots;
 using R3;
 
 namespace LL.User.State.Progress
@@ -12,7 +13,9 @@ namespace LL.User.State.Progress
 
         Observable<RankId> RankChanged { get; }
         Observable<int> ExperienceChanged { get; }
+        Observable<Unit> Changed { get; }
 
+        UserProgressSnapshot CreateSnapshot();
         int GetApplicableExperience(int amount);
         bool CanAddExperience(int amount);
         bool TryAddExperience(int amount);

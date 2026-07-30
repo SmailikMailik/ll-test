@@ -1,11 +1,11 @@
-namespace LL.User.Persistence.SaveData
+namespace LL.User.Persistence.Documents
 {
-    internal sealed class UserProgressSaveData
+    internal sealed class UserProgressDocumentEntry
     {
         public string RankId { get; }
         public int Experience { get; }
 
-        public UserProgressSaveData(string rankId, int experience)
+        public UserProgressDocumentEntry(string rankId, int experience)
         {
             RankId = rankId;
             Experience = experience;

@@ -36,8 +36,7 @@ namespace LLEditor.CI
                 throw new BuildFailedException("At least Bootstrap and Main scenes must be enabled.");
 
             if (scenes[0] != ProjectScenePaths.Bootstrap)
-                throw new BuildFailedException(
-                    $"Bootstrap scene must be the first enabled build scene: '{ProjectScenePaths.Bootstrap}'.");
+                throw new BuildFailedException($"Bootstrap scene must be the first enabled build scene: '{ProjectScenePaths.Bootstrap}'.");
 
             if (scenes.Contains(ProjectScenePaths.Main, StringComparer.Ordinal) is false)
                 throw new BuildFailedException($"Main scene is not enabled: '{ProjectScenePaths.Main}'.");

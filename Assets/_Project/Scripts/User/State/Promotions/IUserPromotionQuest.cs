@@ -1,5 +1,6 @@
 using System;
 using LL.Game.Quests;
+using LL.User.Snapshots;
 using R3;
 
 namespace LL.User.State.Promotions
@@ -13,6 +14,7 @@ namespace LL.User.State.Promotions
         Observable<Unit> Changed { get; }
 
         TimeSpan GetRemainingTime();
+        UserPromotionQuestSnapshot CreateSnapshot();
         bool TryStart(QuestId questId, TimeSpan duration);
         bool TryComplete();
         bool TryExpire();
