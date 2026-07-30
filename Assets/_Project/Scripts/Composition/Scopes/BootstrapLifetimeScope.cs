@@ -1,4 +1,4 @@
-using LL.Composition.Installers;
+using LL.Bootstrap;
 using LL.UI.Controls;
 using UnityEngine;
 using VContainer;
@@ -12,9 +12,24 @@ namespace LL.Composition.Scopes
         [SerializeField] private ProgressBar _progressBar;
         [SerializeField, Min(0f)] private float _minDisplaySeconds = 0.75f;
 
+        private const string TargetSceneName = "Main";
+
         protected override void Configure(IContainerBuilder builder)
         {
-            new BootstrapInstaller(_progressBar, _minDisplaySeconds).Install(builder);
+            builder.RegisterComponent(_progressBar);
+            builder
+                .Register<LocalizationBootstrapOperation>(Lifetime.Scoped)
+                .As<IBootstrapOperation>();
+            builder
+                .Register<MinDisplayBootstrapOperation>(Lifetime.Scoped)
+                .As<IBootstrapOperation>()
+                .WithParameter(_minDisplaySeconds);
+            builder
+                .Register<SceneLoadingBootstrapOperation>(Lifetime.Scoped)
+                .AsSelf()
+                .As<IBootstrapOperation>()
+                .WithParameter(TargetSceneName);
+            builder.RegisterEntryPoint<BootstrapFlow>(Lifetime.Scoped);
         }
     }
 }

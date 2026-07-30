@@ -287,14 +287,6 @@ foreach ($file in Get-ChildItem -LiteralPath $compositionRoot -Recurse -Filter "
     }
 }
 
-foreach ($file in Get-ChildItem (Join-Path $compositionRoot "Scopes") -Filter "*.cs") {
-    $content = [IO.File]::ReadAllText($file.FullName)
-
-    if ($content -match "\bbuilder\s*\.\s*Register") {
-        Add-ArchitectureError "Lifetime scope must delegate registrations to installers: $($file.FullName)"
-    }
-}
-
 $vagueFolderNames = @("Common", "Misc", "Helpers", "Managers", "Runtime")
 
 foreach ($sourceRoot in @($scriptsRoot, $editorRoot)) {
@@ -361,8 +353,8 @@ foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recu
     foreach ($line in [IO.File]::ReadLines($file.FullName)) {
         $lineNumber++
 
-        if ($line.Length -gt 120) {
-            Add-ArchitectureError "Line exceeds 120 characters: $($file.FullName):$lineNumber"
+        if ($line.Length -gt 140) {
+            Add-ArchitectureError "Line exceeds the hard limit of 140 characters: $($file.FullName):$lineNumber"
         }
     }
 }

@@ -74,7 +74,7 @@ Owns application assembly: concrete implementation selection, manual object cons
 lifetime configuration.
 
 - `Scopes` contains VContainer lifetime scopes. A scope stores serialized Unity references, defines a lifetime
-  boundary, and orchestrates installers.
+  boundary, performs small scene-local registrations, and orchestrates larger installers.
 - `Installers` contains cohesive registration modules that implement VContainer's `IInstaller`. Construct installers
   manually from a scope; do not resolve them through DI.
 - `Factories` contains concrete construction policies that are reused by installers, scopes, or editor tooling.
@@ -85,9 +85,11 @@ lifetime configuration.
 - Runtime areas must never depend on `Composition`.
 - Composition contains no domain decisions, mapping, validation rules, I/O implementation, or mutable application
   state.
-- A scope must not call `Register`, `RegisterInstance`, `RegisterComponent`, or `RegisterEntryPoint` directly.
-  Registrations belong to an installer, including a single serialized scene component when it participates in a
-  larger scene module.
+- A scope may register its serialized scene components and a small cohesive set of scene-local services or entry
+  points directly when keeping the registrations visible makes the scene composition easier to understand.
+- Move registrations to an installer when they form a named subsystem, are reused by more than one scope, require
+  their own construction policy, or change independently from the scene boundary. Do not create an installer merely
+  to shorten a scope.
 - An installer owns one cohesive registration module, such as game-data loading or the user lifecycle. Do not create
   an installer for a single trivial registration.
 - A factory method exposes its concrete policy in its name, such as `CreateFromJsonFile` or `CreateJsonFile`.
@@ -309,9 +311,9 @@ The application has three composition boundaries:
 | `BootstrapLifetimeScope` | Bootstrap scene | Progress view, bootstrap operations, transition to `Main` |
 | `MainLifetimeScope` | Main scene | Scene window controller, modal adapters, promotion flow, upgrade flow |
 
-Every scope constructs installers manually with `new` and calls `Install`. Installers are not DI services and their
-constructors do not use `[Inject]`. Runtime services, controllers, flows, and MonoBehaviour injection methods resolved
-by VContainer do use `[Inject]`.
+A scope registers small scene-local composition directly and constructs larger installers manually with `new`.
+Installers are not DI services and their constructors do not use `[Inject]`. Runtime services, controllers, flows,
+and MonoBehaviour injection methods resolved by VContainer do use `[Inject]`.
 
 The project scope is auto-created from `VContainerSettings`; the bootstrap scene must not create another project
 scope. Scene scopes inherit project registrations through the configured parent relationship.
@@ -417,8 +419,10 @@ that semantically owns it or introduce a small contract at the consumer-facing b
   values when serialized or persisted.
 - C# attributes occupy separate lines except a serialized field's constraints and decorators, which share its
   `[SerializeField, ...]` list.
-- Empty bodies are inline as `{ }`. C# lines do not exceed 120 characters. A C# file ends immediately after its final
-  non-empty line without a trailing CR or LF.
+- Empty bodies are inline as `{ }`. Treat 120 characters as the point at which line wrapping deserves an explicit
+  readability decision: lines from 121 through 140 characters may remain intact when the single-line form is clearer,
+  and should be wrapped when the split reads better. The hard limit is 140 characters. A C# file ends immediately
+  after its final non-empty line without a trailing CR or LF.
 
 ## Changing the architecture
 
@@ -447,7 +451,7 @@ For every new or moved type, verify:
 - Domain code does not know its persistence or authoring format.
 - Configuration remains beside its owning subsystem.
 - Composition contains wiring only and uses only the documented `Scopes`, `Installers`, and `Factories` roles.
-- Lifetime scopes delegate registrations to installers.
+- Lifetime scopes keep small scene-local composition visible and delegate named subsystems to installers.
 - No vague catch-all folder or type name was introduced.
 - External representations are versioned where compatibility matters.
 - Unity asset GUIDs and serialized references remain valid after moves.

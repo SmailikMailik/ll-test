@@ -306,19 +306,37 @@ def render_composition(pdf: canvas.Canvas, page_number: int) -> None:
                 "GameServicesInstaller",
             ],
             "process lifetime",
+            "Installers",
+            "new + Install",
         ),
         (
             "BootstrapLifetimeScope",
-            ["BootstrapInstaller"],
+            [
+                "ProgressBar",
+                "BootstrapFlow",
+                "IBootstrapOperation × 3",
+            ],
             "Bootstrap scene",
+            "Direct scene registrations",
+            "Register",
         ),
         (
             "MainLifetimeScope",
-            ["MainSceneInstaller"],
+            [
+                "WindowController",
+                "Modal confirmation adapters",
+                "RankPromotionFlow",
+                "UpgradeFlow",
+            ],
             "Main scene",
+            "Direct scene registrations",
+            "Register",
         ),
     ]
-    for x, (scope, installers, lifetime) in zip(scope_x, scopes):
+    for x, (scope, registrations, lifetime, registration_title, arrow_label) in zip(
+        scope_x,
+        scopes,
+    ):
         draw_box(
             pdf,
             x,
@@ -326,19 +344,29 @@ def render_composition(pdf: canvas.Canvas, page_number: int) -> None:
             300,
             115,
             scope,
-            [f"«lifetime» {lifetime}", "orchestrates installers only"],
+            [
+                f"«lifetime» {lifetime}",
+                (
+                    "orchestrates named installers"
+                    if registration_title == "Installers"
+                    else "owns scene-local composition"
+                ),
+            ],
             AREA_COLORS["Composition"],
             8,
         )
-        installer_height = 28 + len(installers) * 14
+        installer_height = 28 + len(registrations) * 14
         draw_box(
             pdf,
             x,
             390,
             300,
             installer_height,
-            "Installers",
-            [f"«installer» {name}" for name in installers],
+            registration_title,
+            [
+                f"«installer» {name}" if registration_title == "Installers" else name
+                for name in registrations
+            ],
             colors.HexColor("#EEE9FF"),
             7.5,
         )
@@ -346,7 +374,7 @@ def render_composition(pdf: canvas.Canvas, page_number: int) -> None:
             pdf,
             (x + 150, scope_y),
             (x + 150, 390 + installer_height),
-            "new + Install",
+            arrow_label,
         )
     draw_box(
         pdf,
