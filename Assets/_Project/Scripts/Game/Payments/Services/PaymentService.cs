@@ -1,8 +1,9 @@
 using System;
+using LL.Game.Payments;
 using LL.User.State.Items;
 using VContainer;
 
-namespace LL.Game.Payments
+namespace LL.Game.Payments.Services
 {
     internal sealed class PaymentService : IPaymentService
     {

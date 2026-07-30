@@ -1,6 +1,6 @@
 using System;
 
-namespace LL.Game.Upgrades
+namespace LL.Presentation.Upgrades
 {
     internal interface IExperienceOverflowConfirmation
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace LL.Presentation.Collections
+namespace LL.UI
 {
     internal sealed class ReusableComponentCollection<TComponent>
         where TComponent : Component

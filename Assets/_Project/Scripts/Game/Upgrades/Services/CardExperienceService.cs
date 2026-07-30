@@ -2,18 +2,13 @@ using System;
 using System.Collections.Generic;
 using LL.Game.Cards;
 using LL.Game.Items;
+using LL.Game.Upgrades;
 using LL.User.State.Items;
 using LL.User.State.Progress;
 using VContainer;
 
-namespace LL.Game.Upgrades
+namespace LL.Game.Upgrades.Services
 {
-    internal interface ICardExperienceService
-    {
-        bool TryGetApplication(IReadOnlyList<ItemAmount> cards, out ExperienceApplication application);
-        bool TryApply(IReadOnlyList<ItemAmount> cards);
-    }
-
     internal sealed class CardExperienceService : ICardExperienceService
     {
         private const int MinAmount = 0;

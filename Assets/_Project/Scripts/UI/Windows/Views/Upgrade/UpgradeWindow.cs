@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using LL.Game.Items;
 using LL.Game.Ranks;
 using LL.Game.Upgrades;
+using LL.Game.Upgrades.Services;
+using LL.Presentation.Upgrades;
 using LL.UI.Controls;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Views.Upgrade.Cards;

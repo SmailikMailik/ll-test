@@ -4,7 +4,7 @@ using LL.Game.Items;
 using LL.Game.Payments;
 using LL.Game.Promotions;
 using LL.Game.Promotions.Services;
-using LL.UI.Promotions;
+using LL.Presentation.Promotions;
 using VContainer;
 
 namespace LL.UI.Windows.Flows

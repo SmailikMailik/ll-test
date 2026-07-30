@@ -1,12 +1,12 @@
 using LL.Composition.Installers;
 using LL.Game.Cards.Configuration;
-using LL.Game.Payments;
+using LL.Game.Payments.Services;
 using LL.Game.Promotions.Configuration;
 using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using LL.Game.Rewards.Services;
-using LL.Game.Upgrades;
+using LL.Game.Upgrades.Services;
 using LL.Infrastructure.Validation;
 using LL.Presentation.Icons.Configuration;
 using LL.Presentation.Localization;

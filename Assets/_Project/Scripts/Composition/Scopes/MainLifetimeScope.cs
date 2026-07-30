@@ -1,8 +1,7 @@
 using LL.Game.Promotions.Services;
-using LL.Game.Upgrades;
+using LL.Presentation.Promotions;
 using LL.Presentation.Quests;
 using LL.Presentation.Upgrades;
-using LL.UI.Promotions;
 using LL.UI.Windows;
 using LL.UI.Windows.Flows;
 using UnityEngine;

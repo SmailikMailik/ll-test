@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Upgrades;
 using LL.Presentation.Localization;
 using LL.UI.Typography;
 using LL.UI.Windows;
