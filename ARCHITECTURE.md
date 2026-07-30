@@ -3,6 +3,9 @@
 This document is the source of truth for placing and naming project code. Its purpose is to make ownership,
 dependency direction, and the role of a type understandable from its path and name.
 
+For a practical walkthrough of the game-data and user-data pipelines, see
+[`Documentation/Architecture/Game-And-User-Data.md`](Documentation/Architecture/Game-And-User-Data.md).
+
 The rules describe the intended architecture, not merely the current directory tree. New code must follow them.
 When existing code is changed substantially, move it toward this standard when that can be done safely within the
 task scope.
@@ -123,6 +126,8 @@ and use-case services.
 - Cross-capability workflows belong to the capability that owns the outcome; create a new capability only when no
   existing owner is correct.
 - `Game/Data` is reserved for the aggregate game-data loading boundary. It is not a general dumping ground.
+- `Game/Data/Declarations` owns the source-neutral, not-yet-trusted aggregate representation produced by every
+  game-data source and consumed by `GameDataCompiler`.
 
 ### `User`
 
@@ -206,6 +211,7 @@ Owns Unity Editor-only tooling, menus, inspectors, build checks, and asset-datab
 Use these names only with the stated meaning:
 
 - `Configuration`: Unity-authored or otherwise author-authored input for one owning capability.
+- `Declarations`: source-neutral, not-yet-trusted aggregate input normalized from multiple concrete sources.
 - `Persistence`: durable/external serialized representation, version handling, mapping, and save/load orchestration.
 - `Documents`: versioned external serialized contracts owned by a `Persistence` boundary.
 - `Snapshots`: immutable point-in-time representation composed at a loading boundary.

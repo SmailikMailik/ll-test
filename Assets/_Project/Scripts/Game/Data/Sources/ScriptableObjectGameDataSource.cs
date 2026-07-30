@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using LL.Game.Cards.Configuration;
 using LL.Game.Data.Configuration;
+using LL.Game.Data.Declarations;
 using LL.Game.Payments.Configuration;
 using LL.Game.RankUp.Configuration;
 using LL.Game.Quests.Configuration;

@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using LL.Game.Data.Declarations;
+using LL.Game.Data.Persistence.Documents;
 
 namespace LL.Game.Data.Persistence
 {
