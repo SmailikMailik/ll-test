@@ -1,4 +1,4 @@
-using LLEditor.Menu;
+using LLEditor.Bootstrap;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -30,12 +30,12 @@ namespace LLEditor.Toolbar
 
         private static void OnPlayModeStateChanged(PlayModeStateChange _)
         {
-            _button.SetEnabled(SceneMenu.CanStartPlayMode());
+            _button.SetEnabled(BootstrapPlayMode.CanStart);
         }
 
         private static Button CreateButton()
         {
-            var button = new Button(SceneMenu.PlayFromBootstrap)
+            var button = new Button(BootstrapPlayMode.Play)
             {
                 name = ButtonName,
                 text = ButtonText,
@@ -51,7 +51,7 @@ namespace LLEditor.Toolbar
             button.style.paddingRight = 0f;
             button.style.borderLeftWidth = 1f;
             button.style.borderLeftColor = new Color(0.25f, 0.64f, 1f);
-            button.SetEnabled(SceneMenu.CanStartPlayMode());
+            button.SetEnabled(BootstrapPlayMode.CanStart);
             return button;
         }
     }

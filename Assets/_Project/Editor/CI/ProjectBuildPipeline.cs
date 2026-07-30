@@ -93,10 +93,7 @@ namespace LLEditor.CI
                 return;
 
             if (int.TryParse(buildNumber, out var parsedBuildNumber) is false || parsedBuildNumber <= 0)
-            {
-                throw new BuildFailedException(
-                    $"{BuildNumberEnvironmentVariable} must be a positive integer.");
-            }
+                throw new BuildFailedException($"{BuildNumberEnvironmentVariable} must be a positive integer.");
 
             PlayerSettings.Android.bundleVersionCode = parsedBuildNumber;
         }

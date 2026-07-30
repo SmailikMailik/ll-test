@@ -1,3 +1,4 @@
+using LLEditor;
 using NUnit.Framework;
 using UnityEditor;
 
@@ -5,9 +6,6 @@ namespace LL.Tests.EditMode
 {
     internal sealed class BuildSceneConfigurationTests
     {
-        private const string BootstrapScenePath = "Assets/_Project/Scenes/Bootstrap.unity";
-        private const string MainScenePath = "Assets/_Project/Scenes/Main.unity";
-
         [Test]
         public void BootstrapAndMainScenesAreEnabledInOrder()
         {
@@ -15,13 +13,13 @@ namespace LL.Tests.EditMode
 
             Assert.That(scenes.Length, Is.GreaterThanOrEqualTo(2));
             Assert.That(scenes[0].enabled, Is.True);
-            Assert.That(scenes[0].path, Is.EqualTo(BootstrapScenePath));
+            Assert.That(scenes[0].path, Is.EqualTo(ProjectScenePaths.Bootstrap));
             Assert.That(scenes[1].enabled, Is.True);
-            Assert.That(scenes[1].path, Is.EqualTo(MainScenePath));
+            Assert.That(scenes[1].path, Is.EqualTo(ProjectScenePaths.Main));
         }
 
-        [TestCase(BootstrapScenePath)]
-        [TestCase(MainScenePath)]
+        [TestCase(ProjectScenePaths.Bootstrap)]
+        [TestCase(ProjectScenePaths.Main)]
         public void RequiredSceneExists(string scenePath)
         {
             Assert.That(AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath), Is.Not.Null);
