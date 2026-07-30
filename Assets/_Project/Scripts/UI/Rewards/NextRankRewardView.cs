@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Promotions;
+using LL.Game.RankUp;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
 using LL.Presentation.Localization;
-using LL.Presentation.Promotions;
+using LL.Presentation.RankUp;
 using LL.UI.Rewards;
 using R3;
 using TMPro;
@@ -22,7 +22,7 @@ namespace LL.UI.Rewards
         private const string RankVariable = "rank";
 
         private RankCatalog _rankCatalog;
-        private RankPromotionCatalog _promotionCatalog;
+        private RankUpCatalog _rankUpCatalog;
         private RewardCatalog _rewardCatalog;
         private ILocalizationService _localization;
         private int _nextRank;
@@ -31,12 +31,12 @@ namespace LL.UI.Rewards
         [Inject]
         private void Construct(
             RankCatalog rankCatalog,
-            RankPromotionCatalog promotionCatalog,
+            RankUpCatalog rankUpCatalog,
             RewardCatalog rewardCatalog,
             ILocalizationService localization)
         {
             _rankCatalog = rankCatalog ?? throw new ArgumentNullException(nameof(rankCatalog));
-            _promotionCatalog = promotionCatalog ?? throw new ArgumentNullException(nameof(promotionCatalog));
+            _rankUpCatalog = rankUpCatalog ?? throw new ArgumentNullException(nameof(rankUpCatalog));
             _rewardCatalog = rewardCatalog ?? throw new ArgumentNullException(nameof(rewardCatalog));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         }
@@ -49,15 +49,15 @@ namespace LL.UI.Rewards
         internal void ShowNextRank(RankId currentRankId)
         {
             if (_rankCatalog.TryGetRank(currentRankId, out var currentRank) is false ||
-                _promotionCatalog.TryGetPromotion(currentRankId, out var promotion) is false)
+                _rankUpCatalog.TryGetDefinition(currentRankId, out var definition) is false)
             {
                 Clear();
                 return;
             }
 
-            if (_rewardCatalog.TryGetReward(promotion.RewardId, out var reward) is false)
+            if (_rewardCatalog.TryGetReward(definition.RewardId, out var reward) is false)
             {
-                Debug.LogError($"Missing reward for rank promotion: {promotion.RewardId}", this);
+                Debug.LogError($"Missing reward for rank-up: {definition.RewardId}", this);
                 Clear();
                 return;
             }
@@ -86,7 +86,7 @@ namespace LL.UI.Rewards
         private void RefreshTitle()
         {
             _titleLabel.text = _localization.GetText(
-                RankPromotionLocalizationKeys.RewardsAtRank,
+                RankUpLocalizationKeys.RewardsAtRank,
                 new Dictionary<string, object>
                 {
                     [RankVariable] = _nextRank

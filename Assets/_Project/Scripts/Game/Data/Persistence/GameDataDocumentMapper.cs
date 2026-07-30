@@ -20,7 +20,7 @@ namespace LL.Game.Data.Persistence
                         quest.Id,
                         quest.TitleLocalizationKey,
                         quest.DescriptionLocalizationKey)),
-                document.RankPromotions.Select(ToDeclaration),
+                document.RankUps.Select(ToDeclaration),
                 document.Rewards.Select(reward =>
                     new RewardDeclaration(
                         reward.Id,
@@ -28,20 +28,20 @@ namespace LL.Game.Data.Persistence
                             new ItemAmountDeclaration(item.Id, item.Amount)))));
         }
 
-        private static RankPromotionDeclaration ToDeclaration(RankPromotionDocumentEntry promotion)
+        private static RankUpDeclaration ToDeclaration(RankUpDocumentEntry rankUp)
         {
-            if (promotion == null)
-                throw new ArgumentException("Rank promotion data cannot contain null entries.");
+            if (rankUp == null)
+                throw new ArgumentException("Rank-up data cannot contain null entries.");
 
-            return new RankPromotionDeclaration(
-                promotion.RankId,
-                promotion.QuestId,
-                promotion.HeroLocalizationKey,
-                promotion.RequiredAmount,
-                promotion.DurationMinutes,
-                ToDeclaration(promotion.QuestPayment),
-                ToDeclaration(promotion.InstantPayment),
-                promotion.RewardId);
+            return new RankUpDeclaration(
+                rankUp.RankId,
+                rankUp.QuestId,
+                rankUp.HeroLocalizationKey,
+                rankUp.RequiredAmount,
+                rankUp.DurationMinutes,
+                ToDeclaration(rankUp.QuestPayment),
+                ToDeclaration(rankUp.InstantPayment),
+                rankUp.RewardId);
         }
 
         private static PaymentDeclaration ToDeclaration(PaymentDocumentEntry payment)

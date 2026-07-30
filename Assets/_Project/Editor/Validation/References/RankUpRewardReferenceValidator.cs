@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using LL.Game.Identifiers;
-using LL.Game.Promotions.Configuration;
+using LL.Game.RankUp.Configuration;
 using LL.Game.Rewards;
 using LL.Game.Rewards.Configuration;
 using LL.Validation;
@@ -9,32 +9,32 @@ using UnityEditor;
 
 namespace LLEditor.Validation.References
 {
-    internal sealed class RankPromotionRewardReferenceValidator : IProjectDataReferenceValidation
+    internal sealed class RankUpRewardReferenceValidator : IProjectDataReferenceValidation
     {
-        private const string RewardExistsCode = "rank-promotion.reward.exists";
+        private const string RewardExistsCode = "rank-up.reward.exists";
 
         public void Validate(
             ProjectDataSources sources,
             ValidationContext context)
         {
-            var promotions = sources.GetSingle<RankPromotionCatalogConfig>();
+            var rankUps = sources.GetSingle<RankUpCatalogConfig>();
             var rewards = sources.GetSingle<RewardCatalogConfig>();
 
-            if (promotions == null || rewards == null)
+            if (rankUps == null || rewards == null)
                 return;
 
             ValidateReferences(
-                promotions.Promotions,
+                rankUps.RankUps,
                 rewards.Rewards,
-                context.At(AssetDatabase.GetAssetPath(promotions)));
+                context.At(AssetDatabase.GetAssetPath(rankUps)));
         }
 
         private static void ValidateReferences(
-            IReadOnlyList<RankPromotionEntry> promotions,
+            IReadOnlyList<RankUpEntry> rankUps,
             IEnumerable<RewardEntry> rewards,
             ValidationContext context)
         {
-            if (promotions == null || rewards == null)
+            if (rankUps == null || rewards == null)
                 return;
 
             var rewardIds = new HashSet<RewardId>();
@@ -45,20 +45,20 @@ namespace LLEditor.Validation.References
                     rewardIds.Add(reward.Id);
             }
 
-            for (var index = 0; index < promotions.Count; index++)
+            for (var index = 0; index < rankUps.Count; index++)
             {
-                var promotion = promotions[index];
+                var rankUp = rankUps[index];
 
-                if (promotion == null ||
-                    IdentifierValidator.IsValid(promotion.RewardId) is false)
+                if (rankUp == null ||
+                    IdentifierValidator.IsValid(rankUp.RewardId) is false)
                 {
                     continue;
                 }
 
                 ValidationRules.ReferenceExists(
-                    promotion.RewardId,
+                    rankUp.RewardId,
                     rewardIds,
-                    context.At(index).At(nameof(RankPromotionEntry.RewardId)),
+                    context.At(index).At(nameof(RankUpEntry.RewardId)),
                     RewardExistsCode);
             }
         }

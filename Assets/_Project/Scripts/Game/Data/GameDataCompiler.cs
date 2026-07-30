@@ -4,7 +4,7 @@ using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Game.Payments;
-using LL.Game.Promotions;
+using LL.Game.RankUp;
 using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
@@ -23,14 +23,14 @@ namespace LL.Game.Data
             var questIds = CollectIds(declaration.Quests, entry => entry?.Id, nameof(declaration.Quests));
             var rewardIds = CollectIds(declaration.Rewards, entry => entry?.Id, nameof(declaration.Rewards));
 
-            foreach (var promotion in declaration.RankPromotions)
+            foreach (var rankUp in declaration.RankUps)
             {
-                if (promotion == null)
-                    throw new ArgumentException("Rank promotions cannot contain null entries.", nameof(declaration));
+                if (rankUp == null)
+                    throw new ArgumentException("Rank-ups cannot contain null entries.", nameof(declaration));
 
-                EnsureReferenceExists(rankIds, promotion.RankId, nameof(promotion.RankId));
-                EnsureReferenceExists(questIds, promotion.QuestId, nameof(promotion.QuestId));
-                EnsureReferenceExists(rewardIds, promotion.RewardId, nameof(promotion.RewardId));
+                EnsureReferenceExists(rankIds, rankUp.RankId, nameof(rankUp.RankId));
+                EnsureReferenceExists(questIds, rankUp.QuestId, nameof(rankUp.QuestId));
+                EnsureReferenceExists(rewardIds, rankUp.RewardId, nameof(rankUp.RewardId));
             }
 
             return new GameDataSnapshot(
@@ -43,25 +43,25 @@ namespace LL.Game.Data
                         new QuestId(quest.Id),
                         quest.TitleLocalizationKey,
                         quest.DescriptionLocalizationKey))),
-                new RankPromotionCatalog(declaration.RankPromotions.Select(ToRankPromotion)),
+                new RankUpCatalog(declaration.RankUps.Select(ToRankUpDefinition)),
                 new RewardCatalog(declaration.Rewards.Select(reward =>
                     new Reward(
                         new RewardId(reward.Id),
                         reward.Items.Select(item => new ItemAmount(new ItemId(item.Id), item.Amount))))));
         }
 
-        private static RankPromotion ToRankPromotion(RankPromotionDeclaration promotion)
+        private static RankUpDefinition ToRankUpDefinition(RankUpDeclaration declaration)
         {
-            return new RankPromotion(
-                new RankId(promotion.RankId),
-                new RankPromotionQuest(
-                    new QuestId(promotion.QuestId),
-                    promotion.HeroLocalizationKey,
-                    promotion.RequiredAmount,
-                    TimeSpan.FromMinutes(promotion.DurationMinutes),
-                    ToPayment(promotion.QuestPayment)),
-                ToPayment(promotion.InstantPayment),
-                new RewardId(promotion.RewardId));
+            return new RankUpDefinition(
+                new RankId(declaration.RankId),
+                new RankUpQuest(
+                    new QuestId(declaration.QuestId),
+                    declaration.HeroLocalizationKey,
+                    declaration.RequiredAmount,
+                    TimeSpan.FromMinutes(declaration.DurationMinutes),
+                    ToPayment(declaration.QuestPayment)),
+                ToPayment(declaration.InstantPayment),
+                new RewardId(declaration.RewardId));
         }
 
         private static Payment ToPayment(PaymentDeclaration payment)

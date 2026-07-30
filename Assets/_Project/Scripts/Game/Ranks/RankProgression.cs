@@ -50,7 +50,7 @@ namespace LL.Game.Ranks
             return new RankProgress(rank, nextRank, experience);
         }
 
-        public bool CanPromote(RankId rankId, int experience)
+        public bool CanRankUp(RankId rankId, int experience)
         {
             var progress = GetProgress(rankId, experience);
 

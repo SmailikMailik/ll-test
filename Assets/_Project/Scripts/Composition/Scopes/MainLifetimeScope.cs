@@ -1,5 +1,5 @@
-using LL.Game.Promotions.Services;
-using LL.Presentation.Promotions;
+using LL.Game.RankUp.Services;
+using LL.Presentation.RankUp;
 using LL.Presentation.Quests;
 using LL.Presentation.Upgrades;
 using LL.UI.Windows;
@@ -20,7 +20,7 @@ namespace LL.Composition.Scopes
         {
             builder.RegisterComponent(_windowController);
             RegisterConfirmations(builder);
-            RegisterPromotion(builder);
+            RegisterRankUp(builder);
             RegisterUpgradeFlow(builder);
         }
 
@@ -30,17 +30,17 @@ namespace LL.Composition.Scopes
                 .Register<ModalQuestCompletionConfirmation>(Lifetime.Scoped)
                 .As<IQuestCompletionConfirmation>();
             builder
-                .Register<ModalRankPromotionConfirmation>(Lifetime.Scoped)
-                .As<IRankPromotionConfirmation>();
+                .Register<ModalRankUpConfirmation>(Lifetime.Scoped)
+                .As<IRankUpConfirmation>();
             builder
                 .Register<ModalExperienceOverflowConfirmation>(Lifetime.Scoped)
                 .As<IExperienceOverflowConfirmation>();
         }
 
-        private static void RegisterPromotion(IContainerBuilder builder)
+        private static void RegisterRankUp(IContainerBuilder builder)
         {
-            builder.Register<RankPromotionService>(Lifetime.Scoped).As<IRankPromotionService>();
-            builder.Register<RankPromotionFlow>(Lifetime.Scoped);
+            builder.Register<RankUpService>(Lifetime.Scoped).As<IRankUpService>();
+            builder.Register<RankUpFlow>(Lifetime.Scoped);
         }
 
         private static void RegisterUpgradeFlow(IContainerBuilder builder)

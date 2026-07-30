@@ -161,7 +161,7 @@ namespace LL.UI.Windows.Upgrade
                 ResetPendingChanges();
             }
 
-            if (applied && _userProgress.CanPromoteRank)
+            if (applied && _userProgress.CanRankUp)
                 _upgradeFlow.ReplaceCurrent();
         }
 

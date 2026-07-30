@@ -13,49 +13,49 @@ MonoBehaviour:
   m_Name: RewardCatalogConfig
   m_EditorClassIdentifier:
   _rewards:
-  - _id: rank_1_promotion
+  - _id: rank_1_rank_up
     _items:
     - _id: hard
       _amount: 800
     - _id: master_point
       _amount: 120
-  - _id: rank_2_promotion
+  - _id: rank_2_rank_up
     _items:
     - _id: skill
       _amount: 1
     - _id: soft
       _amount: 3600
-  - _id: rank_3_promotion
+  - _id: rank_3_rank_up
     _items:
     - _id: skill
       _amount: 1
     - _id: master_point
       _amount: 100
-  - _id: rank_4_promotion
+  - _id: rank_4_rank_up
     _items:
     - _id: master_point
       _amount: 180
     - _id: soft
       _amount: 3000
-  - _id: rank_5_promotion
+  - _id: rank_5_rank_up
     _items:
     - _id: hard
       _amount: 1700
     - _id: skill
       _amount: 1
-  - _id: rank_6_promotion
+  - _id: rank_6_rank_up
     _items:
     - _id: hard
       _amount: 600
     - _id: soft
       _amount: 1800
-  - _id: rank_7_promotion
+  - _id: rank_7_rank_up
     _items:
     - _id: master_point
       _amount: 150
     - _id: skill
       _amount: 1
-  - _id: rank_8_promotion
+  - _id: rank_8_rank_up
     _items:
     - _id: soft
       _amount: 4800

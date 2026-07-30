@@ -1311,7 +1311,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5342419485409765225, guid: f9350fce70addb8428188df130a79330, type: 3}
       propertyPath: m_Name
-      value: P_PromotionWindow
+      value: P_RankUpWindow
       objectReference: {fileID: 0}
     - target: {fileID: 5342419485409765225, guid: f9350fce70addb8428188df130a79330, type: 3}
       propertyPath: m_IsActive

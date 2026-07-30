@@ -2,41 +2,41 @@ using System;
 using System.Collections.Generic;
 using LL.Game.Items;
 using LL.Game.Payments;
-using LL.Game.Promotions;
-using LL.Game.Promotions.Services;
-using LL.Presentation.Promotions;
+using LL.Game.RankUp;
+using LL.Game.RankUp.Services;
+using LL.Presentation.RankUp;
 using VContainer;
 
 namespace LL.UI.Windows.Flows
 {
-    internal sealed class RankPromotionFlow
+    internal sealed class RankUpFlow
     {
-        private readonly IRankPromotionService _promotionService;
-        private readonly IRankPromotionConfirmation _confirmation;
+        private readonly IRankUpService _rankUpService;
+        private readonly IRankUpConfirmation _confirmation;
 
         private bool _isPending;
 
         [Inject]
-        internal RankPromotionFlow(
-            IRankPromotionService promotionService,
-            IRankPromotionConfirmation confirmation)
+        internal RankUpFlow(
+            IRankUpService rankUpService,
+            IRankUpConfirmation confirmation)
         {
-            _promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
+            _rankUpService = rankUpService ?? throw new ArgumentNullException(nameof(rankUpService));
             _confirmation = confirmation ?? throw new ArgumentNullException(nameof(confirmation));
         }
 
-        internal bool TryGetPromotion(out RankPromotion promotion)
+        internal bool TryGetDefinition(out RankUpDefinition definition)
         {
-            return _promotionService.TryGetPromotion(out promotion);
+            return _rankUpService.TryGetDefinition(out definition);
         }
 
-        internal void Promote(
+        internal void RequestRankUp(
             Payment payment,
             Action<IReadOnlyList<ItemAmount>> onSucceeded,
             Action onFailed)
         {
             if (_isPending ||
-                _promotionService.CanPromote(payment) is false)
+                _rankUpService.CanRankUp(payment) is false)
             {
                 onFailed?.Invoke();
                 return;
@@ -45,11 +45,11 @@ namespace LL.UI.Windows.Flows
             _isPending = true;
             _confirmation.Confirm(
                 payment,
-                () => OnPromotionConfirmed(payment, onSucceeded, onFailed),
-                () => OnPromotionRejected(onFailed));
+                () => OnRankUpConfirmed(payment, onSucceeded, onFailed),
+                () => OnRankUpRejected(onFailed));
         }
 
-        private void OnPromotionConfirmed(
+        private void OnRankUpConfirmed(
             Payment payment,
             Action<IReadOnlyList<ItemAmount>> onSucceeded,
             Action onFailed)
@@ -57,18 +57,18 @@ namespace LL.UI.Windows.Flows
             if (_isPending is false)
                 return;
 
-            if (_promotionService.TryPromote(payment, out var rewardItems))
-                OnPromotionSucceeded(rewardItems, onSucceeded);
+            if (_rankUpService.TryRankUp(payment, out var rewardItems))
+                OnRankUpSucceeded(rewardItems, onSucceeded);
             else
-                OnPromotionFailed(onFailed);
+                OnRankUpFailed(onFailed);
         }
 
-        private void OnPromotionRejected(Action onFailed)
+        private void OnRankUpRejected(Action onFailed)
         {
-            OnPromotionFailed(onFailed);
+            OnRankUpFailed(onFailed);
         }
 
-        private void OnPromotionSucceeded(
+        private void OnRankUpSucceeded(
             IReadOnlyList<ItemAmount> items,
             Action<IReadOnlyList<ItemAmount>> onSucceeded)
         {
@@ -79,7 +79,7 @@ namespace LL.UI.Windows.Flows
             onSucceeded?.Invoke(items);
         }
 
-        private void OnPromotionFailed(Action onFailed)
+        private void OnRankUpFailed(Action onFailed)
         {
             if (_isPending is false)
                 return;

@@ -1,12 +1,12 @@
 namespace LL.User.Persistence.Documents
 {
-    internal sealed class UserPromotionQuestDocumentEntry
+    internal sealed class UserRankUpQuestDocumentEntry
     {
         public string QuestId { get; }
         public long DeadlineUnixMilliseconds { get; }
         public bool IsCompleted { get; }
 
-        public UserPromotionQuestDocumentEntry(
+        public UserRankUpQuestDocumentEntry(
             string questId,
             long deadlineUnixMilliseconds,
             bool isCompleted)

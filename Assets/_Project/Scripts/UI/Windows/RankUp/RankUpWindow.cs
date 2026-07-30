@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using LL.Game.Items;
 using LL.Game.Payments;
-using LL.Game.Promotions;
+using LL.Game.RankUp;
 using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Presentation.Payments;
@@ -16,9 +16,9 @@ using TMPro;
 using UnityEngine;
 using VContainer;
 
-namespace LL.UI.Windows.Promotion
+namespace LL.UI.Windows.RankUp
 {
-    internal sealed class PromotionWindow : Window<PromotionWindowParameters>
+    internal sealed class RankUpWindow : Window<RankUpWindowParameters>
     {
         [SerializeField] private TMP_Text _currentRankLabel;
         [SerializeField] private TMP_Text _nextRankLabel;
@@ -33,34 +33,34 @@ namespace LL.UI.Windows.Promotion
 
         [SerializeField] private NextRankRewardView _nextRankRewardView;
 
-        [SerializeField] private PromotionQuestView _questView;
+        [SerializeField] private RankUpQuestView _questView;
 
         private IUserProgress _userProgress;
         private IRankProgression _rankProgression;
-        private RankPromotionFlow _rankPromotionFlow;
+        private RankUpFlow _rankUpFlow;
         private QuestCatalog _questCatalog;
         private UpgradeFlow _upgradeFlow;
-        private RankPromotion _promotion;
+        private RankUpDefinition _definition;
 
         [Inject]
         private void Construct(
             IUserProgress userProgress,
             IRankProgression rankProgression,
-            RankPromotionFlow rankPromotionFlow,
+            RankUpFlow rankUpFlow,
             QuestCatalog questCatalog,
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
-            _rankPromotionFlow = rankPromotionFlow ?? throw new ArgumentNullException(nameof(rankPromotionFlow));
+            _rankUpFlow = rankUpFlow ?? throw new ArgumentNullException(nameof(rankUpFlow));
             _questCatalog = questCatalog ?? throw new ArgumentNullException(nameof(questCatalog));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
 
         private void Start()
         {
-            _questButton.Clicked.Subscribe(_ => OnQuestPromotionClicked()).AddTo(this);
-            _instantButton.Clicked.Subscribe(_ => OnInstantPromotionClicked()).AddTo(this);
+            _questButton.Clicked.Subscribe(_ => OnQuestRankUpClicked()).AddTo(this);
+            _instantButton.Clicked.Subscribe(_ => OnInstantRankUpClicked()).AddTo(this);
             _questView.Completed.Subscribe(_ => OnQuestCompleted()).AddTo(this);
         }
 
@@ -74,56 +74,56 @@ namespace LL.UI.Windows.Promotion
             _nextRankLabel.text = TextFormatter.Number(nextRank);
             _nextRankRewardView.ShowNextRank(_userProgress.RankId);
 
-            if (_rankPromotionFlow.TryGetPromotion(out _promotion) &&
-                _questCatalog.TryGetQuest(_promotion.Quest.QuestId, out var quest))
+            if (_rankUpFlow.TryGetDefinition(out _definition) &&
+                _questCatalog.TryGetQuest(_definition.Quest.QuestId, out var quest))
             {
-                _questPriceLabel.text = PaymentFormatter.Format(_promotion.Quest.Payment);
-                _instantPriceLabel.text = PaymentFormatter.Format(_promotion.InstantPayment);
+                _questPriceLabel.text = PaymentFormatter.Format(_definition.Quest.Payment);
+                _instantPriceLabel.text = PaymentFormatter.Format(_definition.InstantPayment);
                 _questView.Refresh(
-                    _promotion.Quest,
+                    _definition.Quest,
                     quest,
-                    _userProgress.CanPromoteRank);
+                    _userProgress.CanRankUp);
             }
             else
             {
-                _promotion = null;
+                _definition = null;
                 _questPriceLabel.text = string.Empty;
                 _instantPriceLabel.text = string.Empty;
             }
 
-            _questView.gameObject.SetActive(_promotion != null);
+            _questView.gameObject.SetActive(_definition != null);
             RefreshActions();
         }
 
-        private void PromoteRank(Payment payment)
+        private void RequestRankUp(Payment payment)
         {
-            if (_promotion == null || _userProgress.CanPromoteRank is false)
+            if (_definition == null || _userProgress.CanRankUp is false)
                 return;
 
-            _rankPromotionFlow.Promote(
+            _rankUpFlow.RequestRankUp(
                 payment,
-                OnPromotionSucceeded,
-                OnPromotionFailed);
+                OnRankUpSucceeded,
+                OnRankUpFailed);
         }
 
-        private void OnQuestPromotionClicked()
+        private void OnQuestRankUpClicked()
         {
-            if (_promotion != null)
-                PromoteRank(_promotion.Quest.Payment);
+            if (_definition != null)
+                RequestRankUp(_definition.Quest.Payment);
         }
 
-        private void OnInstantPromotionClicked()
+        private void OnInstantRankUpClicked()
         {
-            if (_promotion != null)
-                PromoteRank(_promotion.InstantPayment);
+            if (_definition != null)
+                RequestRankUp(_definition.InstantPayment);
         }
 
-        private void OnPromotionSucceeded(IReadOnlyList<ItemAmount> rewardItems)
+        private void OnRankUpSucceeded(IReadOnlyList<ItemAmount> rewardItems)
         {
-            _upgradeFlow.CompletePromotion(_userProgress.Rank, rewardItems);
+            _upgradeFlow.CompleteRankUp(_userProgress.Rank, rewardItems);
         }
 
-        private void OnPromotionFailed()
+        private void OnRankUpFailed()
         {
             RefreshActions();
         }
@@ -135,15 +135,15 @@ namespace LL.UI.Windows.Promotion
 
         private void RefreshActions()
         {
-            var hasPromotion = _promotion != null;
-            var canPromoteRank = _userProgress.CanPromoteRank;
+            var hasRankUp = _definition != null;
+            var canRankUp = _userProgress.CanRankUp;
 
-            _questView.SetAvailable(hasPromotion && canPromoteRank);
+            _questView.SetAvailable(hasRankUp && canRankUp);
             _questButton.SetInteractable(
-                hasPromotion &&
-                canPromoteRank &&
+                hasRankUp &&
+                canRankUp &&
                 _questView.IsCompleted);
-            _instantButton.SetInteractable(hasPromotion && canPromoteRank);
+            _instantButton.SetInteractable(hasRankUp && canRankUp);
         }
     }
 }

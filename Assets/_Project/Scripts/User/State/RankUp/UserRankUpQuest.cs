@@ -4,9 +4,9 @@ using LL.User.Snapshots;
 using R3;
 using VContainer;
 
-namespace LL.User.State.Promotions
+namespace LL.User.State.RankUp
 {
-    internal sealed class UserPromotionQuest : IUserPromotionQuest, IDisposable
+    internal sealed class UserRankUpQuest : IUserRankUpQuest, IDisposable
     {
         private const long NoDeadline = 0L;
 
@@ -27,7 +27,7 @@ namespace LL.User.State.Promotions
             _deadlineUnixMilliseconds > NoDeadline;
 
         [Inject]
-        internal UserPromotionQuest(UserPromotionQuestSnapshot snapshot)
+        internal UserRankUpQuest(UserRankUpQuestSnapshot snapshot)
         {
             if (snapshot == null)
                 throw new ArgumentNullException(nameof(snapshot));
@@ -46,9 +46,9 @@ namespace LL.User.State.Promotions
             return TimeSpan.FromMilliseconds(Math.Max(0L, remainingMilliseconds));
         }
 
-        public UserPromotionQuestSnapshot CreateSnapshot()
+        public UserRankUpQuestSnapshot CreateSnapshot()
         {
-            return new UserPromotionQuestSnapshot(
+            return new UserRankUpQuestSnapshot(
                 QuestId,
                 DeadlineUnixMilliseconds,
                 IsCompleted);

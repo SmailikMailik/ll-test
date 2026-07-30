@@ -45,7 +45,7 @@ namespace LL.User.Configuration
                 Identity.ToSnapshot(),
                 new UserItemsSnapshot(Items.Select(item => item.ToItemAmount())),
                 Progress.ToSnapshot(),
-                UserPromotionQuestSnapshot.Empty);
+                UserRankUpQuestSnapshot.Empty);
         }
 
         private static bool HasValidItems(ItemAmountEntry[] entries)

@@ -1,23 +1,23 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Promotions;
+using LL.Game.RankUp;
 using LL.Game.Quests;
 using LL.Presentation.Localization;
-using LL.Presentation.Promotions;
+using LL.Presentation.RankUp;
 using LL.Presentation.Quests;
 using LL.Presentation.Typography;
 using LL.UI.Controls;
 using LL.UI.Localization;
-using LL.User.State.Promotions;
+using LL.User.State.RankUp;
 using R3;
 using TMPro;
 using UnityEngine;
 using VContainer;
 
-namespace LL.UI.Windows.Promotion
+namespace LL.UI.Windows.RankUp
 {
     [DisallowMultipleComponent]
-    internal sealed class PromotionQuestView : MonoBehaviour
+    internal sealed class RankUpQuestView : MonoBehaviour
     {
         [SerializeField] private TMP_Text _titleLabel;
         [SerializeField] private TMP_Text _descriptionLabel;
@@ -38,10 +38,10 @@ namespace LL.UI.Windows.Promotion
 
         private IQuestCompletionConfirmation _completionConfirmation;
         private ILocalizationService _localization;
-        private IUserPromotionQuest _promotionQuest;
+        private IUserRankUpQuest _rankUpQuest;
 
         private QuestState _state = QuestState.Available;
-        private RankPromotionQuest _promotionQuestDefinition;
+        private RankUpQuest _rankUpQuestDefinition;
         private QuestDefinition _quest;
         private int _displayedRemainingSeconds = -1;
         private bool _canAccept;
@@ -51,12 +51,12 @@ namespace LL.UI.Windows.Promotion
         private void Construct(
             IQuestCompletionConfirmation completionConfirmation,
             ILocalizationService localization,
-            IUserPromotionQuest promotionQuest)
+            IUserRankUpQuest rankUpQuest)
         {
             _completionConfirmation = completionConfirmation
                 ?? throw new ArgumentNullException(nameof(completionConfirmation));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-            _promotionQuest = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
+            _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
         }
 
         private void Start()
@@ -73,16 +73,16 @@ namespace LL.UI.Windows.Promotion
         }
 
         internal void Refresh(
-            RankPromotionQuest promotionQuest,
+            RankUpQuest rankUpQuest,
             QuestDefinition quest,
             bool canAccept)
         {
-            _promotionQuestDefinition = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
+            _rankUpQuestDefinition = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
             _quest = quest ?? throw new ArgumentNullException(nameof(quest));
-            _duration = promotionQuest.Duration;
+            _duration = rankUpQuest.Duration;
             _canAccept = canAccept;
             RestoreState();
-            RefreshText(promotionQuest, quest);
+            RefreshText(rankUpQuest, quest);
             RefreshState();
         }
 
@@ -94,19 +94,19 @@ namespace LL.UI.Windows.Promotion
 
         internal void ClearQuest()
         {
-            _promotionQuest.ClearQuest();
+            _rankUpQuest.ClearQuest();
             SetState(QuestState.Available);
         }
 
         private void RefreshText(
-            RankPromotionQuest promotionQuest,
+            RankUpQuest rankUpQuest,
             QuestDefinition quest)
         {
             var unlockText = TextTags.Style(
-                _localization.GetText(RankPromotionLocalizationKeys.Unlock),
+                _localization.GetText(RankUpLocalizationKeys.Unlock),
                 TextStyle.Accent);
             var countText = TextTags.Style(
-                TextFormatter.Number(promotionQuest.RequiredAmount),
+                TextFormatter.Number(rankUpQuest.RequiredAmount),
                 TextStyle.Accent);
 
             _titleLabel.text = _localization.GetText(
@@ -120,7 +120,7 @@ namespace LL.UI.Windows.Promotion
                 new Dictionary<string, object>
                 {
                     [CountVariable] = countText,
-                    [HeroVariable] = _localization.GetText(promotionQuest.HeroLocalizationKey)
+                    [HeroVariable] = _localization.GetText(rankUpQuest.HeroLocalizationKey)
                 });
         }
 
@@ -149,7 +149,7 @@ namespace LL.UI.Windows.Promotion
 
         private bool StartQuest()
         {
-            if (_promotionQuest.TryStart(_promotionQuestDefinition.QuestId, _duration) is false)
+            if (_rankUpQuest.TryStart(_rankUpQuestDefinition.QuestId, _duration) is false)
                 return false;
 
             SetState(QuestState.Active);
@@ -158,7 +158,7 @@ namespace LL.UI.Windows.Promotion
 
         private void OnQuestCompletionConfirmed()
         {
-            if (_state != QuestState.Active || _promotionQuest.TryComplete() is false)
+            if (_state != QuestState.Active || _rankUpQuest.TryComplete() is false)
                 return;
 
             SetState(QuestState.Completed);
@@ -173,14 +173,14 @@ namespace LL.UI.Windows.Promotion
 
         private void RestoreState()
         {
-            if (_promotionQuest.QuestId.Equals(_promotionQuestDefinition.QuestId) is false)
-                _promotionQuest.ClearQuest();
+            if (_rankUpQuest.QuestId.Equals(_rankUpQuestDefinition.QuestId) is false)
+                _rankUpQuest.ClearQuest();
 
-            _promotionQuest.TryExpire();
+            _rankUpQuest.TryExpire();
 
-            if (_promotionQuest.IsCompleted)
+            if (_rankUpQuest.IsCompleted)
                 _state = QuestState.Completed;
-            else if (_promotionQuest.IsActive)
+            else if (_rankUpQuest.IsActive)
                 _state = QuestState.Active;
             else
                 _state = QuestState.Available;
@@ -206,8 +206,8 @@ namespace LL.UI.Windows.Promotion
 
         private void OnLocaleChanged()
         {
-            if (_promotionQuestDefinition != null && _quest != null)
-                RefreshText(_promotionQuestDefinition, _quest);
+            if (_rankUpQuestDefinition != null && _quest != null)
+                RefreshText(_rankUpQuestDefinition, _quest);
 
             RefreshButtonText();
         }
@@ -250,7 +250,7 @@ namespace LL.UI.Windows.Promotion
 
         private float GetRemainingSeconds()
         {
-            return Mathf.Max(0f, (float)_promotionQuest.GetRemainingTime().TotalSeconds);
+            return Mathf.Max(0f, (float)_rankUpQuest.GetRemainingTime().TotalSeconds);
         }
 
         private enum QuestState : byte

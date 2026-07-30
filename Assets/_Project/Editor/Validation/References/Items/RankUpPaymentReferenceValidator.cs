@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using LL.Game.Identifiers;
 using LL.Game.Items;
 using LL.Game.Payments.Configuration;
-using LL.Game.Promotions.Configuration;
+using LL.Game.RankUp.Configuration;
 using LL.Presentation.Icons.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
@@ -11,19 +11,19 @@ using UnityEditor;
 
 namespace LLEditor.Validation.References.Items
 {
-    internal sealed class RankPromotionPaymentReferenceValidator : IProjectDataReferenceValidation
+    internal sealed class RankUpPaymentReferenceValidator : IProjectDataReferenceValidation
     {
-        private const string UserItemCode = "rank-promotion.payment.user-item.exists";
-        private const string IconCode = "rank-promotion.payment.icon.exists";
+        private const string UserItemCode = "rank-up.payment.user-item.exists";
+        private const string IconCode = "rank-up.payment.icon.exists";
 
         public void Validate(
             ProjectDataSources sources,
             ValidationContext context)
         {
-            var config = sources.GetSingle<RankPromotionCatalogConfig>();
-            var promotions = config?.Promotions;
+            var config = sources.GetSingle<RankUpCatalogConfig>();
+            var rankUps = config?.RankUps;
 
-            if (promotions == null)
+            if (rankUps == null)
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
@@ -43,23 +43,23 @@ namespace LLEditor.Validation.References.Items
 
             var configContext = context.At(AssetDatabase.GetAssetPath(config));
 
-            for (var index = 0; index < promotions.Count; index++)
+            for (var index = 0; index < rankUps.Count; index++)
             {
-                var promotion = promotions[index];
+                var rankUp = rankUps[index];
 
-                if (promotion == null)
+                if (rankUp == null)
                     continue;
 
                 ValidatePayment(
-                    promotion.QuestPayment,
-                    configContext.At(index).At(nameof(RankPromotionEntry.QuestPayment)),
+                    rankUp.QuestPayment,
+                    configContext.At(index).At(nameof(RankUpEntry.QuestPayment)),
                     hasUserItems,
                     userItemIds,
                     hasIcons,
                     iconIds);
                 ValidatePayment(
-                    promotion.InstantPayment,
-                    configContext.At(index).At(nameof(RankPromotionEntry.InstantPayment)),
+                    rankUp.InstantPayment,
+                    configContext.At(index).At(nameof(RankUpEntry.InstantPayment)),
                     hasUserItems,
                     userItemIds,
                     hasIcons,

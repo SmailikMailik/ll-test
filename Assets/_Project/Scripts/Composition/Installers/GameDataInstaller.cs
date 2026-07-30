@@ -3,7 +3,7 @@ using LL.Composition.Factories;
 using LL.Game.Data;
 using LL.Game.Data.Configuration;
 using LL.Game.Cards;
-using LL.Game.Promotions;
+using LL.Game.RankUp;
 using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
@@ -29,7 +29,7 @@ namespace LL.Composition.Installers
             builder.RegisterSnapshotPart<GameDataSnapshot, RankCatalog>(snapshot => snapshot.Ranks);
             builder.RegisterSnapshotPart<GameDataSnapshot, CardCatalog>(snapshot => snapshot.Cards);
             builder.RegisterSnapshotPart<GameDataSnapshot, QuestCatalog>(snapshot => snapshot.Quests);
-            builder.RegisterSnapshotPart<GameDataSnapshot, RankPromotionCatalog>(snapshot => snapshot.RankPromotions);
+            builder.RegisterSnapshotPart<GameDataSnapshot, RankUpCatalog>(snapshot => snapshot.RankUps);
             builder.RegisterSnapshotPart<GameDataSnapshot, RewardCatalog>(snapshot => snapshot.Rewards);
         }
     }

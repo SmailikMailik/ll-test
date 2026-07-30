@@ -1,7 +1,7 @@
 using System;
 using LL.Game.Cards.Configuration;
 using LL.Game.Data.Configuration;
-using LL.Game.Promotions.Configuration;
+using LL.Game.RankUp.Configuration;
 using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
@@ -23,7 +23,7 @@ namespace LLEditor.Validation.Sources
             typeof(CardCatalogConfig),
             typeof(QuestCatalogConfig),
             typeof(RankCatalogConfig),
-            typeof(RankPromotionCatalogConfig),
+            typeof(RankUpCatalogConfig),
             typeof(RewardCatalogConfig),
             typeof(ItemIconCatalogConfig),
             typeof(WindowCatalogConfig),

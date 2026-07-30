@@ -8,13 +8,13 @@ namespace LLEditor.Validation.References
     {
         private readonly IProjectDataReferenceValidation[] _validations =
         {
-            new RankPromotionQuestReferenceValidator(),
-            new RankPromotionRankReferenceValidator(),
-            new RankPromotionRewardReferenceValidator(),
+            new RankUpQuestReferenceValidator(),
+            new RankUpRankReferenceValidator(),
+            new RankUpRewardReferenceValidator(),
             new UserProgressRankReferenceValidator(),
             new BuiltInUserItemReferenceValidator(),
             new CardItemReferenceValidator(),
-            new RankPromotionPaymentReferenceValidator(),
+            new RankUpPaymentReferenceValidator(),
             new RewardItemReferenceValidator()
         };
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LL.User.Snapshots;
 using LL.User.State.Items;
 using LL.User.State.Progress;
-using LL.User.State.Promotions;
+using LL.User.State.RankUp;
 using R3;
 using VContainer;
 using VContainer.Unity;
@@ -17,7 +17,7 @@ namespace LL.User.State
         private readonly UserIdentitySnapshot _identity;
         private readonly IUserItems _items;
         private readonly IUserProgress _progress;
-        private readonly IUserPromotionQuest _promotionQuest;
+        private readonly IUserRankUpQuest _rankUpQuest;
         private readonly Subject<Unit> _changed = new();
         private readonly List<IDisposable> _subscriptions = new();
 
@@ -26,19 +26,19 @@ namespace LL.User.State
             UserIdentitySnapshot identity,
             IUserItems items,
             IUserProgress progress,
-            IUserPromotionQuest promotionQuest)
+            IUserRankUpQuest rankUpQuest)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _items = items ?? throw new ArgumentNullException(nameof(items));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            _promotionQuest = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
+            _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
         }
 
         public void Initialize()
         {
             _subscriptions.Add(_items.Changed.Subscribe(OnStateChanged));
             _subscriptions.Add(_progress.Changed.Subscribe(OnStateChanged));
-            _subscriptions.Add(_promotionQuest.Changed.Subscribe(OnStateChanged));
+            _subscriptions.Add(_rankUpQuest.Changed.Subscribe(OnStateChanged));
         }
 
         internal UserSnapshot CreateSnapshot()
@@ -47,7 +47,7 @@ namespace LL.User.State
                 _identity,
                 _items.CreateSnapshot(),
                 _progress.CreateSnapshot(),
-                _promotionQuest.CreateSnapshot());
+                _rankUpQuest.CreateSnapshot());
         }
 
         public void Dispose()

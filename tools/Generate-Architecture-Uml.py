@@ -325,7 +325,7 @@ def render_composition(pdf: canvas.Canvas, page_number: int) -> None:
             [
                 "WindowController",
                 "Modal confirmation adapters",
-                "RankPromotionFlow",
+                "RankUpFlow",
                 "UpgradeFlow",
             ],
             "Main scene",
@@ -405,7 +405,7 @@ def render_composition(pdf: canvas.Canvas, page_number: int) -> None:
         [
             "Project: WindowProvider, WindowNavigator, localization, catalogs, user state, game services",
             "Bootstrap: BootstrapFlow + parallel IBootstrapOperation implementations",
-            "Main: WindowController, modal confirmation adapters, RankPromotionFlow, UpgradeFlow",
+            "Main: WindowController, modal confirmation adapters, RankUpFlow, UpgradeFlow",
             "DI constructors / Construct methods: [Inject]",
             "Manual installer and factory construction: no [Inject]",
         ],

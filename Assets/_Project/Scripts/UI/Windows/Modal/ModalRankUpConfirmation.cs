@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using LL.Game.Payments;
 using LL.Presentation.Localization;
 using LL.Presentation.Payments;
-using LL.Presentation.Promotions;
+using LL.Presentation.RankUp;
 using LL.Presentation.Typography;
 using VContainer;
 
 namespace LL.UI.Windows.Modal
 {
-    internal sealed class ModalRankPromotionConfirmation : IRankPromotionConfirmation
+    internal sealed class ModalRankUpConfirmation : IRankUpConfirmation
     {
         private const string PriceVariable = "price";
         private const string HeroVariable = "hero";
@@ -18,7 +18,7 @@ namespace LL.UI.Windows.Modal
         private readonly ILocalizationService _localization;
 
         [Inject]
-        internal ModalRankPromotionConfirmation(
+        internal ModalRankUpConfirmation(
             WindowController windowController,
             ILocalizationService localization)
         {
@@ -30,26 +30,26 @@ namespace LL.UI.Windows.Modal
         {
             var priceText = PaymentFormatter.Format(payment);
             var priceLabel = TextTags.Style(
-                _localization.GetText(RankPromotionLocalizationKeys.PriceLabel),
+                _localization.GetText(RankUpLocalizationKeys.PriceLabel),
                 TextStyle.Muted);
             var priceLine = $"{priceLabel} {priceText}";
             var heroText = TextTags.Style(
-                _localization.GetText(RankPromotionLocalizationKeys.Hero),
+                _localization.GetText(RankUpLocalizationKeys.Hero),
                 TextStyle.Accent);
 
             _windowController.Show(new ModalWindowParameters
             (
-                headerText: _localization.GetText(RankPromotionLocalizationKeys.Title),
+                headerText: _localization.GetText(RankUpLocalizationKeys.Title),
                 messageText: _localization.GetText(
-                    RankPromotionLocalizationKeys.Confirmation,
+                    RankUpLocalizationKeys.Confirmation,
                     new Dictionary<string, object>
                     {
                         [PriceVariable] = priceLine,
                         [HeroVariable] = heroText
                     }),
-                positiveText: _localization.GetText(RankPromotionLocalizationKeys.ConfirmAction),
+                positiveText: _localization.GetText(RankUpLocalizationKeys.ConfirmAction),
                 positiveCallback: onConfirmed,
-                negativeText: _localization.GetText(RankPromotionLocalizationKeys.CancelAction),
+                negativeText: _localization.GetText(RankUpLocalizationKeys.CancelAction),
                 negativeCallback: onRejected,
                 closeCallback: onRejected
             ));

@@ -1,5 +1,5 @@
 using LL.Game.Cards.Configuration;
-using LL.Game.Promotions.Configuration;
+using LL.Game.RankUp.Configuration;
 using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
@@ -15,10 +15,10 @@ namespace LLEditor.Menu
             ProjectAssetSelector.Select<RankCatalogConfig>(RankCatalogConfig.CreationPath);
         }
 
-        [MenuItem(LastLevelMenu.ContentPath + "Rank Promotion Catalog", false, LastLevelMenu.GameContentPriority + 3)]
-        private static void SelectRankPromotionCatalog()
+        [MenuItem(LastLevelMenu.ContentPath + "Rank-Up Catalog", false, LastLevelMenu.GameContentPriority + 3)]
+        private static void SelectRankUpCatalog()
         {
-            ProjectAssetSelector.Select<RankPromotionCatalogConfig>(RankPromotionCatalogConfig.CreationPath);
+            ProjectAssetSelector.Select<RankUpCatalogConfig>(RankUpCatalogConfig.CreationPath);
         }
 
         [MenuItem(LastLevelMenu.ContentPath + "Quest Catalog", false, LastLevelMenu.GameContentPriority + 1)]

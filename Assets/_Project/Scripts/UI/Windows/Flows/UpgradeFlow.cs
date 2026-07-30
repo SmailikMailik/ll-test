@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Items;
-using LL.UI.Windows.Promotion;
+using LL.UI.Windows.RankUp;
 using LL.UI.Windows.Reward;
 using LL.UI.Windows.Upgrade;
 using LL.User.State.Progress;
@@ -25,21 +25,21 @@ namespace LL.UI.Windows.Flows
 
         internal void Open()
         {
-            if (_userProgress.CanPromoteRank)
-                _windowController.Show(new PromotionWindowParameters());
+            if (_userProgress.CanRankUp)
+                _windowController.Show(new RankUpWindowParameters());
             else
                 _windowController.Show(new UpgradeWindowParameters());
         }
 
         internal void ReplaceCurrent()
         {
-            if (_userProgress.CanPromoteRank)
-                _windowController.Replace(new PromotionWindowParameters());
+            if (_userProgress.CanRankUp)
+                _windowController.Replace(new RankUpWindowParameters());
             else
                 _windowController.Replace(new UpgradeWindowParameters());
         }
 
-        internal void CompletePromotion(int rank, IReadOnlyList<ItemAmount> rewardItems)
+        internal void CompleteRankUp(int rank, IReadOnlyList<ItemAmount> rewardItems)
         {
             ReplaceCurrent();
             _windowController.Show(new RewardWindowParameters(rank, rewardItems));

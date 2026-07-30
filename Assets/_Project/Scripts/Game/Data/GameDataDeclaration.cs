@@ -8,20 +8,20 @@ namespace LL.Game.Data
         internal IReadOnlyList<RankDeclaration> Ranks { get; }
         internal IReadOnlyList<CardDeclaration> Cards { get; }
         internal IReadOnlyList<QuestDeclaration> Quests { get; }
-        internal IReadOnlyList<RankPromotionDeclaration> RankPromotions { get; }
+        internal IReadOnlyList<RankUpDeclaration> RankUps { get; }
         internal IReadOnlyList<RewardDeclaration> Rewards { get; }
 
         internal GameDataDeclaration(
             IEnumerable<RankDeclaration> ranks,
             IEnumerable<CardDeclaration> cards,
             IEnumerable<QuestDeclaration> quests,
-            IEnumerable<RankPromotionDeclaration> rankPromotions,
+            IEnumerable<RankUpDeclaration> rankUps,
             IEnumerable<RewardDeclaration> rewards)
         {
             Ranks = Copy(ranks);
             Cards = Copy(cards);
             Quests = Copy(quests);
-            RankPromotions = Copy(rankPromotions);
+            RankUps = Copy(rankUps);
             Rewards = Copy(rewards);
         }
 
@@ -69,7 +69,7 @@ namespace LL.Game.Data
         }
     }
 
-    internal sealed class RankPromotionDeclaration
+    internal sealed class RankUpDeclaration
     {
         internal string RankId { get; }
         internal string QuestId { get; }
@@ -80,7 +80,7 @@ namespace LL.Game.Data
         internal PaymentDeclaration InstantPayment { get; }
         internal string RewardId { get; }
 
-        internal RankPromotionDeclaration(
+        internal RankUpDeclaration(
             string rankId,
             string questId,
             string heroLocalizationKey,

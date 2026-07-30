@@ -56,11 +56,11 @@ group of closely related types. Do not create a one-type folder merely to make t
 | --- | --- | --- |
 | `Bootstrap` | First-scene startup coordination | Localization readiness, minimum display time, scene activation |
 | `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
-| `Game` | Game rules and reference data | Cards, items, payments, promotions, quests, ranks, rewards, upgrades |
+| `Game` | Game rules and reference data | Cards, items, payments, rank-up, quests, ranks, rewards, upgrades |
 | `Infrastructure` | Reusable technical adapters | Loading, serialization, save services, storage, console reporting |
 | `Presentation` | Display meaning without visual lifecycle | Icons, localization, display formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
-| `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, promotion quest |
+| `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, rank-up quest |
 | `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
 
 `AssemblyInfo.cs` and `LL.Runtime.asmdef` are the only files allowed directly at the runtime root. Adding another
@@ -114,6 +114,11 @@ and use-case services.
 - Core game models must not depend on `User`, `Presentation`, `UI`, `Composition`, or `Editor`.
 - Game application services may coordinate user state through focused `User.State` interfaces. Domain definitions and
   calculations must remain independent of concrete user-state implementations.
+- `Game/RankUp` owns the rules for advancing to the next rank: its quest path, instant-payment path, and reward.
+  `RankUpDefinition` is one immutable rule set, `RankUpQuest` describes its quest path, and `RankUpService` executes
+  the selected path. Within this feature, use `Definition` for APIs and variables that expose the immutable rule set,
+  and `RankUp` for commands and capability names that describe the player action. Use `RankUp`, never `Promotion`, as
+  the code and folder vocabulary for this feature.
 - Unity-dependent authoring adapters are allowed under the owning capability's `Configuration` folder.
 - Cross-capability workflows belong to the capability that owns the outcome; create a new capability only when no
   existing owner is correct.
@@ -169,7 +174,7 @@ Owns concrete visual behavior: views, windows, controls, graphics, navigation, v
 - `Localization` owns concrete localized UI components; localization services and presentation wording remain under
   `Presentation`.
 - `Windows` owns window definitions, navigation, window flows, and concrete windows. Place each concrete window and
-  its feature-specific parts directly under a feature folder such as `Windows/Promotion` or `Windows/Upgrade`.
+  its feature-specific parts directly under a feature folder such as `Windows/RankUp` or `Windows/Upgrade`.
 - Keep only foundational UI mechanisms at the `UI` root. A reusable element with a recognized role must use its role
   folder.
 - Feature-specific views stay under their feature or window view hierarchy.
@@ -321,7 +326,7 @@ The application has three composition boundaries:
 | --- | --- | --- |
 | `ProjectLifetimeScope` | Whole process | Window catalog/provider, presentation services, validation reporting, game data, user state, game services |
 | `BootstrapLifetimeScope` | Bootstrap scene | Progress view, bootstrap operations, transition to `Main` |
-| `MainLifetimeScope` | Main scene | Scene window controller, modal adapters, promotion flow, upgrade flow |
+| `MainLifetimeScope` | Main scene | Scene window controller, modal adapters, rank-up flow, upgrade flow |
 
 A scope registers small scene-local composition directly and constructs larger installers manually with `new`.
 Installers are not DI services and their constructors do not use `[Inject]`. Runtime services, controllers, flows,
@@ -381,7 +386,7 @@ WindowCatalogConfig -> WindowCatalog -> WindowProvider
     -> WindowNavigator -> WindowController -> Window<TParameters>
 ```
 
-`RankPromotionFlow` and `UpgradeFlow` coordinate use cases and windows. Game services own rule execution; flows own
+`RankUpFlow` and `UpgradeFlow` coordinate use cases and windows. Game services own rule execution; flows own
 sequencing and presentation decisions; windows own visual behavior.
 
 ## Dependency rules

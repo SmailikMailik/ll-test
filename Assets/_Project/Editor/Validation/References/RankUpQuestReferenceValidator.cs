@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using LL.Game.Identifiers;
-using LL.Game.Promotions.Configuration;
+using LL.Game.RankUp.Configuration;
 using LL.Game.Quests;
 using LL.Game.Quests.Configuration;
 using LL.Validation;
@@ -9,18 +9,18 @@ using UnityEditor;
 
 namespace LLEditor.Validation.References
 {
-    internal sealed class RankPromotionQuestReferenceValidator : IProjectDataReferenceValidation
+    internal sealed class RankUpQuestReferenceValidator : IProjectDataReferenceValidation
     {
-        private const string QuestExistsCode = "rank-promotion.quest.exists";
+        private const string QuestExistsCode = "rank-up.quest.exists";
 
         public void Validate(
             ProjectDataSources sources,
             ValidationContext context)
         {
-            var promotions = sources.GetSingle<RankPromotionCatalogConfig>();
+            var rankUps = sources.GetSingle<RankUpCatalogConfig>();
             var quests = sources.GetSingle<QuestCatalogConfig>();
 
-            if (promotions == null || quests == null)
+            if (rankUps == null || quests == null)
                 return;
 
             var questIds = new HashSet<QuestId>();
@@ -31,20 +31,20 @@ namespace LLEditor.Validation.References
                     questIds.Add(quest.Id);
             }
 
-            var promotionEntries = promotions.Promotions;
-            var promotionContext = context.At(AssetDatabase.GetAssetPath(promotions));
+            var rankUpEntries = rankUps.RankUps;
+            var rankUpContext = context.At(AssetDatabase.GetAssetPath(rankUps));
 
-            for (var index = 0; index < promotionEntries.Count; index++)
+            for (var index = 0; index < rankUpEntries.Count; index++)
             {
-                var promotion = promotionEntries[index];
+                var rankUp = rankUpEntries[index];
 
-                if (promotion == null || IdentifierValidator.IsValid(promotion.QuestId) is false)
+                if (rankUp == null || IdentifierValidator.IsValid(rankUp.QuestId) is false)
                     continue;
 
                 ValidationRules.ReferenceExists(
-                    promotion.QuestId,
+                    rankUp.QuestId,
                     questIds,
-                    promotionContext.At(index).At(nameof(RankPromotionEntry.QuestId)),
+                    rankUpContext.At(index).At(nameof(RankUpEntry.QuestId)),
                     QuestExistsCode);
             }
         }

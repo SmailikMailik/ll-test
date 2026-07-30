@@ -15,5 +15,5 @@ MonoBehaviour:
   _ranks: {fileID: 11400000, guid: 245c77e9974bb8144995a9d3f3f0ba73, type: 2}
   _cards: {fileID: 11400000, guid: 3f842080888c4b8da27d1418c074ad9b, type: 2}
   _quests: {fileID: 11400000, guid: 1c2b7f1f93174826ab93e458c70db59d, type: 2}
-  _rankPromotions: {fileID: 11400000, guid: c4db41c7eed54e8c8657bd65c216c53a, type: 2}
+  _rankUps: {fileID: 11400000, guid: c4db41c7eed54e8c8657bd65c216c53a, type: 2}
   _rewards: {fileID: 11400000, guid: bb1111aabbbb4ccccddddeeeeeeeee01, type: 2}

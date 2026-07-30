@@ -10,7 +10,7 @@ namespace LL.Game.Data.Persistence
         public RankDocumentEntry[] Ranks { get; }
         public CardDocumentEntry[] Cards { get; }
         public QuestDocumentEntry[] Quests { get; }
-        public RankPromotionDocumentEntry[] RankPromotions { get; }
+        public RankUpDocumentEntry[] RankUps { get; }
         public RewardDocumentEntry[] Rewards { get; }
 
         public GameDataDocument(
@@ -18,14 +18,14 @@ namespace LL.Game.Data.Persistence
             RankDocumentEntry[] ranks,
             CardDocumentEntry[] cards,
             QuestDocumentEntry[] quests,
-            RankPromotionDocumentEntry[] rankPromotions,
+            RankUpDocumentEntry[] rankUps,
             RewardDocumentEntry[] rewards)
         {
             Version = version;
             Ranks = ranks ?? Array.Empty<RankDocumentEntry>();
             Cards = cards ?? Array.Empty<CardDocumentEntry>();
             Quests = quests ?? Array.Empty<QuestDocumentEntry>();
-            RankPromotions = rankPromotions ?? Array.Empty<RankPromotionDocumentEntry>();
+            RankUps = rankUps ?? Array.Empty<RankUpDocumentEntry>();
             Rewards = rewards ?? Array.Empty<RewardDocumentEntry>();
         }
     }
@@ -71,7 +71,7 @@ namespace LL.Game.Data.Persistence
         }
     }
 
-    internal sealed class RankPromotionDocumentEntry
+    internal sealed class RankUpDocumentEntry
     {
         public string RankId { get; }
         public string QuestId { get; }
@@ -82,7 +82,7 @@ namespace LL.Game.Data.Persistence
         public PaymentDocumentEntry InstantPayment { get; }
         public string RewardId { get; }
 
-        public RankPromotionDocumentEntry(
+        public RankUpDocumentEntry(
             string rankId,
             string questId,
             string heroLocalizationKey,

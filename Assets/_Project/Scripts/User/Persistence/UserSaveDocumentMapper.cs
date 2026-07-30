@@ -23,10 +23,10 @@ namespace LL.User.Persistence
                 new UserProgressSnapshot(
                     new RankId(saveData.Progress.RankId),
                     saveData.Progress.Experience),
-                new UserPromotionQuestSnapshot(
-                    new QuestId(saveData.PromotionQuest.QuestId),
-                    saveData.PromotionQuest.DeadlineUnixMilliseconds,
-                    saveData.PromotionQuest.IsCompleted));
+                new UserRankUpQuestSnapshot(
+                    new QuestId(saveData.RankUpQuest.QuestId),
+                    saveData.RankUpQuest.DeadlineUnixMilliseconds,
+                    saveData.RankUpQuest.IsCompleted));
         }
 
         internal static UserSaveDocument ToDocument(UserSnapshot snapshot)
@@ -40,10 +40,10 @@ namespace LL.User.Persistence
                 new UserProgressDocumentEntry(
                     snapshot.Progress.RankId.Value,
                     snapshot.Progress.Experience),
-                new UserPromotionQuestDocumentEntry(
-                    snapshot.PromotionQuest.QuestId.Value,
-                    snapshot.PromotionQuest.DeadlineUnixMilliseconds,
-                    snapshot.PromotionQuest.IsCompleted),
+                new UserRankUpQuestDocumentEntry(
+                    snapshot.RankUpQuest.QuestId.Value,
+                    snapshot.RankUpQuest.DeadlineUnixMilliseconds,
+                    snapshot.RankUpQuest.IsCompleted),
                 snapshot.Items.Amounts
                     .Select(item => new ItemAmountDocumentEntry(item.Id.Value, item.Amount))
                     .ToArray());

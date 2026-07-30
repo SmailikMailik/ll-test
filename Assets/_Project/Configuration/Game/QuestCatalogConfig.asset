@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   _quests:
   - _id: headshots
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
+    _titleLocalizationKey: Upgrade/messages.unlock_rank_up_with_credits
     _descriptionLocalizationKey: Upgrade/messages.headshot_requirement

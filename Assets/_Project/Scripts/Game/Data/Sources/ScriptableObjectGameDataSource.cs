@@ -3,7 +3,7 @@ using System.Linq;
 using LL.Game.Cards.Configuration;
 using LL.Game.Data.Configuration;
 using LL.Game.Payments.Configuration;
-using LL.Game.Promotions.Configuration;
+using LL.Game.RankUp.Configuration;
 using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
@@ -28,7 +28,7 @@ namespace LL.Game.Data.Sources
                 _manifest.Ranks.Ranks.Select(ToRankDeclaration),
                 _manifest.Cards.Cards.Select(ToCardDeclaration),
                 _manifest.Quests.Quests.Select(ToQuestDeclaration),
-                _manifest.RankPromotions.Promotions.Select(ToRankPromotionDeclaration),
+                _manifest.RankUps.RankUps.Select(ToRankUpDeclaration),
                 _manifest.Rewards.Rewards.Select(ToRewardDeclaration));
         }
 
@@ -38,7 +38,7 @@ namespace LL.Game.Data.Sources
             ValidationRunner.EnsureValid(_manifest.Ranks);
             ValidationRunner.EnsureValid(_manifest.Cards);
             ValidationRunner.EnsureValid(_manifest.Quests);
-            ValidationRunner.EnsureValid(_manifest.RankPromotions);
+            ValidationRunner.EnsureValid(_manifest.RankUps);
             ValidationRunner.EnsureValid(_manifest.Rewards);
         }
 
@@ -60,17 +60,17 @@ namespace LL.Game.Data.Sources
                 quest.DescriptionLocalizationKey);
         }
 
-        private static RankPromotionDeclaration ToRankPromotionDeclaration(RankPromotionEntry promotion)
+        private static RankUpDeclaration ToRankUpDeclaration(RankUpEntry rankUp)
         {
-            return new RankPromotionDeclaration(
-                promotion.RankId.Value,
-                promotion.QuestId.Value,
-                promotion.HeroLocalizationKey,
-                promotion.RequiredAmount,
-                promotion.DurationMinutes,
-                ToPaymentDeclaration(promotion.QuestPayment),
-                ToPaymentDeclaration(promotion.InstantPayment),
-                promotion.RewardId.Value);
+            return new RankUpDeclaration(
+                rankUp.RankId.Value,
+                rankUp.QuestId.Value,
+                rankUp.HeroLocalizationKey,
+                rankUp.RequiredAmount,
+                rankUp.DurationMinutes,
+                ToPaymentDeclaration(rankUp.QuestPayment),
+                ToPaymentDeclaration(rankUp.InstantPayment),
+                rankUp.RewardId.Value);
         }
 
         private static PaymentDeclaration ToPaymentDeclaration(PaymentEntry payment)

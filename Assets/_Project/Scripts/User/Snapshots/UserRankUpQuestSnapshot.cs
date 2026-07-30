@@ -4,15 +4,15 @@ using LL.Game.Quests;
 
 namespace LL.User.Snapshots
 {
-    internal sealed class UserPromotionQuestSnapshot
+    internal sealed class UserRankUpQuestSnapshot
     {
-        internal static UserPromotionQuestSnapshot Empty { get; } = new(default, 0L, false);
+        internal static UserRankUpQuestSnapshot Empty { get; } = new(default, 0L, false);
 
         internal QuestId QuestId { get; }
         internal long DeadlineUnixMilliseconds { get; }
         internal bool IsCompleted { get; }
 
-        internal UserPromotionQuestSnapshot(
+        internal UserRankUpQuestSnapshot(
             QuestId questId,
             long deadlineUnixMilliseconds,
             bool isCompleted)
@@ -21,12 +21,12 @@ namespace LL.User.Snapshots
             {
                 if (deadlineUnixMilliseconds != 0L)
                     throw new ArgumentException(
-                        "Promotion quest without an ID must have a zero deadline.",
+                        "Rank-up quest without an ID must have a zero deadline.",
                         nameof(deadlineUnixMilliseconds));
 
                 if (isCompleted)
                     throw new ArgumentException(
-                        "Promotion quest without an ID cannot be completed.",
+                        "Rank-up quest without an ID cannot be completed.",
                         nameof(isCompleted));
             }
             else if (deadlineUnixMilliseconds <= 0L)
@@ -34,7 +34,7 @@ namespace LL.User.Snapshots
                 throw new ArgumentOutOfRangeException(
                     nameof(deadlineUnixMilliseconds),
                     deadlineUnixMilliseconds,
-                    "Promotion quest deadline must be greater than zero.");
+                    "Rank-up quest deadline must be greater than zero.");
             }
 
             if (string.IsNullOrWhiteSpace(questId.Value) is false)

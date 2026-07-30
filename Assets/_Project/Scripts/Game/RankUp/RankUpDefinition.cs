@@ -3,26 +3,26 @@ using LL.Game.Payments;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
 
-namespace LL.Game.Promotions
+namespace LL.Game.RankUp
 {
-    internal sealed class RankPromotion
+    internal sealed class RankUpDefinition
     {
         internal RankId RankId { get; }
-        internal RankPromotionQuest Quest { get; }
+        internal RankUpQuest Quest { get; }
         internal Payment InstantPayment { get; }
         internal RewardId RewardId { get; }
 
-        internal RankPromotion(
+        internal RankUpDefinition(
             RankId rankId,
-            RankPromotionQuest quest,
+            RankUpQuest quest,
             Payment instantPayment,
             RewardId rewardId)
         {
             if (string.IsNullOrWhiteSpace(rankId.Value))
-                throw new ArgumentException("Promotion rank ID must be non-empty.", nameof(rankId));
+                throw new ArgumentException("Rank-up rank ID must be non-empty.", nameof(rankId));
 
             if (string.IsNullOrWhiteSpace(rewardId.Value))
-                throw new ArgumentException("Promotion reward ID must be non-empty.", nameof(rewardId));
+                throw new ArgumentException("Rank-up reward ID must be non-empty.", nameof(rewardId));
 
             RankId = rankId;
             Quest = quest ?? throw new ArgumentNullException(nameof(quest));

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 402e5a924a4f4d1a98424d0ce9be94bf, type: 3}
-  m_Name: RankPromotionCatalogConfig
+  m_Name: RankUpCatalogConfig
   m_EditorClassIdentifier: 
-  _promotions:
+  _rankUps:
   - _rankId: rank_1
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -24,7 +24,7 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_1_promotion
+    _rewardId: rank_1_rank_up
   - _rankId: rank_2
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -36,7 +36,7 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_2_promotion
+    _rewardId: rank_2_rank_up
   - _rankId: rank_3
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -48,7 +48,7 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_3_promotion
+    _rewardId: rank_3_rank_up
   - _rankId: rank_4
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -60,7 +60,7 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_4_promotion
+    _rewardId: rank_4_rank_up
   - _rankId: rank_5
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -72,7 +72,7 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_5_promotion
+    _rewardId: rank_5_rank_up
   - _rankId: rank_6
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -84,7 +84,7 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_6_promotion
+    _rewardId: rank_6_rank_up
   - _rankId: rank_7
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -96,7 +96,7 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_7_promotion
+    _rewardId: rank_7_rank_up
   - _rankId: rank_8
     _questId: headshots
     _heroLocalizationKey: Game/heroes.soldier
@@ -108,4 +108,4 @@ MonoBehaviour:
     _instantPayment:
       _itemId: hard
       _amount: 999
-    _rewardId: rank_8_promotion
+    _rewardId: rank_8_rank_up

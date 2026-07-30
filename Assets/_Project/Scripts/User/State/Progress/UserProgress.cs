@@ -11,7 +11,7 @@ namespace LL.User.State.Progress
         public RankId RankId { get; private set; }
         public int Rank { get; private set; }
         public int Experience { get; private set; }
-        public bool CanPromoteRank => _rankProgression.CanPromote(RankId, Experience);
+        public bool CanRankUp => _rankProgression.CanRankUp(RankId, Experience);
 
         public Observable<RankId> RankChanged => _rankChanged;
         public Observable<int> ExperienceChanged => _experienceChanged;
@@ -66,9 +66,9 @@ namespace LL.User.State.Progress
             return true;
         }
 
-        public bool TryPromoteRank()
+        public bool TryRankUp()
         {
-            if (CanPromoteRank is false)
+            if (CanRankUp is false)
                 return false;
 
             var progress = _rankProgression.GetProgress(RankId, Experience);

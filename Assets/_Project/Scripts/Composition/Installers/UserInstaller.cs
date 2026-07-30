@@ -8,7 +8,7 @@ using LL.User.Snapshots;
 using LL.User.State;
 using LL.User.State.Items;
 using LL.User.State.Progress;
-using LL.User.State.Promotions;
+using LL.User.State.RankUp;
 using VContainer;
 using VContainer.Unity;
 
@@ -32,10 +32,10 @@ namespace LL.Composition.Installers
             builder.RegisterSnapshotPart<UserSnapshot, UserIdentitySnapshot>(snapshot => snapshot.Identity);
             builder.RegisterSnapshotPart<UserSnapshot, UserItemsSnapshot>(snapshot => snapshot.Items);
             builder.RegisterSnapshotPart<UserSnapshot, UserProgressSnapshot>(snapshot => snapshot.Progress);
-            builder.RegisterSnapshotPart<UserSnapshot, UserPromotionQuestSnapshot>(snapshot => snapshot.PromotionQuest);
+            builder.RegisterSnapshotPart<UserSnapshot, UserRankUpQuestSnapshot>(snapshot => snapshot.RankUpQuest);
 
             builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
-            builder.Register<UserPromotionQuest>(Lifetime.Singleton).As<IUserPromotionQuest>();
+            builder.Register<UserRankUpQuest>(Lifetime.Singleton).As<IUserRankUpQuest>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
             builder.RegisterEntryPoint<UserState>().AsSelf();

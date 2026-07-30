@@ -16,7 +16,7 @@ MonoBehaviour:
   m_TableCollectionNameGuidString: 8733600427614121adc422604016f521
   m_Entries:
   - m_Id: 352062502440971
-    m_Key: titles.rank_promotion
+    m_Key: titles.rank_up
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440972
@@ -28,7 +28,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440974
-    m_Key: messages.unlock_promotion_with_credits
+    m_Key: messages.unlock_rank_up_with_credits
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440975
@@ -36,7 +36,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440979
-    m_Key: messages.confirm_rank_promotion
+    m_Key: messages.confirm_rank_up
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440982
@@ -48,15 +48,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440984
-    m_Key: actions.confirm_rank_promotion
+    m_Key: actions.confirm_rank_up
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440985
-    m_Key: actions.cancel_rank_promotion
+    m_Key: actions.cancel_rank_up
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440986
-    m_Key: fragments.promotion_unlock
+    m_Key: fragments.rank_up_unlock
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440987

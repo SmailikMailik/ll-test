@@ -9,7 +9,7 @@ namespace LL.User.State.Progress
         RankId RankId { get; }
         int Rank { get; }
         int Experience { get; }
-        bool CanPromoteRank { get; }
+        bool CanRankUp { get; }
 
         Observable<RankId> RankChanged { get; }
         Observable<int> ExperienceChanged { get; }
@@ -19,6 +19,6 @@ namespace LL.User.State.Progress
         int GetApplicableExperience(int amount);
         bool CanAddExperience(int amount);
         bool TryAddExperience(int amount);
-        bool TryPromoteRank();
+        bool TryRankUp();
     }
 }

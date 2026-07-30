@@ -8,33 +8,33 @@ using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.Game.Promotions.Configuration
+namespace LL.Game.RankUp.Configuration
 {
-    [CreateAssetMenu(fileName = nameof(RankPromotionCatalogConfig), menuName = CreationPath)]
-    internal sealed class RankPromotionCatalogConfig : ScriptableObject, IValidationSource
+    [CreateAssetMenu(fileName = nameof(RankUpCatalogConfig), menuName = CreationPath)]
+    internal sealed class RankUpCatalogConfig : ScriptableObject, IValidationSource
     {
-        [ValidateInput(nameof(HasValidPromotions), "Rank promotion data is invalid.")]
-        [SerializeField] private RankPromotionEntry[] _promotions;
+        [ValidateInput(nameof(HasValidRankUps), "Rank-up data is invalid.")]
+        [SerializeField] private RankUpEntry[] _rankUps;
 
-        internal const string CreationPath = "LL/Game Data/Rank Promotion Catalog";
+        internal const string CreationPath = "LL/Game Data/Rank-Up Catalog";
 
-        private static readonly IDataValidator<RankPromotionEntry[]> _validator = new RankPromotionCatalogConfigValidator();
+        private static readonly IDataValidator<RankUpEntry[]> _validator = new RankUpCatalogConfigValidator();
 
-        internal IReadOnlyList<RankPromotionEntry> Promotions => _promotions;
+        internal IReadOnlyList<RankUpEntry> RankUps => _rankUps;
 
-        private static bool HasValidPromotions(RankPromotionEntry[] promotions)
+        private static bool HasValidRankUps(RankUpEntry[] rankUps)
         {
-            return ValidationRunner.IsValid(promotions, _validator);
+            return ValidationRunner.IsValid(rankUps, _validator);
         }
 
         void IValidationSource.Validate(ValidationContext context)
         {
-            _validator.Validate(_promotions, context);
+            _validator.Validate(_rankUps, context);
         }
     }
 
     [Serializable]
-    internal sealed class RankPromotionEntry
+    internal sealed class RankUpEntry
     {
         [SerializeField] private string _rankId;
         [SerializeField] private string _questId;

@@ -2,9 +2,9 @@ using System;
 using LL.Game.Payments;
 using LL.Game.Quests;
 
-namespace LL.Game.Promotions
+namespace LL.Game.RankUp
 {
-    internal sealed class RankPromotionQuest
+    internal sealed class RankUpQuest
     {
         internal QuestId QuestId { get; }
         internal string HeroLocalizationKey { get; }
@@ -12,7 +12,7 @@ namespace LL.Game.Promotions
         internal TimeSpan Duration { get; }
         internal Payment Payment { get; }
 
-        internal RankPromotionQuest(
+        internal RankUpQuest(
             QuestId questId,
             string heroLocalizationKey,
             int requiredAmount,
@@ -20,10 +20,10 @@ namespace LL.Game.Promotions
             Payment payment)
         {
             if (string.IsNullOrWhiteSpace(questId.Value))
-                throw new ArgumentException("Promotion quest ID must be non-empty.", nameof(questId));
+                throw new ArgumentException("Rank-up quest ID must be non-empty.", nameof(questId));
 
             if (string.IsNullOrWhiteSpace(heroLocalizationKey))
-                throw new ArgumentException("Promotion quest hero localization key must be non-empty.");
+                throw new ArgumentException("Rank-up quest hero localization key must be non-empty.");
 
             if (requiredAmount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(requiredAmount));
