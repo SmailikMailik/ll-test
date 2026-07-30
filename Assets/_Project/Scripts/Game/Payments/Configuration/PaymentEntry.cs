@@ -6,15 +6,10 @@ using UnityEngine;
 namespace LL.Game.Payments.Configuration
 {
     [Serializable]
-    [InlineProperty]
     internal sealed class PaymentEntry
     {
-        [HorizontalGroup("Payment")]
-        [LabelText("Item ID")]
         [SerializeField] private string _itemId;
 
-        [HorizontalGroup("Payment")]
-        [LabelText("Amount")]
         [MinValue(1)]
         [SerializeField] private int _amount = 1;
 

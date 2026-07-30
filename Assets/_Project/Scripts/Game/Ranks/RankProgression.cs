@@ -1,29 +1,21 @@
 using System;
-using System.Collections.Generic;
 using VContainer;
 
 namespace LL.Game.Ranks
 {
     internal sealed class RankProgression : IRankProgression
     {
-        private readonly IReadOnlyList<int> _experienceRequirements;
+        private readonly RankCatalog _catalog;
 
         [Inject]
         internal RankProgression(RankCatalog catalog)
         {
-            _experienceRequirements = catalog?.ExperienceRequirements
-                ?? throw new ArgumentNullException(nameof(catalog));
+            _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
         }
 
-        public RankProgress GetProgress(int rank, int experience)
+        public RankProgress GetProgress(RankId rankId, int experience)
         {
-            if (rank < 1 || rank > _experienceRequirements.Count)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(rank),
-                    rank,
-                    $"Rank must be between 1 and {_experienceRequirements.Count}.");
-            }
+            var rank = _catalog.GetRank(rankId);
 
             if (experience < 0)
             {
@@ -33,17 +25,18 @@ namespace LL.Game.Ranks
                     "Experience must not be negative.");
             }
 
-            var hasNextRank = rank < _experienceRequirements.Count;
-            var requiredExperience = hasNextRank
-                ? _experienceRequirements[rank]
-                : 0;
+            var hasNextRank = rank.Number < _catalog.Ranks.Count;
+            var nextRank = hasNextRank
+                ? _catalog.Ranks[rank.Number]
+                : null;
+            var requiredExperience = nextRank?.RequiredExperience ?? 0;
 
             if (hasNextRank && experience > requiredExperience)
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(experience),
                     experience,
-                    $"Experience at rank {rank} must not exceed {requiredExperience}.");
+                    $"Experience at rank '{rank.Id}' must not exceed {requiredExperience}.");
             }
 
             if (hasNextRank is false && experience != 0)
@@ -51,19 +44,15 @@ namespace LL.Game.Ranks
                 throw new ArgumentOutOfRangeException(
                     nameof(experience),
                     experience,
-                    $"Experience at final rank {rank} must be zero.");
+                    $"Experience at final rank '{rank.Id}' must be zero.");
             }
 
-            return new RankProgress(
-                rank,
-                experience,
-                requiredExperience,
-                hasNextRank);
+            return new RankProgress(rank, nextRank, experience);
         }
 
-        public bool CanPromote(int rank, int experience)
+        public bool CanPromote(RankId rankId, int experience)
         {
-            var progress = GetProgress(rank, experience);
+            var progress = GetProgress(rankId, experience);
 
             return progress.HasNextRank &&
                    experience >= progress.RequiredExperience;

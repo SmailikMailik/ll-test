@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using LL.Game.Identifiers;
 using LL.Game.Promotions.Configuration;
+using LL.Game.Ranks;
 using LL.Game.Ranks.Configuration;
 using LL.Validation;
 using LLEditor.Validation.Sources;
@@ -25,67 +27,70 @@ namespace LLEditor.Validation.References
 
             ValidateReferences(
                 promotions.Promotions,
-                ranks.RankRequirements,
+                ranks.Ranks,
                 context.At(AssetDatabase.GetAssetPath(promotions)));
         }
 
         private static void ValidateReferences(
             IReadOnlyList<RankPromotionEntry> promotions,
-            IReadOnlyList<RankExperienceRequirementEntry> rankRequirements,
+            IReadOnlyList<RankEntry> ranks,
             ValidationContext context)
         {
-            if (rankRequirements == null || rankRequirements.Count == 0)
+            if (ranks == null || ranks.Count == 0)
                 return;
 
-            var ranks = new HashSet<int>();
+            var rankIds = new HashSet<RankId>();
 
-            for (var index = 0; index < rankRequirements.Count; index++)
+            for (var index = 0; index < ranks.Count; index++)
             {
-                if (rankRequirements[index] != null)
-                    ranks.Add(index + 1);
+                var rank = ranks[index];
+
+                if (rank != null && IdentifierValidator.IsValid(rank.Id))
+                    rankIds.Add(rank.Id);
             }
 
-            var promotionRanks = new HashSet<int>();
+            var promotionRankIds = new HashSet<RankId>();
             var promotionCount = promotions?.Count ?? 0;
 
             for (var index = 0; index < promotionCount; index++)
             {
                 var promotion = promotions[index];
 
-                if (promotion == null || promotion.Rank <= 0)
+                if (promotion == null || IdentifierValidator.IsValid(promotion.RankId) is false)
                     continue;
 
-                promotionRanks.Add(promotion.Rank);
+                promotionRankIds.Add(promotion.RankId);
 
                 if (ValidationRules.ReferenceExists(
-                        promotion.Rank,
-                        ranks,
-                        context.At(index).At(nameof(RankPromotionEntry.Rank)),
+                        promotion.RankId,
+                        rankIds,
+                        context.At(index).At(nameof(RankPromotionEntry.RankId)),
                         RankExistsCode) is false)
                 {
                     continue;
                 }
 
-                if (ranks.Contains(promotion.Rank + 1) is false)
+                var rankIndex = FindRankIndex(ranks, promotion.RankId);
+
+                if (rankIndex < 0 || rankIndex + 1 >= ranks.Count)
                 {
                     context
                         .At(index)
-                        .At(nameof(RankPromotionEntry.Rank))
+                        .At(nameof(RankPromotionEntry.RankId))
                         .Report(
                             ValidationSeverity.Error,
                             FinalRankCode,
-                            $"Final rank '{promotion.Rank}' must not have a promotion.");
+                            $"Final rank '{promotion.RankId}' must not have a promotion.");
                 }
             }
 
-            for (var index = 0; index < rankRequirements.Count; index++)
+            for (var index = 0; index + 1 < ranks.Count; index++)
             {
-                var requirement = rankRequirements[index];
-                var rank = index + 1;
+                var rank = ranks[index];
 
-                if (requirement == null ||
-                    ranks.Contains(rank + 1) is false ||
-                    promotionRanks.Contains(rank))
+                if (rank == null ||
+                    IdentifierValidator.IsValid(rank.Id) is false ||
+                    promotionRankIds.Contains(rank.Id))
                 {
                     continue;
                 }
@@ -93,8 +98,21 @@ namespace LLEditor.Validation.References
                 context.Report(
                     ValidationSeverity.Error,
                     PromotionRequiredCode,
-                    $"Rank '{rank}' must have a promotion to the next rank.");
+                    $"Rank '{rank.Id}' must have a promotion to the next rank.");
             }
+        }
+
+        private static int FindRankIndex(
+            IReadOnlyList<RankEntry> ranks,
+            RankId rankId)
+        {
+            for (var index = 0; index < ranks.Count; index++)
+            {
+                if (ranks[index]?.Id.Equals(rankId) == true)
+                    return index;
+            }
+
+            return -1;
         }
     }
 }

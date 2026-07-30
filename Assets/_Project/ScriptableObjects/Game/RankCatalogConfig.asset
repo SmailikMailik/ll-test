@@ -12,13 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f12dbdf5b0ff474299ba9ff585b90c4, type: 3}
   m_Name: RankCatalogConfig
   m_EditorClassIdentifier: 
-  _rankRequirements:
-  - _requiredExperience: 0
-  - _requiredExperience: 5000
-  - _requiredExperience: 10000
-  - _requiredExperience: 15000
-  - _requiredExperience: 20000
-  - _requiredExperience: 25000
-  - _requiredExperience: 30000
-  - _requiredExperience: 35000
-  - _requiredExperience: 40000
+  _ranks:
+  - _id: rank_1
+    _requiredExperience: 0
+  - _id: rank_2
+    _requiredExperience: 5000
+  - _id: rank_3
+    _requiredExperience: 10000
+  - _id: rank_4
+    _requiredExperience: 15000
+  - _id: rank_5
+    _requiredExperience: 20000
+  - _id: rank_6
+    _requiredExperience: 25000
+  - _id: rank_7
+    _requiredExperience: 30000
+  - _id: rank_8
+    _requiredExperience: 35000
+  - _id: rank_9
+    _requiredExperience: 40000

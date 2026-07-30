@@ -12,13 +12,13 @@ namespace LL.Game.Cards
 
         internal CardCatalog(IEnumerable<ICard> cards)
         {
-            var copy = cards?.ToArray() ?? Array.Empty<ICard>();
+            var entries = cards?.ToArray() ?? Array.Empty<ICard>();
             IdentifierCollectionValidator.EnsureValid(
-                copy,
+                entries,
                 card => card.Id,
                 nameof(cards));
 
-            _cardsById = copy.ToDictionary(card => card.Id);
+            _cardsById = entries.ToDictionary(card => card.Id);
         }
 
         internal bool TryGetCard(ItemId id, out ICard card) => _cardsById.TryGetValue(id, out card);

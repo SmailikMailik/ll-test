@@ -7,18 +7,18 @@ namespace LL.User.Snapshots
         internal UserIdentitySnapshot Identity { get; }
         internal UserItemsSnapshot Items { get; }
         internal UserProgressSnapshot Progress { get; }
-        internal UserPromotionOrderSnapshot PromotionOrder { get; }
+        internal UserPromotionQuestSnapshot PromotionQuest { get; }
 
         internal UserSnapshot(
             UserIdentitySnapshot identity,
             UserItemsSnapshot items,
             UserProgressSnapshot progress,
-            UserPromotionOrderSnapshot promotionOrder)
+            UserPromotionQuestSnapshot promotionQuest)
         {
             Identity = identity ?? throw new ArgumentNullException(nameof(identity));
             Items = items ?? throw new ArgumentNullException(nameof(items));
             Progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            PromotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
+            PromotionQuest = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
         }
     }
 }

@@ -8,6 +8,7 @@ namespace LLEditor.Validation.References
     {
         private readonly IProjectDataReferenceValidation[] _validations =
         {
+            new RankPromotionQuestReferenceValidator(),
             new RankPromotionRankReferenceValidator(),
             new RankPromotionRewardReferenceValidator(),
             new UserProgressRankReferenceValidator(),

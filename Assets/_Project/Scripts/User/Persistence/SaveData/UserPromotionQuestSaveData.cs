@@ -1,17 +1,17 @@
 namespace LL.User.Persistence.SaveData
 {
-    internal sealed class UserPromotionOrderSaveData
+    internal sealed class UserPromotionQuestSaveData
     {
-        public string RequirementId { get; }
+        public string QuestId { get; }
         public long DeadlineUnixMilliseconds { get; }
         public bool IsCompleted { get; }
 
-        public UserPromotionOrderSaveData(
-            string requirementId,
+        public UserPromotionQuestSaveData(
+            string questId,
             long deadlineUnixMilliseconds,
             bool isCompleted)
         {
-            RequirementId = requirementId;
+            QuestId = questId;
             DeadlineUnixMilliseconds = deadlineUnixMilliseconds;
             IsCompleted = isCompleted;
         }

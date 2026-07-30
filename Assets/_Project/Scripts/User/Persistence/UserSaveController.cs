@@ -17,20 +17,20 @@ namespace LL.User.Persistence
         private readonly UserIdentitySnapshot _identity;
         private readonly IUserItems _items;
         private readonly IUserProgress _progress;
-        private readonly IUserPromotionOrder _promotionOrder;
+        private readonly IUserPromotionQuest _promotionQuest;
         private readonly ISaveService _saveService;
         private readonly List<IDisposable> _subscriptions = new();
 
         private readonly Dictionary<ItemId, int> _itemAmounts;
         private UserProgressSnapshot _progressSnapshot;
-        private UserPromotionOrderSnapshot _promotionOrderSnapshot;
+        private UserPromotionQuestSnapshot _promotionQuestSnapshot;
 
         [Inject]
         internal UserSaveController(
             UserSnapshot initialSnapshot,
             IUserItems items,
             IUserProgress progress,
-            IUserPromotionOrder promotionOrder,
+            IUserPromotionQuest promotionQuest,
             ISaveService saveService)
         {
             if (initialSnapshot == null)
@@ -39,7 +39,7 @@ namespace LL.User.Persistence
             _identity = initialSnapshot.Identity;
             _items = items ?? throw new ArgumentNullException(nameof(items));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
+            _promotionQuest = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
 
             _itemAmounts = new Dictionary<ItemId, int>();
@@ -47,11 +47,11 @@ namespace LL.User.Persistence
             foreach (var item in initialSnapshot.Items.Amounts)
                 _itemAmounts.Add(item.Id, item.Amount);
 
-            _progressSnapshot = new UserProgressSnapshot(_progress.Rank, _progress.Experience);
-            _promotionOrderSnapshot = new UserPromotionOrderSnapshot(
-                _promotionOrder.RequirementId,
-                _promotionOrder.DeadlineUnixMilliseconds,
-                _promotionOrder.IsCompleted);
+            _progressSnapshot = new UserProgressSnapshot(_progress.RankId, _progress.Experience);
+            _promotionQuestSnapshot = new UserPromotionQuestSnapshot(
+                _promotionQuest.QuestId,
+                _promotionQuest.DeadlineUnixMilliseconds,
+                _promotionQuest.IsCompleted);
         }
 
         public void Initialize()
@@ -60,7 +60,7 @@ namespace LL.User.Persistence
 
             _subscriptions.Add(_progress.RankChanged.Subscribe(_ => OnProgressChanged()));
             _subscriptions.Add(_progress.ExperienceChanged.Subscribe(_ => OnProgressChanged()));
-            _subscriptions.Add(_promotionOrder.Changed.Subscribe(_ => OnPromotionOrderChanged()));
+            _subscriptions.Add(_promotionQuest.Changed.Subscribe(_ => OnPromotionQuestChanged()));
         }
 
         public void Dispose()
@@ -90,31 +90,31 @@ namespace LL.User.Persistence
             Save();
         }
 
-        private void OnPromotionOrderChanged()
+        private void OnPromotionQuestChanged()
         {
-            var snapshot = new UserPromotionOrderSnapshot(
-                _promotionOrder.RequirementId,
-                _promotionOrder.DeadlineUnixMilliseconds,
-                _promotionOrder.IsCompleted);
+            var snapshot = new UserPromotionQuestSnapshot(
+                _promotionQuest.QuestId,
+                _promotionQuest.DeadlineUnixMilliseconds,
+                _promotionQuest.IsCompleted);
 
-            if (_promotionOrderSnapshot.RequirementId.Equals(snapshot.RequirementId) &&
-                _promotionOrderSnapshot.DeadlineUnixMilliseconds == snapshot.DeadlineUnixMilliseconds &&
-                _promotionOrderSnapshot.IsCompleted == snapshot.IsCompleted)
+            if (_promotionQuestSnapshot.QuestId.Equals(snapshot.QuestId) &&
+                _promotionQuestSnapshot.DeadlineUnixMilliseconds == snapshot.DeadlineUnixMilliseconds &&
+                _promotionQuestSnapshot.IsCompleted == snapshot.IsCompleted)
             {
                 return;
             }
 
-            _promotionOrderSnapshot = snapshot;
+            _promotionQuestSnapshot = snapshot;
             Save();
         }
 
         private void OnProgressChanged()
         {
             var snapshot = new UserProgressSnapshot(
-                _progress.Rank,
+                _progress.RankId,
                 _progress.Experience);
 
-            if (_progressSnapshot.Rank == snapshot.Rank &&
+            if (_progressSnapshot.RankId.Equals(snapshot.RankId) &&
                 _progressSnapshot.Experience == snapshot.Experience)
             {
                 return;
@@ -136,7 +136,7 @@ namespace LL.User.Persistence
                 _identity,
                 new UserItemsSnapshot(GetItemAmounts()),
                 _progressSnapshot,
-                _promotionOrderSnapshot);
+                _promotionQuestSnapshot);
         }
 
         private IEnumerable<ItemAmount> GetItemAmounts()

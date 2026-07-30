@@ -37,7 +37,7 @@ MonoBehaviour:
       m_Items:
       - id: 0
   - m_Id: 352062502440975
-    m_Localized: Get {count} headshot kills while playing as {target}
+    m_Localized: Get {count} headshot kills while playing as {hero}
     m_Metadata:
       m_Items:
       - id: 0

@@ -1,32 +1,32 @@
 using System;
 using LL.Game.Identifiers;
-using LL.Game.Promotions;
+using LL.Game.Quests;
 
 namespace LL.User.Snapshots
 {
-    internal sealed class UserPromotionOrderSnapshot
+    internal sealed class UserPromotionQuestSnapshot
     {
-        internal static UserPromotionOrderSnapshot Empty { get; } = new(default, 0L, false);
+        internal static UserPromotionQuestSnapshot Empty { get; } = new(default, 0L, false);
 
-        internal PromotionRequirementId RequirementId { get; }
+        internal QuestId QuestId { get; }
         internal long DeadlineUnixMilliseconds { get; }
         internal bool IsCompleted { get; }
 
-        internal UserPromotionOrderSnapshot(
-            PromotionRequirementId requirementId,
+        internal UserPromotionQuestSnapshot(
+            QuestId questId,
             long deadlineUnixMilliseconds,
             bool isCompleted)
         {
-            if (string.IsNullOrWhiteSpace(requirementId.Value))
+            if (string.IsNullOrWhiteSpace(questId.Value))
             {
                 if (deadlineUnixMilliseconds != 0L)
                     throw new ArgumentException(
-                        "Promotion order without a requirement must have a zero deadline.",
+                        "Promotion quest without an ID must have a zero deadline.",
                         nameof(deadlineUnixMilliseconds));
 
                 if (isCompleted)
                     throw new ArgumentException(
-                        "Promotion order without a requirement cannot be completed.",
+                        "Promotion quest without an ID cannot be completed.",
                         nameof(isCompleted));
             }
             else if (deadlineUnixMilliseconds <= 0L)
@@ -34,13 +34,13 @@ namespace LL.User.Snapshots
                 throw new ArgumentOutOfRangeException(
                     nameof(deadlineUnixMilliseconds),
                     deadlineUnixMilliseconds,
-                    "Promotion order deadline must be greater than zero.");
+                    "Promotion quest deadline must be greater than zero.");
             }
 
-            if (string.IsNullOrWhiteSpace(requirementId.Value) is false)
-                IdentifierValidator.EnsureValid(requirementId, nameof(requirementId));
+            if (string.IsNullOrWhiteSpace(questId.Value) is false)
+                IdentifierValidator.EnsureValid(questId, nameof(questId));
 
-            RequirementId = requirementId;
+            QuestId = questId;
             DeadlineUnixMilliseconds = deadlineUnixMilliseconds;
             IsCompleted = isCompleted;
         }

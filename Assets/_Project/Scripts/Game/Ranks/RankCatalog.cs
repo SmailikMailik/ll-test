@@ -1,39 +1,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Identifiers;
 
 namespace LL.Game.Ranks
 {
     internal sealed class RankCatalog
     {
-        internal IReadOnlyList<int> ExperienceRequirements { get; }
+        internal IReadOnlyList<RankDefinition> Ranks { get; }
 
-        internal RankCatalog(IEnumerable<int> experienceRequirements)
+        private readonly IReadOnlyDictionary<RankId, RankDefinition> _ranksById;
+
+        internal RankCatalog(IEnumerable<RankDefinition> ranks)
         {
-            if (experienceRequirements == null)
-                throw new ArgumentNullException(nameof(experienceRequirements));
+            var entries = ranks?.ToArray() ?? Array.Empty<RankDefinition>();
 
-            var requirements = experienceRequirements.ToArray();
-
-            if (requirements.Length == 0)
+            if (entries.Length == 0)
                 throw new ArgumentException(
-                    "Rank catalog must contain at least one experience requirement.",
-                    nameof(experienceRequirements));
+                    "Rank catalog must contain at least one rank.",
+                    nameof(ranks));
 
-            if (requirements[0] != 0)
-                throw new ArgumentException(
-                    "Rank 1 required experience must be zero.",
-                    nameof(experienceRequirements));
+            IdentifierCollectionValidator.EnsureValid(
+                entries,
+                rank => rank.Id,
+                nameof(ranks));
 
-            for (var index = 1; index < requirements.Length; index++)
-            {
-                if (requirements[index] <= 0)
-                    throw new ArgumentException(
-                        $"Rank {index + 1} required experience must be greater than zero.",
-                        nameof(experienceRequirements));
-            }
-
-            ExperienceRequirements = Array.AsReadOnly(requirements);
+            Ranks = Array.AsReadOnly(entries);
+            _ranksById = entries.ToDictionary(rank => rank.Id);
         }
+
+        internal RankDefinition GetRank(RankId id)
+        {
+            if (_ranksById.TryGetValue(id, out var rank))
+                return rank;
+
+            throw new ArgumentException($"Unknown rank ID: {id}", nameof(id));
+        }
+
+        internal bool TryGetRank(RankId id, out RankDefinition rank) =>
+            _ranksById.TryGetValue(id, out rank);
     }
 }

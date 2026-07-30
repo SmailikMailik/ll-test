@@ -2,24 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Payments.Configuration;
+using LL.Game.Quests;
+using LL.Game.Ranks;
 using LL.Game.Rewards;
 using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LL.Game.Promotions.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankPromotionCatalogConfig), menuName = CreationPath)]
-    [HideMonoScript]
     internal sealed class RankPromotionCatalogConfig :
         ScriptableObject,
         IDataLoader<RankPromotionCatalog>,
         IValidationSource
     {
         [ValidateInput(nameof(HasValidPromotions), "Rank promotion data is invalid.")]
-        [ListDrawerSettings(ShowFoldout = false, ShowPaging = false)]
         [SerializeField] private RankPromotionEntry[] _promotions;
 
         internal const string CreationPath = "LL/Game Data/Rank Promotion Catalog";
@@ -50,74 +49,39 @@ namespace LL.Game.Promotions.Configuration
     [Serializable]
     internal sealed class RankPromotionEntry
     {
-        [HorizontalGroup("Columns")]
-        [BoxGroup("Columns/Promotion")]
-        [MinValue(1)]
-        [SerializeField] private int _rank = 1;
+        [SerializeField] private string _rankId;
+        [SerializeField] private string _questId;
+        [SerializeField] private string _heroLocalizationKey;
 
-        [BoxGroup("Columns/Promotion")]
-        [LabelText("Duration")]
-        [SuffixLabel("min", true)]
-        [MinValue(1)]
-        [SerializeField] private int _durationMinutes = 1440;
-
-        [BoxGroup("Columns/Requirement")]
-        [LabelText("ID")]
-        [SerializeField] private string _requirementId;
-
-        [BoxGroup("Columns/Requirement")]
-        [LabelText("Amount")]
         [MinValue(1)]
         [SerializeField] private int _requiredAmount = 1;
 
-        [BoxGroup("Columns/Localization")]
-        [LabelText("Title")]
-        [SerializeField] private string _titleLocalizationKey;
+        [MinValue(1)]
+        [SerializeField] private int _durationMinutes = 1440;
 
-        [BoxGroup("Columns/Localization")]
-        [LabelText("Description")]
-        [SerializeField] private string _descriptionLocalizationKey;
-
-        [BoxGroup("Columns/Localization")]
-        [LabelText("Target")]
-        [SerializeField] private string _targetLocalizationKey;
-
-        [BoxGroup("Columns/Economy")]
-        [LabelText("Order")]
-        [SerializeField] private PaymentEntry _orderPayment = new();
-
-        [BoxGroup("Columns/Economy")]
-        [LabelText("Instant")]
+        [SerializeField] private PaymentEntry _questPayment = new();
         [SerializeField] private PaymentEntry _instantPayment = new();
-
-        [BoxGroup("Columns/Economy")]
-        [LabelText("Reward")]
-        [FormerlySerializedAs("_rewardBundleId")]
         [SerializeField] private string _rewardId;
 
-        internal int Rank => _rank;
-        internal int DurationMinutes => _durationMinutes;
-        internal PromotionRequirementId RequirementId => new(_requirementId);
+        internal RankId RankId => new(_rankId);
+        internal QuestId QuestId => new(_questId);
+        internal string HeroLocalizationKey => _heroLocalizationKey;
         internal int RequiredAmount => _requiredAmount;
-        internal string TitleLocalizationKey => _titleLocalizationKey;
-        internal string DescriptionLocalizationKey => _descriptionLocalizationKey;
-        internal string TargetLocalizationKey => _targetLocalizationKey;
-        internal PaymentEntry OrderPayment => _orderPayment;
+        internal int DurationMinutes => _durationMinutes;
+        internal PaymentEntry QuestPayment => _questPayment;
         internal PaymentEntry InstantPayment => _instantPayment;
         internal RewardId RewardId => new(_rewardId);
 
         internal RankPromotion ToPromotion()
         {
             return new RankPromotion(
-                Rank,
-                new RankPromotionRequirement(
-                    RequirementId,
-                    TitleLocalizationKey,
-                    DescriptionLocalizationKey,
-                    TargetLocalizationKey,
-                    RequiredAmount),
-                TimeSpan.FromMinutes(DurationMinutes),
-                OrderPayment.ToPayment(),
+                RankId,
+                new RankPromotionQuest(
+                    QuestId,
+                    HeroLocalizationKey,
+                    RequiredAmount,
+                    TimeSpan.FromMinutes(DurationMinutes),
+                    QuestPayment.ToPayment()),
                 InstantPayment.ToPayment(),
                 RewardId);
         }

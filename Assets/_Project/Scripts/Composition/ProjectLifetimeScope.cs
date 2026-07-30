@@ -3,6 +3,7 @@ using LL.Composition.Persistence;
 using LL.Game.Cards.Configuration;
 using LL.Game.Payments;
 using LL.Game.Promotions.Configuration;
+using LL.Game.Quests.Configuration;
 using LL.Game.Ranks;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
@@ -23,7 +24,6 @@ using LL.User.State.Progress;
 using LL.User.State.Promotions;
 using LL.Validation.Reporting;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -37,9 +37,9 @@ namespace LL.Composition
         [Header("Game Data")]
         [SerializeField] private RankCatalogConfig _rankCatalogConfig;
         [SerializeField] private CardCatalogConfig _cardCatalogConfig;
+        [SerializeField] private QuestCatalogConfig _questCatalogConfig;
         [SerializeField] private RankPromotionCatalogConfig _rankPromotionCatalogConfig;
 
-        [FormerlySerializedAs("_rewardBundleCatalogConfig")]
         [SerializeField] private RewardCatalogConfig _rewardCatalogConfig;
 
         [Header("Presentation")]
@@ -82,6 +82,7 @@ namespace LL.Composition
         {
             RegisterLoadedData(builder, _rankCatalogConfig);
             RegisterLoadedData(builder, _cardCatalogConfig);
+            RegisterLoadedData(builder, _questCatalogConfig);
             RegisterLoadedData(builder, _rankPromotionCatalogConfig);
             RegisterLoadedData(builder, _rewardCatalogConfig);
         }
@@ -101,7 +102,7 @@ namespace LL.Composition
             RegisterUserSnapshotPart(builder, snapshot => snapshot.Identity);
             RegisterUserSnapshotPart(builder, snapshot => snapshot.Items);
             RegisterUserSnapshotPart(builder, snapshot => snapshot.Progress);
-            RegisterUserSnapshotPart(builder, snapshot => snapshot.PromotionOrder);
+            RegisterUserSnapshotPart(builder, snapshot => snapshot.PromotionQuest);
 
             builder.RegisterEntryPoint<UserSaveController>();
         }
@@ -109,7 +110,7 @@ namespace LL.Composition
         private static void RegisterUserState(IContainerBuilder builder)
         {
             builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
-            builder.Register<UserPromotionOrder>(Lifetime.Singleton).As<IUserPromotionOrder>();
+            builder.Register<UserPromotionQuest>(Lifetime.Singleton).As<IUserPromotionQuest>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Identifiers;
 using LL.Validation;
 
 namespace LL.User.Configuration
@@ -14,7 +15,6 @@ namespace LL.User.Configuration
         private const string RegionWhitespaceCode = "user-defaults.identity.region-code.trimmed";
         private const string RegionCaseCode = "user-defaults.identity.region-code.uppercase";
         private const string ProgressCode = "user-defaults.progress.required";
-        private const string RankCode = "user-defaults.progress.rank.positive";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
 
         private readonly IDataValidator<IReadOnlyList<ItemAmountEntry>> _itemsValidator;
@@ -76,10 +76,9 @@ namespace LL.User.Configuration
             if (ValidationRules.NotNull(progress, context, ProgressCode) is false)
                 return;
 
-            ValidationRules.Positive(
-                progress.Rank,
-                context.At(nameof(UserProgressDefaults.Rank)),
-                RankCode);
+            IdentifierValidator.Validate(
+                progress.RankId,
+                context.At(nameof(UserProgressDefaults.RankId)));
 
             ValidationRules.NonNegative(
                 progress.Experience,

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Promotions;
+using LL.Game.Ranks;
 using LL.Game.Rewards;
 using LL.Presentation.Localization;
 using LL.Presentation.Promotions;
@@ -20,6 +21,7 @@ namespace LL.UI
 
         private const string RankVariable = "rank";
 
+        private RankCatalog _rankCatalog;
         private RankPromotionCatalog _promotionCatalog;
         private RewardCatalog _rewardCatalog;
         private ILocalizationService _localization;
@@ -28,10 +30,12 @@ namespace LL.UI
 
         [Inject]
         private void Construct(
+            RankCatalog rankCatalog,
             RankPromotionCatalog promotionCatalog,
             RewardCatalog rewardCatalog,
             ILocalizationService localization)
         {
+            _rankCatalog = rankCatalog ?? throw new ArgumentNullException(nameof(rankCatalog));
             _promotionCatalog = promotionCatalog ?? throw new ArgumentNullException(nameof(promotionCatalog));
             _rewardCatalog = rewardCatalog ?? throw new ArgumentNullException(nameof(rewardCatalog));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
@@ -42,9 +46,10 @@ namespace LL.UI
             _localization.LocaleChanged.Subscribe(_ => OnLocaleChanged()).AddTo(this);
         }
 
-        internal void ShowNextRank(int currentRank)
+        internal void ShowNextRank(RankId currentRankId)
         {
-            if (_promotionCatalog.TryGetPromotion(currentRank, out var promotion) is false)
+            if (_rankCatalog.TryGetRank(currentRankId, out var currentRank) is false ||
+                _promotionCatalog.TryGetPromotion(currentRankId, out var promotion) is false)
             {
                 Clear();
                 return;
@@ -57,7 +62,7 @@ namespace LL.UI
                 return;
             }
 
-            _nextRank = currentRank + 1;
+            _nextRank = currentRank.Number + 1;
             _hasPreview = true;
             gameObject.SetActive(true);
             RefreshTitle();

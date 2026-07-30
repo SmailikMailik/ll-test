@@ -3,16 +3,16 @@ using LL.Validation;
 
 namespace LL.Game.Cards.Configuration
 {
-    internal sealed class CardCatalogConfigValidator : IDataValidator<CardDefinitionEntry[]>
+    internal sealed class CardCatalogConfigValidator : IDataValidator<CardEntry[]>
     {
-        private const string CardsCode = "card.entries.required";
+        private const string EntriesCode = "card.entries.required";
         private const string ExperienceAmountCode = "card.experience.positive";
 
         public void Validate(
-            CardDefinitionEntry[] cards,
+            CardEntry[] cards,
             ValidationContext context)
         {
-            if (ValidationRules.NotNull(cards, context, CardsCode) is false)
+            if (ValidationRules.NotNull(cards, context, EntriesCode) is false)
                 return;
 
             IdentifierCollectionValidator.Validate(
@@ -27,9 +27,10 @@ namespace LL.Game.Cards.Configuration
                 if (card == null)
                     continue;
 
+                var cardContext = context.At(index);
                 ValidationRules.Positive(
                     card.ExperienceAmount,
-                    context.At(index).At(nameof(CardDefinitionEntry.ExperienceAmount)),
+                    cardContext.At(nameof(CardEntry.ExperienceAmount)),
                     ExperienceAmountCode);
             }
         }

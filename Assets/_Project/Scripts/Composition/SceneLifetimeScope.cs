@@ -1,6 +1,6 @@
 using LL.Game.Promotions.Services;
 using LL.Game.Upgrades;
-using LL.Presentation.Orders;
+using LL.Presentation.Quests;
 using LL.Presentation.Upgrades;
 using LL.UI.Promotions;
 using LL.UI.Windows;
@@ -32,8 +32,8 @@ namespace LL.Composition
         private static void RegisterConfirmations(IContainerBuilder builder)
         {
             builder
-                .Register<ModalOrderCompletionConfirmation>(Lifetime.Scoped)
-                .As<IOrderCompletionConfirmation>();
+                .Register<ModalQuestCompletionConfirmation>(Lifetime.Scoped)
+                .As<IQuestCompletionConfirmation>();
             builder
                 .Register<ModalRankPromotionConfirmation>(Lifetime.Scoped)
                 .As<IRankPromotionConfirmation>();

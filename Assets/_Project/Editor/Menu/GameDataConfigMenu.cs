@@ -1,5 +1,6 @@
 using LL.Game.Cards.Configuration;
 using LL.Game.Promotions.Configuration;
+using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using UnityEditor;
@@ -18,6 +19,12 @@ namespace LLEditor.Menu
         private static void SelectRankPromotionCatalog()
         {
             ProjectAssetSelector.Select<RankPromotionCatalogConfig>(RankPromotionCatalogConfig.CreationPath);
+        }
+
+        [MenuItem(LastLevelMenu.GamePath + "Quests/Quest Catalog", false, LastLevelMenu.ContentPriority)]
+        private static void SelectQuestCatalog()
+        {
+            ProjectAssetSelector.Select<QuestCatalogConfig>(QuestCatalogConfig.CreationPath);
         }
 
         [MenuItem(LastLevelMenu.GamePath + "Cards/Card Catalog", false, LastLevelMenu.ContentPriority)]

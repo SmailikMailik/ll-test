@@ -47,7 +47,7 @@ namespace LLEditor.Validation.References.Items
                 if (card == null || IdentifierValidator.IsValid(card.Id) is false)
                     continue;
 
-                var idContext = configContext.At(index).At(nameof(CardDefinitionEntry.Id));
+                var idContext = configContext.At(index).At(nameof(CardEntry.Id));
 
                 if (hasUserItems)
                 {

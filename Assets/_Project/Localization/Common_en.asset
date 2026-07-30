@@ -51,7 +51,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440967
-    m_Localized: Accept Order
+    m_Localized: Accept Quest
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440968
@@ -83,11 +83,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440988
-    m_Localized: Order in Progress
+    m_Localized: Quest in Progress
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440989
-    m_Localized: Complete this order for testing?
+    m_Localized: Complete this quest for testing?
     m_Metadata:
       m_Items: []
   - m_Id: 352062502440990

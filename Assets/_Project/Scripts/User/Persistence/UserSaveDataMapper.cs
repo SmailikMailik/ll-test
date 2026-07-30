@@ -1,7 +1,8 @@
 using System;
 using System.Linq;
 using LL.Game.Items;
-using LL.Game.Promotions;
+using LL.Game.Quests;
+using LL.Game.Ranks;
 using LL.User.Persistence.SaveData;
 using LL.User.Snapshots;
 
@@ -19,11 +20,13 @@ namespace LL.User.Persistence
                 new UserItemsSnapshot(
                     saveData.Items.Select(item =>
                         new ItemAmount(new ItemId(item.Id), item.Amount))),
-                new UserProgressSnapshot(saveData.Progress.Rank, saveData.Progress.Experience),
-                new UserPromotionOrderSnapshot(
-                    new PromotionRequirementId(saveData.PromotionOrder.RequirementId),
-                    saveData.PromotionOrder.DeadlineUnixMilliseconds,
-                    saveData.PromotionOrder.IsCompleted));
+                new UserProgressSnapshot(
+                    new RankId(saveData.Progress.RankId),
+                    saveData.Progress.Experience),
+                new UserPromotionQuestSnapshot(
+                    new QuestId(saveData.PromotionQuest.QuestId),
+                    saveData.PromotionQuest.DeadlineUnixMilliseconds,
+                    saveData.PromotionQuest.IsCompleted));
         }
 
         internal static UserSaveData ToSaveData(UserSnapshot snapshot)
@@ -34,11 +37,13 @@ namespace LL.User.Persistence
             return new UserSaveData(
                 UserSaveData.CurrentVersion,
                 new UserIdentitySaveData(snapshot.Identity.UserId, snapshot.Identity.RegionCode),
-                new UserProgressSaveData(snapshot.Progress.Rank, snapshot.Progress.Experience),
-                new UserPromotionOrderSaveData(
-                    snapshot.PromotionOrder.RequirementId.Value,
-                    snapshot.PromotionOrder.DeadlineUnixMilliseconds,
-                    snapshot.PromotionOrder.IsCompleted),
+                new UserProgressSaveData(
+                    snapshot.Progress.RankId.Value,
+                    snapshot.Progress.Experience),
+                new UserPromotionQuestSaveData(
+                    snapshot.PromotionQuest.QuestId.Value,
+                    snapshot.PromotionQuest.DeadlineUnixMilliseconds,
+                    snapshot.PromotionQuest.IsCompleted),
                 snapshot.Items.Amounts
                     .Select(item => new ItemAmountSaveData(item.Id.Value, item.Amount))
                     .ToArray());

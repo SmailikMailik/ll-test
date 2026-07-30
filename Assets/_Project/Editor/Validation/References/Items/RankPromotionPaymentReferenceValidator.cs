@@ -51,8 +51,8 @@ namespace LLEditor.Validation.References.Items
                     continue;
 
                 ValidatePayment(
-                    promotion.OrderPayment,
-                    configContext.At(index).At(nameof(RankPromotionEntry.OrderPayment)),
+                    promotion.QuestPayment,
+                    configContext.At(index).At(nameof(RankPromotionEntry.QuestPayment)),
                     hasUserItems,
                     userItemIds,
                     hasIcons,

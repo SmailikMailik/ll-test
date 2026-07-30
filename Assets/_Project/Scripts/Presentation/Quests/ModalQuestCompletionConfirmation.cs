@@ -4,15 +4,15 @@ using LL.UI.Windows;
 using LL.UI.Windows.Views;
 using VContainer;
 
-namespace LL.Presentation.Orders
+namespace LL.Presentation.Quests
 {
-    internal sealed class ModalOrderCompletionConfirmation : IOrderCompletionConfirmation
+    internal sealed class ModalQuestCompletionConfirmation : IQuestCompletionConfirmation
     {
         private readonly WindowController _windowController;
         private readonly ILocalizationService _localization;
 
         [Inject]
-        internal ModalOrderCompletionConfirmation(
+        internal ModalQuestCompletionConfirmation(
             WindowController windowController,
             ILocalizationService localization)
         {
@@ -24,11 +24,11 @@ namespace LL.Presentation.Orders
         {
             _windowController.Show(new ModalWindowParameters
             (
-                headerText: _localization.GetText(OrderLocalizationKeys.TestingTitle),
-                messageText: _localization.GetText(OrderLocalizationKeys.TestingMessage),
-                positiveText: _localization.GetText(OrderLocalizationKeys.CompleteAction),
+                headerText: _localization.GetText(QuestLocalizationKeys.TestingTitle),
+                messageText: _localization.GetText(QuestLocalizationKeys.TestingMessage),
+                positiveText: _localization.GetText(QuestLocalizationKeys.CompleteAction),
                 positiveCallback: onConfirmed,
-                negativeText: _localization.GetText(OrderLocalizationKeys.CancelAction),
+                negativeText: _localization.GetText(QuestLocalizationKeys.CancelAction),
                 closeActive: false
             ));
         }

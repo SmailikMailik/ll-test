@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LL.Game.Items;
 using LL.Game.Payments;
 using LL.Game.Promotions;
+using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Presentation.Payments;
 using LL.UI.Controls;
@@ -12,7 +13,6 @@ using LL.User.State.Progress;
 using R3;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 
 namespace LL.UI.Windows.Views.Promotion
@@ -22,24 +22,22 @@ namespace LL.UI.Windows.Views.Promotion
         [SerializeField] private TMP_Text _currentRankLabel;
         [SerializeField] private TMP_Text _nextRankLabel;
 
-        [FormerlySerializedAs("_softPriceLabel")]
-        [SerializeField] private TMP_Text _orderPriceLabel;
+        [SerializeField] private TMP_Text _questPriceLabel;
 
-        [FormerlySerializedAs("_softButton")]
-        [SerializeField] private InteractiveButton _orderButton;
+        [SerializeField] private InteractiveButton _questButton;
 
-        [FormerlySerializedAs("_hardPriceLabel")]
         [SerializeField] private TMP_Text _instantPriceLabel;
 
-        [FormerlySerializedAs("_hardButton")]
         [SerializeField] private InteractiveButton _instantButton;
 
         [SerializeField] private NextRankRewardView _nextRankRewardView;
-        [SerializeField] private PromotionOrderView _orderView;
+
+        [SerializeField] private PromotionQuestView _questView;
 
         private IUserProgress _userProgress;
         private IRankProgression _rankProgression;
         private RankPromotionFlow _rankPromotionFlow;
+        private QuestCatalog _questCatalog;
         private UpgradeFlow _upgradeFlow;
         private RankPromotion _promotion;
 
@@ -48,47 +46,51 @@ namespace LL.UI.Windows.Views.Promotion
             IUserProgress userProgress,
             IRankProgression rankProgression,
             RankPromotionFlow rankPromotionFlow,
+            QuestCatalog questCatalog,
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _rankPromotionFlow = rankPromotionFlow ?? throw new ArgumentNullException(nameof(rankPromotionFlow));
+            _questCatalog = questCatalog ?? throw new ArgumentNullException(nameof(questCatalog));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
 
         private void Start()
         {
-            _orderButton.Clicked.Subscribe(_ => OnOrderPromotionClicked()).AddTo(this);
+            _questButton.Clicked.Subscribe(_ => OnQuestPromotionClicked()).AddTo(this);
             _instantButton.Clicked.Subscribe(_ => OnInstantPromotionClicked()).AddTo(this);
-            _orderView.Completed.Subscribe(_ => OnOrderCompleted()).AddTo(this);
+            _questView.Completed.Subscribe(_ => OnQuestCompleted()).AddTo(this);
         }
 
         protected override void OnShow()
         {
-            var rank = _userProgress.Rank;
-            var progress = _rankProgression.GetProgress(rank, _userProgress.Experience);
+            var progress = _rankProgression.GetProgress(_userProgress.RankId, _userProgress.Experience);
+            var rank = progress.Rank;
             var nextRank = progress.HasNextRank ? rank + 1 : rank;
 
             _currentRankLabel.text = TextFormatter.Number(rank);
             _nextRankLabel.text = TextFormatter.Number(nextRank);
-            _nextRankRewardView.ShowNextRank(rank);
+            _nextRankRewardView.ShowNextRank(_userProgress.RankId);
 
-            if (_rankPromotionFlow.TryGetPromotion(out _promotion))
+            if (_rankPromotionFlow.TryGetPromotion(out _promotion) &&
+                _questCatalog.TryGetQuest(_promotion.Quest.QuestId, out var quest))
             {
-                _orderPriceLabel.text = PaymentFormatter.Format(_promotion.OrderPayment);
+                _questPriceLabel.text = PaymentFormatter.Format(_promotion.Quest.Payment);
                 _instantPriceLabel.text = PaymentFormatter.Format(_promotion.InstantPayment);
-                _orderView.Refresh(
-                    _promotion.Requirement,
-                    _promotion.OrderDuration,
+                _questView.Refresh(
+                    _promotion.Quest,
+                    quest,
                     _userProgress.CanPromoteRank);
             }
             else
             {
-                _orderPriceLabel.text = string.Empty;
+                _promotion = null;
+                _questPriceLabel.text = string.Empty;
                 _instantPriceLabel.text = string.Empty;
             }
 
-            _orderView.gameObject.SetActive(_promotion != null);
+            _questView.gameObject.SetActive(_promotion != null);
             RefreshActions();
         }
 
@@ -103,10 +105,10 @@ namespace LL.UI.Windows.Views.Promotion
                 OnPromotionFailed);
         }
 
-        private void OnOrderPromotionClicked()
+        private void OnQuestPromotionClicked()
         {
             if (_promotion != null)
-                PromoteRank(_promotion.OrderPayment);
+                PromoteRank(_promotion.Quest.Payment);
         }
 
         private void OnInstantPromotionClicked()
@@ -125,7 +127,7 @@ namespace LL.UI.Windows.Views.Promotion
             RefreshActions();
         }
 
-        private void OnOrderCompleted()
+        private void OnQuestCompleted()
         {
             RefreshActions();
         }
@@ -135,11 +137,11 @@ namespace LL.UI.Windows.Views.Promotion
             var hasPromotion = _promotion != null;
             var canPromoteRank = _userProgress.CanPromoteRank;
 
-            _orderView.SetAvailable(hasPromotion && canPromoteRank);
-            _orderButton.SetInteractable(
+            _questView.SetAvailable(hasPromotion && canPromoteRank);
+            _questButton.SetInteractable(
                 hasPromotion &&
                 canPromoteRank &&
-                _orderView.IsCompleted);
+                _questView.IsCompleted);
             _instantButton.SetInteractable(hasPromotion && canPromoteRank);
         }
     }

@@ -12,7 +12,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         {
             get
             {
-                var progress = _rankProgression.GetProgress(_baseRank, _baseExperience);
+                var progress = _rankProgression.GetProgress(_baseRankId, _baseExperience);
                 return progress.RemainingExperience;
             }
         }
@@ -25,7 +25,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
         private readonly IUserProgress _userProgress;
         private readonly IRankProgression _rankProgression;
 
-        private int _baseRank;
+        private RankId _baseRankId;
         private int _baseExperience;
         private int _pendingExperience;
 
@@ -41,7 +41,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         internal void ResetPreview()
         {
-            _baseRank = _userProgress.Rank;
+            _baseRankId = _userProgress.RankId;
             _baseExperience = _userProgress.Experience;
             ClearPreview();
         }
@@ -83,7 +83,7 @@ namespace LL.UI.Windows.Views.Upgrade.Progress
 
         private void RefreshView()
         {
-            var progress = _rankProgression.GetProgress(_baseRank, _baseExperience);
+            var progress = _rankProgression.GetProgress(_baseRankId, _baseExperience);
             _view.Show(progress, _baseExperience, _pendingExperience);
         }
     }

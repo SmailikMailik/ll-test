@@ -6,12 +6,10 @@ namespace LL.Game.Promotions.Configuration
 {
     internal sealed class RankPromotionCatalogConfigValidator : IDataValidator<RankPromotionEntry[]>
     {
-        private const string PromotionsCode = "rank-promotion.entries.required";
-        private const string DurationCode = "rank-promotion.duration.positive";
-        private const string RequiredAmountCode = "rank-promotion.requirement.amount.positive";
-        private const string TitleKeyCode = "rank-promotion.localization.title.not-empty";
-        private const string DescriptionKeyCode = "rank-promotion.localization.description.not-empty";
-        private const string TargetKeyCode = "rank-promotion.localization.target.not-empty";
+        private const string EntriesCode = "rank-promotion.entries.required";
+        private const string HeroKeyCode = "rank-promotion.quest.hero.not-empty";
+        private const string RequiredAmountCode = "rank-promotion.quest.amount.positive";
+        private const string DurationCode = "rank-promotion.quest.duration.positive";
         private static readonly IDataValidator<PaymentEntry> _paymentValidator =
             new PaymentEntryValidator();
 
@@ -19,12 +17,12 @@ namespace LL.Game.Promotions.Configuration
             RankPromotionEntry[] promotions,
             ValidationContext context)
         {
-            if (ValidationRules.NotNull(promotions, context, PromotionsCode) is false)
+            if (ValidationRules.NotNull(promotions, context, EntriesCode) is false)
                 return;
 
-            RankPromotionCatalogValidator.Validate(
+            IdentifierCollectionValidator.Validate(
                 promotions,
-                promotion => promotion.Rank,
+                promotion => promotion.RankId,
                 context);
 
             for (var index = 0; index < promotions.Length; index++)
@@ -36,38 +34,28 @@ namespace LL.Game.Promotions.Configuration
 
                 var promotionContext = context.At(index);
 
-                ValidationRules.Positive(
-                    promotion.DurationMinutes,
-                    promotionContext.At(nameof(RankPromotionEntry.DurationMinutes)),
-                    DurationCode);
-
                 IdentifierValidator.Validate(
-                    promotion.RequirementId,
-                    promotionContext.At(nameof(RankPromotionEntry.RequirementId)));
+                    promotion.QuestId,
+                    promotionContext.At(nameof(RankPromotionEntry.QuestId)));
+
+                ValidationRules.NotEmpty(
+                    promotion.HeroLocalizationKey,
+                    promotionContext.At(nameof(RankPromotionEntry.HeroLocalizationKey)),
+                    HeroKeyCode);
 
                 ValidationRules.Positive(
                     promotion.RequiredAmount,
                     promotionContext.At(nameof(RankPromotionEntry.RequiredAmount)),
                     RequiredAmountCode);
 
-                ValidationRules.NotEmpty(
-                    promotion.TitleLocalizationKey,
-                    promotionContext.At(nameof(RankPromotionEntry.TitleLocalizationKey)),
-                    TitleKeyCode);
-
-                ValidationRules.NotEmpty(
-                    promotion.DescriptionLocalizationKey,
-                    promotionContext.At(nameof(RankPromotionEntry.DescriptionLocalizationKey)),
-                    DescriptionKeyCode);
-
-                ValidationRules.NotEmpty(
-                    promotion.TargetLocalizationKey,
-                    promotionContext.At(nameof(RankPromotionEntry.TargetLocalizationKey)),
-                    TargetKeyCode);
+                ValidationRules.Positive(
+                    promotion.DurationMinutes,
+                    promotionContext.At(nameof(RankPromotionEntry.DurationMinutes)),
+                    DurationCode);
 
                 _paymentValidator.Validate(
-                    promotion.OrderPayment,
-                    promotionContext.At(nameof(RankPromotionEntry.OrderPayment)));
+                    promotion.QuestPayment,
+                    promotionContext.At(nameof(RankPromotionEntry.QuestPayment)));
                 _paymentValidator.Validate(
                     promotion.InstantPayment,
                     promotionContext.At(nameof(RankPromotionEntry.InstantPayment)));

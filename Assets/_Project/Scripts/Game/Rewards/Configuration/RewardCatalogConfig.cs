@@ -6,20 +6,16 @@ using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace LL.Game.Rewards.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RewardCatalogConfig), menuName = CreationPath)]
-    [HideMonoScript]
     internal sealed class RewardCatalogConfig :
         ScriptableObject,
         IDataLoader<RewardCatalog>,
         IValidationSource
     {
-        [FormerlySerializedAs("_bundles")]
         [ValidateInput(nameof(HasValidRewards), "Reward data is invalid.")]
-        [ListDrawerSettings(ShowFoldout = false, ShowPaging = false)]
         [SerializeField] private RewardEntry[] _rewards;
 
         internal const string CreationPath = "LL/Game Data/Reward Catalog";
@@ -50,36 +46,22 @@ namespace LL.Game.Rewards.Configuration
     [Serializable]
     internal sealed class RewardEntry
     {
-        [HorizontalGroup("Columns")]
-        [BoxGroup("Columns/Reward")]
-        [LabelText("ID")]
         [SerializeField] private string _id;
 
-        [FormerlySerializedAs("_rewards")]
-        [BoxGroup("Columns/Items")]
-        [TableList(AlwaysExpanded = true, DrawScrollView = false, HideToolbar = false)]
         [SerializeField] private RewardItemEntry[] _items;
 
         internal RewardId Id => new(_id);
         internal IReadOnlyList<RewardItemEntry> Items => _items;
 
-        internal Reward ToReward()
-        {
-            return new Reward(
-                Id,
-                Items.Select(item => item.ToItemAmount()));
-        }
+        internal Reward ToReward() =>
+            new(Id, Items.Select(item => item.ToItemAmount()));
     }
 
     [Serializable]
     internal sealed class RewardItemEntry
     {
-        [TableColumnWidth(120, Resizable = false)]
-        [HideLabel]
         [SerializeField] private string _id;
 
-        [TableColumnWidth(80, Resizable = false)]
-        [HideLabel]
         [MinValue(1)]
         [SerializeField] private int _amount = 1;
 

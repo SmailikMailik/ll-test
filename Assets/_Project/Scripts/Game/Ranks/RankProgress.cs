@@ -4,25 +4,31 @@ namespace LL.Game.Ranks
 {
     internal readonly struct RankProgress
     {
+        internal RankId RankId { get; }
         internal int Rank { get; }
+        internal RankId NextRankId { get; }
         internal int Experience { get; }
         internal int RequiredExperience { get; }
         internal int RemainingExperience { get; }
         internal bool HasNextRank { get; }
 
         internal RankProgress(
-            int rank,
-            int experience,
-            int requiredExperience,
-            bool hasNextRank)
+            RankDefinition rank,
+            RankDefinition nextRank,
+            int experience)
         {
-            Rank = rank;
+            if (rank == null)
+                throw new ArgumentNullException(nameof(rank));
+
+            RankId = rank.Id;
+            Rank = rank.Number;
+            NextRankId = nextRank?.Id ?? default;
             Experience = experience;
-            RequiredExperience = requiredExperience;
-            RemainingExperience = hasNextRank
-                ? Math.Max(0, requiredExperience - experience)
+            RequiredExperience = nextRank?.RequiredExperience ?? 0;
+            RemainingExperience = nextRank != null
+                ? Math.Max(0, RequiredExperience - experience)
                 : 0;
-            HasNextRank = hasNextRank;
+            HasNextRank = nextRank != null;
         }
 
         internal float GetNormalizedExperience(int experience)

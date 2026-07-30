@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Promotions;
+using LL.Game.Quests;
 using LL.Presentation.Localization;
-using LL.Presentation.Orders;
 using LL.Presentation.Promotions;
+using LL.Presentation.Quests;
 using LL.UI.Controls;
 using LL.UI.Localization;
 using LL.UI.Typography;
@@ -16,7 +17,7 @@ using VContainer;
 namespace LL.UI.Windows.Views.Promotion
 {
     [DisallowMultipleComponent]
-    internal sealed class PromotionOrderView : MonoBehaviour
+    internal sealed class PromotionQuestView : MonoBehaviour
     {
         [SerializeField] private TMP_Text _titleLabel;
         [SerializeField] private TMP_Text _descriptionLabel;
@@ -25,36 +26,37 @@ namespace LL.UI.Windows.Views.Promotion
         [SerializeField] private InteractiveButton _button;
 
         private const string CountVariable = "count";
-        private const string TargetVariable = "target";
+        private const string HeroVariable = "hero";
         private const string UnlockVariable = "unlock";
 
         private static readonly TimeSpan _timerTickInterval = TimeSpan.FromSeconds(1);
 
         internal Observable<Unit> Completed => _completed;
-        internal bool IsCompleted => _state == OrderState.Completed;
+        internal bool IsCompleted => _state == QuestState.Completed;
 
         private readonly Subject<Unit> _completed = new();
 
-        private IOrderCompletionConfirmation _completionConfirmation;
+        private IQuestCompletionConfirmation _completionConfirmation;
         private ILocalizationService _localization;
-        private IUserPromotionOrder _promotionOrder;
+        private IUserPromotionQuest _promotionQuest;
 
-        private OrderState _state = OrderState.Available;
-        private RankPromotionRequirement _requirement;
-        private PromotionRequirementId _requirementId;
+        private QuestState _state = QuestState.Available;
+        private RankPromotionQuest _promotionQuestDefinition;
+        private QuestDefinition _quest;
         private int _displayedRemainingSeconds = -1;
         private bool _canAccept;
         private TimeSpan _duration;
 
         [Inject]
         private void Construct(
-            IOrderCompletionConfirmation completionConfirmation,
+            IQuestCompletionConfirmation completionConfirmation,
             ILocalizationService localization,
-            IUserPromotionOrder promotionOrder)
+            IUserPromotionQuest promotionQuest)
         {
-            _completionConfirmation = completionConfirmation ?? throw new ArgumentNullException(nameof(completionConfirmation));
+            _completionConfirmation = completionConfirmation
+                ?? throw new ArgumentNullException(nameof(completionConfirmation));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
+            _promotionQuest = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
         }
 
         private void Start()
@@ -65,22 +67,22 @@ namespace LL.UI.Windows.Views.Promotion
 
             Observable
                 .Interval(_timerTickInterval)
-                .Where(_ => _state == OrderState.Active)
+                .Where(_ => _state == QuestState.Active)
                 .Subscribe(_ => TickTimer())
                 .AddTo(this);
         }
 
         internal void Refresh(
-            RankPromotionRequirement requirement,
-            TimeSpan duration,
+            RankPromotionQuest promotionQuest,
+            QuestDefinition quest,
             bool canAccept)
         {
-            _requirement = requirement ?? throw new ArgumentNullException(nameof(requirement));
-            _requirementId = requirement.Id;
-            _duration = duration;
+            _promotionQuestDefinition = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
+            _quest = quest ?? throw new ArgumentNullException(nameof(quest));
+            _duration = promotionQuest.Duration;
             _canAccept = canAccept;
             RestoreState();
-            RefreshText(requirement);
+            RefreshText(promotionQuest, quest);
             RefreshState();
         }
 
@@ -90,33 +92,35 @@ namespace LL.UI.Windows.Views.Promotion
             RefreshButtonAvailability();
         }
 
-        internal void ClearOrder()
+        internal void ClearQuest()
         {
-            _promotionOrder.ClearOrder();
-            SetState(OrderState.Available);
+            _promotionQuest.ClearQuest();
+            SetState(QuestState.Available);
         }
 
-        private void RefreshText(RankPromotionRequirement requirement)
+        private void RefreshText(
+            RankPromotionQuest promotionQuest,
+            QuestDefinition quest)
         {
             var unlockText = TextTags.Style(
                 _localization.GetText(RankPromotionLocalizationKeys.Unlock),
                 TextStyle.Accent);
             var countText = TextTags.Style(
-                TextFormatter.Number(requirement.RequiredAmount),
+                TextFormatter.Number(promotionQuest.RequiredAmount),
                 TextStyle.Accent);
 
             _titleLabel.text = _localization.GetText(
-                requirement.TitleLocalizationKey,
+                quest.TitleLocalizationKey,
                 new Dictionary<string, object>
                 {
                     [UnlockVariable] = unlockText
                 });
             _descriptionLabel.text = _localization.GetText(
-                requirement.DescriptionLocalizationKey,
+                quest.DescriptionLocalizationKey,
                 new Dictionary<string, object>
                 {
                     [CountVariable] = countText,
-                    [TargetVariable] = _localization.GetText(requirement.TargetLocalizationKey)
+                    [HeroVariable] = _localization.GetText(promotionQuest.HeroLocalizationKey)
                 });
         }
 
@@ -124,9 +128,9 @@ namespace LL.UI.Windows.Views.Promotion
         {
             var localizationKey = _state switch
             {
-                OrderState.Available => OrderLocalizationKeys.AcceptAction,
-                OrderState.Active => OrderLocalizationKeys.CompleteAction,
-                _ => OrderLocalizationKeys.CompletedLabel
+                QuestState.Available => QuestLocalizationKeys.AcceptAction,
+                QuestState.Active => QuestLocalizationKeys.CompleteAction,
+                _ => QuestLocalizationKeys.CompletedLabel
             };
 
             _buttonLabel.text = _localization.GetText(localizationKey);
@@ -137,31 +141,31 @@ namespace LL.UI.Windows.Views.Promotion
             if (_canAccept is false || IsCompleted)
                 return;
 
-            if (_state == OrderState.Available && StartOrder() is false)
+            if (_state == QuestState.Available && StartQuest() is false)
                 return;
 
-            _completionConfirmation.Confirm(CompleteOrder);
+            _completionConfirmation.Confirm(OnQuestCompletionConfirmed);
         }
 
-        private bool StartOrder()
+        private bool StartQuest()
         {
-            if (_promotionOrder.TryStart(_requirementId, _duration) is false)
+            if (_promotionQuest.TryStart(_promotionQuestDefinition.QuestId, _duration) is false)
                 return false;
 
-            SetState(OrderState.Active);
+            SetState(QuestState.Active);
             return true;
         }
 
-        private void CompleteOrder()
+        private void OnQuestCompletionConfirmed()
         {
-            if (_state != OrderState.Active || _promotionOrder.TryComplete() is false)
+            if (_state != QuestState.Active || _promotionQuest.TryComplete() is false)
                 return;
 
-            SetState(OrderState.Completed);
+            SetState(QuestState.Completed);
             _completed.OnNext(Unit.Default);
         }
 
-        private void SetState(OrderState state)
+        private void SetState(QuestState state)
         {
             _state = state;
             RefreshState();
@@ -169,23 +173,23 @@ namespace LL.UI.Windows.Views.Promotion
 
         private void RestoreState()
         {
-            if (_promotionOrder.RequirementId.Equals(_requirementId) is false)
-                _promotionOrder.ClearOrder();
+            if (_promotionQuest.QuestId.Equals(_promotionQuestDefinition.QuestId) is false)
+                _promotionQuest.ClearQuest();
 
-            _promotionOrder.TryExpire();
+            _promotionQuest.TryExpire();
 
-            if (_promotionOrder.IsCompleted)
-                _state = OrderState.Completed;
-            else if (_promotionOrder.IsActive)
-                _state = OrderState.Active;
+            if (_promotionQuest.IsCompleted)
+                _state = QuestState.Completed;
+            else if (_promotionQuest.IsActive)
+                _state = QuestState.Active;
             else
-                _state = OrderState.Available;
+                _state = QuestState.Available;
         }
 
         private void RefreshState()
         {
             _displayedRemainingSeconds = -1;
-            var showTime = _state != OrderState.Completed;
+            var showTime = _state != QuestState.Completed;
             _timeLabel.gameObject.SetActive(showTime);
 
             if (showTime)
@@ -202,8 +206,8 @@ namespace LL.UI.Windows.Views.Promotion
 
         private void OnLocaleChanged()
         {
-            if (_requirement != null)
-                RefreshText(_requirement);
+            if (_promotionQuestDefinition != null && _quest != null)
+                RefreshText(_promotionQuestDefinition, _quest);
 
             RefreshButtonText();
         }
@@ -214,7 +218,7 @@ namespace LL.UI.Windows.Views.Promotion
 
             if (remainingSeconds <= 0f)
             {
-                ClearOrder();
+                ClearQuest();
                 return;
             }
 
@@ -225,8 +229,8 @@ namespace LL.UI.Windows.Views.Promotion
         {
             var remainingSeconds = _state switch
             {
-                OrderState.Available => Mathf.Max(0f, (float)_duration.TotalSeconds),
-                OrderState.Active => GetRemainingSeconds(),
+                QuestState.Available => Mathf.Max(0f, (float)_duration.TotalSeconds),
+                QuestState.Active => GetRemainingSeconds(),
                 _ => 0f
             };
 
@@ -246,10 +250,10 @@ namespace LL.UI.Windows.Views.Promotion
 
         private float GetRemainingSeconds()
         {
-            return Mathf.Max(0f, (float)_promotionOrder.GetRemainingTime().TotalSeconds);
+            return Mathf.Max(0f, (float)_promotionQuest.GetRemainingTime().TotalSeconds);
         }
 
-        private enum OrderState : byte
+        private enum QuestState : byte
         {
             Available = 0,
             Active = 1,

@@ -14,7 +14,7 @@ namespace LL.Game.Promotions.Services
     {
         private readonly RankPromotionCatalog _catalog;
         private readonly IUserProgress _userProgress;
-        private readonly IUserPromotionOrder _promotionOrder;
+        private readonly IUserPromotionQuest _promotionQuest;
         private readonly IPaymentService _paymentService;
         private readonly IRewardGrantService _rewardGrantService;
 
@@ -22,20 +22,20 @@ namespace LL.Game.Promotions.Services
         internal RankPromotionService(
             RankPromotionCatalog catalog,
             IUserProgress userProgress,
-            IUserPromotionOrder promotionOrder,
+            IUserPromotionQuest promotionQuest,
             IPaymentService paymentService,
             IRewardGrantService rewardGrantService)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
+            _promotionQuest = promotionQuest ?? throw new ArgumentNullException(nameof(promotionQuest));
             _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
             _rewardGrantService = rewardGrantService ?? throw new ArgumentNullException(nameof(rewardGrantService));
         }
 
         public bool TryGetPromotion(out RankPromotion promotion)
         {
-            return _catalog.TryGetPromotion(_userProgress.Rank, out promotion);
+            return _catalog.TryGetPromotion(_userProgress.RankId, out promotion);
         }
 
         public bool CanPromote(Payment payment)
@@ -64,19 +64,22 @@ namespace LL.Game.Promotions.Services
             }
 
             rewardItems = GrantReward(promotion);
-            _promotionOrder.ClearOrder();
+            _promotionQuest.ClearQuest();
             return true;
         }
 
         private bool CanPromote(RankPromotion promotion, Payment payment)
         {
-            if (_userProgress.Rank != promotion.Rank || _userProgress.CanPromoteRank is false)
-                return false;
-
-            if (Matches(payment, promotion.OrderPayment))
+            if (_userProgress.RankId.Equals(promotion.RankId) is false ||
+                _userProgress.CanPromoteRank is false)
             {
-                return _promotionOrder.IsCompleted &&
-                       _promotionOrder.RequirementId.Equals(promotion.Requirement.Id);
+                return false;
+            }
+
+            if (Matches(payment, promotion.Quest.Payment))
+            {
+                return _promotionQuest.IsCompleted &&
+                       _promotionQuest.QuestId.Equals(promotion.Quest.QuestId);
             }
 
             return Matches(payment, promotion.InstantPayment);

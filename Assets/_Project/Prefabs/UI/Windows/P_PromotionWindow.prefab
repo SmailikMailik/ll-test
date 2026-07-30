@@ -947,7 +947,7 @@ GameObject:
   - component: {fileID: 3562573439481763340}
   - component: {fileID: 5198742301845612770}
   m_Layer: 5
-  m_Name: Container_Order
+  m_Name: Container_Quest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1376,12 +1376,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _currentRankLabel: {fileID: 2233690373681334854}
   _nextRankLabel: {fileID: 7540754940811745395}
-  _orderPriceLabel: {fileID: 1461057108868792146}
-  _orderButton: {fileID: 5026556986183734536}
+  _questPriceLabel: {fileID: 1461057108868792146}
+  _questButton: {fileID: 5026556986183734536}
   _instantPriceLabel: {fileID: 7552061282649467504}
   _instantButton: {fileID: 4127851390835802154}
   _nextRankRewardView: {fileID: 2547094923437266544}
-  _orderView: {fileID: 5198742301845612770}
+  _questView: {fileID: 5198742301845612770}
 --- !u!1001 &791393746731214815
 PrefabInstance:
   m_ObjectHideFlags: 0

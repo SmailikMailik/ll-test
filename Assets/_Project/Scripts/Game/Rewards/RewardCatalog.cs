@@ -7,23 +7,20 @@ namespace LL.Game.Rewards
 {
     internal sealed class RewardCatalog
     {
-        private readonly IReadOnlyDictionary<RewardId, Reward> _rewards;
+        private readonly IReadOnlyDictionary<RewardId, Reward> _rewardsById;
 
         internal RewardCatalog(IEnumerable<Reward> rewards)
         {
-            var copy = rewards?.ToArray() ?? Array.Empty<Reward>();
-
+            var entries = rewards?.ToArray() ?? Array.Empty<Reward>();
             IdentifierCollectionValidator.EnsureValid(
-                copy,
+                entries,
                 reward => reward.Id,
                 nameof(rewards));
 
-            _rewards = copy.ToDictionary(reward => reward.Id);
+            _rewardsById = entries.ToDictionary(reward => reward.Id);
         }
 
-        internal bool TryGetReward(RewardId id, out Reward reward)
-        {
-            return _rewards.TryGetValue(id, out reward);
-        }
+        internal bool TryGetReward(RewardId id, out Reward reward) =>
+            _rewardsById.TryGetValue(id, out reward);
     }
 }

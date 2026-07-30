@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using LL.Game.Identifiers;
+using LL.Game.Ranks;
 using LL.Game.Ranks.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
@@ -25,7 +27,7 @@ namespace LLEditor.Validation.References
 
             ValidateReferences(
                 userDefaults.Progress,
-                ranks.RankRequirements,
+                ranks.Ranks,
                 context
                     .At(AssetDatabase.GetAssetPath(userDefaults))
                     .At(nameof(UserDefaultsConfig.Progress)));
@@ -33,29 +35,31 @@ namespace LLEditor.Validation.References
 
         private static void ValidateReferences(
             UserProgressDefaults progress,
-            IReadOnlyList<RankExperienceRequirementEntry> rankRequirements,
+            IReadOnlyList<RankEntry> ranks,
             ValidationContext context)
         {
             if (progress == null ||
-                progress.Rank <= 0 ||
-                rankRequirements == null ||
-                rankRequirements.Count == 0)
+                IdentifierValidator.IsValid(progress.RankId) is false ||
+                ranks == null ||
+                ranks.Count == 0)
             {
                 return;
             }
 
-            var ranks = new HashSet<int>();
+            var rankIds = new HashSet<RankId>();
 
-            for (var index = 0; index < rankRequirements.Count; index++)
+            for (var index = 0; index < ranks.Count; index++)
             {
-                if (rankRequirements[index] != null)
-                    ranks.Add(index + 1);
+                var rank = ranks[index];
+
+                if (rank != null && IdentifierValidator.IsValid(rank.Id))
+                    rankIds.Add(rank.Id);
             }
 
             if (ValidationRules.ReferenceExists(
-                    progress.Rank,
-                    ranks,
-                    context.At(nameof(UserProgressDefaults.Rank)),
+                    progress.RankId,
+                    rankIds,
+                    context.At(nameof(UserProgressDefaults.RankId)),
                     RankExistsCode) is false)
             {
                 return;
@@ -64,8 +68,9 @@ namespace LLEditor.Validation.References
             if (progress.Experience < 0)
                 return;
 
-            var nextRank = progress.Rank < rankRequirements.Count
-                ? rankRequirements[progress.Rank]
+            var rankIndex = FindRankIndex(ranks, progress.RankId);
+            var nextRank = rankIndex >= 0 && rankIndex + 1 < ranks.Count
+                ? ranks[rankIndex + 1]
                 : null;
 
             if (nextRank == null)
@@ -77,7 +82,7 @@ namespace LLEditor.Validation.References
                         .Report(
                             ValidationSeverity.Error,
                             FinalRankExperienceCode,
-                            $"Experience at final rank '{progress.Rank}' must be zero.");
+                            $"Experience at final rank '{progress.RankId}' must be zero.");
                 }
 
                 return;
@@ -90,9 +95,22 @@ namespace LLEditor.Validation.References
                     .Report(
                         ValidationSeverity.Error,
                         ExperienceMaximumCode,
-                        $"Experience at rank '{progress.Rank}' must not exceed " +
+                        $"Experience at rank '{progress.RankId}' must not exceed " +
                         $"{nextRank.RequiredExperience}.");
             }
+        }
+
+        private static int FindRankIndex(
+            IReadOnlyList<RankEntry> ranks,
+            RankId rankId)
+        {
+            for (var index = 0; index < ranks.Count; index++)
+            {
+                if (ranks[index]?.Id.Equals(rankId) == true)
+                    return index;
+            }
+
+            return -1;
         }
     }
 }

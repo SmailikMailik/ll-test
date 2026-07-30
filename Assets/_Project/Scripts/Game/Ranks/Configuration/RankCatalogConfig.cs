@@ -9,47 +9,51 @@ using UnityEngine;
 namespace LL.Game.Ranks.Configuration
 {
     [CreateAssetMenu(fileName = nameof(RankCatalogConfig), menuName = CreationPath)]
-    [HideMonoScript]
-    internal sealed class RankCatalogConfig : ScriptableObject, IDataLoader<RankCatalog>, IValidationSource
+    internal sealed class RankCatalogConfig :
+        ScriptableObject,
+        IDataLoader<RankCatalog>,
+        IValidationSource
     {
-        [ValidateInput(nameof(HasValidRequirements), "Rank catalog data is invalid.")]
-        [InfoBox("Local experience required to reach each rank. Rank 1 always requires 0 XP.")]
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
-        [SerializeField] private RankExperienceRequirementEntry[] _rankRequirements;
+        [ValidateInput(nameof(HasValidRanks), "Rank catalog data is invalid.")]
+        [SerializeField] private RankEntry[] _ranks;
 
         internal const string CreationPath = "LL/Game Data/Rank Catalog";
 
-        private static readonly IDataValidator<RankExperienceRequirementEntry[]> _validator =
+        private static readonly IDataValidator<RankEntry[]> _validator =
             new RankCatalogConfigValidator();
 
-        internal IReadOnlyList<RankExperienceRequirementEntry> RankRequirements => _rankRequirements;
+        internal IReadOnlyList<RankEntry> Ranks => _ranks;
 
         public RankCatalog Load()
         {
-            ValidationRunner.EnsureValid(this, nameof(_rankRequirements));
+            ValidationRunner.EnsureValid(this, nameof(_ranks));
 
-            return new RankCatalog(_rankRequirements.Select(requirement => requirement.RequiredExperience));
+            return new RankCatalog(
+                _ranks.Select((entry, index) => entry.ToRank(index + 1)));
         }
 
-        private static bool HasValidRequirements(RankExperienceRequirementEntry[] requirements)
+        private static bool HasValidRanks(RankEntry[] ranks)
         {
-            return ValidationRunner.IsValid(requirements, _validator);
+            return ValidationRunner.IsValid(ranks, _validator);
         }
 
         void IValidationSource.Validate(ValidationContext context)
         {
-            _validator.Validate(_rankRequirements, context);
+            _validator.Validate(_ranks, context);
         }
     }
 
     [Serializable]
-    internal sealed class RankExperienceRequirementEntry
+    internal sealed class RankEntry
     {
-        [LabelText("Required Experience")]
-        [SuffixLabel("XP", true)]
+        [SerializeField] private string _id;
+
         [MinValue(0)]
         [SerializeField] private int _requiredExperience;
 
+        internal RankId Id => new(_id);
         internal int RequiredExperience => _requiredExperience;
+
+        internal RankDefinition ToRank(int number) => new(Id, number, RequiredExperience);
     }
 }

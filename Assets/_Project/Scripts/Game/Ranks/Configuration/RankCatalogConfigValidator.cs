@@ -1,35 +1,40 @@
+using LL.Game.Identifiers;
 using LL.Validation;
 
 namespace LL.Game.Ranks.Configuration
 {
-    internal sealed class RankCatalogConfigValidator : IDataValidator<RankExperienceRequirementEntry[]>
+    internal sealed class RankCatalogConfigValidator : IDataValidator<RankEntry[]>
     {
-        private const string RequirementsCode = "rank-catalog.requirements.not-empty";
-        private const string EntryCode = "rank-catalog.entry.required";
+        private const string EntriesCode = "rank-catalog.entries.not-empty";
         private const string InitialExperienceCode = "rank-catalog.initial-experience.zero";
         private const string ExperienceCode = "rank-catalog.experience.positive";
 
         public void Validate(
-            RankExperienceRequirementEntry[] requirements,
+            RankEntry[] ranks,
             ValidationContext context)
         {
-            if (ValidationRules.NotEmpty(requirements, context, RequirementsCode) is false)
+            if (ValidationRules.NotEmpty(ranks, context, EntriesCode) is false)
                 return;
 
-            for (var index = 0; index < requirements.Length; index++)
-            {
-                var requirement = requirements[index];
-                var requirementContext = context.At(index);
+            IdentifierCollectionValidator.Validate(
+                ranks,
+                rank => rank.Id,
+                context);
 
-                if (ValidationRules.NotNull(requirement, requirementContext, EntryCode) is false)
+            for (var index = 0; index < ranks.Length; index++)
+            {
+                var rank = ranks[index];
+
+                if (rank == null)
                     continue;
 
-                var experienceContext = requirementContext.At(
-                    nameof(RankExperienceRequirementEntry.RequiredExperience));
+                var rankContext = context.At(index);
+                var experienceContext = rankContext.At(
+                    nameof(RankEntry.RequiredExperience));
 
                 if (index == 0)
                 {
-                    if (requirement.RequiredExperience != 0)
+                    if (rank.RequiredExperience != 0)
                     {
                         experienceContext.Report(
                             ValidationSeverity.Error,
@@ -41,7 +46,7 @@ namespace LL.Game.Ranks.Configuration
                 }
 
                 ValidationRules.Positive(
-                    requirement.RequiredExperience,
+                    rank.RequiredExperience,
                     experienceContext,
                     ExperienceCode);
             }

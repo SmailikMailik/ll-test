@@ -5,7 +5,7 @@ namespace LL.Game.Rewards.Configuration
 {
     internal sealed class RewardCatalogConfigValidator : IDataValidator<RewardEntry[]>
     {
-        private const string RewardsCode = "reward.entries.required";
+        private const string EntriesCode = "reward.entries.required";
         private const string ItemsCode = "reward.items.not-empty";
         private const string ItemAmountCode = "reward.item.amount.positive";
 
@@ -13,7 +13,7 @@ namespace LL.Game.Rewards.Configuration
             RewardEntry[] rewards,
             ValidationContext context)
         {
-            if (ValidationRules.NotNull(rewards, context, RewardsCode) is false)
+            if (ValidationRules.NotNull(rewards, context, EntriesCode) is false)
                 return;
 
             IdentifierCollectionValidator.Validate(

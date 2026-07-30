@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
+using LL.Game.Ranks;
 using LL.User.Snapshots;
 using LL.Validation;
 using Sirenix.OdinInspector;
@@ -46,7 +47,7 @@ namespace LL.User.Configuration
                 Identity.ToSnapshot(),
                 new UserItemsSnapshot(Items.Select(item => item.ToItemAmount())),
                 Progress.ToSnapshot(),
-                UserPromotionOrderSnapshot.Empty);
+                UserPromotionQuestSnapshot.Empty);
         }
 
         private static bool HasValidItems(ItemAmountEntry[] entries)
@@ -80,19 +81,18 @@ namespace LL.User.Configuration
     [InlineProperty]
     internal sealed class UserProgressDefaults
     {
-        [LabelText("Rank")]
-        [MinValue(1)]
-        [SerializeField] private int _rank = 1;
+        [LabelText("Rank ID")]
+        [SerializeField] private string _rankId;
 
         [LabelText("Experience")]
         [SuffixLabel("XP", true)]
         [MinValue(0)]
         [SerializeField] private int _experience;
 
-        internal int Rank => _rank;
+        internal RankId RankId => new(_rankId);
         internal int Experience => _experience;
 
-        internal UserProgressSnapshot ToSnapshot() => new(Rank, Experience);
+        internal UserProgressSnapshot ToSnapshot() => new(RankId, Experience);
     }
 
     [Serializable]

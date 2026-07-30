@@ -58,7 +58,7 @@ namespace LL.UI.Windows.Views.Upgrade
         protected override void OnShow()
         {
             InitializeComponents();
-            _nextRankRewardView.ShowNextRank(_userProgress.Rank);
+            _nextRankRewardView.ShowNextRank(_userProgress.RankId);
             ResetPendingChanges();
         }
 

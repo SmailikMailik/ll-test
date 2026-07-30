@@ -13,112 +13,96 @@ MonoBehaviour:
   m_Name: RankPromotionCatalogConfig
   m_EditorClassIdentifier: 
   _promotions:
-  - _rank: 1
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_1
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:
       _itemId: hard
       _amount: 999
     _rewardId: rank_1_promotion
-  - _rank: 2
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_2
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:
       _itemId: hard
       _amount: 999
     _rewardId: rank_2_promotion
-  - _rank: 3
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_3
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:
       _itemId: hard
       _amount: 999
     _rewardId: rank_3_promotion
-  - _rank: 4
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_4
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:
       _itemId: hard
       _amount: 999
     _rewardId: rank_4_promotion
-  - _rank: 5
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_5
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:
       _itemId: hard
       _amount: 999
     _rewardId: rank_5_promotion
-  - _rank: 6
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_6
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:
       _itemId: hard
       _amount: 999
     _rewardId: rank_6_promotion
-  - _rank: 7
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_7
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:
       _itemId: hard
       _amount: 999
     _rewardId: rank_7_promotion
-  - _rank: 8
-    _durationMinutes: 1440
-    _requirementId: headshots
+  - _rankId: rank_8
+    _questId: headshots
+    _heroLocalizationKey: Game/heroes.soldier
     _requiredAmount: 20
-    _titleLocalizationKey: Upgrade/messages.unlock_promotion_with_credits
-    _descriptionLocalizationKey: Upgrade/messages.headshot_requirement
-    _targetLocalizationKey: Game/heroes.soldier
-    _orderPayment:
+    _durationMinutes: 1440
+    _questPayment:
       _itemId: soft
       _amount: 99900
     _instantPayment:

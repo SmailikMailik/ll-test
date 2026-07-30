@@ -2,12 +2,12 @@ namespace LL.User.Persistence.SaveData
 {
     internal sealed class UserProgressSaveData
     {
-        public int Rank { get; }
+        public string RankId { get; }
         public int Experience { get; }
 
-        public UserProgressSaveData(int rank, int experience)
+        public UserProgressSaveData(string rankId, int experience)
         {
-            Rank = rank;
+            RankId = rankId;
             Experience = experience;
         }
     }

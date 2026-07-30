@@ -2,7 +2,7 @@ namespace LL.Game.Ranks
 {
     internal interface IRankProgression
     {
-        RankProgress GetProgress(int rank, int experience);
-        bool CanPromote(int rank, int experience);
+        RankProgress GetProgress(RankId rankId, int experience);
+        bool CanPromote(RankId rankId, int experience);
     }
 }

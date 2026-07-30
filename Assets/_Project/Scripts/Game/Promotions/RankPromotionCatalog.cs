@@ -1,27 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Identifiers;
+using LL.Game.Ranks;
 
 namespace LL.Game.Promotions
 {
     internal sealed class RankPromotionCatalog
     {
-        private readonly IReadOnlyDictionary<int, RankPromotion> _promotions;
+        private readonly IReadOnlyDictionary<RankId, RankPromotion> _promotionsByRankId;
 
         internal RankPromotionCatalog(IEnumerable<RankPromotion> promotions)
         {
-            var copy = promotions?.ToArray() ?? Array.Empty<RankPromotion>();
-            RankPromotionCatalogValidator.EnsureValid(
-                copy,
-                promotion => promotion.Rank,
+            var entries = promotions?.ToArray() ?? Array.Empty<RankPromotion>();
+            IdentifierCollectionValidator.EnsureValid(
+                entries,
+                promotion => promotion.RankId,
                 nameof(promotions));
 
-            _promotions = copy.ToDictionary(promotion => promotion.Rank);
+            _promotionsByRankId = entries.ToDictionary(promotion => promotion.RankId);
         }
 
-        internal bool TryGetPromotion(int rank, out RankPromotion promotion)
-        {
-            return _promotions.TryGetValue(rank, out promotion);
-        }
+        internal bool TryGetPromotion(RankId rankId, out RankPromotion promotion) =>
+            _promotionsByRankId.TryGetValue(rankId, out promotion);
     }
 }
