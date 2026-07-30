@@ -214,6 +214,23 @@ Loaders and mappers cross these boundaries. Domain and state code must not read 
 A whole-data load should produce one aggregate snapshot and register that snapshot once. Consumers receive the
 snapshot or its owned parts, never the concrete source adapter.
 
+## Authored asset placement
+
+- Keep project-authored configuration assets under `Assets/_Project/Configuration`.
+- Organize configuration assets by their owning runtime area first, for example `Game`, `Presentation`, `UI`, or
+  `User`.
+- Keep the C# configuration types beside the subsystem whose data they author; do not mirror the asset folder by
+  centralizing unrelated configuration code.
+- Keep framework, package, and application assembly settings under `Assets/_Project/Settings`, grouped by the
+  capability or integration they configure.
+- When an integration loads settings through `Resources`, place its required `Resources` folder below the owning
+  settings capability and integration so the expected resource key remains unchanged.
+- Do not mix framework settings with authored game, presentation, UI, or user data merely because both use
+  `ScriptableObject`.
+- Keep shared Unity swatch and preset libraries under `Assets/_Project/Presets`.
+- Place Unity project preset-library files in a nested `Editor` folder so Unity discovers them without mixing them
+  with the editor-tooling source assembly.
+
 ## Dependency rules
 
 The required direction is:
