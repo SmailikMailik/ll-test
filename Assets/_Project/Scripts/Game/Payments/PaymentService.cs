@@ -14,6 +14,8 @@ namespace LL.Game.Payments
             _items = items ?? throw new ArgumentNullException(nameof(items));
         }
 
+        public bool CanPay(Payment payment) => _items.CanSpend(payment.ItemId, payment.Amount);
+
         public bool TryPay(Payment payment) => _items.TrySpend(payment.ItemId, payment.Amount);
         public bool TryRefund(Payment payment) => _items.TryAdd(payment.ItemId, payment.Amount);
     }

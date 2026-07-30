@@ -25,17 +25,32 @@ namespace LL.User.State.Items
 
         public Observable<int> ObserveAmount(ItemId id)
         {
-            if (TryGetAmount(id, out var amount))
-                return amount;
+            if (TryGetAmount(id, out var amount) is false)
+                throw new KeyNotFoundException($"Unknown item ID: {id}");
 
-            throw new KeyNotFoundException($"Unknown item ID: {id}");
+            return amount;
         }
 
         public bool CanAdd(ItemId id, int amount)
         {
-            return TryGetAmount(id, out var currentAmount) &&
-                   amount > 0 &&
-                   currentAmount.Value <= int.MaxValue - amount;
+            if (amount <= 0)
+                return false;
+
+            if (TryGetAmount(id, out var currentAmount) is false)
+                return false;
+
+            return currentAmount.Value <= int.MaxValue - amount;
+        }
+
+        public bool CanSpend(ItemId id, int amount)
+        {
+            if (amount <= 0)
+                return false;
+
+            if (TryGetAmount(id, out var currentAmount) is false)
+                return false;
+
+            return currentAmount.Value >= amount;
         }
 
         public bool TryAdd(ItemId id, int amount)
@@ -50,13 +65,10 @@ namespace LL.User.State.Items
 
         public bool TrySpend(ItemId id, int amount)
         {
-            if (amount <= 0 ||
-                TryGetAmount(id, out var currentAmount) is false ||
-                currentAmount.Value < amount)
-            {
+            if (CanSpend(id, amount) is false)
                 return false;
-            }
 
+            TryGetAmount(id, out var currentAmount);
             currentAmount.Value -= amount;
             return true;
         }
