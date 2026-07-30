@@ -13,6 +13,7 @@ namespace LLEditor.Validation.References
             new UserProgressRankReferenceValidator(),
             new BuiltInUserItemReferenceValidator(),
             new CardItemReferenceValidator(),
+            new RankPromotionPaymentReferenceValidator(),
             new RewardItemReferenceValidator()
         };
 

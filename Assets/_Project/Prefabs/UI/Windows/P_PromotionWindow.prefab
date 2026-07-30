@@ -1376,10 +1376,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _currentRankLabel: {fileID: 2233690373681334854}
   _nextRankLabel: {fileID: 7540754940811745395}
-  _softPriceLabel: {fileID: 1461057108868792146}
-  _softButton: {fileID: 5026556986183734536}
-  _hardPriceLabel: {fileID: 7552061282649467504}
-  _hardButton: {fileID: 4127851390835802154}
+  _orderPriceLabel: {fileID: 1461057108868792146}
+  _orderButton: {fileID: 5026556986183734536}
+  _instantPriceLabel: {fileID: 7552061282649467504}
+  _instantButton: {fileID: 4127851390835802154}
   _nextRankRewardView: {fileID: 2547094923437266544}
   _orderView: {fileID: 5198742301845612770}
 --- !u!1001 &791393746731214815

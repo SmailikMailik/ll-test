@@ -1,8 +1,8 @@
 using LL.Game.Promotions.Services;
 using LL.Game.Upgrades;
 using LL.Presentation.Orders;
-using LL.Presentation.Promotions;
 using LL.Presentation.Upgrades;
+using LL.UI.Promotions;
 using LL.UI.Windows;
 using LL.UI.Windows.Flows;
 using UnityEngine;
@@ -20,7 +20,7 @@ namespace LL.Composition
         {
             RegisterWindow(builder);
             RegisterConfirmations(builder);
-            RegisterPromotionServices(builder);
+            RegisterPromotion(builder);
             RegisterUpgradeFlow(builder);
         }
 
@@ -42,9 +42,10 @@ namespace LL.Composition
                 .As<IExperienceOverflowConfirmation>();
         }
 
-        private static void RegisterPromotionServices(IContainerBuilder builder)
+        private static void RegisterPromotion(IContainerBuilder builder)
         {
             builder.Register<RankPromotionService>(Lifetime.Scoped).As<IRankPromotionService>();
+            builder.Register<RankPromotionFlow>(Lifetime.Scoped);
         }
 
         private static void RegisterUpgradeFlow(IContainerBuilder builder)

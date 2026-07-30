@@ -1,7 +1,7 @@
 using System;
 using LL.Game.Payments;
 
-namespace LL.Game.Promotions.Services
+namespace LL.UI.Promotions
 {
     internal interface IRankPromotionConfirmation
     {

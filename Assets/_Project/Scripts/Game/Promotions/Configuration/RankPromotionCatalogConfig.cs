@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LL.Game.Items;
-using LL.Game.Payments;
+using LL.Game.Payments.Configuration;
 using LL.Game.Rewards;
 using LL.Infrastructure.Loading;
 using LL.Validation;
@@ -84,14 +83,12 @@ namespace LL.Game.Promotions.Configuration
         [SerializeField] private string _targetLocalizationKey;
 
         [BoxGroup("Columns/Economy")]
-        [LabelText("Soft")]
-        [MinValue(1)]
-        [SerializeField] private int _softPrice = 1;
+        [LabelText("Order")]
+        [SerializeField] private PaymentEntry _orderPayment = new();
 
         [BoxGroup("Columns/Economy")]
-        [LabelText("Hard")]
-        [MinValue(1)]
-        [SerializeField] private int _hardPrice = 1;
+        [LabelText("Instant")]
+        [SerializeField] private PaymentEntry _instantPayment = new();
 
         [BoxGroup("Columns/Economy")]
         [LabelText("Reward")]
@@ -105,8 +102,8 @@ namespace LL.Game.Promotions.Configuration
         internal string TitleLocalizationKey => _titleLocalizationKey;
         internal string DescriptionLocalizationKey => _descriptionLocalizationKey;
         internal string TargetLocalizationKey => _targetLocalizationKey;
-        internal int SoftPrice => _softPrice;
-        internal int HardPrice => _hardPrice;
+        internal PaymentEntry OrderPayment => _orderPayment;
+        internal PaymentEntry InstantPayment => _instantPayment;
         internal RewardId RewardId => new(_rewardId);
 
         internal RankPromotion ToPromotion()
@@ -120,8 +117,8 @@ namespace LL.Game.Promotions.Configuration
                     TargetLocalizationKey,
                     RequiredAmount),
                 TimeSpan.FromMinutes(DurationMinutes),
-                new Payment(ItemIds.Soft, SoftPrice),
-                new Payment(ItemIds.Hard, HardPrice),
+                OrderPayment.ToPayment(),
+                InstantPayment.ToPayment(),
                 RewardId);
         }
     }

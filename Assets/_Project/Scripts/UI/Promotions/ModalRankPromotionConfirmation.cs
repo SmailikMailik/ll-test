@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Payments;
-using LL.Game.Promotions.Services;
 using LL.Presentation.Localization;
 using LL.Presentation.Payments;
+using LL.Presentation.Promotions;
 using LL.UI.Typography;
 using LL.UI.Windows;
 using LL.UI.Windows.Views;
 using VContainer;
 
-namespace LL.Presentation.Promotions
+namespace LL.UI.Promotions
 {
     internal sealed class ModalRankPromotionConfirmation : IRankPromotionConfirmation
     {

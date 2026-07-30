@@ -52,8 +52,7 @@ namespace LL.UI.Windows.Views.Promotion
             ILocalizationService localization,
             IUserPromotionOrder promotionOrder)
         {
-            _completionConfirmation = completionConfirmation
-                ?? throw new ArgumentNullException(nameof(completionConfirmation));
+            _completionConfirmation = completionConfirmation ?? throw new ArgumentNullException(nameof(completionConfirmation));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
             _promotionOrder = promotionOrder ?? throw new ArgumentNullException(nameof(promotionOrder));
         }

@@ -1,4 +1,5 @@
 using LL.Game.Identifiers;
+using LL.Game.Payments.Configuration;
 using LL.Validation;
 
 namespace LL.Game.Promotions.Configuration
@@ -11,8 +12,8 @@ namespace LL.Game.Promotions.Configuration
         private const string TitleKeyCode = "rank-promotion.localization.title.not-empty";
         private const string DescriptionKeyCode = "rank-promotion.localization.description.not-empty";
         private const string TargetKeyCode = "rank-promotion.localization.target.not-empty";
-        private const string SoftPriceCode = "rank-promotion.soft-price.positive";
-        private const string HardPriceCode = "rank-promotion.hard-price.positive";
+        private static readonly IDataValidator<PaymentEntry> _paymentValidator =
+            new PaymentEntryValidator();
 
         public void Validate(
             RankPromotionEntry[] promotions,
@@ -64,15 +65,12 @@ namespace LL.Game.Promotions.Configuration
                     promotionContext.At(nameof(RankPromotionEntry.TargetLocalizationKey)),
                     TargetKeyCode);
 
-                ValidationRules.Positive(
-                    promotion.SoftPrice,
-                    promotionContext.At(nameof(RankPromotionEntry.SoftPrice)),
-                    SoftPriceCode);
-
-                ValidationRules.Positive(
-                    promotion.HardPrice,
-                    promotionContext.At(nameof(RankPromotionEntry.HardPrice)),
-                    HardPriceCode);
+                _paymentValidator.Validate(
+                    promotion.OrderPayment,
+                    promotionContext.At(nameof(RankPromotionEntry.OrderPayment)));
+                _paymentValidator.Validate(
+                    promotion.InstantPayment,
+                    promotionContext.At(nameof(RankPromotionEntry.InstantPayment)));
 
                 IdentifierValidator.Validate(
                     promotion.RewardId,

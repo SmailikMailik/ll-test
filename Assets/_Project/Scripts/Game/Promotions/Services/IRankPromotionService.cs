@@ -1,16 +1,13 @@
-using System;
 using System.Collections.Generic;
 using LL.Game.Items;
+using LL.Game.Payments;
 
 namespace LL.Game.Promotions.Services
 {
     internal interface IRankPromotionService
     {
         bool TryGetPromotion(out RankPromotion promotion);
-
-        void Promote(
-            PromotionPaymentType paymentType,
-            Action<IReadOnlyList<ItemAmount>> onSucceeded,
-            Action onFailed);
+        bool CanPromote(Payment payment);
+        bool TryPromote(Payment payment, out IReadOnlyList<ItemAmount> rewardItems);
     }
 }

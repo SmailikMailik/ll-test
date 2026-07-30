@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Items;
+using LL.Game.Payments;
 using LL.Game.Promotions;
-using LL.Game.Promotions.Services;
 using LL.Game.Ranks;
 using LL.Presentation.Payments;
 using LL.UI.Controls;
@@ -12,6 +12,7 @@ using LL.User.State.Progress;
 using R3;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 
 namespace LL.UI.Windows.Views.Promotion
@@ -21,18 +22,24 @@ namespace LL.UI.Windows.Views.Promotion
         [SerializeField] private TMP_Text _currentRankLabel;
         [SerializeField] private TMP_Text _nextRankLabel;
 
-        [SerializeField] private TMP_Text _softPriceLabel;
-        [SerializeField] private InteractiveButton _softButton;
+        [FormerlySerializedAs("_softPriceLabel")]
+        [SerializeField] private TMP_Text _orderPriceLabel;
 
-        [SerializeField] private TMP_Text _hardPriceLabel;
-        [SerializeField] private InteractiveButton _hardButton;
+        [FormerlySerializedAs("_softButton")]
+        [SerializeField] private InteractiveButton _orderButton;
+
+        [FormerlySerializedAs("_hardPriceLabel")]
+        [SerializeField] private TMP_Text _instantPriceLabel;
+
+        [FormerlySerializedAs("_hardButton")]
+        [SerializeField] private InteractiveButton _instantButton;
 
         [SerializeField] private NextRankRewardView _nextRankRewardView;
         [SerializeField] private PromotionOrderView _orderView;
 
         private IUserProgress _userProgress;
         private IRankProgression _rankProgression;
-        private IRankPromotionService _promotionService;
+        private RankPromotionFlow _rankPromotionFlow;
         private UpgradeFlow _upgradeFlow;
         private RankPromotion _promotion;
 
@@ -40,20 +47,20 @@ namespace LL.UI.Windows.Views.Promotion
         private void Construct(
             IUserProgress userProgress,
             IRankProgression rankProgression,
-            IRankPromotionService promotionService,
+            RankPromotionFlow rankPromotionFlow,
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
-            _promotionService = promotionService ?? throw new ArgumentNullException(nameof(promotionService));
+            _rankPromotionFlow = rankPromotionFlow ?? throw new ArgumentNullException(nameof(rankPromotionFlow));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
 
         private void Start()
         {
-            _softButton.Clicked.Subscribe(_ => PromoteRank(PromotionPaymentType.Soft)).AddTo(this);
-            _hardButton.Clicked.Subscribe(_ => PromoteRank(PromotionPaymentType.Hard)).AddTo(this);
-            _orderView.Completed.Subscribe(_ => RefreshActions()).AddTo(this);
+            _orderButton.Clicked.Subscribe(_ => OnOrderPromotionClicked()).AddTo(this);
+            _instantButton.Clicked.Subscribe(_ => OnInstantPromotionClicked()).AddTo(this);
+            _orderView.Completed.Subscribe(_ => OnOrderCompleted()).AddTo(this);
         }
 
         protected override void OnShow()
@@ -66,10 +73,10 @@ namespace LL.UI.Windows.Views.Promotion
             _nextRankLabel.text = TextFormatter.Number(nextRank);
             _nextRankRewardView.ShowNextRank(rank);
 
-            if (_promotionService.TryGetPromotion(out _promotion))
+            if (_rankPromotionFlow.TryGetPromotion(out _promotion))
             {
-                _softPriceLabel.text = PaymentFormatter.Format(_promotion.SoftPayment);
-                _hardPriceLabel.text = PaymentFormatter.Format(_promotion.HardPayment);
+                _orderPriceLabel.text = PaymentFormatter.Format(_promotion.OrderPayment);
+                _instantPriceLabel.text = PaymentFormatter.Format(_promotion.InstantPayment);
                 _orderView.Refresh(
                     _promotion.Requirement,
                     _promotion.OrderDuration,
@@ -77,28 +84,50 @@ namespace LL.UI.Windows.Views.Promotion
             }
             else
             {
-                _softPriceLabel.text = string.Empty;
-                _hardPriceLabel.text = string.Empty;
+                _orderPriceLabel.text = string.Empty;
+                _instantPriceLabel.text = string.Empty;
             }
 
             _orderView.gameObject.SetActive(_promotion != null);
             RefreshActions();
         }
 
-        private void PromoteRank(PromotionPaymentType paymentType)
+        private void PromoteRank(Payment payment)
         {
             if (_promotion == null || _userProgress.CanPromoteRank is false)
                 return;
 
-            _promotionService.Promote(
-                paymentType,
-                CompletePromotion,
-                RefreshActions);
+            _rankPromotionFlow.Promote(
+                payment,
+                OnPromotionSucceeded,
+                OnPromotionFailed);
         }
 
-        private void CompletePromotion(IReadOnlyList<ItemAmount> rewardItems)
+        private void OnOrderPromotionClicked()
+        {
+            if (_promotion != null)
+                PromoteRank(_promotion.OrderPayment);
+        }
+
+        private void OnInstantPromotionClicked()
+        {
+            if (_promotion != null)
+                PromoteRank(_promotion.InstantPayment);
+        }
+
+        private void OnPromotionSucceeded(IReadOnlyList<ItemAmount> rewardItems)
         {
             _upgradeFlow.CompletePromotion(_userProgress.Rank, rewardItems);
+        }
+
+        private void OnPromotionFailed()
+        {
+            RefreshActions();
+        }
+
+        private void OnOrderCompleted()
+        {
+            RefreshActions();
         }
 
         private void RefreshActions()
@@ -107,11 +136,11 @@ namespace LL.UI.Windows.Views.Promotion
             var canPromoteRank = _userProgress.CanPromoteRank;
 
             _orderView.SetAvailable(hasPromotion && canPromoteRank);
-            _softButton.SetInteractable(
+            _orderButton.SetInteractable(
                 hasPromotion &&
                 canPromoteRank &&
                 _orderView.IsCompleted);
-            _hardButton.SetInteractable(hasPromotion && canPromoteRank);
+            _instantButton.SetInteractable(hasPromotion && canPromoteRank);
         }
     }
 
