@@ -317,7 +317,9 @@ For game and user domain data, use `IDataLoader<T>` only for an application-leve
 configs or other partial domain data. A whole-data load registers one aggregate once; consumers receive the
 aggregate or its owned parts, never a concrete source, repository, or compiler. Presentation and UI resource
 catalogs may retain focused loaders because they are independently owned runtime resources rather than partial
-domain aggregates.
+domain aggregates. A `Config` remains an authoring and validation object; a technology-specific loader such as
+`ScriptableObjectItemIconCatalogLoader` or `ScriptableObjectWindowCatalogLoader` validates that config and constructs
+the runtime catalog.
 
 ## Authored asset placement
 

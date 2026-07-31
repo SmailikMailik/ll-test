@@ -86,7 +86,10 @@ function Test-RuntimeDependencies {
                         $true
                     } elseif (
                         $targetArea -in @("Infrastructure", "Validation") -and
-                        $sourceNamespace -like "LL.UI.Windows.Configuration*") {
+                        (
+                            $sourceNamespace -like "LL.UI.Windows.Configuration*" -or
+                            $sourceNamespace -like "LL.UI.Windows.Loading*"
+                        )) {
                         $true
                     } else {
                         $false
@@ -99,7 +102,10 @@ function Test-RuntimeDependencies {
                         $true
                     } elseif (
                         $targetArea -in @("Infrastructure", "Validation") -and
-                        $sourceNamespace -like "LL.Presentation.*.Configuration*") {
+                        (
+                            $sourceNamespace -like "LL.Presentation.*.Configuration*" -or
+                            $sourceNamespace -like "LL.Presentation.*.Loading*"
+                        )) {
                         $true
                     } else {
                         $false

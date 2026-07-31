@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -10,10 +8,7 @@ namespace LL.UI.Windows.Configuration
 {
     [CreateAssetMenu(fileName = nameof(WindowCatalogConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class WindowCatalogConfig :
-        ScriptableObject,
-        IDataLoader<WindowCatalog>,
-        IValidationSource
+    internal sealed class WindowCatalogConfig : ScriptableObject, IValidationSource
     {
         [ValidateInput(nameof(HasValidEntries), "Assign every prefab and remove duplicate parameter types.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
@@ -24,13 +19,6 @@ namespace LL.UI.Windows.Configuration
         private static readonly IDataValidator<IReadOnlyList<WindowEntry>> _validator = new WindowCatalogConfigValidator();
 
         internal IReadOnlyList<WindowEntry> Entries => _entries;
-
-        public WindowCatalog Load()
-        {
-            ValidationRunner.EnsureValid(this, nameof(_entries));
-
-            return new WindowCatalog(_entries.Select(entry => entry.ToDefinition()));
-        }
 
         private static bool HasValidEntries(List<WindowEntry> entries)
         {

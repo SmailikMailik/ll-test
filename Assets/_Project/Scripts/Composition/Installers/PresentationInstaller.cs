@@ -1,5 +1,7 @@
 using System;
-using LL.Presentation.Icons.Configuration;
+using LL.Game.Items;
+using LL.Infrastructure.Loading;
+using LL.Presentation.Icons;
 using LL.Presentation.Localization;
 using VContainer;
 using VContainer.Unity;
@@ -8,17 +10,17 @@ namespace LL.Composition.Installers
 {
     internal sealed class PresentationInstaller : IInstaller
     {
-        private readonly ItemIconCatalogConfig _itemIconCatalogConfig;
+        private readonly IDataLoader<IconCatalog<ItemId>> _itemIconCatalogLoader;
 
-        internal PresentationInstaller(ItemIconCatalogConfig itemIconCatalogConfig)
+        internal PresentationInstaller(IDataLoader<IconCatalog<ItemId>> itemIconCatalogLoader)
         {
-            _itemIconCatalogConfig = itemIconCatalogConfig ?? throw new ArgumentNullException(nameof(itemIconCatalogConfig));
+            _itemIconCatalogLoader = itemIconCatalogLoader ?? throw new ArgumentNullException(nameof(itemIconCatalogLoader));
         }
 
         public void Install(IContainerBuilder builder)
         {
             builder.Register<UnityLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
-            builder.RegisterLoadedData(_itemIconCatalogConfig);
+            builder.RegisterLoadedData(_itemIconCatalogLoader);
         }
     }
 }
