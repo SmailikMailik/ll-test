@@ -48,10 +48,9 @@
   materially clarifies the expression. Apply the same rule to a simple invocation with a single expression or lambda
   argument: do not leave the opening parenthesis at the end of one line and the entire argument on the next when the
   invocation fits within 120 characters.
-- In DI constructors and `[Inject]` `Construct` methods, keep every dependency null guard as a single-line
-  null-coalescing expression, normally
-  `_dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));`. When the dependency is not
-  assigned directly, use `_ = dependency ?? throw new ArgumentNullException(nameof(dependency));`. Keep either form
-  on a single line even when it exceeds the 140-character hard limit.
+- In DI constructors and `[Inject]` `Construct` methods, keep a dependency null guard that directly assigns the
+  dependency in the form `_dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));` on a
+  single line, even when it exceeds the 140-character hard limit. When the dependency is not assigned directly, use
+  a conventional two-line `if` statement followed by `throw new ArgumentNullException(...)`.
 - When generating code, prioritize readability and clear separation of responsibilities. Reuse existing code wherever possible, and introduce abstractions when they make repeated use simpler without adding unnecessary complexity.
 - When asked for a commit message, output only a concise English imperative phrase as plain text: start with a capital letter and do not use quotation marks, backticks, explanations, conventional prefixes such as `feat:` or `refactor:`, or a trailing period.

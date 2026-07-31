@@ -18,7 +18,8 @@ namespace LL.User.State.Items
         [Inject]
         internal UserItems(UserItemsSnapshot snapshot)
         {
-            _ = snapshot ?? throw new ArgumentNullException(nameof(snapshot));
+            if (snapshot == null)
+                throw new ArgumentNullException(nameof(snapshot));
 
             _amounts = snapshot.Amounts.ToDictionary(
                 amount => amount.Id,
