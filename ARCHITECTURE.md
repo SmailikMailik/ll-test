@@ -309,6 +309,9 @@ Sources and repositories own I/O. Mappers only convert representations. Compiler
 reference resolution. Domain and state code must not read JSON, files, PlayerPrefs, or `ScriptableObject` fields
 directly.
 
+Compilers implement `IDataCompiler<TDeclaration, TSnapshot>`. Their source-neutral declaration is the only input to
+`Compile`; stable catalogs or other services required to resolve it are constructor dependencies.
+
 For game and user domain data, use `IDataLoader<T>` only for an application-level aggregate such as
 `GameDataSnapshot`, `UserDefaultsSnapshot`, or `UserSnapshot`. Do not implement it on individual domain catalog
 configs or other partial domain data. A whole-data load registers one aggregate once; consumers receive the

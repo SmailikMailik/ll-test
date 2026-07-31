@@ -31,7 +31,7 @@ namespace LL.Game.Identifiers
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            var usedValues = new HashSet<string>(StringComparer.Ordinal);
+            var usedValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var index = 0;
 
             if (entries == null)
@@ -53,15 +53,13 @@ namespace LL.Game.Identifiers
 
                 if (string.IsNullOrWhiteSpace(id.Value) is false)
                 {
-                    var comparisonValue = id.Value.Trim().ToLowerInvariant();
+                    var comparisonValue = id.Value.Trim();
 
-                    if (usedValues.Add(comparisonValue) is false)
-                    {
-                        idContext.Report(
-                            ValidationSeverity.Error,
-                            DuplicateIdentifierCode,
-                            $"Identifier '{id}' must be unique.");
-                    }
+                    ValidationRules.Unique(
+                        comparisonValue,
+                        usedValues,
+                        idContext,
+                        DuplicateIdentifierCode);
                 }
 
                 index++;

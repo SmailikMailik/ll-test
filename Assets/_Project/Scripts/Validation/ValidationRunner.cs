@@ -4,6 +4,16 @@ namespace LL.Validation
 {
     internal static class ValidationRunner
     {
+        internal static ValidationResult Run(Action<ValidationContext> validate)
+        {
+            if (validate == null)
+                throw new ArgumentNullException(nameof(validate));
+
+            var result = new ValidationResult();
+            validate(new ValidationContext(result));
+            return result;
+        }
+
         internal static ValidationResult Run(IValidationSource source)
         {
             if (source == null)
@@ -26,6 +36,9 @@ namespace LL.Validation
 
         internal static void EnsureValid(IValidationSource source, string parameterName = null) =>
             ValidationResultGuard.EnsureValid(Run(source), parameterName);
+
+        internal static void EnsureValid(Action<ValidationContext> validate, string parameterName = null) =>
+            ValidationResultGuard.EnsureValid(Run(validate), parameterName);
 
         internal static void EnsureValid<T>(T value, IDataValidator<T> validator, string parameterName = null) =>
             ValidationResultGuard.EnsureValid(Run(value, validator), parameterName);

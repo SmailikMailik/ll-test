@@ -117,6 +117,57 @@ namespace LL.Validation
             return false;
         }
 
+        internal static bool Equal<T>(
+            T value,
+            T expectedValue,
+            ValidationContext context,
+            string code,
+            IEqualityComparer<T> comparer = null)
+        {
+            EnsureArguments(context, code);
+
+            comparer ??= EqualityComparer<T>.Default;
+
+            if (comparer.Equals(value, expectedValue))
+                return true;
+
+            ReportError(context, code, $"Value '{value}' must equal '{expectedValue}'.");
+            return false;
+        }
+
+        internal static bool NotEqual<T>(
+            T value,
+            T forbiddenValue,
+            ValidationContext context,
+            string code,
+            IEqualityComparer<T> comparer = null)
+        {
+            EnsureArguments(context, code);
+
+            comparer ??= EqualityComparer<T>.Default;
+
+            if (comparer.Equals(value, forbiddenValue) is false)
+                return true;
+
+            ReportError(context, code, $"Value '{value}' must not equal '{forbiddenValue}'.");
+            return false;
+        }
+
+        internal static bool LessThanOrEqual(
+            int value,
+            int maximumValue,
+            ValidationContext context,
+            string code)
+        {
+            EnsureArguments(context, code);
+
+            if (value <= maximumValue)
+                return true;
+
+            ReportError(context, code, $"Value '{value}' must not exceed '{maximumValue}'.");
+            return false;
+        }
+
         internal static bool DefinedEnum<TEnum>(
             TEnum value,
             ValidationContext context,
@@ -151,6 +202,24 @@ namespace LL.Validation
         }
 
         internal static bool Unique<T>(
+            T value,
+            ISet<T> usedValues,
+            ValidationContext context,
+            string code)
+        {
+            EnsureArguments(context, code);
+
+            if (usedValues == null)
+                throw new ArgumentNullException(nameof(usedValues));
+
+            if (usedValues.Add(value))
+                return true;
+
+            ReportError(context, code, $"Value '{value}' must be unique.");
+            return false;
+        }
+
+        internal static bool Unique<T>(
             IEnumerable<T> values,
             ValidationContext context,
             string code,
@@ -167,11 +236,8 @@ namespace LL.Validation
 
             foreach (var value in values)
             {
-                if (usedValues.Add(value) is false)
-                {
-                    ReportError(context.At(index), code, $"Value '{value}' must be unique.");
+                if (Unique(value, usedValues, context.At(index), code) is false)
                     isValid = false;
-                }
 
                 index++;
             }

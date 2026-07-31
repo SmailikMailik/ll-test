@@ -12,6 +12,7 @@ namespace LLEditor.Validation.References
     internal sealed class UserProgressRankReferenceValidator : IProjectDataReferenceValidation
     {
         private const string RankExistsCode = "user-defaults.progress.rank.exists";
+        private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
         private const string ExperienceMaximumCode = "user-defaults.progress.experience.maximum";
         private const string FinalRankExperienceCode = "user-defaults.progress.final-rank-experience.zero";
 
@@ -65,39 +66,28 @@ namespace LLEditor.Validation.References
                 return;
             }
 
-            if (progress.Experience < 0)
+            var experienceContext = context.At(nameof(UserProgressDefaults.Experience));
+
+            if (ValidationRules.NonNegative(progress.Experience, experienceContext, ExperienceCode) is false)
                 return;
 
             var rankIndex = FindRankIndex(ranks, progress.RankId);
-            var nextRank = rankIndex >= 0 && rankIndex + 1 < ranks.Count
-                ? ranks[rankIndex + 1]
-                : null;
 
-            if (nextRank == null)
+            if (rankIndex + 1 < ranks.Count)
             {
-                if (progress.Experience != 0)
-                {
-                    context
-                        .At(nameof(UserProgressDefaults.Experience))
-                        .Report(
-                            ValidationSeverity.Error,
-                            FinalRankExperienceCode,
-                            $"Experience at final rank '{progress.RankId}' must be zero.");
-                }
-
+                ValidationRules.LessThanOrEqual(
+                    progress.Experience,
+                    ranks[rankIndex + 1].RequiredExperience,
+                    experienceContext,
+                    ExperienceMaximumCode);
                 return;
             }
 
-            if (progress.Experience > nextRank.RequiredExperience)
-            {
-                context
-                    .At(nameof(UserProgressDefaults.Experience))
-                    .Report(
-                        ValidationSeverity.Error,
-                        ExperienceMaximumCode,
-                        $"Experience at rank '{progress.RankId}' must not exceed " +
-                        $"{nextRank.RequiredExperience}.");
-            }
+            ValidationRules.Equal(
+                progress.Experience,
+                0,
+                experienceContext,
+                FinalRankExperienceCode);
         }
 
         private static int FindRankIndex(

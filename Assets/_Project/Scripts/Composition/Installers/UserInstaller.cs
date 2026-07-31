@@ -1,7 +1,9 @@
 using System;
 using LL.Game.Ranks;
+using LL.Infrastructure.Compilation;
 using LL.Infrastructure.Loading;
 using LL.User.Defaults;
+using LL.User.Defaults.Declarations;
 using LL.User.Defaults.Sources;
 using LL.User.Persistence;
 using LL.User.Snapshots;
@@ -31,7 +33,9 @@ namespace LL.Composition.Installers
         {
             builder.RegisterInstance(_defaultsSource);
             builder.RegisterInstance(_saveRepository);
-            builder.Register<UserDefaultsCompiler>(Lifetime.Singleton);
+            builder
+                .Register<UserDefaultsCompiler>(Lifetime.Singleton)
+                .As<IDataCompiler<UserDefaultsDeclaration, UserDefaultsSnapshot>>();
             builder.Register<UserDefaultsLoader>(Lifetime.Singleton).As<IDataLoader<UserDefaultsSnapshot>>();
             builder.RegisterLoadedData<UserDefaultsSnapshot>();
             builder.Register<UserSnapshotReconciler>(Lifetime.Singleton);

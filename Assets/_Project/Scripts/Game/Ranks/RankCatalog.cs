@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Identifiers;
+using LL.Validation;
 
 namespace LL.Game.Ranks
 {
     internal sealed class RankCatalog
     {
+        private const string EntriesCode = "rank-catalog.entries.not-empty";
+
         internal IReadOnlyList<RankDefinition> Ranks { get; }
 
         private readonly IReadOnlyDictionary<RankId, RankDefinition> _ranksById;
@@ -15,10 +18,12 @@ namespace LL.Game.Ranks
         {
             var entries = ranks?.ToArray() ?? Array.Empty<RankDefinition>();
 
-            if (entries.Length == 0)
-                throw new ArgumentException(
-                    "Rank catalog must contain at least one rank.",
-                    nameof(ranks));
+            ValidationRunner.EnsureValid(
+                context => ValidationRules.NotEmpty(
+                    entries,
+                    context,
+                    EntriesCode),
+                nameof(ranks));
 
             IdentifierCollectionValidator.EnsureValid(
                 entries,
