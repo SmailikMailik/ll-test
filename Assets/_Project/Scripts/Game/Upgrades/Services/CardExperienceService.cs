@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LL.Game.Cards;
 using LL.Game.Items;
 using LL.Game.Upgrades;
+using LL.User.State;
 using LL.User.State.Items;
 using LL.User.State.Progress;
 using VContainer;
@@ -13,22 +14,33 @@ namespace LL.Game.Upgrades.Services
     {
         private const int MinAmount = 0;
 
-        private readonly IUserItems _userItems;
+        private readonly IUserItemsCommands _userItems;
         private readonly IUserProgress _userProgress;
+        private readonly IUserProgressCommands _userProgressCommands;
         private readonly CardCatalog _cardCatalog;
+        private readonly IUserStateChangeBatch _changeBatch;
 
         [Inject]
         internal CardExperienceService(
-            IUserItems userItems,
+            IUserItemsCommands userItems,
             IUserProgress userProgress,
-            CardCatalog cardCatalog)
+            IUserProgressCommands userProgressCommands,
+            CardCatalog cardCatalog,
+            IUserStateChangeBatch changeBatch)
         {
             _userItems = userItems ?? throw new ArgumentNullException(nameof(userItems));
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
+            _userProgressCommands = userProgressCommands ?? throw new ArgumentNullException(nameof(userProgressCommands));
             _cardCatalog = cardCatalog ?? throw new ArgumentNullException(nameof(cardCatalog));
+            _changeBatch = changeBatch ?? throw new ArgumentNullException(nameof(changeBatch));
         }
 
         public bool TryApply(IReadOnlyList<ItemAmount> cards)
+        {
+            return _changeBatch.Execute(() => TryApplyCore(cards));
+        }
+
+        private bool TryApplyCore(IReadOnlyList<ItemAmount> cards)
         {
             if (TryGetApplication(cards, out var application) is false)
                 return false;
@@ -47,7 +59,7 @@ namespace LL.Game.Upgrades.Services
                 return false;
             }
 
-            if (_userProgress.TryAddExperience(application.GrantedExperience))
+            if (_userProgressCommands.TryAddExperience(application.GrantedExperience))
                 return true;
 
             RestoreCards(spentCards);

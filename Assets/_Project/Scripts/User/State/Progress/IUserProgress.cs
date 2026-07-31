@@ -11,14 +11,10 @@ namespace LL.User.State.Progress
         int Experience { get; }
         bool CanRankUp { get; }
 
-        Observable<RankId> RankChanged { get; }
-        Observable<int> ExperienceChanged { get; }
         Observable<Unit> Changed { get; }
 
         UserProgressSnapshot CreateSnapshot();
         int GetApplicableExperience(int amount);
         bool CanAddExperience(int amount);
-        bool TryAddExperience(int amount);
-        bool TryRankUp();
     }
 }

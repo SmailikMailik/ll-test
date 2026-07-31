@@ -9,7 +9,7 @@ using VContainer;
 
 namespace LL.User.Defaults
 {
-    internal sealed class UserDefaultsLoader : IDataLoader<UserDefaultsTemplate>
+    internal sealed class UserDefaultsLoader : IDataLoader<UserDefaultsSnapshot>
     {
         private readonly IUserDefaultsSource _source;
         private readonly UserDefaultsCompiler _compiler;
@@ -35,7 +35,7 @@ namespace LL.User.Defaults
             _rewards = rewards ?? throw new ArgumentNullException(nameof(rewards));
         }
 
-        public UserDefaultsTemplate Load()
+        public UserDefaultsSnapshot Load()
         {
             return _compiler.Compile(_source.Read(), _ranks, _cards, _rankUps, _rewards);
         }

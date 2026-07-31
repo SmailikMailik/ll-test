@@ -6,19 +6,15 @@ using VContainer;
 
 namespace LL.User.State.Progress
 {
-    internal sealed class UserProgress : IUserProgress, IDisposable
+    internal sealed class UserProgress : IUserProgress, IUserProgressCommands, IDisposable
     {
         public RankId RankId { get; private set; }
         public int Rank { get; private set; }
         public int Experience { get; private set; }
         public bool CanRankUp => _rankProgression.CanRankUp(RankId, Experience);
 
-        public Observable<RankId> RankChanged => _rankChanged;
-        public Observable<int> ExperienceChanged => _experienceChanged;
         public Observable<Unit> Changed => _changed;
 
-        private readonly Subject<RankId> _rankChanged = new();
-        private readonly Subject<int> _experienceChanged = new();
         private readonly Subject<Unit> _changed = new();
         private readonly IRankProgression _rankProgression;
 
@@ -60,7 +56,6 @@ namespace LL.User.State.Progress
                 return false;
 
             Experience += appliedExperience;
-            _experienceChanged.OnNext(Experience);
             _changed.OnNext(Unit.Default);
 
             return true;
@@ -78,8 +73,6 @@ namespace LL.User.State.Progress
             Rank = nextProgress.Rank;
             Experience = 0;
 
-            _rankChanged.OnNext(RankId);
-            _experienceChanged.OnNext(Experience);
             _changed.OnNext(Unit.Default);
 
             return true;
@@ -87,8 +80,6 @@ namespace LL.User.State.Progress
 
         public void Dispose()
         {
-            _rankChanged.Dispose();
-            _experienceChanged.Dispose();
             _changed.Dispose();
         }
     }

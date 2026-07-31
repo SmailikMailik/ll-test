@@ -8,7 +8,7 @@ using VContainer;
 
 namespace LL.User.State.Items
 {
-    internal sealed class UserItems : IUserItems, IDisposable
+    internal sealed class UserItems : IUserItems, IUserItemsCommands, IDisposable
     {
         public Observable<Unit> Changed => _changed;
 

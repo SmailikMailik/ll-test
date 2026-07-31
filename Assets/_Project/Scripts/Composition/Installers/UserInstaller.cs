@@ -32,8 +32,9 @@ namespace LL.Composition.Installers
             builder.RegisterInstance(_defaultsSource);
             builder.RegisterInstance(_saveRepository);
             builder.Register<UserDefaultsCompiler>(Lifetime.Singleton);
-            builder.Register<UserDefaultsLoader>(Lifetime.Singleton).As<IDataLoader<UserDefaultsTemplate>>();
-            builder.RegisterLoadedData<UserDefaultsTemplate>();
+            builder.Register<UserDefaultsLoader>(Lifetime.Singleton).As<IDataLoader<UserDefaultsSnapshot>>();
+            builder.RegisterLoadedData<UserDefaultsSnapshot>();
+            builder.Register<UserSnapshotReconciler>(Lifetime.Singleton);
             builder.Register<UserSessionLoader>(Lifetime.Singleton).As<IDataLoader<UserSnapshot>>();
             builder.RegisterLoadedData<UserSnapshot>();
             builder.RegisterSnapshotPart<UserSnapshot, UserIdentitySnapshot>(snapshot => snapshot.Identity);
@@ -41,11 +42,20 @@ namespace LL.Composition.Installers
             builder.RegisterSnapshotPart<UserSnapshot, UserProgressSnapshot>(snapshot => snapshot.Progress);
             builder.RegisterSnapshotPart<UserSnapshot, UserRankUpQuestSnapshot>(snapshot => snapshot.RankUpQuest);
 
-            builder.Register<UserItems>(Lifetime.Singleton).As<IUserItems>();
-            builder.Register<UserRankUpQuest>(Lifetime.Singleton).As<IUserRankUpQuest>();
+            builder
+                .Register<UserItems>(Lifetime.Singleton)
+                .As<IUserItems>()
+                .As<IUserItemsCommands>();
+            builder
+                .Register<UserRankUpQuest>(Lifetime.Singleton)
+                .As<IUserRankUpQuest>()
+                .As<IUserRankUpQuestCommands>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
-            builder.Register<UserProgress>(Lifetime.Singleton).As<IUserProgress>();
-            builder.RegisterEntryPoint<UserState>().AsSelf();
+            builder
+                .Register<UserProgress>(Lifetime.Singleton)
+                .As<IUserProgress>()
+                .As<IUserProgressCommands>();
+            builder.RegisterEntryPoint<UserState>().AsSelf().As<IUserStateChangeBatch>();
             builder.RegisterEntryPoint<UserSaveCoordinator>();
         }
     }

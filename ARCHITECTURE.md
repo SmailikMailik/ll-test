@@ -120,11 +120,15 @@ and use-case services.
 - Core game models must not depend on `User`, `Presentation`, `UI`, `Composition`, or `Editor`.
 - Game application services may coordinate user state through focused `User.State` interfaces. Domain definitions and
   calculations must remain independent of concrete user-state implementations.
+- UI may consume read-only user-state interfaces for display and queries. Only game application services may consume
+  `*Commands` interfaces and mutate user state; UI actions must cross a game service boundary.
 - `Game/RankUp` owns the rules for advancing to the next rank: its quest path, instant-payment path, and reward.
   `RankUpDefinition` is one immutable rule set, `RankUpQuest` describes its quest path, and `RankUpService` executes
-  the selected path. Within this feature, use `Definition` for APIs and variables that expose the immutable rule set,
-  and `RankUp` for commands and capability names that describe the player action. Use `RankUp`, never `Promotion`, as
-  the code and folder vocabulary for this feature.
+  the selected path. `RankUpQuestService` is the command boundary for starting, completing, expiring, and clearing
+  the persisted user quest; UI may observe quest state but must issue mutations through this service. Within this
+  feature, use `Definition` for APIs and variables that expose the immutable rule set, and `RankUp` for commands and
+  capability names that describe the player action. Use `RankUp`, never `Promotion`, as the code and folder vocabulary
+  for this feature.
 - Unity-dependent authoring adapters are allowed under the owning capability's `Configuration` folder.
 - Cross-capability workflows belong to the capability that owns the outcome; create a new capability only when no
   existing owner is correct.
@@ -138,11 +142,13 @@ Owns user-specific defaults, persisted user representation, immutable loaded sna
 
 - `Configuration` owns authored defaults and their validation.
 - `Defaults` owns the source-neutral defaults pipeline: declarations, source adapters, runtime compilation, and the
-  immutable template used to initialize a user without a valid save.
+  immutable defaults snapshot used to initialize a user without a valid save.
 - `Persistence` owns the user repository, session loading and save coordination, document mapping, and version
   handling.
 - `Snapshots` owns immutable point-in-time user data.
 - `State` owns long-lived mutable runtime state, grouped by capability.
+- Each mutable state capability exposes a read interface separately from its `*Commands` interface. Register both
+  against one concrete singleton so consumers receive the same state instance with compile-time-appropriate access.
 - `User` may depend on stable `Game` value objects and definitions.
 
 ### `Infrastructure`
@@ -257,7 +263,6 @@ Use the most specific applicable suffix:
 - `Entry`: one serialized authoring row nested under a configuration.
 - `DocumentEntry`: one serialized transport row nested under a `Document`.
 - `Declaration`: normalized, source-neutral, not-yet-trusted data prepared for compilation into runtime meaning.
-- `Template`: immutable compiled initial values used to create a new aggregate.
 - `Definition`: immutable domain description used by game rules.
 - `Catalog`: immutable indexed collection of definitions or resources.
 - `Snapshot`: immutable, internally consistent point-in-time aggregate.
@@ -305,7 +310,7 @@ reference resolution. Domain and state code must not read JSON, files, PlayerPre
 directly.
 
 For game and user domain data, use `IDataLoader<T>` only for an application-level aggregate such as
-`GameDataSnapshot`, `UserDefaultsTemplate`, or `UserSnapshot`. Do not implement it on individual domain catalog
+`GameDataSnapshot`, `UserDefaultsSnapshot`, or `UserSnapshot`. Do not implement it on individual domain catalog
 configs or other partial domain data. A whole-data load registers one aggregate once; consumers receive the
 aggregate or its owned parts, never a concrete source, repository, or compiler. Presentation and UI resource
 catalogs may retain focused loaders because they are independently owned runtime resources rather than partial
@@ -392,9 +397,17 @@ UserDefaultsConfig
     -> IUserDefaultsSource
     -> UserDefaultsDeclaration
     -> UserDefaultsCompiler
-    -> UserDefaultsTemplate -----\
-                                  -> UserSessionLoader -> UserSnapshot -> UserState
-IUserSaveRepository -------------/
+    -> UserDefaultsSnapshot -----\
+                                  -> UserSessionLoader
+IUserSaveRepository -------------/          |
+                                            v
+                                  UserSnapshotReconciler
+                                            |
+                                            v
+                                      UserSnapshot
+                                            |
+                                            v
+                                        UserState
 
 UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
                                          -> UserSaveDocumentMapper
@@ -402,11 +415,13 @@ UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
 ```
 
 The defaults source normalizes authoring data without exposing its storage technology. `UserDefaultsCompiler`
-validates references against the loaded rank and card catalogs and creates an immutable template. The repository
-owns the persisted user document and reports a semantic load result; it does not decide whether defaults should
-replace missing, corrupt, or unsupported data. `UserSessionLoader` owns that startup policy. `UserState` is the
-single mutable aggregate, emits one change notification per successful logical mutation, and creates the complete
-snapshot saved by `UserSaveCoordinator`.
+validates references against the loaded game catalogs and creates an immutable defaults snapshot. The repository owns the
+persisted user document and reports a semantic load result. `UserSessionLoader` owns the fallback policy, while
+`UserSnapshotReconciler` checks a loaded snapshot against current game data, adds newly required default items, and
+clears stale rank-up quests before runtime state is constructed. `UserState` is the single mutable aggregate, batches
+child notifications into one notification per synchronous logical mutation, and creates the complete snapshot saved
+by `UserSaveCoordinator`. A save failure must not throw from the change observer after memory has already changed;
+the coordinator keeps the state dirty, reports the failure, and retries on the next change or disposal.
 
 Snapshots are immutable load-boundary values. State objects are the only long-lived mutable representation. Current
 user documents start at version `1`; future version changes require explicit migration rather than compatibility

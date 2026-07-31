@@ -3,13 +3,13 @@ using LL.User.Snapshots;
 
 namespace LL.User.Defaults
 {
-    internal sealed class UserDefaultsTemplate
+    internal sealed class UserDefaultsSnapshot
     {
         private readonly UserIdentitySnapshot _identity;
         private readonly UserItemsSnapshot _items;
         private readonly UserProgressSnapshot _progress;
 
-        internal UserDefaultsTemplate(
+        internal UserDefaultsSnapshot(
             UserIdentitySnapshot identity,
             UserItemsSnapshot items,
             UserProgressSnapshot progress)
@@ -19,7 +19,7 @@ namespace LL.User.Defaults
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
         }
 
-        internal UserSnapshot CreateSnapshot()
+        internal UserSnapshot CreateUserSnapshot()
         {
             return new UserSnapshot(
                 _identity,

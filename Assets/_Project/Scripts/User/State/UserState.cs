@@ -10,7 +10,7 @@ using VContainer.Unity;
 
 namespace LL.User.State
 {
-    internal sealed class UserState : IInitializable, IDisposable
+    internal sealed class UserState : IUserStateChangeBatch, IInitializable, IDisposable
     {
         internal Observable<Unit> Changed => _changed;
 
@@ -18,8 +18,12 @@ namespace LL.User.State
         private readonly IUserItems _items;
         private readonly IUserProgress _progress;
         private readonly IUserRankUpQuest _rankUpQuest;
+
         private readonly Subject<Unit> _changed = new();
         private readonly List<IDisposable> _subscriptions = new();
+
+        private int _changeBatchDepth;
+        private bool _hasPendingChange;
 
         [Inject]
         internal UserState(
@@ -50,6 +54,29 @@ namespace LL.User.State
                 _rankUpQuest.CreateSnapshot());
         }
 
+        public TResult Execute<TResult>(Func<TResult> mutation)
+        {
+            if (mutation == null)
+                throw new ArgumentNullException(nameof(mutation));
+
+            _changeBatchDepth++;
+
+            try
+            {
+                return mutation();
+            }
+            finally
+            {
+                _changeBatchDepth--;
+
+                if (_changeBatchDepth == 0 && _hasPendingChange)
+                {
+                    _hasPendingChange = false;
+                    _changed.OnNext(Unit.Default);
+                }
+            }
+        }
+
         public void Dispose()
         {
             foreach (var subscription in _subscriptions)
@@ -59,6 +86,15 @@ namespace LL.User.State
             _changed.Dispose();
         }
 
-        private void OnStateChanged(Unit _) => _changed.OnNext(Unit.Default);
+        private void OnStateChanged(Unit _)
+        {
+            if (_changeBatchDepth > 0)
+            {
+                _hasPendingChange = true;
+                return;
+            }
+
+            _changed.OnNext(Unit.Default);
+        }
     }
 }

@@ -198,7 +198,8 @@ flowchart LR
     Source["IUserDefaultsSource"]
     Declaration["UserDefaultsDeclaration"]
     Compiler["UserDefaultsCompiler"]
-    Defaults["UserDefaultsTemplate"]
+    Defaults["UserDefaultsSnapshot"]
+    Reconciler["UserSnapshotReconciler"]
     State["UserState"]
     Coordinator["UserSaveCoordinator"]
 
@@ -212,7 +213,9 @@ flowchart LR
     Declaration --> Compiler
     Compiler --> Defaults
     Defaults --> Loader
-    Loader --> Snapshot
+    Loader --> Reconciler
+    Snapshot --> Reconciler
+    Reconciler --> Snapshot
     Snapshot --> State
     State -- Changed --> Coordinator
     Coordinator --> Repository
@@ -224,10 +227,12 @@ flowchart LR
 
 `IUserDefaultsSource` преобразует конкретный источник начальных значений в `UserDefaultsDeclaration`.
 `UserDefaultsCompiler` проверяет стартовый ранг, допустимый опыт и наличие всех предметов, используемых встроенными
-правилами, картами, оплатами и наградами, после чего создаёт `UserDefaultsTemplate`. `UserSessionLoader` сначала
-пытается загрузить сохранение. Если файла нет, он повреждён или имеет неподдерживаемую версию, загрузчик создаёт
-`UserSnapshot` из шаблона и сохраняет его. Во время сессии `UserState` объединяет изменяемые части состояния.
-`UserSaveCoordinator` подписывается на `UserState.Changed`, создаёт новый снимок и передаёт его репозиторию.
+правилами, картами, оплатами и наградами, после чего создаёт `UserDefaultsSnapshot`. `UserSessionLoader` сначала
+пытается загрузить сохранение. `UserSnapshotReconciler` проверяет его относительно текущих игровых каталогов,
+добавляет отсутствующие обязательные предметы и очищает устаревшее rank-up задание. Несовместимый прогресс приводит
+к явному сбросу на defaults. Во время сессии `UserState` объединяет изменяемые части состояния и сворачивает все
+изменения одной синхронной игровой операции в одно уведомление. `UserSaveCoordinator` сохраняет итоговый снимок;
+ошибка записи не прерывает уже выполненную игровую операцию и повторно проверяется при следующем изменении.
 
 ### Файлы пользовательского потока
 
@@ -237,19 +242,20 @@ flowchart LR
 | `Defaults/Sources/IUserDefaultsSource.cs` | Контракт любого источника начальных значений |
 | `Defaults/Sources/ScriptableObjectUserDefaultsSource.cs` | Преобразование Unity-конфига в source-neutral declaration |
 | `Defaults/Declarations/*Declaration.cs` | Не проверенное представление начальных значений без зависимости от источника |
-| `Defaults/UserDefaultsCompiler.cs` | Runtime-проверка ссылок и построение согласованного шаблона |
-| `Defaults/UserDefaultsTemplate.cs` | Неизменяемые начальные значения для создания нового пользователя |
+| `Defaults/UserDefaultsCompiler.cs` | Runtime-проверка ссылок и построение согласованного снимка начальных значений |
+| `Defaults/UserDefaultsSnapshot.cs` | Неизменяемые начальные значения для создания нового пользователя |
 | `Persistence/Documents/UserSaveDocument.cs` | Корневой версионируемый контракт сохранения |
 | `Persistence/Documents/*DocumentEntry.cs` | Сериализуемые части identity, progress, rank-up quest и inventory |
 | `Persistence/UserSaveDocumentMapper.cs` | Двустороннее преобразование `UserSaveDocument` ↔ `UserSnapshot` |
 | `Persistence/IUserSaveRepository.cs` | Семантический контракт загрузки и сохранения пользователя |
 | `Persistence/SerializedUserSaveRepository.cs` | I/O, проверка версии и классификация ошибок загрузки |
 | `Persistence/UserLoadResult.cs` и `UserLoadStatus.cs` | Результат загрузки: loaded, not found, corrupted или unsupported version |
-| `Persistence/UserSessionLoader.cs` | Выбрать сохранённый снимок либо создать и сохранить значения по умолчанию |
+| `Persistence/UserSessionLoader.cs` | Выбрать согласованный сохранённый снимок либо создать значения по умолчанию |
+| `Persistence/UserSnapshotReconciler.cs` | Согласовать сохранение с текущими рангами, предметами и rank-up заданием |
 | `Snapshots/UserSnapshot.cs` | Корень неизменяемого снимка пользователя |
 | `Snapshots/*Snapshot.cs` | Неизменяемые части identity, inventory, progress и rank-up quest |
-| `State/UserState.cs` | Объединить изменяемые части сессии и сообщать об их изменениях |
-| `State/Items`, `State/Progress`, `State/RankUp` | Изменяемое поведение отдельных пользовательских возможностей |
+| `State/UserState.cs` | Объединить части сессии и пакетировать уведомления составных операций |
+| `State/Items`, `State/Progress`, `State/RankUp` | Read-интерфейсы, command-интерфейсы и состояние пользовательских возможностей |
 | `Persistence/UserSaveCoordinator.cs` | Сохранять новый снимок после изменения состояния |
 | `Composition/Factories/UserDefaultsSourceFactory.cs` | Выбрать конкретный источник начальных значений |
 | `Composition/Factories/UserSaveRepositoryFactory.cs` | Собрать JSON-сериализацию, файловое хранилище и репозиторий |
@@ -271,7 +277,7 @@ flowchart LR
 2. Проверить преобразование в `ScriptableObjectUserDefaultsSource`.
 3. Проверить соответствующий `Defaults/Declarations/*Declaration`.
 4. Проверить runtime-валидацию в `UserDefaultsCompiler`.
-5. Найти итоговое значение в `UserDefaultsTemplate`.
+5. Найти итоговое значение в `UserDefaultsSnapshot`.
 
 Для сохранённого состояния пользователя:
 
@@ -280,6 +286,10 @@ flowchart LR
 3. Найти значение в соответствующем `*Snapshot`.
 4. Проверить изменяемую реализацию в `User/State`.
 5. При проблеме сохранения пройти `UserState.Changed` → `UserSaveCoordinator` → `SerializedUserSaveRepository`.
+
+UI получает только read-интерфейсы `IUserItems`, `IUserProgress` и `IUserRankUpQuest`. Изменения выполняют игровые
+сервисы через соответствующие `*Commands` интерфейсы. Например, кнопка добавления карты вызывает
+`CardCollectionService`, а не изменяет пользовательский инвентарь напрямую.
 
 ## Как добавить новую группу игровых данных
 

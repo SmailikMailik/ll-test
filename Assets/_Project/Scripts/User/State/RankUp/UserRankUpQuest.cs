@@ -6,12 +6,11 @@ using VContainer;
 
 namespace LL.User.State.RankUp
 {
-    internal sealed class UserRankUpQuest : IUserRankUpQuest, IDisposable
+    internal sealed class UserRankUpQuest : IUserRankUpQuest, IUserRankUpQuestCommands, IDisposable
     {
         private const long NoDeadline = 0L;
 
         public QuestId QuestId => _questId;
-        public long DeadlineUnixMilliseconds => _deadlineUnixMilliseconds;
         public bool IsActive => HasQuest && IsCompleted is false && GetRemainingTime() > TimeSpan.Zero;
         public bool IsCompleted => _isCompleted;
         public Observable<Unit> Changed => _changed;
@@ -50,7 +49,7 @@ namespace LL.User.State.RankUp
         {
             return new UserRankUpQuestSnapshot(
                 QuestId,
-                DeadlineUnixMilliseconds,
+                _deadlineUnixMilliseconds,
                 IsCompleted);
         }
 
@@ -87,11 +86,11 @@ namespace LL.User.State.RankUp
             if (HasQuest is false || IsCompleted || GetRemainingTime() > TimeSpan.Zero)
                 return false;
 
-            ClearQuest();
+            Clear();
             return true;
         }
 
-        public void ClearQuest()
+        public void Clear()
         {
             if (HasQuest is false && IsCompleted is false)
                 return;

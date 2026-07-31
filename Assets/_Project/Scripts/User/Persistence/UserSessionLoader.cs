@@ -9,16 +9,19 @@ namespace LL.User.Persistence
 {
     internal sealed class UserSessionLoader : IDataLoader<UserSnapshot>
     {
-        private readonly UserDefaultsTemplate _defaults;
+        private readonly UserDefaultsSnapshot _defaults;
         private readonly IUserSaveRepository _repository;
+        private readonly UserSnapshotReconciler _reconciler;
 
         [Inject]
         internal UserSessionLoader(
-            UserDefaultsTemplate defaults,
-            IUserSaveRepository repository)
+            UserDefaultsSnapshot defaults,
+            IUserSaveRepository repository,
+            UserSnapshotReconciler reconciler)
         {
             _defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _reconciler = reconciler ?? throw new ArgumentNullException(nameof(reconciler));
         }
 
         public UserSnapshot Load()
@@ -26,7 +29,17 @@ namespace LL.User.Persistence
             var result = _repository.Load();
 
             if (result.Status == UserLoadStatus.Loaded)
-                return result.Snapshot;
+            {
+                if (_reconciler.TryReconcile(result.Snapshot, out var reconciled, out var changed))
+                {
+                    if (changed && _repository.Save(reconciled) is false)
+                        Debug.LogError("Reconciled user data could not be saved.");
+
+                    return reconciled;
+                }
+
+                Debug.LogWarning("User data is incompatible with current game data. Resetting user data.");
+            }
 
             if (result.Status == UserLoadStatus.UnsupportedVersion)
             {
@@ -37,8 +50,11 @@ namespace LL.User.Persistence
                 Debug.LogWarning("User document is corrupted. Resetting user data.");
             }
 
-            var defaultSnapshot = _defaults.CreateSnapshot();
-            _repository.Save(defaultSnapshot);
+            var defaultSnapshot = _defaults.CreateUserSnapshot();
+
+            if (_repository.Save(defaultSnapshot) is false)
+                Debug.LogError("Default user data could not be saved.");
+
             return defaultSnapshot;
         }
     }

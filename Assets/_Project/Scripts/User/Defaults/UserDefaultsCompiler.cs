@@ -17,7 +17,7 @@ namespace LL.User.Defaults
         [Inject]
         internal UserDefaultsCompiler() { }
 
-        internal UserDefaultsTemplate Compile(
+        internal UserDefaultsSnapshot Compile(
             UserDefaultsDeclaration declaration,
             RankCatalog ranks,
             CardCatalog cards,
@@ -45,7 +45,7 @@ namespace LL.User.Defaults
             var itemAmounts = CompileItems(declaration.Items);
             EnsureRequiredItemsExist(itemAmounts, cards, rankUps, rewards);
 
-            return new UserDefaultsTemplate(
+            return new UserDefaultsSnapshot(
                 new UserIdentitySnapshot(declaration.UserId, declaration.RegionCode),
                 new UserItemsSnapshot(itemAmounts),
                 new UserProgressSnapshot(rankId, declaration.Experience));

@@ -77,17 +77,29 @@ UserDefaultsConfig
     -> IUserDefaultsSource
     -> UserDefaultsDeclaration
     -> UserDefaultsCompiler
-    -> UserDefaultsTemplate -----\
-                                  -> UserSessionLoader -> UserSnapshot -> UserState
-IUserSaveRepository -------------/
+    -> UserDefaultsSnapshot -----\
+                                  -> UserSessionLoader
+IUserSaveRepository -------------/          |
+                                            v
+                                  UserSnapshotReconciler
+                                            |
+                                            v
+                                  UserSnapshot -> UserState
 
 UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
 ```
 
 Источник отделяет Unity-конфигурацию от runtime-представления. Компилятор проверяет начальный ранг, опыт и наличие
 всех предметов, на которые ссылаются встроенные правила, карты, оплаты и награды, после чего создаёт неизменяемый
-шаблон. `UserSessionLoader` загружает сохранённый снимок или создаёт начальный из этого шаблона. `UserState` остаётся
-единственным изменяемым агрегатом сессии, а `UserSaveCoordinator` сохраняет новый снимок после успешных изменений.
+снимок начальных значений. `UserSessionLoader` загружает сохранённый снимок или создаёт новый пользовательский снимок
+из начального.
+`UserSnapshotReconciler` согласует старое сохранение с актуальными каталогами и обязательными предметами.
+`UserState` объединяет изменения составной синхронной операции в одно уведомление, а `UserSaveCoordinator` выполняет
+одну запись итогового снимка и безопасно повторяет её после временной ошибки.
+
+UI наблюдает `IUserItems`, `IUserProgress` и `IUserRankUpQuest`, но не получает mutating API. Игровые сервисы изменяют
+те же singleton-состояния через отдельные `IUserItemsCommands`, `IUserProgressCommands` и
+`IUserRankUpQuestCommands`.
 
 Подробное описание представлений и преобразований находится в
 [`Game-And-User-Data.md`](Game-And-User-Data.md).

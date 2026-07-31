@@ -1,6 +1,7 @@
 using System;
 using LL.User.State;
 using R3;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -12,6 +13,8 @@ namespace LL.User.Persistence
         private readonly IUserSaveRepository _repository;
 
         private IDisposable _subscription;
+        private bool _isDirty;
+        private bool _saveFailureReported;
 
         [Inject]
         internal UserSaveCoordinator(UserState state, IUserSaveRepository repository)
@@ -29,12 +32,31 @@ namespace LL.User.Persistence
         {
             _subscription?.Dispose();
             _subscription = null;
+
+            if (_isDirty)
+                TrySave();
         }
 
         private void OnStateChanged(Unit _)
         {
-            if (_repository.Save(_state.CreateSnapshot()) is false)
-                throw new InvalidOperationException("User state could not be saved.");
+            _isDirty = true;
+            TrySave();
+        }
+
+        private void TrySave()
+        {
+            if (_repository.Save(_state.CreateSnapshot()))
+            {
+                _isDirty = false;
+                _saveFailureReported = false;
+                return;
+            }
+
+            if (_saveFailureReported)
+                return;
+
+            _saveFailureReported = true;
+            Debug.LogError("User state could not be saved. The next state change will retry.");
         }
     }
 }

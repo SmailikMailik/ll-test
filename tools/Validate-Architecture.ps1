@@ -250,7 +250,21 @@ function Test-DomainDataLoaders {
             $content -match "IDataLoader<" -and
             $file.Name -notin @("UserDefaultsLoader.cs", "UserSessionLoader.cs")) {
             Add-ArchitectureError (
-                "User domain data may use IDataLoader only at UserDefaultsTemplate or UserSnapshot boundary: " +
+                "User domain data may use IDataLoader only at UserDefaultsSnapshot or UserSnapshot boundary: " +
+                "$($file.FullName)")
+        }
+    }
+}
+
+function Test-UserStateCommandConsumers {
+    $commandsPattern = "\bIUser(?:Items|Progress|RankUpQuest)Commands\b"
+
+    foreach ($file in Get-ChildItem -LiteralPath (Join-Path $scriptsRoot "UI") -Recurse -Filter "*.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if ($content -match $commandsPattern) {
+            Add-ArchitectureError (
+                "UI must mutate user state through game services, not User.State command interfaces: " +
                 "$($file.FullName)")
         }
     }
@@ -330,6 +344,7 @@ Test-RuntimeDependencies
 Test-EnumDeclarations
 Test-DiRegistrations
 Test-DomainDataLoaders
+Test-UserStateCommandConsumers
 
 foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recurse -Filter "*.cs") {
     $content = [IO.File]::ReadAllText($file.FullName)

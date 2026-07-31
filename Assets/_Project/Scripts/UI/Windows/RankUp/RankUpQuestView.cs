@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.RankUp;
+using LL.Game.RankUp.Services;
 using LL.Game.Quests;
 using LL.Presentation.Localization;
 using LL.Presentation.RankUp;
@@ -39,6 +40,7 @@ namespace LL.UI.Windows.RankUp
         private IQuestCompletionConfirmation _completionConfirmation;
         private ILocalizationService _localization;
         private IUserRankUpQuest _rankUpQuest;
+        private IRankUpQuestService _rankUpQuestService;
 
         private QuestState _state = QuestState.Available;
         private RankUpQuest _rankUpQuestDefinition;
@@ -51,12 +53,14 @@ namespace LL.UI.Windows.RankUp
         private void Construct(
             IQuestCompletionConfirmation completionConfirmation,
             ILocalizationService localization,
-            IUserRankUpQuest rankUpQuest)
+            IUserRankUpQuest rankUpQuest,
+            IRankUpQuestService rankUpQuestService)
         {
             _completionConfirmation = completionConfirmation
                 ?? throw new ArgumentNullException(nameof(completionConfirmation));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
             _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
+            _rankUpQuestService = rankUpQuestService ?? throw new ArgumentNullException(nameof(rankUpQuestService));
         }
 
         private void Start()
@@ -94,7 +98,7 @@ namespace LL.UI.Windows.RankUp
 
         internal void ClearQuest()
         {
-            _rankUpQuest.ClearQuest();
+            _rankUpQuestService.Clear();
             SetState(QuestState.Available);
         }
 
@@ -149,7 +153,7 @@ namespace LL.UI.Windows.RankUp
 
         private bool StartQuest()
         {
-            if (_rankUpQuest.TryStart(_rankUpQuestDefinition.QuestId, _duration) is false)
+            if (_rankUpQuestService.TryStart(_rankUpQuestDefinition) is false)
                 return false;
 
             SetState(QuestState.Active);
@@ -158,7 +162,7 @@ namespace LL.UI.Windows.RankUp
 
         private void OnQuestCompletionConfirmed()
         {
-            if (_state != QuestState.Active || _rankUpQuest.TryComplete() is false)
+            if (_state != QuestState.Active || _rankUpQuestService.TryComplete() is false)
                 return;
 
             SetState(QuestState.Completed);
@@ -174,9 +178,9 @@ namespace LL.UI.Windows.RankUp
         private void RestoreState()
         {
             if (_rankUpQuest.QuestId.Equals(_rankUpQuestDefinition.QuestId) is false)
-                _rankUpQuest.ClearQuest();
+                _rankUpQuestService.Clear();
 
-            _rankUpQuest.TryExpire();
+            _rankUpQuestService.TryExpire();
 
             if (_rankUpQuest.IsCompleted)
                 _state = QuestState.Completed;

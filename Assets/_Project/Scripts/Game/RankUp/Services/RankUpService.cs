@@ -4,6 +4,7 @@ using LL.Game.Items;
 using LL.Game.Payments;
 using LL.Game.Payments.Services;
 using LL.Game.Rewards.Services;
+using LL.User.State;
 using LL.User.State.Progress;
 using LL.User.State.RankUp;
 using UnityEngine;
@@ -15,23 +16,32 @@ namespace LL.Game.RankUp.Services
     {
         private readonly RankUpCatalog _catalog;
         private readonly IUserProgress _userProgress;
+        private readonly IUserProgressCommands _userProgressCommands;
         private readonly IUserRankUpQuest _rankUpQuest;
+        private readonly IRankUpQuestService _rankUpQuestService;
         private readonly IPaymentService _paymentService;
         private readonly IRewardGrantService _rewardGrantService;
+        private readonly IUserStateChangeBatch _changeBatch;
 
         [Inject]
         internal RankUpService(
             RankUpCatalog catalog,
             IUserProgress userProgress,
+            IUserProgressCommands userProgressCommands,
             IUserRankUpQuest rankUpQuest,
+            IRankUpQuestService rankUpQuestService,
             IPaymentService paymentService,
-            IRewardGrantService rewardGrantService)
+            IRewardGrantService rewardGrantService,
+            IUserStateChangeBatch changeBatch)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
+            _userProgressCommands = userProgressCommands ?? throw new ArgumentNullException(nameof(userProgressCommands));
             _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
+            _rankUpQuestService = rankUpQuestService ?? throw new ArgumentNullException(nameof(rankUpQuestService));
             _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
             _rewardGrantService = rewardGrantService ?? throw new ArgumentNullException(nameof(rewardGrantService));
+            _changeBatch = changeBatch ?? throw new ArgumentNullException(nameof(changeBatch));
         }
 
         public bool TryGetDefinition(out RankUpDefinition definition)
@@ -48,6 +58,16 @@ namespace LL.Game.RankUp.Services
             Payment payment,
             out IReadOnlyList<ItemAmount> rewardItems)
         {
+            IReadOnlyList<ItemAmount> appliedRewardItems = Array.Empty<ItemAmount>();
+            var succeeded = _changeBatch.Execute(() => TryRankUpCore(payment, out appliedRewardItems));
+            rewardItems = appliedRewardItems;
+            return succeeded;
+        }
+
+        private bool TryRankUpCore(
+            Payment payment,
+            out IReadOnlyList<ItemAmount> rewardItems)
+        {
             rewardItems = Array.Empty<ItemAmount>();
 
             if (TryGetDefinition(out var definition) is false ||
@@ -58,14 +78,14 @@ namespace LL.Game.RankUp.Services
                 _paymentService.TryPay(payment) is false)
                 return false;
 
-            if (_userProgress.TryRankUp() is false)
+            if (_userProgressCommands.TryRankUp() is false)
             {
                 RefundPayment(payment);
                 return false;
             }
 
             rewardItems = GrantReward(definition);
-            _rankUpQuest.ClearQuest();
+            _rankUpQuestService.Clear();
             return true;
         }
 
