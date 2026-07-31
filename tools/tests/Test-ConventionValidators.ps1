@@ -251,9 +251,9 @@ try {
         -ExpectedOutput "Odin Inspector validation passed."
 
     $validItemIconOdinRoot = Join-Path $fixtureRoot "odin-valid-item-icon-catalog"
-    [IO.Directory]::CreateDirectory((Join-Path $validItemIconOdinRoot "Scripts/Presentation/Icons/Configuration")) | Out-Null
+    [IO.Directory]::CreateDirectory((Join-Path $validItemIconOdinRoot "Scripts/Presentation/Items/Configuration")) | Out-Null
     [IO.File]::WriteAllText(
-        (Join-Path $validItemIconOdinRoot "Scripts/Presentation/Icons/Configuration/ItemIconCatalogConfig.cs"),
+        (Join-Path $validItemIconOdinRoot "Scripts/Presentation/Items/Configuration/ItemIconCatalogConfig.cs"),
         "using Sirenix.OdinInspector;`n`ninternal sealed class ItemIconCatalogConfig`n{`n" +
             "    [TableList(AlwaysExpanded = true, DrawScrollView = false)]`n" +
             "    [ValidateInput(nameof(IsValid))]`n    [SerializeField] private ItemIconEntry[] _icons;`n}`n`n" +
@@ -281,9 +281,9 @@ try {
         -ExpectedOutput "Catalogs must use the default Odin presentation"
 
     $invalidItemIconOdinRoot = Join-Path $fixtureRoot "odin-invalid-item-icon-catalog"
-    [IO.Directory]::CreateDirectory((Join-Path $invalidItemIconOdinRoot "Scripts/Presentation/Icons/Configuration")) | Out-Null
+    [IO.Directory]::CreateDirectory((Join-Path $invalidItemIconOdinRoot "Scripts/Presentation/Items/Configuration")) | Out-Null
     [IO.File]::WriteAllText(
-        (Join-Path $invalidItemIconOdinRoot "Scripts/Presentation/Icons/Configuration/ItemIconCatalogConfig.cs"),
+        (Join-Path $invalidItemIconOdinRoot "Scripts/Presentation/Items/Configuration/ItemIconCatalogConfig.cs"),
         "internal sealed class ItemIconCatalogConfig`n{`n    private object[] _icons;`n}")
     Invoke-ExpectedResult `
         -Name "Missing compact item icon presentation" `

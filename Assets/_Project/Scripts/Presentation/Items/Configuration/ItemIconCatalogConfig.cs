@@ -6,7 +6,7 @@ using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.Presentation.Icons.Configuration
+namespace LL.Presentation.Items.Configuration
 {
     [CreateAssetMenu(fileName = nameof(ItemIconCatalogConfig), menuName = CreationPath)]
     internal sealed class ItemIconCatalogConfig : ScriptableObject, IValidationSource

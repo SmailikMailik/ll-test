@@ -1,6 +1,6 @@
 using LL.Presentation.Countries.Configuration;
 using LL.Presentation.Heroes.Configuration;
-using LL.Presentation.Icons.Configuration;
+using LL.Presentation.Items.Configuration;
 using UnityEditor;
 
 namespace LLEditor.Menu

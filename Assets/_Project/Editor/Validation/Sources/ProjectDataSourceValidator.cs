@@ -6,7 +6,7 @@ using LL.Game.RankUp.Configuration;
 using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
-using LL.Presentation.Icons.Configuration;
+using LL.Presentation.Items.Configuration;
 using LL.Presentation.Countries.Configuration;
 using LL.Presentation.Heroes.Configuration;
 using LL.UI.Windows.Configuration;

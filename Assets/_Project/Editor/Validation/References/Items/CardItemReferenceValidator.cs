@@ -1,6 +1,6 @@
 using LL.Game.Cards.Configuration;
 using LL.Game.Identifiers;
-using LL.Presentation.Icons.Configuration;
+using LL.Presentation.Items.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
 using LLEditor.Validation.Sources;

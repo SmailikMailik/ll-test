@@ -66,7 +66,7 @@ group of closely related types. Do not create a one-type folder merely to make t
 | `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
 | `Game` | Game rules and reference data | Cards, countries, heroes, items, payments, rank-up, quests, ranks, rewards, upgrades |
 | `Infrastructure` | Reusable technical adapters | Compilation and loading contracts, serialization, storage, reporting |
-| `Presentation` | Display meaning without visual lifecycle | Country flags, hero portraits, icons, localization, formatting, text tokens, confirmations |
+| `Presentation` | Display meaning without visual lifecycle | Country flags, hero portraits, item icons, localization, formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
 | `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, rank-up quest |
 | `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
@@ -185,6 +185,7 @@ catalogs, and presentation-facing confirmations.
   runtime presentation behavior.
 - `Presentation/Sprites` owns reusable runtime sprite catalogs. `SpriteCatalog<TId>` maps one sprite to a domain ID;
   `SpriteVariantCatalog<TId, TVariant>` maps multiple explicitly named variants to each domain ID.
+- `Presentation/Items` owns item formatting and item icon sprites keyed by `ItemId`.
 - `Presentation/Heroes` owns the independently loaded small and large portrait resources keyed by `HeroId`.
   Portrait data remains static sprites; optional animation is view behavior and does not change hero definitions.
 - `Presentation/Countries` owns country flag sprites keyed by `CountryId`. Game hero definitions never reference

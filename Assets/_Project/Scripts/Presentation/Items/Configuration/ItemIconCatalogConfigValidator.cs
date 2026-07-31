@@ -1,7 +1,7 @@
 using LL.Game.Identifiers;
 using LL.Validation;
 
-namespace LL.Presentation.Icons.Configuration
+namespace LL.Presentation.Items.Configuration
 {
     internal sealed class ItemIconCatalogConfigValidator : IDataValidator<ItemIconEntry[]>
     {

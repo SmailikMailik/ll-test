@@ -3,7 +3,7 @@ using LL.Game.Identifiers;
 using LL.Game.Items;
 using LL.Game.Payments.Configuration;
 using LL.Game.RankUp.Configuration;
-using LL.Presentation.Icons.Configuration;
+using LL.Presentation.Items.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
 using LLEditor.Validation.Sources;
