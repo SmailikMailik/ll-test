@@ -5,11 +5,11 @@ code and serialized assets are the source of truth for current behavior and actu
 the implementation, and its validators synchronized after an architectural decision.
 
 For a concise map of runtime areas, lifetime boundaries, and core flows, see
-[`Documentation/Architecture/LL-Runtime-Overview.md`](Documentation/Architecture/LL-Runtime-Overview.md).
+[`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md).
 For a detailed walkthrough of the game-data and user-data pipelines, see
-[`Documentation/Architecture/Game-And-User-Data.md`](Documentation/Architecture/Game-And-User-Data.md).
-For C# syntax and lifecycle conventions, see [`CODE_STYLE.md`](CODE_STYLE.md). For validation semantics, automated
-coverage, and required verification, see [`VALIDATION.md`](VALIDATION.md).
+[`Game-And-User-Data.md`](../Architecture/Game-And-User-Data.md).
+For C# syntax and lifecycle conventions, see [`Code-Style.md`](Code-Style.md). For validation semantics, automated
+coverage, and required verification, see [`Validation.md`](Validation.md).
 
 The rules describe the intended architecture, not merely the current directory tree. New code must follow them.
 When existing code is changed substantially, move it toward this standard when that can be done safely within the
@@ -216,7 +216,7 @@ Owns reusable validation primitives, results, contexts, rules, and reporting con
 - Validation of one configuration type stays beside that configuration.
 - Cross-asset and project-wide validation that uses `AssetDatabase` belongs in `Editor/Validation`.
 - Validation reports errors; it must not silently repair source data.
-- Validation vocabulary, behavior, and verification rules are defined in [`VALIDATION.md`](VALIDATION.md).
+- Validation vocabulary, behavior, and verification rules are defined in [`Validation.md`](Validation.md).
 
 ### `Editor`
 
@@ -371,7 +371,7 @@ the runtime catalog.
 The application uses one process-wide project scope and scene-owned child scopes. A scene scope adds objects whose
 lifetime and serialized references belong to that scene; it must not recreate the project scope. The current scope
 inventory and registrations are documented in
-[`Documentation/Architecture/LL-Runtime-Overview.md`](Documentation/Architecture/LL-Runtime-Overview.md).
+[`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md).
 
 A scope keeps small scene-local registrations visible and constructs larger installers manually with `new`.
 Installers register supplied policies but do not select storage, serialization, authoring, or loading technologies.
@@ -381,8 +381,8 @@ source is therefore a composition-root change rather than an installer or consum
 ## Current runtime documentation
 
 Current runtime flows, concrete participants, and document versions are descriptive implementation information. Keep
-them synchronized in [`Documentation/Architecture/LL-Runtime-Overview.md`](Documentation/Architecture/LL-Runtime-Overview.md)
-and [`Documentation/Architecture/Game-And-User-Data.md`](Documentation/Architecture/Game-And-User-Data.md). The
+them synchronized in [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md)
+and [`Game-And-User-Data.md`](../Architecture/Game-And-User-Data.md). The
 normative representation boundaries that those flows must follow remain in this document.
 
 ## Dependency rules
@@ -433,8 +433,8 @@ that semantically owns it or introduce a small contract at the consumer-facing b
 ## Related conventions
 
 C# syntax, declaration layout, DI marking, reactive lifecycle, and Unity component conventions are defined only in
-[`CODE_STYLE.md`](CODE_STYLE.md). Validation vocabulary, automated coverage, and required change verification are
-defined only in [`VALIDATION.md`](VALIDATION.md).
+[`Code-Style.md`](Code-Style.md). Validation vocabulary, automated coverage, and required change verification are
+defined only in [`Validation.md`](Validation.md).
 
 ## Changing the architecture
 
@@ -446,7 +446,7 @@ type suffix, or project-wide naming convention. Make such a change in this order
 3. Move or add code while preserving Unity GUIDs and serialized keys.
 4. Extend `tools/Validate-Architecture.ps1` for every mechanically enforceable part.
 5. Update the runtime overview when the change affects its modules, lifetime boundaries, or core flows.
-6. Run the checks required by the change matrix in `VALIDATION.md`.
+6. Run the checks required by the change matrix in `Validation.md`.
 
 Exceptions must be narrow, named by folder or type, and documented beside the rule they qualify. Do not weaken a
 top-level dependency rule to accommodate one adapter.
@@ -479,4 +479,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-Architecture.
 
 The script checks the mechanically enforceable subset of this standard. The semantic ownership and dependency
 questions in the checklist still require review. Automated-coverage classifications and additional checks are
-defined in [`VALIDATION.md`](VALIDATION.md).
+defined in [`Validation.md`](Validation.md).

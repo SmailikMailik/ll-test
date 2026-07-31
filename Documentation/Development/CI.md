@@ -25,7 +25,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-Architecture.
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-CodeStyle.ps1
 ```
 
-The change-to-check mapping is defined in [`VALIDATION.md`](VALIDATION.md); this document defines only how the
+The change-to-check mapping is defined in [`Validation.md`](../Standards/Validation.md); this document defines only how the
 commands run.
 
 ## Test

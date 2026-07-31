@@ -2,13 +2,16 @@
 
 Before changing the project, use the agreement that owns the decision:
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) defines ownership, placement, dependency direction, data boundaries, naming,
+- [`Architecture.md`](Documentation/Standards/Architecture.md) defines ownership, placement, dependency direction,
+  data boundaries, naming,
   composition, and authored-asset layout.
-- [`CODE_STYLE.md`](CODE_STYLE.md) defines C# formatting, member organization, DI and reactive lifecycle conventions,
+- [`Code-Style.md`](Documentation/Standards/Code-Style.md) defines C# formatting, member organization, DI and reactive
+  lifecycle conventions,
   and Unity component conventions.
-- [`VALIDATION.md`](VALIDATION.md) defines validation semantics, validator ownership, automated-rule coverage, and the
-  checks required for each kind of change.
-- [`CI.md`](CI.md) defines the commands and environment used to run validation, tests, and builds.
+- [`Validation.md`](Documentation/Standards/Validation.md) defines validation semantics, validator ownership,
+  automated-rule coverage, and the checks required for each kind of change.
+- [`CI.md`](Documentation/Development/CI.md) defines the commands and environment used to run validation, tests, and
+  builds.
 
 ## Agreement ownership
 
@@ -26,12 +29,13 @@ The agreements above are the source of truth for intended conventions. Validator
 do not establish them. Resolve the intended design before changing production code to satisfy a stale validator,
 then update the applicable agreement, validator, and tests together.
 
-Apply the placement procedure in `ARCHITECTURE.md` before creating or moving a type. Preserve Unity `.meta` GUIDs
-and follow the serialized-identity and field-migration rules in `ARCHITECTURE.md` when moving or renaming Unity types,
-assets, or fields.
+Apply the placement procedure in `Documentation/Standards/Architecture.md` before creating or moving a type. Preserve
+Unity `.meta` GUIDs and follow that agreement's serialized-identity and field-migration rules when moving or renaming
+Unity types, assets, or fields.
 
-After a change, run every check required by the change matrix in `VALIDATION.md`. An architectural change must update
-the architecture agreement and every affected overview, validator, and validator test in the same change.
+After a change, run every check required by the change matrix in `Documentation/Standards/Validation.md`. An
+architectural change must update the architecture agreement and every affected overview, validator, and validator
+test in the same change.
 
 When generating code, prioritize readability and clear separation of responsibilities. Reuse existing code where
 possible, and introduce an abstraction only when it creates a meaningful boundary, replacement point, or reuse

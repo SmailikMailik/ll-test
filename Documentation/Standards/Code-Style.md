@@ -1,8 +1,8 @@
 # C# Code Style and Lifecycle Conventions
 
 This document is the source of truth for project-owned C# style and lifecycle conventions. Architectural ownership,
-placement, dependencies, and type-role naming belong to [`ARCHITECTURE.md`](ARCHITECTURE.md). Validation semantics
-and required checks belong to [`VALIDATION.md`](VALIDATION.md).
+placement, dependencies, and type-role naming belong to [`Architecture.md`](Architecture.md). Validation semantics
+and required checks belong to [`Validation.md`](Validation.md).
 
 These rules apply to C# under `Assets/_Project`. Generated and third-party code is outside their scope.
 
@@ -49,7 +49,7 @@ These rules apply to C# under `Assets/_Project`. Generated and third-party code 
 - Keep `[SerializeField]` and `[JsonProperty]` inline with the field declaration.
 - Combine serialized-field constraints and decorators into the same attribute list, for example
   `[SerializeField, Min(0f), Tooltip("Duration in seconds.")] private float _duration;`.
-- Serialized-field migration rules belong to the authored-asset section of `ARCHITECTURE.md` because they protect
+- Serialized-field migration rules belong to the authored-asset section of `Architecture.md` because they protect
   persisted data rather than formatting.
 
 ## Dependency injection
@@ -84,4 +84,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-CodeStyle.ps1
 ```
 
 The script enforces only rules that can be checked reliably without interpreting design intent. Rules not covered
-by the script remain review requirements; see the coverage table in `VALIDATION.md`.
+by the script remain review requirements; see the coverage table in `Validation.md`.

@@ -1,8 +1,8 @@
 # Validation Standard
 
 This document is the source of truth for validation semantics, validator ownership, automated convention coverage,
-and required project checks. Architecture rules belong to [`ARCHITECTURE.md`](ARCHITECTURE.md), C# conventions to
-[`CODE_STYLE.md`](CODE_STYLE.md), and command details to [`CI.md`](CI.md).
+and required project checks. Architecture rules belong to [`Architecture.md`](Architecture.md), C# conventions to
+[`Code-Style.md`](Code-Style.md), and command details to [`CI.md`](../Development/CI.md).
 
 Validators enforce approved production, asset, and agreement decisions; they do not define those decisions. Do not
 relocate production code or assets solely because a stale validator expects another layout. Resolve the intended
