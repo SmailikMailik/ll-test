@@ -63,7 +63,7 @@ group of closely related types. Do not create a one-type folder merely to make t
 | `Bootstrap` | First-scene startup coordination | Localization readiness, minimum display time, scene activation |
 | `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
 | `Game` | Game rules and reference data | Cards, items, payments, rank-up, quests, ranks, rewards, upgrades |
-| `Infrastructure` | Reusable technical adapters | Loading, serialization, save services, storage, console reporting |
+| `Infrastructure` | Reusable technical adapters | Compilation and loading contracts, serialization, storage, reporting |
 | `Presentation` | Display meaning without visual lifecycle | Icons, localization, display formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
 | `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, rank-up quest |
@@ -204,6 +204,9 @@ Owns reusable validation primitives, results, contexts, rules, and reporting con
 - Validation of one configuration type stays beside that configuration.
 - Cross-asset and project-wide validation that uses `AssetDatabase` belongs in `Editor/Validation`.
 - Validation reports errors; it must not silently repair source data.
+- Validation of untrusted `Config`, `Document`, and `Declaration` data accumulates issues through `ValidationContext`.
+  Constructor and method guard clauses protect programmer-facing runtime contracts and may throw directly; they are
+  not a second validation pipeline.
 - Validators enforce approved code, asset, and architecture decisions; they do not establish those decisions.
 - Do not relocate production code or assets solely because a stale validator expects another layout. Resolve the
   intended design, then update this document and the validator to match it.
@@ -369,6 +372,10 @@ methods, then passes the resulting `IDataLoader<GameDataSnapshot>`, `IUserDefaul
 ScriptableObject, file, PlayerPrefs, or another storage technology. Changing a runtime data source is therefore a
 composition-root change rather than an installer or consumer change.
 
+The same scope constructs the focused `ScriptableObjectItemIconCatalogLoader` and
+`ScriptableObjectWindowCatalogLoader` adapters and passes them to presentation and window installers as
+`IDataLoader<T>`.
+
 The project scope is auto-created from `VContainerSettings`; the bootstrap scene must not create another project
 scope. Scene scopes inherit project registrations through the configured parent relationship.
 
@@ -435,8 +442,14 @@ logic inside the repository or mapper.
 ### UI navigation and flows
 
 ```text
-WindowCatalogConfig -> WindowCatalog -> WindowProvider
+WindowCatalogConfig -> ScriptableObjectWindowCatalogLoader -> WindowCatalog -> WindowProvider
     -> WindowNavigator -> WindowController -> Window<TParameters>
+```
+
+The focused presentation catalog follows the same authored-resource boundary:
+
+```text
+ItemIconCatalogConfig -> ScriptableObjectItemIconCatalogLoader -> IconCatalog<ItemId>
 ```
 
 `RankUpFlow` and `UpgradeFlow` coordinate use cases and windows. Game services own rule execution; flows own
@@ -450,8 +463,8 @@ The top-level project dependency matrix is:
 | --- | --- |
 | `Composition` | Every runtime area |
 | `Bootstrap` | `UI.Controls` and stable framework APIs |
-| `UI` | `Presentation`, `User`, `Game`; `UI.Windows.Configuration` may also use `Infrastructure.Loading` and `Validation` |
-| `Presentation` | `Game`, `User`; configuration adapters may also use `Infrastructure.Loading` and `Validation` |
+| `UI` | `Presentation`, `User`, `Game`; `UI.Windows.Configuration` and `UI.Windows.Loading` may also use `Infrastructure` and `Validation` |
+| `Presentation` | `Game`, `User`; capability-owned `Configuration` and `Loading` adapters may also use `Infrastructure` and `Validation` |
 | `User` | `Game`, `Infrastructure`, `Validation` |
 | `Game` core | Other `Game` capabilities and generic `Validation` |
 | `Game` services | `Game` core and focused `User.State` contracts |

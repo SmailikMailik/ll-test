@@ -37,7 +37,7 @@ namespace LL.UI.Windows.Configuration
                 }
 
                 var parameterType = entry.Prefab.ParameterType;
-                ValidationRules.Unique(
+                ValidationRules.TryAddUnique(
                     parameterType,
                     parameterTypes,
                     entryContext.At(nameof(WindowEntry.Prefab)),

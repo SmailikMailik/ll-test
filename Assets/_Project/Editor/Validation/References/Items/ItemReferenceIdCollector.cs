@@ -7,7 +7,7 @@ namespace LLEditor.Validation.References.Items
 {
     internal static class ItemReferenceIdCollector
     {
-        internal static bool TryCollect<TEntry>(
+        internal static bool TryCollectValidIds<TEntry>(
             IEnumerable<TEntry> entries,
             Func<TEntry, ItemId> getId,
             out HashSet<ItemId> ids)

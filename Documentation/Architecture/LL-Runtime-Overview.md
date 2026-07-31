@@ -35,9 +35,10 @@ Scopes оставляют небольшую локальную композиц
 factories создают конкретные политики хранения и загрузки без DI-регистрации.
 
 `ProjectLifetimeScope` выбирает конкретные политики через `GameDataLoaderFactory`, `UserDefaultsSourceFactory` и
-`UserSaveRepositoryFactory`, после чего передаёт installers только абстракции загрузки и хранения. Для ручной подмены
-источника достаточно изменить соответствующий factory-вызов в project scope; installers и потребители от технологии
-не зависят.
+`UserSaveRepositoryFactory`, напрямую создаёт небольшие `ScriptableObjectItemIconCatalogLoader` и
+`ScriptableObjectWindowCatalogLoader`, после чего передаёт installers только абстракции загрузки и хранения. Для
+ручной подмены источника достаточно изменить composition в project scope; installers и потребители от технологии не
+зависят.
 
 ## Основные потоки
 
@@ -108,6 +109,7 @@ UI наблюдает `IUserItems`, `IUserProgress` и `IUserRankUpQuest`, но 
 
 ```text
 WindowCatalogConfig
+    -> ScriptableObjectWindowCatalogLoader
     -> WindowCatalog
     -> WindowProvider
     -> WindowNavigator
@@ -117,3 +119,11 @@ WindowCatalogConfig
 
 Игровые сервисы выполняют правила, UI flows координируют сценарии, navigator управляет историей переходов, а окна
 отвечают за визуальное поведение.
+
+Каталог иконок строится через такую же границу:
+
+```text
+ItemIconCatalogConfig
+    -> ScriptableObjectItemIconCatalogLoader
+    -> IconCatalog<ItemId>
+```

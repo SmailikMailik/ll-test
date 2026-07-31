@@ -17,7 +17,7 @@ namespace LL.UI.Windows.Loading
 
         public WindowCatalog Load()
         {
-            ValidationRunner.EnsureValid(_config, nameof(_config));
+            ValidationRunner.EnsureValid(_config);
 
             return new WindowCatalog(_config.Entries.Select(entry => entry.ToDefinition()));
         }

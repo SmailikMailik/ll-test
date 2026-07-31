@@ -55,7 +55,7 @@ namespace LL.Game.Identifiers
                 {
                     var comparisonValue = id.Value.Trim();
 
-                    ValidationRules.Unique(
+                    ValidationRules.TryAddUnique(
                         comparisonValue,
                         usedValues,
                         idContext,

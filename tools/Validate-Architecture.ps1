@@ -262,6 +262,44 @@ function Test-DomainDataLoaders {
     }
 }
 
+function Test-DataBoundaryRoles {
+    foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*Config.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if ($content -match "\bIDataLoader\s*<") {
+            Add-ArchitectureError (
+                "Config must remain an authoring object and must not implement IDataLoader: " +
+                "$($file.FullName)")
+        }
+    }
+
+    foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*Compiler.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if ($content -notmatch "\bIDataCompiler\s*<") {
+            Add-ArchitectureError (
+                "Compiler must implement IDataCompiler<TDeclaration, TSnapshot>: " +
+                "$($file.FullName)")
+        }
+    }
+
+    foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "ScriptableObject*Loader.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if ($file.Directory.Name -ne "Loading") {
+            Add-ArchitectureError (
+                "ScriptableObject loader must be placed in its capability's Loading folder: " +
+                "$($file.FullName)")
+        }
+
+        if ($content -notmatch "\bIDataLoader\s*<") {
+            Add-ArchitectureError (
+                "ScriptableObject loader must implement IDataLoader<T>: " +
+                "$($file.FullName)")
+        }
+    }
+}
+
 function Test-UserStateCommandConsumers {
     $commandsPattern = "\bIUser(?:Items|Progress|RankUpQuest)Commands\b"
 
@@ -350,6 +388,7 @@ Test-RuntimeDependencies
 Test-EnumDeclarations
 Test-DiRegistrations
 Test-DomainDataLoaders
+Test-DataBoundaryRoles
 Test-UserStateCommandConsumers
 
 foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recurse -Filter "*.cs") {

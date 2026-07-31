@@ -18,7 +18,7 @@ namespace LL.Presentation.Icons.Loading
 
         public IconCatalog<ItemId> Load()
         {
-            ValidationRunner.EnsureValid(_config, nameof(_config));
+            ValidationRunner.EnsureValid(_config);
 
             return new IconCatalog<ItemId>(_config.Icons.Select(entry => entry.ToPair()));
         }

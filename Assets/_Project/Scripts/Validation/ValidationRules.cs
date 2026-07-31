@@ -168,21 +168,6 @@ namespace LL.Validation
             return false;
         }
 
-        internal static bool DefinedEnum<TEnum>(
-            TEnum value,
-            ValidationContext context,
-            string code)
-            where TEnum : struct, Enum
-        {
-            EnsureArguments(context, code);
-
-            if (Enum.IsDefined(typeof(TEnum), value))
-                return true;
-
-            ReportError(context, code, $"Value '{value}' is not supported.");
-            return false;
-        }
-
         internal static bool ReferenceExists<T>(
             T value,
             ISet<T> availableValues,
@@ -201,7 +186,7 @@ namespace LL.Validation
             return false;
         }
 
-        internal static bool Unique<T>(
+        internal static bool TryAddUnique<T>(
             T value,
             ISet<T> usedValues,
             ValidationContext context,
@@ -217,32 +202,6 @@ namespace LL.Validation
 
             ReportError(context, code, $"Value '{value}' must be unique.");
             return false;
-        }
-
-        internal static bool Unique<T>(
-            IEnumerable<T> values,
-            ValidationContext context,
-            string code,
-            IEqualityComparer<T> comparer = null)
-        {
-            EnsureArguments(context, code);
-
-            if (values == null)
-                return true;
-
-            var usedValues = new HashSet<T>(comparer);
-            var isValid = true;
-            var index = 0;
-
-            foreach (var value in values)
-            {
-                if (Unique(value, usedValues, context.At(index), code) is false)
-                    isValid = false;
-
-                index++;
-            }
-
-            return isValid;
         }
 
         private static void ReportError(

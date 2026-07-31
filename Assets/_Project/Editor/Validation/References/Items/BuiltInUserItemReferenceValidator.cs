@@ -16,7 +16,7 @@ namespace LLEditor.Validation.References.Items
         {
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
 
-            if (ItemReferenceIdCollector.TryCollect(
+            if (ItemReferenceIdCollector.TryCollectValidIds(
                     userDefaults?.Items,
                     item => item.Id,
                     out var userItemIds) is false)

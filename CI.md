@@ -3,6 +3,10 @@
 The repository exposes provider-independent CI entry points. Run them from the project root with the Unity Editor
 closed. Set `UNITY_EDITOR_PATH` when Unity is not installed in one of the paths detected by `tools/ci/Common.ps1`.
 
+The current GitHub Actions workflow packages `main` and verifies archive integrity only; it does not run these Unity
+validation, test, or build entry points. Add a licensed Unity runner before treating archive publication as a code
+quality gate.
+
 ## Validate
 
 ```powershell

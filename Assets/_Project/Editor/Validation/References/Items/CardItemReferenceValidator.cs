@@ -24,13 +24,13 @@ namespace LLEditor.Validation.References.Items
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
-            var hasUserItems = ItemReferenceIdCollector.TryCollect(
+            var hasUserItems = ItemReferenceIdCollector.TryCollectValidIds(
                 userDefaults?.Items,
                 item => item.Id,
                 out var userItemIds);
 
             var icons = sources.GetSingle<ItemIconCatalogConfig>();
-            var hasIcons = ItemReferenceIdCollector.TryCollect(
+            var hasIcons = ItemReferenceIdCollector.TryCollectValidIds(
                 icons?.Icons,
                 icon => icon.Id,
                 out var iconIds);
