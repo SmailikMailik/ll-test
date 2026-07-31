@@ -19,7 +19,7 @@ namespace LL.User.Defaults
     {
         private const string RankExistsCode = "user-defaults.progress.rank.exists";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
-        private const string ExperienceMaximumCode = "user-defaults.progress.experience.maximum";
+        private const string ExperienceMaxCode = "user-defaults.progress.experience.maximum";
         private const string FinalRankExperienceCode = "user-defaults.progress.final-rank-experience.zero";
         private const string BuiltInItemCode = "user-defaults.item.built-in.exists";
         private const string CardItemCode = "card.user-item.exists";
@@ -117,7 +117,7 @@ namespace LL.User.Defaults
                             experience,
                             ranks.Ranks[rankIndex + 1].RequiredExperience,
                             experienceContext,
-                            ExperienceMaximumCode);
+                            ExperienceMaxCode);
                         return;
                     }
 

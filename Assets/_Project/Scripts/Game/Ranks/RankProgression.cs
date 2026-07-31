@@ -7,7 +7,7 @@ namespace LL.Game.Ranks
     internal sealed class RankProgression : IRankProgression
     {
         private const string ExperienceCode = "rank-progress.experience.non-negative";
-        private const string ExperienceMaximumCode = "rank-progress.experience.maximum";
+        private const string ExperienceMaxCode = "rank-progress.experience.maximum";
         private const string FinalRankExperienceCode = "rank-progress.final-rank-experience.zero";
 
         private readonly RankCatalog _catalog;
@@ -42,7 +42,7 @@ namespace LL.Game.Ranks
                             experience,
                             requiredExperience,
                             experienceContext,
-                            ExperienceMaximumCode);
+                            ExperienceMaxCode);
                         return;
                     }
 

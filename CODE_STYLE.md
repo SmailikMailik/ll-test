@@ -14,8 +14,7 @@ These rules apply to C# under `Assets/_Project`. Generated and third-party code 
 - Keep a simple assignment, expression, or invocation with one expression or lambda argument on one line when it
   fits within 120 characters.
 - Do not break immediately after an assignment operator merely to shorten a line.
-- Do not impose a project-specific end-of-file newline style. Preserve the existing file convention and avoid
-  whitespace-only churn.
+- End every C# file immediately after its final non-empty line, without a trailing `LF` or `CRLF` character.
 
 ## Expressions and null checks
 

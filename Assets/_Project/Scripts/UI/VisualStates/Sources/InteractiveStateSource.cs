@@ -4,13 +4,6 @@ using UnityEngine;
 
 namespace LL.UI.VisualStates.Sources
 {
-    internal enum InteractiveState : byte
-    {
-        Normal = 0,
-        Pressed = 1,
-        Disabled = 2
-    }
-
     [DisallowMultipleComponent]
     [AddComponentMenu("LL/UI/Visual States/Sources/Interactive State Source")]
     [HideMonoScript]

@@ -50,7 +50,7 @@ namespace LL.UI.Windows
                 return false;
             }
 
-            if (_container is null)
+            if (_container == null)
             {
                 Debug.LogError(
                     "[WindowController::TryGetWindow] Window container is not assigned",

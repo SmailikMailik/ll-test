@@ -18,6 +18,105 @@ function Add-CodeStyleError {
     $script:errors.Add($Message)
 }
 
+function Remove-CSharpCommentsAndLiterals {
+    param([string]$Content)
+
+    $pattern = @'
+(?msx)
+    ^[ \t]*\#[^\r\n]*
+  | //[^\r\n]*
+  | /\*.*?\*/
+  | (?:\$@|@\$|@)"(?:""|[^"])*"
+  | \$?"(?:\\.|[^"\\])*"
+  | '(?:\\.|[^'\\])*'
+'@
+
+    return [regex]::Replace(
+        $Content,
+        $pattern,
+        { param($match) [regex]::Replace($match.Value, "[^\r\n]", " ") })
+}
+
+function Test-UnityNullPatterns {
+    $unityTypeNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+
+    foreach ($typeName in @(
+        "Object",
+        "GameObject",
+        "Transform",
+        "RectTransform",
+        "Component",
+        "MonoBehaviour",
+        "ScriptableObject",
+        "Sprite",
+        "Texture",
+        "Texture2D",
+        "Texture3D",
+        "Material",
+        "Camera",
+        "Canvas",
+        "CanvasGroup",
+        "Animator",
+        "Animation",
+        "AudioClip",
+        "AudioSource",
+        "Graphic",
+        "MaskableGraphic",
+        "Selectable",
+        "Image",
+        "Button",
+        "TMP_Text",
+        "TextMeshProUGUI",
+        "SceneAsset")) {
+        $unityTypeNames.Add($typeName) | Out-Null
+    }
+
+    $files = @(Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter "*.cs")
+    $addedType = $true
+
+    while ($addedType) {
+        $addedType = $false
+
+        foreach ($file in $files) {
+            $codeOnly = Remove-CSharpCommentsAndLiterals ([IO.File]::ReadAllText($file.FullName))
+
+            foreach ($typeMatch in [regex]::Matches(
+                $codeOnly,
+                "\bclass\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)[^\r\n{]*:\s*" +
+                    "(?:[A-Za-z_][A-Za-z0-9_]*\.)*(?<base>[A-Za-z_][A-Za-z0-9_]*)")) {
+                if (
+                    $unityTypeNames.Contains($typeMatch.Groups["base"].Value) -and
+                    $unityTypeNames.Add($typeMatch.Groups["name"].Value)) {
+                    $addedType = $true
+                }
+            }
+        }
+    }
+
+    $typePattern = ($unityTypeNames | ForEach-Object { [regex]::Escape($_) }) -join "|"
+
+    foreach ($file in $files) {
+        $content = [IO.File]::ReadAllText($file.FullName)
+        $codeOnly = Remove-CSharpCommentsAndLiterals $content
+        $declarationPattern = "\b(?:$typePattern)(?:\[\])?\s+(?<name>_[A-Za-z0-9_]+|[a-z][A-Za-z0-9_]*)\b"
+
+        foreach ($declaration in [regex]::Matches($codeOnly, $declarationPattern)) {
+            $name = [regex]::Escape($declaration.Groups["name"].Value)
+
+            foreach ($nullMatch in [regex]::Matches(
+                $codeOnly,
+                "\b$name\s+is\s+(?:not\s+)?null\b")) {
+                $lineNumber = [regex]::Matches(
+                    $codeOnly.Substring(0, $nullMatch.Index),
+                    "\r\n|\r|\n").Count + 1
+                Add-CodeStyleError (
+                    "Unity object must use overloaded equality for null checks: " +
+                    "$($file.FullName):$lineNumber")
+            }
+        }
+    }
+}
+
 function Test-EnumDeclarations {
     foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter "*.cs") {
         $content = [IO.File]::ReadAllText($file.FullName)
@@ -64,9 +163,38 @@ function Test-EnumDeclarations {
 }
 
 Test-EnumDeclarations
+Test-UnityNullPatterns
 
 foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter "*.cs") {
     $content = [IO.File]::ReadAllText($file.FullName)
+    $bytes = [IO.File]::ReadAllBytes($file.FullName)
+    $codeOnly = Remove-CSharpCommentsAndLiterals $content
+
+    if ($bytes.Length -gt 0 -and $bytes[$bytes.Length - 1] -in 10, 13) {
+        Add-CodeStyleError "C# file must end without a trailing newline: $($file.FullName)"
+    }
+
+    foreach ($callbackMatch in [regex]::Matches(
+        $codeOnly,
+        "\.Subscribe\s*\(\s*(?<name>(?!On)[A-Za-z_][A-Za-z0-9_]*)\s*\)")) {
+        $lineNumber = [regex]::Matches(
+            $codeOnly.Substring(0, $callbackMatch.Index),
+            "\r\n|\r|\n").Count + 1
+        Add-CodeStyleError (
+            "Reactive callback method must use the On prefix: " +
+            "$($file.FullName):$lineNumber ($($callbackMatch.Groups["name"].Value))")
+    }
+
+    foreach ($boundNameMatch in [regex]::Matches(
+        $codeOnly,
+        "\b[A-Za-z_][A-Za-z0-9_]*(?:Minimum|Maximum)[A-Za-z0-9_]*\b")) {
+        $lineNumber = [regex]::Matches(
+            $codeOnly.Substring(0, $boundNameMatch.Index),
+            "\r\n|\r|\n").Count + 1
+        Add-CodeStyleError (
+            "Bound identifier must use Min or Max: " +
+            "$($file.FullName):$lineNumber ($($boundNameMatch.Value))")
+    }
 
     if ($content -match "(?m)^[ \t]*\[[^\]\r\n]+\][ \t]*\[[^\]\r\n]+\]") {
         Add-CodeStyleError "Place each C# attribute on its own line: $($file.FullName)"

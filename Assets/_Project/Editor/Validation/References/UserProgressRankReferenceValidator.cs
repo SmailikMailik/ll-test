@@ -13,7 +13,7 @@ namespace LLEditor.Validation.References
     {
         private const string RankExistsCode = "user-defaults.progress.rank.exists";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
-        private const string ExperienceMaximumCode = "user-defaults.progress.experience.maximum";
+        private const string ExperienceMaxCode = "user-defaults.progress.experience.maximum";
         private const string FinalRankExperienceCode = "user-defaults.progress.final-rank-experience.zero";
 
         public void Validate(
@@ -79,7 +79,7 @@ namespace LLEditor.Validation.References
                     progress.Experience,
                     ranks[rankIndex + 1].RequiredExperience,
                     experienceContext,
-                    ExperienceMaximumCode);
+                    ExperienceMaxCode);
                 return;
             }
 

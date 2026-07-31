@@ -64,10 +64,11 @@ Coverage labels mean:
 | Top-level runtime dependency directions | Partial | `tools/Validate-Architecture.ps1` checks `using LL...` directives |
 | Selected DI, data-boundary, and user-state dependencies | Partial | `tools/Validate-Architecture.ps1` |
 | Ownership, abstraction value, and feature placement | Review | Architecture review |
-| Enum representation and hard line length | Automated | `tools/Validate-CodeStyle.ps1` |
+| Enum representation, C# file ending, and hard line length | Automated | `tools/Validate-CodeStyle.ps1` |
 | Attribute layout, empty bodies, and simple expression wrapping | Partial | `tools/Validate-CodeStyle.ps1` |
 | DI constructor marking, R3 lifetime, and component multiplicity | Partial | `tools/Validate-CodeStyle.ps1` |
-| Naming clarity, member order, null semantics, and lifecycle intent | Review | Code review |
+| Unity null semantics, callback prefixes, and bound identifiers | Partial | `tools/Validate-CodeStyle.ps1` |
+| Naming clarity, member order, managed null semantics, and lifecycle intent | Review | Code review |
 | Unity serialized keys, GUIDs, asset references, and data validity | Partial | Unity validation plus targeted search and review |
 
 When adding or materially changing a structural rule, add focused positive and negative fixtures for the validator

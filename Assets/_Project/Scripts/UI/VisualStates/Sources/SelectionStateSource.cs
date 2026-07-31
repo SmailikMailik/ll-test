@@ -4,12 +4,6 @@ using UnityEngine;
 
 namespace LL.UI.VisualStates.Sources
 {
-    internal enum SelectionState : byte
-    {
-        Normal = 0,
-        Selected = 1
-    }
-
     [DisallowMultipleComponent]
     [AddComponentMenu("LL/UI/Visual States/Sources/Selection State Source")]
     [HideMonoScript]

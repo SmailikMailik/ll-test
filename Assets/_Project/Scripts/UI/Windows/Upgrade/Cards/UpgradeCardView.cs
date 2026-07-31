@@ -76,7 +76,7 @@ namespace LL.UI.Windows.Upgrade.Cards
             SetSelected(false);
 
             _addButton.Clicked.Subscribe(_ => _cardCollectionService.TryAdd(Card.Id, AddAmount)).AddTo(this);
-            _userItems.ObserveAmount(Card.Id).Subscribe(UpdateProgress).AddTo(this);
+            _userItems.ObserveAmount(Card.Id).Subscribe(OnAvailableAmountChanged).AddTo(this);
         }
 
         public void OnPointerClick(PointerEventData _)
@@ -102,7 +102,7 @@ namespace LL.UI.Windows.Upgrade.Cards
             _stateSource.SetSelected(isSelected);
         }
 
-        private void UpdateProgress(int availableAmount)
+        private void OnAvailableAmountChanged(int availableAmount)
         {
             AvailableAmount = Math.Max(MinAmount, availableAmount);
             SetPlannedAmount(PlannedAmount);

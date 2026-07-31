@@ -104,6 +104,56 @@ try {
         -Arguments @("-ProjectAssetsRoot", $invalidStyleRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "Enum must use byte"
+
+    $invalidUnityNullRoot = Join-Path $fixtureRoot "style-invalid-unity-null"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidUnityNullRoot "Scripts/UI")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidUnityNullRoot "Scripts/UI/View.cs"),
+        "using UnityEngine;`n`ninternal sealed class View`n{`n    private Transform _target;`n" +
+            "    private bool IsMissing => _target is null;`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid Unity null pattern" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidUnityNullRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Unity object must use overloaded equality"
+
+    $invalidCallbackRoot = Join-Path $fixtureRoot "style-invalid-callback"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidCallbackRoot "Scripts/UI")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidCallbackRoot "Scripts/UI/View.cs"),
+        "internal sealed class View`n{`n    private void Observe(dynamic source)`n    {`n" +
+            "        source.Subscribe(UpdateValue);`n    }`n`n    private void UpdateValue(int value) { }`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid reactive callback" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidCallbackRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Reactive callback method must use the On prefix"
+
+    $invalidBoundNameRoot = Join-Path $fixtureRoot "style-invalid-bound-name"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidBoundNameRoot "Scripts/Game")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidBoundNameRoot "Scripts/Game/Limit.cs"),
+        "internal static class Limit`n{`n    private const int ExperienceMaximum = 1;`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid bound identifier" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidBoundNameRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Bound identifier must use Min or Max"
+
+    $invalidFileEndingRoot = Join-Path $fixtureRoot "style-invalid-file-ending"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidFileEndingRoot "Scripts/Game")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidFileEndingRoot "Scripts/Game/Value.cs"),
+        "internal readonly struct Value { }`n")
+    Invoke-ExpectedResult `
+        -Name "Invalid C# file ending" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidFileEndingRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "C# file must end without a trailing newline"
 } finally {
     $resolvedFixtureRoot = [IO.Path]::GetFullPath($fixtureRoot)
     $resolvedTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
