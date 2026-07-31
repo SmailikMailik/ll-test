@@ -1,3 +1,4 @@
+using LL.Composition.Factories;
 using LL.Composition.Installers;
 using LL.Game.Data.Configuration;
 using LL.Presentation.Icons.Configuration;
@@ -28,11 +29,14 @@ namespace LL.Composition.Scopes
 
         protected override void Configure(IContainerBuilder builder)
         {
+            var gameDataLoader = GameDataLoaderFactory.CreateFromScriptableObjects(_gameDataManifestConfig);
+            var userSaveRepository = UserSaveRepositoryFactory.CreateJsonFile();
+
             new WindowInstaller(_windowCatalogConfig).Install(builder);
             new PresentationInstaller(_itemIconCatalogConfig).Install(builder);
             new ValidationReportingInstaller().Install(builder);
-            new GameDataInstaller(_gameDataManifestConfig).Install(builder);
-            new UserInstaller(_userDefaultsConfig).Install(builder);
+            new GameDataInstaller(gameDataLoader).Install(builder);
+            new UserInstaller(_userDefaultsConfig, userSaveRepository).Install(builder);
             new GameServicesInstaller().Install(builder);
         }
     }

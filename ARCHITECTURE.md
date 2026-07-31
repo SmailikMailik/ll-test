@@ -349,6 +349,11 @@ A scope registers small scene-local composition directly and constructs larger i
 Installers are not DI services and their constructors do not use `[Inject]`. Runtime services, controllers, flows,
 and MonoBehaviour injection methods resolved by VContainer do use `[Inject]`.
 
+The project scope selects concrete game-data and user-persistence policies through named factory methods, then passes
+the resulting `IDataLoader<GameDataSnapshot>` and `IUserSaveRepository` abstractions to their installers. Installers
+register the supplied policies but do not choose ScriptableObject, file, PlayerPrefs, or another storage technology.
+Changing a runtime data source is therefore a composition-root change rather than an installer or consumer change.
+
 The project scope is auto-created from `VContainerSettings`; the bootstrap scene must not create another project
 scope. Scene scopes inherit project registrations through the configured parent relationship.
 

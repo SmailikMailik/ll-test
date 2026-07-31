@@ -34,6 +34,10 @@
 Scopes оставляют небольшую локальную композицию на виду, крупные подсистемы подключают через `IInstaller`, а
 factories создают конкретные политики хранения и загрузки без DI-регистрации.
 
+`ProjectLifetimeScope` выбирает конкретные политики через `GameDataLoaderFactory` и `UserSaveRepositoryFactory`, после
+чего передаёт installers только `IDataLoader<GameDataSnapshot>` и `IUserSaveRepository`. Для ручной подмены источника
+достаточно изменить соответствующий factory-вызов в project scope; installers и потребители от технологии не зависят.
+
 ## Основные потоки
 
 ### Запуск приложения

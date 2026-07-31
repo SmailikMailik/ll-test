@@ -57,8 +57,9 @@ flowchart LR
     Snapshot --> Catalogs
 ```
 
-В текущей композиции `GameDataInstaller` выбирает путь через `ScriptableObjectGameDataSource`. Альтернативные пути
-через JSON-файл и PlayerPrefs уже предоставляет `GameDataLoaderFactory`.
+В текущей композиции `ProjectLifetimeScope` выбирает путь через `ScriptableObjectGameDataSource` и передаёт готовый
+`IDataLoader<GameDataSnapshot>` в `GameDataInstaller`. Альтернативные пути через JSON-файл и PlayerPrefs уже
+предоставляет `GameDataLoaderFactory`, поэтому переключение не меняет installer или потребителей.
 
 ### Физическая раскладка игровых данных
 
