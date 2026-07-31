@@ -4,7 +4,9 @@ This document is the source of truth for intended project-wide placement and nam
 code and serialized assets are the source of truth for current behavior and actual placement. Keep this standard,
 the implementation, and its validators synchronized after an architectural decision.
 
-For a practical walkthrough of the game-data and user-data pipelines, see
+For a concise map of runtime areas, lifetime boundaries, and core flows, see
+[`Documentation/Architecture/LL-Runtime-Overview.md`](Documentation/Architecture/LL-Runtime-Overview.md).
+For a detailed walkthrough of the game-data and user-data pipelines, see
 [`Documentation/Architecture/Game-And-User-Data.md`](Documentation/Architecture/Game-And-User-Data.md).
 
 The rules describe the intended architecture, not merely the current directory tree. New code must follow them.
@@ -27,7 +29,7 @@ Split a logical module into another runtime assembly only when at least one of t
 - A separately testable pure-C# core can avoid Unity references without duplicating contracts.
 
 Do not create an assembly solely to mirror a folder. A new assembly requires an explicit dependency update in this
-document, an `.asmdef`, tests for its boundary, and an update to the UML document.
+document, an `.asmdef`, tests for its boundary, and an update to the runtime overview.
 
 ## Core principles
 
@@ -339,7 +341,7 @@ The application has three composition boundaries:
 
 | Boundary | Lifetime | Responsibilities |
 | --- | --- | --- |
-| `ProjectLifetimeScope` | Whole process | Window catalog/provider, presentation services, validation reporting, game data, user state, game services |
+| `ProjectLifetimeScope` | Whole process | Window services, presentation, validation, game data, user state, game services |
 | `BootstrapLifetimeScope` | Bootstrap scene | Progress view, bootstrap operations, transition to `Main` |
 | `MainLifetimeScope` | Main scene | Scene window controller, modal adapters, rank-up flow, upgrade flow |
 
@@ -482,7 +484,7 @@ type suffix, or project-wide naming convention. Make such a change in this order
 2. Update this document with the new boundary and allowed direction.
 3. Move or add code while preserving Unity GUIDs and serialized keys.
 4. Extend `tools/Validate-Architecture.ps1` for every mechanically enforceable part.
-5. Update the UML PDF and its generation source.
+5. Update the runtime overview when the change affects its modules, lifetime boundaries, or core flows.
 6. Run architecture validation, compile the assemblies, and run the relevant tests.
 
 Exceptions must be narrow, named by folder or type, and documented beside the rule they qualify. Do not weaken a
