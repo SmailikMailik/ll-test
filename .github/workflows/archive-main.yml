@@ -43,16 +43,12 @@ jobs:
           mkdir -p "${package_root}" "${output_directory}"
 
           include_paths=(
-            ".gitattributes"
-            ".gitignore"
             "ARCHITECTURE.md"
             "Assets"
-            "CI.md"
             "Documentation"
             "Packages"
             "ProjectSettings"
             "README.md"
-            "tools"
           )
 
           for path in "${include_paths[@]}"; do
@@ -102,9 +98,12 @@ jobs:
           unzip -q "${archive_path}" -d "${validation_root}"
 
           required_paths=(
+            "ARCHITECTURE.md"
             "Assets"
             "Assets/_Project/Scenes/Bootstrap.unity"
             "Assets/_Project/Scenes/Main.unity"
+            "Documentation/Architecture/Game-And-User-Data.md"
+            "Documentation/Architecture/LL-Runtime-Overview.md"
             "Packages/manifest.json"
             "Packages/packages-lock.json"
             "ProjectSettings/ProjectVersion.txt"
@@ -121,14 +120,19 @@ jobs:
 
           excluded_paths=(
             ".git"
+            ".gitattributes"
             ".github"
+            ".gitignore"
             ".idea"
+            "AGENTS.md"
             "artifacts"
             "Builds"
+            "CI.md"
             "Library"
             "Logs"
             "obj"
             "Temp"
+            "tools"
             "UserSettings"
           )
 
@@ -184,6 +188,48 @@ jobs:
             echo "publish=false" >> "${GITHUB_OUTPUT}"
             echo "A newer main commit exists; the workflow artifact is preserved, but main-latest will not be updated."
           fi
+
+      - name: Update Google Drive archive
+        if: steps.latest.outputs.publish == 'true'
+        shell: bash
+        env:
+          ARCHIVE_NAME: ${{ steps.package.outputs.archive_name }}
+          OUTPUT_DIRECTORY: ${{ steps.package.outputs.output_directory }}
+          RCLONE_CONFIG_BASE64: ${{ secrets.RCLONE_CONFIG_BASE64 }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${RCLONE_CONFIG_BASE64}" ]]; then
+            echo "::error::Repository secret RCLONE_CONFIG_BASE64 is not configured."
+            exit 1
+          fi
+
+          config_path="${RUNNER_TEMP}/rclone.conf"
+          drive_stage="${RUNNER_TEMP}/google-drive"
+          remote_directory="gdrive:LL-Test/main"
+          trap 'rm -f "${config_path}"' EXIT
+
+          printf "%s" "${RCLONE_CONFIG_BASE64}" | base64 --decode > "${config_path}"
+          chmod 600 "${config_path}"
+
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends rclone
+
+          if ! rclone listremotes --config "${config_path}" | grep -Fxq "gdrive:"; then
+            echo "::error::The rclone configuration does not contain a gdrive remote."
+            exit 1
+          fi
+
+          mkdir -p "${drive_stage}"
+          cp "${OUTPUT_DIRECTORY}/${ARCHIVE_NAME}" "${drive_stage}/LL-Test-main-latest.zip"
+
+          rclone mkdir "${remote_directory}" --config "${config_path}"
+          rclone copy "${drive_stage}" "${remote_directory}" \
+            --config "${config_path}" \
+            --checksum
+          rclone check "${drive_stage}" "${remote_directory}" \
+            --config "${config_path}" \
+            --one-way
 
       - name: Update main-latest prerelease
         if: steps.latest.outputs.publish == 'true'
