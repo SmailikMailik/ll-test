@@ -43,16 +43,12 @@ jobs:
           mkdir -p "${package_root}" "${output_directory}"
 
           include_paths=(
-            ".gitattributes"
-            ".gitignore"
             "ARCHITECTURE.md"
             "Assets"
-            "CI.md"
             "Documentation"
             "Packages"
             "ProjectSettings"
             "README.md"
-            "tools"
           )
 
           for path in "${include_paths[@]}"; do
@@ -102,9 +98,12 @@ jobs:
           unzip -q "${archive_path}" -d "${validation_root}"
 
           required_paths=(
+            "ARCHITECTURE.md"
             "Assets"
             "Assets/_Project/Scenes/Bootstrap.unity"
             "Assets/_Project/Scenes/Main.unity"
+            "Documentation/Architecture/Game-And-User-Data.md"
+            "Documentation/Architecture/LL-Runtime-Overview.md"
             "Packages/manifest.json"
             "Packages/packages-lock.json"
             "ProjectSettings/ProjectVersion.txt"
@@ -121,14 +120,19 @@ jobs:
 
           excluded_paths=(
             ".git"
+            ".gitattributes"
             ".github"
+            ".gitignore"
             ".idea"
+            "AGENTS.md"
             "artifacts"
             "Builds"
+            "CI.md"
             "Library"
             "Logs"
             "obj"
             "Temp"
+            "tools"
             "UserSettings"
           )
 
