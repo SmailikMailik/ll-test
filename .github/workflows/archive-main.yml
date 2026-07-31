@@ -1,0 +1,235 @@
+name: Archive main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  archive:
+    name: Create verified Unity project archive
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository with Git LFS
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: true
+
+      - name: Fetch and verify Git LFS objects
+        shell: bash
+        run: |
+          set -euo pipefail
+          git lfs pull
+          git lfs fsck
+
+      - name: Create project archive
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          short_sha="${GITHUB_SHA::7}"
+          archive_name="LL-Test-main-${GITHUB_RUN_NUMBER}-${short_sha}.zip"
+          package_root="${RUNNER_TEMP}/package/LL-Test"
+          output_directory="${RUNNER_TEMP}/output"
+
+          mkdir -p "${package_root}" "${output_directory}"
+
+          include_paths=(
+            ".gitattributes"
+            ".gitignore"
+            "ARCHITECTURE.md"
+            "Assets"
+            "CI.md"
+            "Documentation"
+            "Packages"
+            "ProjectSettings"
+            "README.md"
+            "tools"
+          )
+
+          for path in "${include_paths[@]}"; do
+            if [[ ! -e "${path}" ]]; then
+              echo "::error::Required archive path is missing: ${path}"
+              exit 1
+            fi
+
+            cp -a "${path}" "${package_root}/"
+          done
+
+          cat > "${package_root}/BUILD-INFO.txt" <<EOF
+          Repository: ${GITHUB_REPOSITORY}
+          Branch: ${GITHUB_REF_NAME}
+          Commit: ${GITHUB_SHA}
+          Workflow run: ${GITHUB_RUN_NUMBER}
+          Created at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          EOF
+
+          (
+            cd "${RUNNER_TEMP}/package"
+            zip -q -r "${output_directory}/${archive_name}" "LL-Test"
+          )
+
+          (
+            cd "${output_directory}"
+            sha256sum "${archive_name}" > "${archive_name}.sha256"
+          )
+
+          echo "archive_name=${archive_name}" >> "${GITHUB_OUTPUT}"
+          echo "output_directory=${output_directory}" >> "${GITHUB_OUTPUT}"
+
+      - name: Validate archive
+        shell: bash
+        env:
+          ARCHIVE_NAME: ${{ steps.package.outputs.archive_name }}
+          OUTPUT_DIRECTORY: ${{ steps.package.outputs.output_directory }}
+        run: |
+          set -euo pipefail
+
+          archive_path="${OUTPUT_DIRECTORY}/${ARCHIVE_NAME}"
+          validation_root="${RUNNER_TEMP}/validation"
+          project_root="${validation_root}/LL-Test"
+
+          unzip -t "${archive_path}"
+          mkdir -p "${validation_root}"
+          unzip -q "${archive_path}" -d "${validation_root}"
+
+          required_paths=(
+            "Assets"
+            "Assets/_Project/Scenes/Bootstrap.unity"
+            "Assets/_Project/Scenes/Main.unity"
+            "Packages/manifest.json"
+            "Packages/packages-lock.json"
+            "ProjectSettings/ProjectVersion.txt"
+            "README.md"
+            "BUILD-INFO.txt"
+          )
+
+          for path in "${required_paths[@]}"; do
+            if [[ ! -e "${project_root}/${path}" ]]; then
+              echo "::error::Required path is missing from the archive: ${path}"
+              exit 1
+            fi
+          done
+
+          excluded_paths=(
+            ".git"
+            ".github"
+            ".idea"
+            "artifacts"
+            "Builds"
+            "Library"
+            "Logs"
+            "obj"
+            "Temp"
+            "UserSettings"
+          )
+
+          for path in "${excluded_paths[@]}"; do
+            if [[ -e "${project_root}/${path}" ]]; then
+              echo "::error::Excluded path is present in the archive: ${path}"
+              exit 1
+            fi
+          done
+
+          lfs_pointers="$(
+            grep -RIl \
+              --exclude="*.md" \
+              --exclude="*.txt" \
+              "^version https://git-lfs.github.com/spec/v1$" \
+              "${project_root}" || true
+          )"
+
+          if [[ -n "${lfs_pointers}" ]]; then
+            echo "::error::The archive contains unresolved Git LFS pointer files:"
+            echo "${lfs_pointers}"
+            exit 1
+          fi
+
+          (
+            cd "${OUTPUT_DIRECTORY}"
+            sha256sum --check "${ARCHIVE_NAME}.sha256"
+          )
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.archive_name }}
+          path: |
+            ${{ steps.package.outputs.output_directory }}/${{ steps.package.outputs.archive_name }}
+            ${{ steps.package.outputs.output_directory }}/${{ steps.package.outputs.archive_name }}.sha256
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+
+      - name: Check whether this is the latest main commit
+        id: latest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest_sha="$(gh api "repos/${GITHUB_REPOSITORY}/commits/main" --jq ".sha")"
+
+          if [[ "${latest_sha}" == "${GITHUB_SHA}" ]]; then
+            echo "publish=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "publish=false" >> "${GITHUB_OUTPUT}"
+            echo "A newer main commit exists; the workflow artifact is preserved, but main-latest will not be updated."
+          fi
+
+      - name: Update main-latest prerelease
+        if: steps.latest.outputs.publish == 'true'
+        shell: bash
+        env:
+          ARCHIVE_NAME: ${{ steps.package.outputs.archive_name }}
+          GH_TOKEN: ${{ github.token }}
+          OUTPUT_DIRECTORY: ${{ steps.package.outputs.output_directory }}
+        run: |
+          set -euo pipefail
+
+          release_archive="${OUTPUT_DIRECTORY}/LL-Test-main-latest.zip"
+          release_checksum="${release_archive}.sha256"
+          cp "${OUTPUT_DIRECTORY}/${ARCHIVE_NAME}" "${release_archive}"
+
+          (
+            cd "${OUTPUT_DIRECTORY}"
+            sha256sum "LL-Test-main-latest.zip" > "LL-Test-main-latest.zip.sha256"
+          )
+
+          commit_url="https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          release_notes="$(
+            printf "%s\n\n%s" \
+              "Automatically generated Unity project archive for main commit [${GITHUB_SHA::7}](${commit_url})." \
+              "The archive was verified and includes Git LFS content."
+          )"
+
+          if gh release view "main-latest" > /dev/null 2>&1; then
+            gh api \
+              --method PATCH \
+              "repos/${GITHUB_REPOSITORY}/git/refs/tags/main-latest" \
+              -f sha="${GITHUB_SHA}" \
+              -F force=true
+            gh release edit "main-latest" \
+              --title "Latest main project archive" \
+              --notes "${release_notes}" \
+              --prerelease
+          else
+            gh release create "main-latest" \
+              --target "${GITHUB_SHA}" \
+              --title "Latest main project archive" \
+              --notes "${release_notes}" \
+              --prerelease
+          fi
+
+          gh release upload "main-latest" \
+            "${release_archive}" \
+            "${release_checksum}" \
+            --clobber
