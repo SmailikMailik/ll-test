@@ -1,7 +1,14 @@
 # Project Rules
 
-- Treat `ARCHITECTURE.md` as the source of truth for architecture, file placement, dependency direction, folder
-  vocabulary, and type suffixes. Apply its placement procedure before creating or moving a type.
+- Treat approved production code and serialized assets as the source of truth for current behavior and actual
+  placement. Treat `ARCHITECTURE.md` as the source of truth for intended architectural conventions, and keep it
+  synchronized with approved code and asset layout. Apply its placement procedure before creating or moving a type.
+- Validators enforce approved code, asset, and architecture decisions; they do not define those decisions. Do not
+  move production code or assets solely to satisfy a stale validator. Resolve the intended design first, then update
+  the validator and `ARCHITECTURE.md` to match it.
+- After changing paths, namespaces, serialized shapes, dependencies, data flow, identifiers, or domain invariants,
+  review and run every affected validator. Update validation discovery, rules, and tests in the same change so the
+  validation system continues to check the current implementation.
 - Keep composition code under exactly one of `Assets/_Project/Scripts/Composition/Scopes`, `Installers`, or
   `Factories`. Scopes define lifetime boundaries, installers implement cohesive `IInstaller` registration modules,
   and factories construct concrete policies without performing registration.

@@ -11,13 +11,13 @@ namespace LLEditor.Validation
 {
     internal static class ProjectDataValidationRunner
     {
-        private const string ProjectDataPath = "Assets/_Project/Configuration";
+        private const string ProjectAssetRoot = "Assets/_Project";
         private const string ProjectDataRoot = "ProjectData";
 
         internal static ValidationResult Run(out int assetCount)
         {
             var assets = AssetDatabase
-                .FindAssets(string.Empty, new[] { ProjectDataPath })
+                .FindAssets(string.Empty, new[] { ProjectAssetRoot })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .OrderBy(path => path, StringComparer.Ordinal)
                 .Select(path => AssetDatabase.LoadAssetAtPath<ScriptableObject>(path))

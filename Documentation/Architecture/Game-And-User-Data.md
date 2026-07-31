@@ -92,6 +92,31 @@ Game/Data/
 Корень `Game/Data` координирует загрузку агрегата. `Declarations` содержит только единое промежуточное представление,
 которое создают все источники и принимает компилятор.
 
+### Раскладка Unity-ассетов
+
+Классы конфигураций остаются рядом со своими фичами в коде, а созданные через Unity конфигурационные ассеты
+группируются по владельцу:
+
+```text
+Assets/_Project/Configuration/
+├── Game/
+│   ├── CardCatalogConfig.asset
+│   ├── GameDataManifestConfig.asset
+│   ├── QuestCatalogConfig.asset
+│   ├── RankCatalogConfig.asset
+│   ├── RankUpCatalogConfig.asset
+│   └── RewardCatalogConfig.asset
+├── Presentation/
+│   └── ItemIconCatalogConfig.asset
+├── UI/
+│   └── WindowCatalogConfig.asset
+└── User/
+    └── UserDefaultsConfig.asset
+```
+
+Папка фичи внутри владельца нужна только для связанной группы из нескольких ассетов или осмысленной вложенной
+структуры. Один ассет не получает отдельную папку только ради повторения иерархии C#-кода.
+
 ### Файлы игрового потока
 
 | Файл или группа | Ответственность |

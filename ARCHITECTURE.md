@@ -1,7 +1,8 @@
 # Project Architecture and Naming Standard
 
-This document is the source of truth for placing and naming project code. Its purpose is to make ownership,
-dependency direction, and the role of a type understandable from its path and name.
+This document is the source of truth for intended project-wide placement and naming conventions. Approved production
+code and serialized assets are the source of truth for current behavior and actual placement. Keep this standard,
+the implementation, and its validators synchronized after an architectural decision.
 
 For a practical walkthrough of the game-data and user-data pipelines, see
 [`Documentation/Architecture/Game-And-User-Data.md`](Documentation/Architecture/Game-And-User-Data.md).
@@ -193,6 +194,11 @@ Owns reusable validation primitives, results, contexts, rules, and reporting con
 - Validation of one configuration type stays beside that configuration.
 - Cross-asset and project-wide validation that uses `AssetDatabase` belongs in `Editor/Validation`.
 - Validation reports errors; it must not silently repair source data.
+- Validators enforce approved code, asset, and architecture decisions; they do not establish those decisions.
+- Do not relocate production code or assets solely because a stale validator expects another layout. Resolve the
+  intended design, then update this document and the validator to match it.
+- A change to paths, namespaces, serialized shapes, dependencies, data flow, identifiers, or domain invariants must
+  review and run the affected validation. Update validation discovery, rules, and tests in the same change.
 
 ### `Editor`
 
@@ -304,6 +310,9 @@ loaders because they are independently owned runtime resources rather than parti
 - Keep project-authored configuration assets under `Assets/_Project/Configuration`.
 - Organize configuration assets by their owning runtime area first, for example `Game`, `Presentation`, `UI`, or
   `User`.
+- Keep assets directly under their owning runtime area while each feature contributes only one authored asset. Add a
+  feature subfolder only when it contains a coherent group of multiple related assets or needs meaningful nested
+  structure; do not create one-asset folders solely to mirror the C# hierarchy.
 - Keep the C# configuration types beside the subsystem whose data they author; do not mirror the asset folder by
   centralizing unrelated configuration code.
 - Keep framework, package, and application assembly settings under `Assets/_Project/Settings`, grouped by the
@@ -495,6 +504,7 @@ For every new or moved type, verify:
 - No vague catch-all folder or type name was introduced.
 - External representations are versioned where compatibility matters.
 - Unity asset GUIDs and serialized references remain valid after moves.
+- Validators and their discovery paths reflect the current code, asset layout, data flow, and domain invariants.
 
 If a type cannot be placed confidently using these rules, pause and resolve its ownership before adding a new folder.
 

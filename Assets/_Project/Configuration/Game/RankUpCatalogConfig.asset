@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 402e5a924a4f4d1a98424d0ce9be94bf, type: 3}
   m_Name: RankUpCatalogConfig
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   _rankUps:
   - _rankId: rank_1
     _questId: headshots
