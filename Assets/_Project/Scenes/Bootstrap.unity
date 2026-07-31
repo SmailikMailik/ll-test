@@ -171,7 +171,7 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   _progressBar: {fileID: 425541466}
-  _minDisplaySeconds: 2
+  _minDisplaySeconds: 3
 --- !u!1 &31202264
 GameObject:
   m_ObjectHideFlags: 0
