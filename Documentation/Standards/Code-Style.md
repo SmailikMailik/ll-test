@@ -57,8 +57,21 @@ exception set.
 - Place attributes applied to types, constructors, methods, properties, and other members on separate lines.
 - Follow the single-line `[MenuItem(...)]` rule in [Hard-limit exceptions](#hard-limit-exceptions).
 - Keep `[SerializeField]` and `[JsonProperty]` inline with the field declaration.
-- Combine serialized-field constraints and decorators into the same attribute list, for example
-  `[SerializeField, Min(0f), Tooltip("Duration in seconds.")] private float _duration;`.
+- Organize a serialized field's attributes into responsibility layers, ordered from inspector presentation to value
+  validation to the field declaration. Put each non-empty layer on its own physical line.
+- Combine attributes that belong to the same layer in one attribute list. Never combine presentation or value
+  validation attributes with the inline declaration layer.
+- The declaration layer contains `[SerializeField]` or `[JsonProperty]` and field-contract attributes such as
+  `Required` and `AssetsOnly`; keep the complete layer inline with the field declaration.
+- Presentation attributes such as `PreviewField`, `TableColumnWidth`, `SuffixLabel`, and `Tooltip` belong on the
+  first line. Value constraints such as `ValidateInput`, `Min`, `Max`, `Range`, `MinValue`, and `MaxValue` belong on
+  the next line. Omit a layer when it has no attributes.
+- For example:
+
+  ```csharp
+  [PreviewField(48, ObjectFieldAlignment.Center), TableColumnWidth(64)]
+  [SerializeField, Required] private Sprite _icon;
+  ```
 - Serialized-field migration rules belong to the authored-asset section of `Architecture.md` because they protect
   persisted data rather than formatting.
 

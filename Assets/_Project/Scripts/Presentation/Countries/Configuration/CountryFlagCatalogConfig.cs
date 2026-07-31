@@ -8,11 +8,9 @@ using UnityEngine;
 namespace LL.Presentation.Countries.Configuration
 {
     [CreateAssetMenu(fileName = nameof(CountryFlagCatalogConfig), menuName = CreationPath)]
-    [HideMonoScript]
     internal sealed class CountryFlagCatalogConfig : ScriptableObject, IValidationSource
     {
         [ValidateInput(nameof(HasValidFlags), "Country flag data is invalid.")]
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private CountryFlagEntry[] _flags;
 
         internal const string CreationPath = "LL/Presentation/Country Flag Catalog";
@@ -32,10 +30,9 @@ namespace LL.Presentation.Countries.Configuration
     [Serializable]
     internal sealed class CountryFlagEntry
     {
-        [LabelText("ISO Code")]
         [SerializeField] private string _countryId;
 
-        [SerializeField, Required, PreviewField(64, ObjectFieldAlignment.Center)] private Sprite _flag;
+        [SerializeField, Required] private Sprite _flag;
 
         internal CountryId CountryId => new(_countryId);
         internal Sprite Flag => _flag;

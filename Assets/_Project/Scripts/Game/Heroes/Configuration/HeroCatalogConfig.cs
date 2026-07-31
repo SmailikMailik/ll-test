@@ -11,7 +11,6 @@ namespace LL.Game.Heroes.Configuration
     internal sealed class HeroCatalogConfig : ScriptableObject, IValidationSource
     {
         [ValidateInput(nameof(HasValidHeroes), "Hero catalog data is invalid.")]
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private HeroEntry[] _heroes;
 
         internal const string CreationPath = "LL/Game Data/Hero Catalog";

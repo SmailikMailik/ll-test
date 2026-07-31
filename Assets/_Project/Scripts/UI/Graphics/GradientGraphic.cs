@@ -11,8 +11,11 @@ namespace LL.UI.Graphics
     {
         [SerializeField] private Gradient _gradient = CreateDefaultGradient();
         [SerializeField] private GradientType _type;
-        [SerializeField, Range(0f, 360f)] private float _angle;
-        [SerializeField, Range(1, 32)] private int _resolution = 16;
+        [Range(0f, 360f)]
+        [SerializeField] private float _angle;
+
+        [Range(1, 32)]
+        [SerializeField] private int _resolution = 16;
 
         private enum GradientType : byte
         {

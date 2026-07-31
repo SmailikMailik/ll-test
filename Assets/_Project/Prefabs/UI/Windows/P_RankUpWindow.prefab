@@ -1363,7 +1363,7 @@ MonoBehaviour:
   _instantPriceLabel: {fileID: 7552061282649467504}
   _instantButton: {fileID: 4127851390835802154}
   _nextRankRewardView: {fileID: 2547094923437266544}
-  _heroView: {fileID: 920000000000000001}
+  _heroView: {fileID: 3889168535084689366}
   _questView: {fileID: 5198742301845612770}
 --- !u!1001 &791393746731214815
 PrefabInstance:
@@ -2282,7 +2282,7 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3590696994899624306, guid: 742589c37b71e3641bb710222d788c87, type: 3}
   m_PrefabInstance: {fileID: 4144555299396872151}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &920000000000000001 stripped
+--- !u!114 &3889168535084689366 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 900000000000000001, guid: 742589c37b71e3641bb710222d788c87, type: 3}
   m_PrefabInstance: {fileID: 4144555299396872151}
@@ -2291,8 +2291,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b3fbb7c04829da4ea4412576385c741, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7376875093291211279
 PrefabInstance:
   m_ObjectHideFlags: 0

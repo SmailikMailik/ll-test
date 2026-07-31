@@ -15,7 +15,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Validate.ps1
 
 Runs structural architecture validation, imports and compiles the Unity project, validates enabled build scenes, and
 runs project-data validation. Before Unity starts, the command runs convention-validator fixtures, structural
-architecture validation, and C# code-style validation. Logs are written to `artifacts/unity-validation.log`.
+architecture validation, C# code-style validation, and Odin Inspector convention validation. Logs are written to
+`artifacts/unity-validation.log`.
 
 Use the focused checks while iterating:
 
@@ -23,6 +24,7 @@ Use the focused checks while iterating:
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/tests/Test-ConventionValidators.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-Architecture.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-CodeStyle.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-OdinInspector.ps1
 ```
 
 The change-to-check mapping is defined in [`Validation.md`](../Standards/Validation.md); this document defines only how the

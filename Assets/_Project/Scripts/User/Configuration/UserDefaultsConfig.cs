@@ -68,7 +68,8 @@ namespace LL.User.Configuration
 
         [LabelText("Experience")]
         [SuffixLabel("XP", true)]
-        [SerializeField, MinValue(0)] private int _experience;
+        [MinValue(0)]
+        [SerializeField] private int _experience;
 
         internal RankId RankId => new(_rankId);
         internal int Experience => _experience;
@@ -81,7 +82,8 @@ namespace LL.User.Configuration
         [SerializeField] private string _id;
 
         [LabelText("Amount")]
-        [SerializeField, MinValue(0)] private int _amount;
+        [MinValue(0)]
+        [SerializeField] private int _amount;
 
         internal ItemId Id => new(_id);
         internal int Amount => _amount;

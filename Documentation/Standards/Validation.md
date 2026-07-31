@@ -2,7 +2,8 @@
 
 This document is the source of truth for validation semantics, validator ownership, automated convention coverage,
 and required project checks. Architecture rules belong to [`Architecture.md`](Architecture.md), C# conventions to
-[`Code-Style.md`](Code-Style.md), and command details to [`CI.md`](../Development/CI.md).
+[`Code-Style.md`](Code-Style.md), Odin authoring conventions to [`Odin-Inspector.md`](Odin-Inspector.md), and command
+details to [`CI.md`](../Development/CI.md).
 
 Validators enforce approved production, asset, and agreement decisions; they do not define those decisions. Do not
 relocate production code or assets solely because a stale validator expects another layout. Resolve the intended
@@ -66,6 +67,7 @@ Coverage labels mean:
 | Root authored-configuration coverage in `Last Level/Content` | Automated | `tools/Validate-Architecture.ps1` |
 | Ownership, abstraction value, and feature placement | Review | Architecture review |
 | Enum representation, C# file ending, hard-limit exception layout, and hard line length | Automated | `tools/Validate-CodeStyle.ps1` |
+| Default Odin presentation in catalog configuration files | Automated | `tools/Validate-OdinInspector.ps1` |
 | Attribute layout, empty bodies, and simple expression wrapping | Partial | `tools/Validate-CodeStyle.ps1` |
 | DI constructor marking, R3 lifetime, and component multiplicity | Partial | `tools/Validate-CodeStyle.ps1` |
 | Unity null semantics, callback prefixes, and bound identifiers | Partial | `tools/Validate-CodeStyle.ps1` |
@@ -83,6 +85,7 @@ Run every row that applies to a change:
 | Change | Required verification |
 | --- | --- |
 | Project-owned C# | Code-style validation and compilation |
+| Catalog inspector or Odin authoring convention | Odin Inspector validation and compilation |
 | Path, namespace, type role, or dependency | Architecture validation, code-style validation, and compilation |
 | New or moved runtime/editor code | Architecture validation and relevant tests |
 | DI registration or lifecycle | Architecture validation, code-style validation, compilation, and relevant tests |

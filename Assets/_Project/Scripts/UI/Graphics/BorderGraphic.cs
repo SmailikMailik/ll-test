@@ -9,7 +9,8 @@ namespace LL.UI.Graphics
     [AddComponentMenu("LL/UI/Graphics/Border")]
     internal sealed class BorderGraphic : MaskableGraphic
     {
-        [SerializeField, Min(0f)] private float _thickness = 4f;
+        [Min(0f)]
+        [SerializeField] private float _thickness = 4f;
         [SerializeField] private BorderAlignment _alignment;
 
         private enum BorderAlignment : byte

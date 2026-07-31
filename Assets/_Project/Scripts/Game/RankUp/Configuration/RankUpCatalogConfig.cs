@@ -41,8 +41,11 @@ namespace LL.Game.RankUp.Configuration
         [SerializeField] private string _questId;
         [SerializeField] private string _heroId;
 
-        [SerializeField, MinValue(1)] private int _requiredAmount = 1;
-        [SerializeField, MinValue(1)] private int _durationMinutes = 1440;
+        [MinValue(1)]
+        [SerializeField] private int _requiredAmount = 1;
+
+        [MinValue(1)]
+        [SerializeField] private int _durationMinutes = 1440;
 
         [SerializeField] private PaymentEntry _questPayment = new();
         [SerializeField] private PaymentEntry _instantPayment = new();

@@ -9,7 +9,8 @@ namespace LL.Game.Payments.Configuration
     internal sealed class PaymentEntry
     {
         [SerializeField] private string _itemId;
-        [SerializeField, MinValue(1)] private int _amount = 1;
+        [MinValue(1)]
+        [SerializeField] private int _amount = 1;
 
         internal ItemId ItemId => new(_itemId);
         internal int Amount => _amount;

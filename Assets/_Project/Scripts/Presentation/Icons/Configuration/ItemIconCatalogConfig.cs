@@ -8,11 +8,10 @@ using UnityEngine;
 namespace LL.Presentation.Icons.Configuration
 {
     [CreateAssetMenu(fileName = nameof(ItemIconCatalogConfig), menuName = CreationPath)]
-    [HideMonoScript]
     internal sealed class ItemIconCatalogConfig : ScriptableObject, IValidationSource
     {
-        [ValidateInput(nameof(HasValidIcons), "Item icon data is invalid.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [ValidateInput(nameof(HasValidIcons), "Item icon data is invalid.")]
         [SerializeField] private ItemIconEntry[] _icons;
 
         internal const string CreationPath = "LL/Presentation/Item Icon Catalog";
@@ -35,10 +34,10 @@ namespace LL.Presentation.Icons.Configuration
     [Serializable]
     internal sealed class ItemIconEntry
     {
-        [LabelText("ID")]
         [SerializeField] private string _id;
 
-        [SerializeField, Required, PreviewField(64, ObjectFieldAlignment.Center)] private Sprite _icon;
+        [PreviewField(48, ObjectFieldAlignment.Center), TableColumnWidth(64)]
+        [SerializeField, Required] private Sprite _icon;
 
         internal ItemId Id => new(_id);
         internal Sprite Icon => _icon;

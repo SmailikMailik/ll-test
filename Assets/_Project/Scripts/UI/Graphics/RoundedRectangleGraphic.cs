@@ -9,8 +9,11 @@ namespace LL.UI.Graphics
     [AddComponentMenu("LL/UI/Graphics/Rounded Rectangle")]
     internal sealed class RoundedRectangleGraphic : MaskableGraphic
     {
-        [SerializeField, Min(0f)] private float _cornerRadius = 16f;
-        [SerializeField, Range(MinCornerSegments, MaxCornerSegments)] private int _cornerSegments = 6;
+        [Min(0f)]
+        [SerializeField] private float _cornerRadius = 16f;
+
+        [Range(MinCornerSegments, MaxCornerSegments)]
+        [SerializeField] private int _cornerSegments = 6;
 
         private const int MinCornerSegments = 1;
         private const int MaxCornerSegments = 16;

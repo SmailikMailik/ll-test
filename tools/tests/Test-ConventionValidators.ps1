@@ -3,6 +3,7 @@ $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $architectureValidator = Join-Path $projectRoot "tools/Validate-Architecture.ps1"
 $codeStyleValidator = Join-Path $projectRoot "tools/Validate-CodeStyle.ps1"
+$odinInspectorValidator = Join-Path $projectRoot "tools/Validate-OdinInspector.ps1"
 $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) "ll-convention-validator-$([guid]::NewGuid())"
 $failures = [System.Collections.Generic.List[string]]::new()
 
@@ -221,6 +222,75 @@ try {
         -Arguments @("-ProjectAssetsRoot", $invalidMultilineThrowRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "Null-coalescing throw expression must remain on one physical line"
+
+    $invalidAttributeLayerRoot = Join-Path $fixtureRoot "style-invalid-attribute-layer"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidAttributeLayerRoot "Scripts/Game")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidAttributeLayerRoot "Scripts/Game/Config.cs"),
+        "using UnityEngine;`n`ninternal sealed class Config`n{`n" +
+            "    [SerializeField, Min(0)] private int _value;`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid serialized field attribute layer" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidAttributeLayerRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Presentation and value-validation attributes must use separate layers"
+
+    $validOdinRoot = Join-Path $fixtureRoot "odin-valid-catalog"
+    [IO.Directory]::CreateDirectory((Join-Path $validOdinRoot "Scripts/Game/Configuration")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $validOdinRoot "Scripts/Game/Configuration/ExampleCatalogConfig.cs"),
+        "using Sirenix.OdinInspector;`n`ninternal sealed class ExampleCatalogConfig`n{`n" +
+            "    [ValidateInput(nameof(IsValid))]`n    private object[] _entries;`n`n" +
+            "    private static bool IsValid(object[] entries) => true;`n}")
+    Invoke-ExpectedResult `
+        -Name "Valid default catalog presentation" `
+        -Script $odinInspectorValidator `
+        -Arguments @("-ProjectAssetsRoot", $validOdinRoot) `
+        -ExpectedExitCode 0 `
+        -ExpectedOutput "Odin Inspector validation passed."
+
+    $validItemIconOdinRoot = Join-Path $fixtureRoot "odin-valid-item-icon-catalog"
+    [IO.Directory]::CreateDirectory((Join-Path $validItemIconOdinRoot "Scripts/Presentation/Icons/Configuration")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $validItemIconOdinRoot "Scripts/Presentation/Icons/Configuration/ItemIconCatalogConfig.cs"),
+        "using Sirenix.OdinInspector;`n`ninternal sealed class ItemIconCatalogConfig`n{`n" +
+            "    [TableList(AlwaysExpanded = true, DrawScrollView = false)]`n" +
+            "    [ValidateInput(nameof(IsValid))]`n    [SerializeField] private ItemIconEntry[] _icons;`n}`n`n" +
+            "internal sealed class ItemIconEntry`n{`n    private string _id;`n" +
+            "    [PreviewField(48, ObjectFieldAlignment.Center), TableColumnWidth(64)]`n" +
+            "    [SerializeField, Required] private Sprite _icon;`n}")
+    Invoke-ExpectedResult `
+        -Name "Valid compact item icon catalog" `
+        -Script $odinInspectorValidator `
+        -Arguments @("-ProjectAssetsRoot", $validItemIconOdinRoot) `
+        -ExpectedExitCode 0 `
+        -ExpectedOutput "Odin Inspector validation passed."
+
+    $invalidOdinRoot = Join-Path $fixtureRoot "odin-invalid-catalog"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidOdinRoot "Scripts/Game/Configuration")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidOdinRoot "Scripts/Game/Configuration/ExampleCatalogConfig.cs"),
+        "using Sirenix.OdinInspector;`n`ninternal sealed class ExampleCatalogConfig`n{`n" +
+            "    [TableList]`n    private object[] _entries;`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid catalog presentation" `
+        -Script $odinInspectorValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidOdinRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Catalogs must use the default Odin presentation"
+
+    $invalidItemIconOdinRoot = Join-Path $fixtureRoot "odin-invalid-item-icon-catalog"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidItemIconOdinRoot "Scripts/Presentation/Icons/Configuration")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidItemIconOdinRoot "Scripts/Presentation/Icons/Configuration/ItemIconCatalogConfig.cs"),
+        "internal sealed class ItemIconCatalogConfig`n{`n    private object[] _icons;`n}")
+    Invoke-ExpectedResult `
+        -Name "Missing compact item icon presentation" `
+        -Script $odinInspectorValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidItemIconOdinRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Item icon catalog must use the approved compact sprite table"
 } finally {
     $resolvedFixtureRoot = [IO.Path]::GetFullPath($fixtureRoot)
     $resolvedTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())

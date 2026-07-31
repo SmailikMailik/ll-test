@@ -24,6 +24,12 @@ if ($LASTEXITCODE -ne 0) {
     throw "Code-style validation failed."
 }
 
+& (Join-Path $projectRoot "tools/Validate-OdinInspector.ps1")
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Odin Inspector validation failed."
+}
+
 Invoke-UnityEditor -Arguments @(
     "-batchmode",
     "-nographics",

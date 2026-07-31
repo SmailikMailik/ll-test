@@ -11,10 +11,17 @@ namespace LL.UI.Windows.Reward
         [SerializeField] private Image _stem;
         [SerializeField] private Image[] _leaves;
 
-        [SerializeField, Min(0f)] private float _stemGrowSeconds = 0.48f;
-        [SerializeField, Min(0f)] private float _leafStartSeconds = 0.08f;
-        [SerializeField, Min(0f)] private float _leafDelaySeconds = 0.04f;
-        [SerializeField, Min(0f)] private float _leafUnfoldSeconds = 0.24f;
+        [Min(0f)]
+        [SerializeField] private float _stemGrowSeconds = 0.48f;
+
+        [Min(0f)]
+        [SerializeField] private float _leafStartSeconds = 0.08f;
+
+        [Min(0f)]
+        [SerializeField] private float _leafDelaySeconds = 0.04f;
+
+        [Min(0f)]
+        [SerializeField] private float _leafUnfoldSeconds = 0.24f;
 
         protected override void BuildSequence(Sequence sequence)
         {

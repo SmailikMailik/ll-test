@@ -34,7 +34,8 @@ namespace LL.Game.Cards.Configuration
     internal sealed class CardEntry
     {
         [SerializeField] private string _id;
-        [SerializeField, MinValue(1)] private int _experienceAmount;
+        [MinValue(1)]
+        [SerializeField] private int _experienceAmount;
 
         internal ItemId Id => new(_id);
         internal int ExperienceAmount => _experienceAmount;

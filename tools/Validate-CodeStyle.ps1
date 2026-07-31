@@ -241,6 +241,18 @@ foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter
         Add-CodeStyleError "Place each C# attribute on its own line: $($file.FullName)"
     }
 
+    foreach ($serializedFieldMatch in [regex]::Matches(
+        $content,
+        "(?m)^[ \t]*\[(?:SerializeField|JsonProperty)(?<attributes>[^\]]*)\][ \t]+(?:private|protected|public|internal)\b")) {
+        if ($serializedFieldMatch.Groups["attributes"].Value -match
+            "\b(?:Min|Max|Range|MinValue|MaxValue|ValidateInput|PreviewField|TableColumnWidth|" +
+                "SuffixLabel|PrefixLabel|Tooltip|LabelText|TableList|PropertyOrder|HideLabel)\b") {
+            Add-CodeStyleError (
+                "Presentation and value-validation attributes must use separate layers above the field declaration: " +
+                "$($file.FullName)")
+        }
+    }
+
     if ($content -match "\)\s*\r?\n\s*\{\s*\r?\n\s*\}") {
         Add-CodeStyleError "Empty C# bodies must be inline: $($file.FullName)"
     }

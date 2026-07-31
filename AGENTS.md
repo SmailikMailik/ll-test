@@ -8,6 +8,8 @@ Before changing the project, use the agreement that owns the decision:
 - [`Code-Style.md`](Documentation/Standards/Code-Style.md) defines C# formatting, member organization, DI and reactive
   lifecycle conventions,
   and Unity component conventions.
+- [`Odin-Inspector.md`](Documentation/Standards/Odin-Inspector.md) defines Odin-powered inspector presentation and
+  authoring UI conventions.
 - [`Validation.md`](Documentation/Standards/Validation.md) defines validation semantics, validator ownership,
   automated-rule coverage, and the checks required for each kind of change.
 - [`CI.md`](Documentation/Development/CI.md) defines the commands and environment used to run validation, tests, and
