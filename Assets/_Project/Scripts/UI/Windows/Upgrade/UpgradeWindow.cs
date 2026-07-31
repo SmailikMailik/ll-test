@@ -50,10 +50,8 @@ namespace LL.UI.Windows.Upgrade
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _cardExperienceService = cardExperienceService
-                ?? throw new ArgumentNullException(nameof(cardExperienceService));
-            _overflowConfirmation = overflowConfirmation
-                ?? throw new ArgumentNullException(nameof(overflowConfirmation));
+            _cardExperienceService = cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
+            _overflowConfirmation = overflowConfirmation ?? throw new ArgumentNullException(nameof(overflowConfirmation));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }

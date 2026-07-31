@@ -56,8 +56,7 @@ namespace LL.UI.Windows.RankUp
             IUserRankUpQuest rankUpQuest,
             IRankUpQuestService rankUpQuestService)
         {
-            _completionConfirmation = completionConfirmation
-                ?? throw new ArgumentNullException(nameof(completionConfirmation));
+            _completionConfirmation = completionConfirmation ?? throw new ArgumentNullException(nameof(completionConfirmation));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
             _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
             _rankUpQuestService = rankUpQuestService ?? throw new ArgumentNullException(nameof(rankUpQuestService));

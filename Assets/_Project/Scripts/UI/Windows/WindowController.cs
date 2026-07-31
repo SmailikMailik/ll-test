@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VContainer;
 
@@ -16,8 +17,8 @@ namespace LL.UI.Windows
             WindowProvider provider,
             WindowNavigator navigator)
         {
-            _provider = provider;
-            _navigator = navigator;
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _navigator = navigator ?? throw new ArgumentNullException(nameof(navigator));
         }
 
         internal void Show<TParameter>(TParameter parameters)

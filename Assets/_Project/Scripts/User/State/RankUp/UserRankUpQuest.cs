@@ -28,8 +28,7 @@ namespace LL.User.State.RankUp
         [Inject]
         internal UserRankUpQuest(UserRankUpQuestSnapshot snapshot)
         {
-            if (snapshot == null)
-                throw new ArgumentNullException(nameof(snapshot));
+            _ = snapshot ?? throw new ArgumentNullException(nameof(snapshot));
 
             _questId = snapshot.QuestId;
             _deadlineUnixMilliseconds = snapshot.DeadlineUnixMilliseconds;

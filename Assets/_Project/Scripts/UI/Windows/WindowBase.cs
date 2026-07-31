@@ -27,7 +27,7 @@ namespace LL.UI.Windows
         [Inject]
         private void Construct(WindowController windowController)
         {
-            _windowController = windowController;
+            _windowController = windowController ?? throw new ArgumentNullException(nameof(windowController));
         }
 
         protected void Awake()
