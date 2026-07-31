@@ -8,6 +8,8 @@ For a concise map of runtime areas, lifetime boundaries, and core flows, see
 [`Documentation/Architecture/LL-Runtime-Overview.md`](Documentation/Architecture/LL-Runtime-Overview.md).
 For a detailed walkthrough of the game-data and user-data pipelines, see
 [`Documentation/Architecture/Game-And-User-Data.md`](Documentation/Architecture/Game-And-User-Data.md).
+For C# syntax and lifecycle conventions, see [`CODE_STYLE.md`](CODE_STYLE.md). For validation semantics, automated
+coverage, and required verification, see [`VALIDATION.md`](VALIDATION.md).
 
 The rules describe the intended architecture, not merely the current directory tree. New code must follow them.
 When existing code is changed substantially, move it toward this standard when that can be done safely within the
@@ -182,8 +184,6 @@ catalogs, and presentation-facing confirmations.
   `SpriteVariantCatalog<TId, TVariant>` maps multiple explicitly named variants to each domain ID.
 - `Presentation/Heroes` owns the independently loaded small and large portrait resources keyed by `HeroId`.
   Portrait data remains static sprites; optional animation is view behavior and does not change hero definitions.
-  The current large portrait is a single composed hero-and-background image. When separate art becomes available,
-  the lobby prefab will retain its background layer and bind only the isolated hero layer to the portrait catalog.
 - `Presentation/Countries` owns country flag sprites keyed by `CountryId`. Game hero definitions never reference
   Unity sprites directly.
 
@@ -213,50 +213,10 @@ Owns concrete visual behavior: views, windows, controls, graphics, navigation, v
 Owns reusable validation primitives, results, contexts, rules, and reporting contracts.
 
 - Generic validation belongs in runtime `Scripts/Validation`.
-- `ValidationChecks` is the base validation layer. It owns stateless, context-free predicates and simple collection
-  checks; it must not report issues, throw for an invalid checked value, or depend on a game or presentation domain.
-  Complementary predicates such as `IsPositive` and `IsNonPositive` expose both readable call-site forms, but one
-  must delegate to the other so the underlying validity formula has a single implementation.
-- `ValidationRules` adapts `ValidationChecks` to `ValidationContext` and owns reusable issue messages. Rules must
-  delegate the validity decision to a base check instead of duplicating its predicate.
-- Configuration validators compose `ValidationRules` to accumulate multiple issues. Runtime facade validators such
-  as `IdentifierValidator` and `EnumValidator` expose convenient `Validate`, `IsValid`, and `EnsureValid` operations
-  over the same base checks. Guards may throw, but must not reimplement the underlying validity predicate.
-- Choose the validation API by intent:
-  - use `ValidationChecks` for a context-free fact about an input, representation, or invariant when that predicate
-    is shared or its named form makes the guard materially clearer;
-  - use `ValidationRules` only while composing a `ValidationContext`, when failures need stable issue codes, paths,
-    messages, or accumulation; do not use a rule as an ordinary business predicate;
-  - use a facade's `Validate` overload inside an existing validation composition, `IsValid` when rejection is an
-    expected non-throwing outcome, and `EnsureValid` at a construction or trust boundary that must reject an invalid
-    value;
-  - use `ValidationRunner` to start or guard a composed validation session, not for normal state transitions or UI
-    branching.
-- A direct guard remains appropriate for a one-off programmer contract, especially a dependency null check or a
-  type-local condition with no reusable validation meaning. Do not add a cross-area `Validation` dependency merely
-  to replace a clear language or framework predicate once.
-- Conditions that describe normal behavior are not validation. Capability checks, `Can...` and `Try...` rejection,
-  optional-state detection, UI visibility, clamping, loop bounds, and no-op decisions should use direct control flow
-  or a domain facade's non-throwing `IsValid` operation. They must not create validation issues or throw merely
-  because the outcome is false.
-- Reuse a domain facade when the validity grammar belongs to a named concept such as an identifier or country code.
-  Do not reconstruct that grammar from individual checks at call sites.
-- Ordinary behavior and presentation consumers of an already-valid `Definition`, `Snapshot`, catalog entry, or
-  domain object must not repeat invariants guaranteed by that object's construction. Validate only new caller input
-  or a relationship owned by the consumer, such as whether a domain identifier has a matching presentation
-  resource. Aggregate constructors may still reuse a collection validator to enforce entry presence, uniqueness, and
-  the aggregate boundary as one operation.
 - Validation of one configuration type stays beside that configuration.
 - Cross-asset and project-wide validation that uses `AssetDatabase` belongs in `Editor/Validation`.
 - Validation reports errors; it must not silently repair source data.
-- Validation of untrusted `Config`, `Document`, and `Declaration` data accumulates issues through `ValidationContext`.
-  Constructor and method guard clauses protect programmer-facing runtime contracts and may throw directly; they are
-  not a second validation pipeline.
-- Validators enforce approved code, asset, and architecture decisions; they do not establish those decisions.
-- Do not relocate production code or assets solely because a stale validator expects another layout. Resolve the
-  intended design, then update this document and the validator to match it.
-- A change to paths, namespaces, serialized shapes, dependencies, data flow, identifiers, or domain invariants must
-  review and run the affected validation. Update validation discovery, rules, and tests in the same change.
+- Validation vocabulary, behavior, and verification rules are defined in [`VALIDATION.md`](VALIDATION.md).
 
 ### `Editor`
 
@@ -270,9 +230,9 @@ Owns Unity Editor-only tooling, menus, inspectors, build checks, and asset-datab
 - `CI` contains provider-independent batch-mode entry points for validation, tests, and player builds. Provider
   configuration calls these entry points and must not duplicate their project rules.
 
-## Recognized role folders
+## Reserved architectural role folders
 
-Use these names only with the stated meaning:
+The following names have project-wide architectural meaning and must be used consistently:
 
 - `Configuration`: Unity-authored or otherwise author-authored input for one owning capability.
 - `Declarations`: source-neutral, not-yet-trusted aggregate input normalized from multiple concrete sources.
@@ -281,6 +241,7 @@ Use these names only with the stated meaning:
 - `Snapshots`: immutable point-in-time representation composed at a loading boundary.
 - `State`: live mutable runtime state.
 - `Sources`: source-specific adapters that read external or authored data into a source-neutral declaration.
+- `Loading`: adapters and orchestration that produce one fully constructed runtime resource or aggregate.
 - `Serialization`: object-to-byte or object-to-text format conversion.
 - `Storage`: raw byte or text access to a medium, addressed without domain knowledge.
 - `Services`: cohesive domain or application operations with no more specific feature role.
@@ -296,8 +257,10 @@ Use these names only with the stated meaning:
 - `Installers`: cohesive `IInstaller` registration modules; only under `Composition`.
 - `Factories`: reusable concrete construction policies; under `Composition` when they select application technology.
 
-Avoid vague folders such as `Common`, `Misc`, `Helpers`, `Managers`, `Runtime`, or `Data` without a narrowly documented
-meaning. A broadly reusable type still needs a concrete owner and responsibility.
+This is not a closed list of every legal folder. A feature-local folder such as `Effects`, `Modal`, `Progress`, or
+`Values` is valid when its owner and responsibility are clear and it does not redefine a reserved role. Avoid vague
+folders such as `Common`, `Misc`, `Helpers`, `Managers`, `Runtime`, or `Data` without a narrowly documented meaning.
+A broadly reusable type still needs a concrete owner and responsibility.
 
 ## Type naming vocabulary
 
@@ -399,114 +362,22 @@ the runtime catalog.
 
 ## Lifetime and composition model
 
-The application has three composition boundaries:
+The application uses one process-wide project scope and scene-owned child scopes. A scene scope adds objects whose
+lifetime and serialized references belong to that scene; it must not recreate the project scope. The current scope
+inventory and registrations are documented in
+[`Documentation/Architecture/LL-Runtime-Overview.md`](Documentation/Architecture/LL-Runtime-Overview.md).
 
-| Boundary | Lifetime | Responsibilities |
-| --- | --- | --- |
-| `ProjectLifetimeScope` | Whole process | Window services, presentation, validation, game data, user state, game services |
-| `BootstrapLifetimeScope` | Bootstrap scene | Progress view, bootstrap operations, transition to `Main` |
-| `MainLifetimeScope` | Main scene | Scene window controller, modal adapters, rank-up flow, upgrade flow |
+A scope keeps small scene-local registrations visible and constructs larger installers manually with `new`.
+Installers register supplied policies but do not select storage, serialization, authoring, or loading technologies.
+Factories make those concrete construction choices without performing DI registration. Changing a runtime data
+source is therefore a composition-root change rather than an installer or consumer change.
 
-A scope registers small scene-local composition directly and constructs larger installers manually with `new`.
-Installers are not DI services and their constructors do not use `[Inject]`. Runtime services, controllers, flows,
-and MonoBehaviour injection methods resolved by VContainer do use `[Inject]`.
+## Current runtime documentation
 
-The project scope selects concrete game-data, user-defaults, and user-persistence policies through named factory
-methods, then passes the resulting `IDataLoader<GameDataSnapshot>`, `IUserDefaultsSource`, and
-`IUserSaveRepository` abstractions to their installers. Installers register the supplied policies but do not choose
-ScriptableObject, file, PlayerPrefs, or another storage technology. Changing a runtime data source is therefore a
-composition-root change rather than an installer or consumer change.
-
-The same scope constructs the focused item-icon, country-flag, hero-portrait, and window-catalog ScriptableObject
-loaders and passes them to presentation and window installers as `IDataLoader<T>`.
-
-The project scope is auto-created from `VContainerSettings`; the bootstrap scene must not create another project
-scope. Scene scopes inherit project registrations through the configured parent relationship.
-
-## Runtime data flows
-
-### Game reference data
-
-```text
-GameDataManifestConfig -> ScriptableObjectGameDataSource
-                       -> GameDataDeclaration
-                       -> GameDataCompiler
-                       -> GameDataSnapshot
-                       -> immutable catalog parts registered once
-```
-
-The alternative serialized path is:
-
-```text
-ISaveStorage -> ISaveService -> SerializedGameDataSource
-             -> GameDataDocument -> GameDataDocumentMapper
-             -> GameDataDeclaration -> GameDataCompiler -> GameDataSnapshot
-```
-
-Both sources end at the same declaration. A source may check transport shape and document version, but only the
-compiler validates aggregate identifiers and references or creates domain definitions and catalogs.
-Current game-data documents use version `2`; this version adds heroes and replaces rank-up hero localization keys
-with `HeroId` references.
-
-### User state
-
-```text
-UserDefaultsConfig
-    -> IUserDefaultsSource
-    -> UserDefaultsDeclaration
-    -> UserDefaultsCompiler
-    -> UserDefaultsSnapshot -----\
-                                  -> UserSessionLoader
-IUserSaveRepository -------------/          |
-                                            v
-                                  UserSnapshotReconciler
-                                            |
-                                            v
-                                      UserSnapshot
-                                            |
-                                            v
-                                        UserState
-
-UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
-                                         -> UserSaveDocumentMapper
-                                         -> UserSaveDocument
-```
-
-The defaults source normalizes authoring data without exposing its storage technology. `UserDefaultsCompiler`
-validates references against the loaded game catalogs and creates an immutable defaults snapshot. The repository owns the
-persisted user document and reports a semantic load result. `UserSessionLoader` owns the fallback policy, while
-`UserSnapshotReconciler` checks a loaded snapshot against current game data, adds newly required default items, and
-clears stale rank-up quests before runtime state is constructed. `UserState` is the single mutable aggregate, batches
-child notifications into one notification per synchronous logical mutation, and creates the complete snapshot saved
-by `UserSaveCoordinator`. A save failure must not throw from the change observer after memory has already changed;
-the coordinator keeps the state dirty, reports the failure, and retries on the next change or disposal.
-
-Snapshots are immutable load-boundary values. State objects are the only long-lived mutable representation. Current
-user documents start at version `1`; future version changes require explicit migration rather than compatibility
-logic inside the repository or mapper.
-
-### UI navigation and flows
-
-```text
-WindowCatalogConfig -> ScriptableObjectWindowCatalogLoader -> WindowCatalog -> WindowProvider
-    -> WindowNavigator -> WindowController -> Window<TParameters>
-```
-
-The focused presentation catalog follows the same authored-resource boundary:
-
-```text
-ItemIconCatalogConfig -> ScriptableObjectItemIconCatalogLoader -> SpriteCatalog<ItemId>
-CountryFlagCatalogConfig -> ScriptableObjectCountryFlagCatalogLoader -> SpriteCatalog<CountryId>
-HeroPortraitCatalogConfig -> ScriptableObjectHeroPortraitCatalogLoader
-    -> SpriteVariantCatalog<HeroId, HeroPortraitSize>
-```
-
-`HeroView` resolves a hero name and country flag from `HeroId` and composes a small `HeroPortraitView`.
-`HeroPortraitView` selects either the small or large portrait and may own lightweight visual animation without
-moving that behavior into game or presentation data.
-
-`RankUpFlow` and `UpgradeFlow` coordinate use cases and windows. Game services own rule execution; flows own
-sequencing and presentation decisions; windows own visual behavior.
+Current runtime flows, concrete participants, and document versions are descriptive implementation information. Keep
+them synchronized in [`Documentation/Architecture/LL-Runtime-Overview.md`](Documentation/Architecture/LL-Runtime-Overview.md)
+and [`Documentation/Architecture/Game-And-User-Data.md`](Documentation/Architecture/Game-And-User-Data.md). The
+normative representation boundaries that those flows must follow remain in this document.
 
 ## Dependency rules
 
@@ -553,35 +424,11 @@ that semantically owns it or introduce a small contract at the consumer-facing b
   that the old key no longer exists. Do not use `FormerlySerializedAs`.
 - Do not introduce a new top-level area or architectural role folder without updating this document.
 
-## Code and lifecycle invariants
+## Related conventions
 
-- Constructors selected by VContainer and injection methods named `Construct` have `[Inject]`. Manually constructed
-  installer, factory-product, DTO, snapshot, definition, and value-object constructors do not.
-- A `Construct` method only validates and assigns dependencies. Subscription, initialization, UI refresh, and other
-  side effects start in the appropriate lifecycle method.
-- A MonoBehaviour creates long-lived R3 subscriptions in `Start` and binds them with `AddTo(this)`. Dynamically
-  replaced subscriptions have an explicit active lifetime and are still disposed on destruction.
-- Event and reactive callbacks use `On...`; `Handle...` is reserved for command or workflow processing.
-- A concrete MonoBehaviour has `[DisallowMultipleComponent]` when a second instance on one GameObject has no defined
-  behavior. Abstract component bases need not declare it.
-- Serialized fields are declared first. Constants follow serialized fields. Other fields, properties, constructors,
-  lifecycle methods, public/internal behavior, and private helpers follow in that order when practical.
-- Every project enum uses `byte`, assigns explicit sequential values starting at `0`, and preserves existing numeric
-  values when serialized or persisted.
-- C# attributes occupy separate lines except a serialized field's constraints and decorators, which share its
-  `[SerializeField, ...]` list.
-- Boolean expressions use the explicit `expression is false` pattern instead of the unary `!` operator. The `!=`
-  inequality operator remains valid, as does `!` in preprocessor expressions where C# pattern syntax is unavailable.
-- Ordinary managed references use `is null` and `is not null`. References whose static type is
-  `UnityEngine.Object` or a derived Unity type use `== null` and `!= null` instead, because Unity's overloaded
-  equality operators treat destroyed native objects as null while C# pattern matching checks only the managed
-  reference.
-- Empty bodies are inline as `{ }`. Treat 120 characters as the point at which line wrapping deserves an explicit
-  readability decision: lines from 121 through 140 characters may remain intact when the single-line form is clearer,
-  and should be wrapped when the split reads better. Keep simple assignments and expressions on one line when they
-  fit within 120 characters; never break immediately after an assignment operator merely to shorten the line. Keep a
-  simple invocation with one expression or lambda argument on one line under the same condition. The hard limit is
-  140 characters. A C# file ends immediately after its final non-empty line without a trailing CR or LF.
+C# syntax, declaration layout, DI marking, reactive lifecycle, and Unity component conventions are defined only in
+[`CODE_STYLE.md`](CODE_STYLE.md). Validation vocabulary, automated coverage, and required change verification are
+defined only in [`VALIDATION.md`](VALIDATION.md).
 
 ## Changing the architecture
 
@@ -593,7 +440,7 @@ type suffix, or project-wide naming convention. Make such a change in this order
 3. Move or add code while preserving Unity GUIDs and serialized keys.
 4. Extend `tools/Validate-Architecture.ps1` for every mechanically enforceable part.
 5. Update the runtime overview when the change affects its modules, lifetime boundaries, or core flows.
-6. Run architecture validation, compile the assemblies, and run the relevant tests.
+6. Run the checks required by the change matrix in `VALIDATION.md`.
 
 Exceptions must be narrow, named by folder or type, and documented beside the rule they qualify. Do not weaken a
 top-level dependency rule to accommodate one adapter.
@@ -625,4 +472,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-Architecture.
 ```
 
 The script checks the mechanically enforceable subset of this standard. The semantic ownership and dependency
-questions in the checklist still require review.
+questions in the checklist still require review. Automated-coverage classifications and additional checks are
+defined in [`VALIDATION.md`](VALIDATION.md).
