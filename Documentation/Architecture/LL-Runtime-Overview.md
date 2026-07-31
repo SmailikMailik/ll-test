@@ -34,9 +34,10 @@
 Scopes оставляют небольшую локальную композицию на виду, крупные подсистемы подключают через `IInstaller`, а
 factories создают конкретные политики хранения и загрузки без DI-регистрации.
 
-`ProjectLifetimeScope` выбирает конкретные политики через `GameDataLoaderFactory` и `UserSaveRepositoryFactory`, после
-чего передаёт installers только `IDataLoader<GameDataSnapshot>` и `IUserSaveRepository`. Для ручной подмены источника
-достаточно изменить соответствующий factory-вызов в project scope; installers и потребители от технологии не зависят.
+`ProjectLifetimeScope` выбирает конкретные политики через `GameDataLoaderFactory`, `UserDefaultsSourceFactory` и
+`UserSaveRepositoryFactory`, после чего передаёт installers только абстракции загрузки и хранения. Для ручной подмены
+источника достаточно изменить соответствующий factory-вызов в project scope; installers и потребители от технологии
+не зависят.
 
 ## Основные потоки
 
@@ -72,15 +73,21 @@ GameDataManifestConfig
 ### Пользовательские данные
 
 ```text
-UserDefaultsConfig -----\
-                         -> UserSessionLoader -> UserSnapshot -> UserState
-IUserSaveRepository ----/
+UserDefaultsConfig
+    -> IUserDefaultsSource
+    -> UserDefaultsDeclaration
+    -> UserDefaultsCompiler
+    -> UserDefaultsTemplate -----\
+                                  -> UserSessionLoader -> UserSnapshot -> UserState
+IUserSaveRepository -------------/
 
 UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
 ```
 
-`UserSessionLoader` загружает сохранённый снимок или создаёт начальный. `UserState` остаётся единственным изменяемым
-агрегатом сессии, а `UserSaveCoordinator` сохраняет новый снимок после успешных изменений.
+Источник отделяет Unity-конфигурацию от runtime-представления. Компилятор проверяет начальный ранг, опыт и наличие
+всех предметов, на которые ссылаются встроенные правила, карты, оплаты и награды, после чего создаёт неизменяемый
+шаблон. `UserSessionLoader` загружает сохранённый снимок или создаёт начальный из этого шаблона. `UserState` остаётся
+единственным изменяемым агрегатом сессии, а `UserSaveCoordinator` сохраняет новый снимок после успешных изменений.
 
 Подробное описание представлений и преобразований находится в
 [`Game-And-User-Data.md`](Game-And-User-Data.md).

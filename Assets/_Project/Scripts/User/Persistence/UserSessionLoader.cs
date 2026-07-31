@@ -1,6 +1,6 @@
 using System;
 using LL.Infrastructure.Loading;
-using LL.User.Configuration;
+using LL.User.Defaults;
 using LL.User.Snapshots;
 using UnityEngine;
 using VContainer;
@@ -9,15 +9,15 @@ namespace LL.User.Persistence
 {
     internal sealed class UserSessionLoader : IDataLoader<UserSnapshot>
     {
-        private readonly IUserDefaultsFactory _defaultsFactory;
+        private readonly UserDefaultsTemplate _defaults;
         private readonly IUserSaveRepository _repository;
 
         [Inject]
         internal UserSessionLoader(
-            IUserDefaultsFactory defaultsFactory,
+            UserDefaultsTemplate defaults,
             IUserSaveRepository repository)
         {
-            _defaultsFactory = defaultsFactory ?? throw new ArgumentNullException(nameof(defaultsFactory));
+            _defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
@@ -37,7 +37,7 @@ namespace LL.User.Persistence
                 Debug.LogWarning("User document is corrupted. Resetting user data.");
             }
 
-            var defaultSnapshot = _defaultsFactory.CreateSnapshot();
+            var defaultSnapshot = _defaults.CreateSnapshot();
             _repository.Save(defaultSnapshot);
             return defaultSnapshot;
         }

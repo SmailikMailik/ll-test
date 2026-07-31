@@ -8,6 +8,8 @@ namespace LL.Game.Cards
 {
     internal sealed class CardCatalog
     {
+        internal IReadOnlyList<ICard> Cards { get; }
+
         private readonly IReadOnlyDictionary<ItemId, ICard> _cardsById;
 
         internal CardCatalog(IEnumerable<ICard> cards)
@@ -18,6 +20,7 @@ namespace LL.Game.Cards
                 card => card.Id,
                 nameof(cards));
 
+            Cards = Array.AsReadOnly(entries);
             _cardsById = entries.ToDictionary(card => card.Id);
         }
 

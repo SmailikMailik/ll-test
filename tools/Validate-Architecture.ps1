@@ -248,9 +248,9 @@ function Test-DomainDataLoaders {
 
         if (
             $content -match "IDataLoader<" -and
-            $file.Name -ne "UserSessionLoader.cs") {
+            $file.Name -notin @("UserDefaultsLoader.cs", "UserSessionLoader.cs")) {
             Add-ArchitectureError (
-                "User domain data may use IDataLoader only at UserSnapshot boundary: " +
+                "User domain data may use IDataLoader only at UserDefaultsTemplate or UserSnapshot boundary: " +
                 "$($file.FullName)")
         }
     }

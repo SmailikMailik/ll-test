@@ -30,13 +30,14 @@ namespace LL.Composition.Scopes
         protected override void Configure(IContainerBuilder builder)
         {
             var gameDataLoader = GameDataLoaderFactory.CreateFromScriptableObjects(_gameDataManifestConfig);
+            var userDefaultsSource = UserDefaultsSourceFactory.CreateFromScriptableObject(_userDefaultsConfig);
             var userSaveRepository = UserSaveRepositoryFactory.CreateJsonFile();
 
             new WindowInstaller(_windowCatalogConfig).Install(builder);
             new PresentationInstaller(_itemIconCatalogConfig).Install(builder);
             new ValidationReportingInstaller().Install(builder);
             new GameDataInstaller(gameDataLoader).Install(builder);
-            new UserInstaller(_userDefaultsConfig, userSaveRepository).Install(builder);
+            new UserInstaller(userDefaultsSource, userSaveRepository).Install(builder);
             new GameServicesInstaller().Install(builder);
         }
     }

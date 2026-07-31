@@ -1,7 +1,8 @@
 using System;
 using LL.Game.Ranks;
 using LL.Infrastructure.Loading;
-using LL.User.Configuration;
+using LL.User.Defaults;
+using LL.User.Defaults.Sources;
 using LL.User.Persistence;
 using LL.User.Snapshots;
 using LL.User.State;
@@ -15,21 +16,24 @@ namespace LL.Composition.Installers
 {
     internal sealed class UserInstaller : IInstaller
     {
-        private readonly IUserDefaultsFactory _defaultsFactory;
+        private readonly IUserDefaultsSource _defaultsSource;
         private readonly IUserSaveRepository _saveRepository;
 
         internal UserInstaller(
-            IUserDefaultsFactory defaultsFactory,
+            IUserDefaultsSource defaultsSource,
             IUserSaveRepository saveRepository)
         {
-            _defaultsFactory = defaultsFactory ?? throw new ArgumentNullException(nameof(defaultsFactory));
+            _defaultsSource = defaultsSource ?? throw new ArgumentNullException(nameof(defaultsSource));
             _saveRepository = saveRepository ?? throw new ArgumentNullException(nameof(saveRepository));
         }
 
         public void Install(IContainerBuilder builder)
         {
-            builder.RegisterInstance(_defaultsFactory);
+            builder.RegisterInstance(_defaultsSource);
             builder.RegisterInstance(_saveRepository);
+            builder.Register<UserDefaultsCompiler>(Lifetime.Singleton);
+            builder.Register<UserDefaultsLoader>(Lifetime.Singleton).As<IDataLoader<UserDefaultsTemplate>>();
+            builder.RegisterLoadedData<UserDefaultsTemplate>();
             builder.Register<UserSessionLoader>(Lifetime.Singleton).As<IDataLoader<UserSnapshot>>();
             builder.RegisterLoadedData<UserSnapshot>();
             builder.RegisterSnapshotPart<UserSnapshot, UserIdentitySnapshot>(snapshot => snapshot.Identity);

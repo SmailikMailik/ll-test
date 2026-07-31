@@ -194,7 +194,11 @@ flowchart LR
     Mapper["UserSaveDocumentMapper"]
     Snapshot["UserSnapshot"]
     Loader["UserSessionLoader"]
-    Defaults["UserDefaultsConfig"]
+    Config["UserDefaultsConfig"]
+    Source["IUserDefaultsSource"]
+    Declaration["UserDefaultsDeclaration"]
+    Compiler["UserDefaultsCompiler"]
+    Defaults["UserDefaultsTemplate"]
     State["UserState"]
     Coordinator["UserSaveCoordinator"]
 
@@ -203,6 +207,10 @@ flowchart LR
     Document --> Mapper
     Mapper --> Snapshot
     Repository --> Loader
+    Config --> Source
+    Source --> Declaration
+    Declaration --> Compiler
+    Compiler --> Defaults
     Defaults --> Loader
     Loader --> Snapshot
     Snapshot --> State
@@ -214,16 +222,23 @@ flowchart LR
     Document --> Storage
 ```
 
-`UserSessionLoader` сначала пытается загрузить сохранение. Если файла нет, он повреждён или имеет неподдерживаемую
-версию, загрузчик создаёт `UserSnapshot` из `UserDefaultsConfig` и сохраняет его. Во время сессии `UserState`
-объединяет изменяемые части состояния. `UserSaveCoordinator` подписывается на `UserState.Changed`, создаёт новый
-снимок и передаёт его репозиторию.
+`IUserDefaultsSource` преобразует конкретный источник начальных значений в `UserDefaultsDeclaration`.
+`UserDefaultsCompiler` проверяет стартовый ранг, допустимый опыт и наличие всех предметов, используемых встроенными
+правилами, картами, оплатами и наградами, после чего создаёт `UserDefaultsTemplate`. `UserSessionLoader` сначала
+пытается загрузить сохранение. Если файла нет, он повреждён или имеет неподдерживаемую версию, загрузчик создаёт
+`UserSnapshot` из шаблона и сохраняет его. Во время сессии `UserState` объединяет изменяемые части состояния.
+`UserSaveCoordinator` подписывается на `UserState.Changed`, создаёт новый снимок и передаёт его репозиторию.
 
 ### Файлы пользовательского потока
 
 | Файл или группа | Ответственность |
 | --- | --- |
-| `Configuration/UserDefaultsConfig.cs` | Начальные значения пользователя и фабрика снимка по умолчанию |
+| `Configuration/UserDefaultsConfig.cs` | Unity-authoring начальных значений пользователя |
+| `Defaults/Sources/IUserDefaultsSource.cs` | Контракт любого источника начальных значений |
+| `Defaults/Sources/ScriptableObjectUserDefaultsSource.cs` | Преобразование Unity-конфига в source-neutral declaration |
+| `Defaults/Declarations/*Declaration.cs` | Не проверенное представление начальных значений без зависимости от источника |
+| `Defaults/UserDefaultsCompiler.cs` | Runtime-проверка ссылок и построение согласованного шаблона |
+| `Defaults/UserDefaultsTemplate.cs` | Неизменяемые начальные значения для создания нового пользователя |
 | `Persistence/Documents/UserSaveDocument.cs` | Корневой версионируемый контракт сохранения |
 | `Persistence/Documents/*DocumentEntry.cs` | Сериализуемые части identity, progress, rank-up quest и inventory |
 | `Persistence/UserSaveDocumentMapper.cs` | Двустороннее преобразование `UserSaveDocument` ↔ `UserSnapshot` |
@@ -236,6 +251,7 @@ flowchart LR
 | `State/UserState.cs` | Объединить изменяемые части сессии и сообщать об их изменениях |
 | `State/Items`, `State/Progress`, `State/RankUp` | Изменяемое поведение отдельных пользовательских возможностей |
 | `Persistence/UserSaveCoordinator.cs` | Сохранять новый снимок после изменения состояния |
+| `Composition/Factories/UserDefaultsSourceFactory.cs` | Выбрать конкретный источник начальных значений |
 | `Composition/Factories/UserSaveRepositoryFactory.cs` | Собрать JSON-сериализацию, файловое хранилище и репозиторий |
 | `Composition/Installers/UserInstaller.cs` | Зарегистрировать загрузку снимка, состояние и автосохранение в DI |
 
@@ -249,7 +265,15 @@ flowchart LR
 4. Проверить в `GameDataCompiler` валидацию и создание доменного типа.
 5. Найти итоговый `Catalog` в `GameDataSnapshot`.
 
-Для пользовательских данных:
+Для начальных пользовательских данных:
+
+1. Найти значение в `UserDefaultsConfig`.
+2. Проверить преобразование в `ScriptableObjectUserDefaultsSource`.
+3. Проверить соответствующий `Defaults/Declarations/*Declaration`.
+4. Проверить runtime-валидацию в `UserDefaultsCompiler`.
+5. Найти итоговое значение в `UserDefaultsTemplate`.
+
+Для сохранённого состояния пользователя:
 
 1. Проверить JSON и соответствующий `*DocumentEntry`.
 2. Проверить преобразование в `UserSaveDocumentMapper`.

@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using LL.Game.Items;
 using LL.Game.Ranks;
-using LL.User.Snapshots;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,7 +10,7 @@ namespace LL.User.Configuration
 {
     [CreateAssetMenu(fileName = nameof(UserDefaultsConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsFactory, IValidationSource
+    internal sealed class UserDefaultsConfig : ScriptableObject, IValidationSource
     {
         [BoxGroup("Identity")]
         [HideLabel]
@@ -37,17 +35,6 @@ namespace LL.User.Configuration
         internal UserProgressDefaults Progress => _progress;
         internal IReadOnlyList<ItemAmountEntry> Items => _items;
 
-        UserSnapshot IUserDefaultsFactory.CreateSnapshot()
-        {
-            ValidationRunner.EnsureValid(this);
-
-            return new UserSnapshot(
-                Identity.ToSnapshot(),
-                new UserItemsSnapshot(Items.Select(item => item.ToItemAmount())),
-                Progress.ToSnapshot(),
-                UserRankUpQuestSnapshot.Empty);
-        }
-
         private static bool HasValidItems(ItemAmountEntry[] entries)
         {
             return ValidationRunner.IsValid(entries, _itemsValidator);
@@ -71,8 +58,6 @@ namespace LL.User.Configuration
 
         internal string UserId => _userId;
         internal string RegionCode => _regionCode;
-
-        internal UserIdentitySnapshot ToSnapshot() => new(UserId, RegionCode);
     }
 
     [Serializable]
@@ -88,8 +73,6 @@ namespace LL.User.Configuration
 
         internal RankId RankId => new(_rankId);
         internal int Experience => _experience;
-
-        internal UserProgressSnapshot ToSnapshot() => new(RankId, Experience);
     }
 
     [Serializable]
@@ -103,7 +86,5 @@ namespace LL.User.Configuration
 
         internal ItemId Id => new(_id);
         internal int Amount => _amount;
-
-        internal ItemAmount ToItemAmount() => new(Id, Amount);
     }
 }

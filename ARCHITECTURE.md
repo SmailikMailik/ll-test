@@ -137,6 +137,8 @@ and use-case services.
 Owns user-specific defaults, persisted user representation, immutable loaded snapshots, and live mutable user state.
 
 - `Configuration` owns authored defaults and their validation.
+- `Defaults` owns the source-neutral defaults pipeline: declarations, source adapters, runtime compilation, and the
+  immutable template used to initialize a user without a valid save.
 - `Persistence` owns the user repository, session loading and save coordination, document mapping, and version
   handling.
 - `Snapshots` owns immutable point-in-time user data.
@@ -255,6 +257,7 @@ Use the most specific applicable suffix:
 - `Entry`: one serialized authoring row nested under a configuration.
 - `DocumentEntry`: one serialized transport row nested under a `Document`.
 - `Declaration`: normalized, source-neutral, not-yet-trusted data prepared for compilation into runtime meaning.
+- `Template`: immutable compiled initial values used to create a new aggregate.
 - `Definition`: immutable domain description used by game rules.
 - `Catalog`: immutable indexed collection of definitions or resources.
 - `Snapshot`: immutable, internally consistent point-in-time aggregate.
@@ -301,11 +304,12 @@ Sources and repositories own I/O. Mappers only convert representations. Compiler
 reference resolution. Domain and state code must not read JSON, files, PlayerPrefs, or `ScriptableObject` fields
 directly.
 
-For game and user domain data, use `IDataLoader<T>` only for an application-level aggregate snapshot such as
-`GameDataSnapshot` or `UserSnapshot`. Do not implement it on individual domain catalog configs or other partial
-domain data. A whole-data load registers one aggregate snapshot once; consumers receive the snapshot or its owned
-parts, never a concrete source, repository, or compiler. Presentation and UI resource catalogs may retain focused
-loaders because they are independently owned runtime resources rather than partial domain aggregates.
+For game and user domain data, use `IDataLoader<T>` only for an application-level aggregate such as
+`GameDataSnapshot`, `UserDefaultsTemplate`, or `UserSnapshot`. Do not implement it on individual domain catalog
+configs or other partial domain data. A whole-data load registers one aggregate once; consumers receive the
+aggregate or its owned parts, never a concrete source, repository, or compiler. Presentation and UI resource
+catalogs may retain focused loaders because they are independently owned runtime resources rather than partial
+domain aggregates.
 
 ## Authored asset placement
 
@@ -349,10 +353,11 @@ A scope registers small scene-local composition directly and constructs larger i
 Installers are not DI services and their constructors do not use `[Inject]`. Runtime services, controllers, flows,
 and MonoBehaviour injection methods resolved by VContainer do use `[Inject]`.
 
-The project scope selects concrete game-data and user-persistence policies through named factory methods, then passes
-the resulting `IDataLoader<GameDataSnapshot>` and `IUserSaveRepository` abstractions to their installers. Installers
-register the supplied policies but do not choose ScriptableObject, file, PlayerPrefs, or another storage technology.
-Changing a runtime data source is therefore a composition-root change rather than an installer or consumer change.
+The project scope selects concrete game-data, user-defaults, and user-persistence policies through named factory
+methods, then passes the resulting `IDataLoader<GameDataSnapshot>`, `IUserDefaultsSource`, and
+`IUserSaveRepository` abstractions to their installers. Installers register the supplied policies but do not choose
+ScriptableObject, file, PlayerPrefs, or another storage technology. Changing a runtime data source is therefore a
+composition-root change rather than an installer or consumer change.
 
 The project scope is auto-created from `VContainerSettings`; the bootstrap scene must not create another project
 scope. Scene scopes inherit project registrations through the configured parent relationship.
@@ -383,19 +388,25 @@ compiler validates aggregate identifiers and references or creates domain defini
 ### User state
 
 ```text
-IUserDefaultsFactory -----\
-                          -> UserSessionLoader -> UserSnapshot -> UserState
-IUserSaveRepository ------/
+UserDefaultsConfig
+    -> IUserDefaultsSource
+    -> UserDefaultsDeclaration
+    -> UserDefaultsCompiler
+    -> UserDefaultsTemplate -----\
+                                  -> UserSessionLoader -> UserSnapshot -> UserState
+IUserSaveRepository -------------/
 
 UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
                                          -> UserSaveDocumentMapper
                                          -> UserSaveDocument
 ```
 
-The defaults factory creates a fresh valid snapshot. The repository owns the persisted user document and reports a
-semantic load result; it does not decide whether defaults should replace missing, corrupt, or unsupported data.
-`UserSessionLoader` owns that startup policy. `UserState` is the single mutable aggregate, emits one change
-notification per successful logical mutation, and creates the complete snapshot saved by `UserSaveCoordinator`.
+The defaults source normalizes authoring data without exposing its storage technology. `UserDefaultsCompiler`
+validates references against the loaded rank and card catalogs and creates an immutable template. The repository
+owns the persisted user document and reports a semantic load result; it does not decide whether defaults should
+replace missing, corrupt, or unsupported data. `UserSessionLoader` owns that startup policy. `UserState` is the
+single mutable aggregate, emits one change notification per successful logical mutation, and creates the complete
+snapshot saved by `UserSaveCoordinator`.
 
 Snapshots are immutable load-boundary values. State objects are the only long-lived mutable representation. Current
 user documents start at version `1`; future version changes require explicit migration rather than compatibility
