@@ -106,6 +106,12 @@ try {
         "using UnityEditor;`n`ninternal static class ProjectMenu`n{`n" +
             "    [MenuItem(`"Project/Deliberately Long Menu Item That Must Remain On One Physical Line Regardless Of The General Hard Line Limit`", false, 123)]`n" +
             "    private static void Run() { }`n}")
+    [IO.File]::WriteAllText(
+        (Join-Path $validStyleRoot "Scripts/Game/LongGuard.cs"),
+        "using System;`n`ninternal sealed class LongGuard`n{`n" +
+            "    private readonly object _dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException;`n`n" +
+            "    internal LongGuard(object dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException)`n    {`n" +
+            "        _dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException = dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException ?? throw new ArgumentNullException(nameof(dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException));`n    }`n}")
     Invoke-ExpectedResult `
         -Name "Valid code style" `
         -Script $codeStyleValidator `
@@ -187,6 +193,34 @@ try {
         -Arguments @("-ProjectAssetsRoot", $invalidMenuItemRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "MenuItem attribute must remain on one physical line"
+
+    $invalidThrowExpressionRoot = Join-Path $fixtureRoot "style-invalid-throw-expression"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidThrowExpressionRoot "Scripts/Game")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidThrowExpressionRoot "Scripts/Game/Guard.cs"),
+        "using System;`n`ninternal sealed class Guard`n{`n    private readonly object _dependency;`n`n" +
+            "    internal Guard(object dependency)`n    {`n        _dependency = dependency ??`n" +
+            "            throw new ArgumentNullException(nameof(dependency));`n    }`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid null-coalescing throw layout" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidThrowExpressionRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Null-coalescing throw expression must remain on one physical line"
+
+    $invalidMultilineThrowRoot = Join-Path $fixtureRoot "style-invalid-multiline-throw"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidMultilineThrowRoot "Scripts/Game")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidMultilineThrowRoot "Scripts/Game/Guard.cs"),
+        "using System;`n`ninternal sealed class Guard`n{`n    private readonly object _dependency;`n`n" +
+            "    internal Guard(object dependency)`n    {`n        _dependency = dependency ?? throw new ArgumentNullException(`n" +
+            "            nameof(dependency));`n    }`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid multiline thrown expression" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidMultilineThrowRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Null-coalescing throw expression must remain on one physical line"
 } finally {
     $resolvedFixtureRoot = [IO.Path]::GetFullPath($fixtureRoot)
     $resolvedTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
@@ -205,3 +239,4 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Output "Convention validator tests passed."
+exit 0

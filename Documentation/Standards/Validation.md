@@ -65,7 +65,7 @@ Coverage labels mean:
 | Selected DI, data-boundary, and user-state dependencies | Partial | `tools/Validate-Architecture.ps1` |
 | Root authored-configuration coverage in `Last Level/Content` | Automated | `tools/Validate-Architecture.ps1` |
 | Ownership, abstraction value, and feature placement | Review | Architecture review |
-| Enum representation, C# file ending, `MenuItem` layout, and hard line length | Automated | `tools/Validate-CodeStyle.ps1` |
+| Enum representation, C# file ending, hard-limit exception layout, and hard line length | Automated | `tools/Validate-CodeStyle.ps1` |
 | Attribute layout, empty bodies, and simple expression wrapping | Partial | `tools/Validate-CodeStyle.ps1` |
 | DI constructor marking, R3 lifetime, and component multiplicity | Partial | `tools/Validate-CodeStyle.ps1` |
 | Unity null semantics, callback prefixes, and bound identifiers | Partial | `tools/Validate-CodeStyle.ps1` |

@@ -187,6 +187,34 @@ foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter
         }
     }
 
+    foreach ($throwExpressionMatch in [regex]::Matches(
+        $codeOnly,
+        "(?m)(?:\?\?[ \t]*\r?\n[ \t]*throw\b|[^\r\n;]+\r?\n[ \t]*\?\?[ \t]*throw\b)")) {
+        $lineNumber = [regex]::Matches(
+            $codeOnly.Substring(0, $throwExpressionMatch.Index),
+            "\r\n|\r|\n").Count + 1
+        Add-CodeStyleError (
+            "Null-coalescing throw expression must remain on one physical line: " +
+            "$($file.FullName):$lineNumber")
+    }
+
+    foreach ($throwExpressionMatch in [regex]::Matches(
+        $codeOnly,
+        "(?m)\?\?[ \t]+throw\b[^\r\n]*")) {
+        $throwExpression = $throwExpressionMatch.Value
+        $openParentheses = [regex]::Matches($throwExpression, "\(").Count
+        $closeParentheses = [regex]::Matches($throwExpression, "\)").Count
+
+        if ($openParentheses -gt $closeParentheses) {
+            $lineNumber = [regex]::Matches(
+                $codeOnly.Substring(0, $throwExpressionMatch.Index),
+                "\r\n|\r|\n").Count + 1
+            Add-CodeStyleError (
+                "Null-coalescing throw expression must remain on one physical line: " +
+                "$($file.FullName):$lineNumber")
+        }
+    }
+
     foreach ($callbackMatch in [regex]::Matches(
         $codeOnly,
         "\.Subscribe\s*\(\s*(?<name>(?!On)[A-Za-z_][A-Za-z0-9_]*)\s*\)")) {
@@ -277,7 +305,11 @@ foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter
     foreach ($line in [IO.File]::ReadLines($file.FullName)) {
         $lineNumber++
 
-        if ($line.Length -gt 140 -and $line -notmatch "^\s*\[MenuItem\s*\(") {
+        $isHardLimitException =
+            $line -match "^\s*\[MenuItem\s*\(" -or
+            $line -match "\?\?[ \t]+throw\b"
+
+        if ($line.Length -gt 140 -and $isHardLimitException -eq $false) {
             Add-CodeStyleError "Line exceeds the hard limit of 140 characters: $($file.FullName):$lineNumber"
         }
     }

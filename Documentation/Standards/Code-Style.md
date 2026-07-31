@@ -10,11 +10,22 @@ These rules apply to C# under `Assets/_Project`. Generated and third-party code 
 
 - Treat 120 characters as the point at which wrapping deserves a readability decision.
 - Lines from 121 through 140 characters may remain intact when the single-line form is clearer.
-- Never exceed 140 characters except for a single-line Unity Editor `[MenuItem(...)]` attribute.
+- Never exceed 140 characters except for the constructs listed under [Hard-limit exceptions](#hard-limit-exceptions).
 - Keep a simple assignment, expression, or invocation with one expression or lambda argument on one line when it
   fits within 120 characters.
 - Do not break immediately after an assignment operator merely to shorten a line.
 - End every C# file immediately after its final non-empty line, without a trailing `LF` or `CRLF` character.
+
+### Hard-limit exceptions
+
+The following constructs must remain complete on one physical line regardless of length. They are the only
+exceptions to the 140-character hard limit:
+
+- A Unity Editor `[MenuItem(...)]` attribute.
+- A null-coalescing throw expression containing `?? throw`, from its left operand through the thrown expression.
+
+Add any future hard-limit exception to this list and make narrower sections link here instead of restating the
+exception set.
 
 ## Expressions and null checks
 
@@ -23,9 +34,9 @@ These rules apply to C# under `Assets/_Project`. Generated and third-party code 
 - Check ordinary managed references with `is null` and `is not null`, not `== null` or `!= null`.
 - Check references whose static type is `UnityEngine.Object` or a derived Unity type with `== null` and `!= null` so
   Unity's destroyed-object fake-null semantics are preserved.
-- In DI constructors and injection methods, directly assign a required dependency with
-  `_dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));` when it fits within the hard
-  line limit. Otherwise wrap the expression without creating an exception to the limit.
+- Keep every null-coalescing throw expression in the form
+  `_dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));` on one physical line, as
+  required by [Hard-limit exceptions](#hard-limit-exceptions).
 - When a dependency is not assigned directly, use a conventional `if` guard followed by
   `throw new ArgumentNullException(...)`.
 
@@ -44,8 +55,7 @@ These rules apply to C# under `Assets/_Project`. Generated and third-party code 
 ## Attributes and serialized fields
 
 - Place attributes applied to types, constructors, methods, properties, and other members on separate lines.
-- Keep each Unity Editor `[MenuItem(...)]` attribute complete on one physical line regardless of its length. This is
-  the only exception to the 140-character hard limit.
+- Follow the single-line `[MenuItem(...)]` rule in [Hard-limit exceptions](#hard-limit-exceptions).
 - Keep `[SerializeField]` and `[JsonProperty]` inline with the field declaration.
 - Combine serialized-field constraints and decorators into the same attribute list, for example
   `[SerializeField, Min(0f), Tooltip("Duration in seconds.")] private float _duration;`.
