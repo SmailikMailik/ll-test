@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Heroes;
+using LL.Presentation.Sprites;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -42,6 +43,10 @@ namespace LL.Presentation.Heroes.Configuration
         internal Sprite SmallPortrait => _smallPortrait;
         internal Sprite LargePortrait => _largePortrait;
 
-        internal HeroPortraitDefinition ToDefinition() => new(HeroId, SmallPortrait, LargePortrait);
+        internal IEnumerable<SpriteVariant<HeroId, HeroPortraitSize>> ToVariants()
+        {
+            yield return new SpriteVariant<HeroId, HeroPortraitSize>(HeroId, HeroPortraitSize.Small, SmallPortrait);
+            yield return new SpriteVariant<HeroId, HeroPortraitSize>(HeroId, HeroPortraitSize.Large, LargePortrait);
+        }
     }
 }

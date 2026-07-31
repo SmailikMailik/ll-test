@@ -178,6 +178,8 @@ catalogs, and presentation-facing confirmations.
 - Presentation must not own reusable visual controls, concrete feature views, navigation, or game rules.
 - Presentation must not depend on `UI`.
 - Presentation-specific configuration stays with its presentation capability.
+- `Presentation/Sprites` owns reusable runtime sprite catalogs. `SpriteCatalog<TId>` maps one sprite to a domain ID;
+  `SpriteVariantCatalog<TId, TVariant>` maps multiple explicitly named variants to each domain ID.
 - `Presentation/Heroes` owns the independently loaded small and large portrait resources keyed by `HeroId`.
   Portrait data remains static sprites; optional animation is view behavior and does not change hero definitions.
   The current large portrait is a single composed hero-and-background image. When separate art becomes available,
@@ -460,9 +462,10 @@ WindowCatalogConfig -> ScriptableObjectWindowCatalogLoader -> WindowCatalog -> W
 The focused presentation catalog follows the same authored-resource boundary:
 
 ```text
-ItemIconCatalogConfig -> ScriptableObjectItemIconCatalogLoader -> IconCatalog<ItemId>
-CountryFlagCatalogConfig -> ScriptableObjectCountryFlagCatalogLoader -> IconCatalog<CountryId>
-HeroPortraitCatalogConfig -> ScriptableObjectHeroPortraitCatalogLoader -> HeroPortraitCatalog
+ItemIconCatalogConfig -> ScriptableObjectItemIconCatalogLoader -> SpriteCatalog<ItemId>
+CountryFlagCatalogConfig -> ScriptableObjectCountryFlagCatalogLoader -> SpriteCatalog<CountryId>
+HeroPortraitCatalogConfig -> ScriptableObjectHeroPortraitCatalogLoader
+    -> SpriteVariantCatalog<HeroId, HeroPortraitSize>
 ```
 
 `HeroView` resolves a hero name and country flag from `HeroId` and composes a small `HeroPortraitView`.

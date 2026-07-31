@@ -3,11 +3,12 @@ using System.Linq;
 using LL.Game.Items;
 using LL.Infrastructure.Loading;
 using LL.Presentation.Icons.Configuration;
+using LL.Presentation.Sprites;
 using LL.Validation;
 
 namespace LL.Presentation.Icons.Loading
 {
-    internal sealed class ScriptableObjectItemIconCatalogLoader : IDataLoader<IconCatalog<ItemId>>
+    internal sealed class ScriptableObjectItemIconCatalogLoader : IDataLoader<SpriteCatalog<ItemId>>
     {
         private readonly ItemIconCatalogConfig _config;
 
@@ -16,11 +17,11 @@ namespace LL.Presentation.Icons.Loading
             _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
-        public IconCatalog<ItemId> Load()
+        public SpriteCatalog<ItemId> Load()
         {
             ValidationRunner.EnsureValid(_config);
 
-            return new IconCatalog<ItemId>(_config.Icons.Select(entry => entry.ToPair()));
+            return new SpriteCatalog<ItemId>(_config.Icons.Select(entry => entry.ToPair()));
         }
     }
 }

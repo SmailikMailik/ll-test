@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LL.Game.Cards;
 using LL.Game.Cards.Services;
 using LL.Game.Items;
-using LL.Presentation.Icons;
+using LL.Presentation.Sprites;
 using LL.Presentation.Typography;
 using LL.UI.Controls;
 using LL.UI.VisualStates.Sources;
@@ -42,14 +42,14 @@ namespace LL.UI.Windows.Upgrade.Cards
 
         private IUserItems _userItems;
         private ICardCollectionService _cardCollectionService;
-        private IconCatalog<ItemId> _iconCatalog;
+        private SpriteCatalog<ItemId> _iconCatalog;
         private bool _isInitialized;
 
         [Inject]
         private void Construct(
             IUserItems userItems,
             ICardCollectionService cardCollectionService,
-            IconCatalog<ItemId> iconCatalog)
+            SpriteCatalog<ItemId> iconCatalog)
         {
             _userItems = userItems ?? throw new ArgumentNullException(nameof(userItems));
             _cardCollectionService = cardCollectionService ?? throw new ArgumentNullException(nameof(cardCollectionService));
@@ -67,7 +67,7 @@ namespace LL.UI.Windows.Upgrade.Cards
             if (string.IsNullOrWhiteSpace(card.Id.Value))
                 throw new ArgumentException("Card Id cannot be empty.", nameof(card));
 
-            if (_iconCatalog.TryGetIcon(card.Id, out var icon) is false)
+            if (_iconCatalog.TryGetSprite(card.Id, out var icon) is false)
                 throw new KeyNotFoundException($"Missing icon for Card Id: {card.Id}");
 
             _isInitialized = true;

@@ -1,8 +1,8 @@
 using System;
 using LL.Game.Countries;
 using LL.Game.Heroes;
-using LL.Presentation.Icons;
 using LL.Presentation.Localization;
+using LL.Presentation.Sprites;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -19,7 +19,7 @@ namespace LL.UI.Views.Heroes
         [SerializeField] private string _initialHeroId;
 
         private HeroCatalog _heroes;
-        private IconCatalog<CountryId> _flags;
+        private SpriteCatalog<CountryId> _flags;
         private ILocalizationService _localization;
         private HeroId _heroId;
         private bool _hasHero;
@@ -27,7 +27,7 @@ namespace LL.UI.Views.Heroes
         [Inject]
         private void Construct(
             HeroCatalog heroes,
-            IconCatalog<CountryId> flags,
+            SpriteCatalog<CountryId> flags,
             ILocalizationService localization)
         {
             _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
@@ -47,7 +47,7 @@ namespace LL.UI.Views.Heroes
         {
             var hero = _heroes.GetHero(heroId);
 
-            if (_flags.TryGetIcon(hero.CountryId, out var flag) is false)
+            if (_flags.TryGetSprite(hero.CountryId, out var flag) is false)
                 throw new InvalidOperationException($"Flag for country '{hero.CountryId}' is not configured.");
 
             _heroId = heroId;
