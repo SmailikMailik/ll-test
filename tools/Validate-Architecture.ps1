@@ -13,6 +13,25 @@ function Add-ArchitectureError {
     $script:errors.Add($Message)
 }
 
+function Remove-CSharpCommentsAndLiterals {
+    param([string]$Content)
+
+    $pattern = @'
+(?msx)
+    ^[ \t]*\#[^\r\n]*
+  | //[^\r\n]*
+  | /\*.*?\*/
+  | (?:\$@|@\$|@)"(?:""|[^"])*"
+  | \$?"(?:\\.|[^"\\])*"
+  | '(?:\\.|[^'\\])*'
+'@
+
+    return [regex]::Replace(
+        $Content,
+        $pattern,
+        { param($match) [regex]::Replace($match.Value, "[^\r\n]", " ") })
+}
+
 function Test-NamespaceTree {
     param(
         [string]$Root,
@@ -101,11 +120,13 @@ function Test-RuntimeDependencies {
                     if ($targetArea -in @("Game", "User")) {
                         $true
                     } elseif (
-                        $targetArea -in @("Infrastructure", "Validation") -and
+                        $targetArea -eq "Infrastructure" -and
                         (
                             $sourceNamespace -like "LL.Presentation.*.Configuration*" -or
                             $sourceNamespace -like "LL.Presentation.*.Loading*"
                         )) {
+                        $true
+                    } elseif ($targetArea -eq "Validation") {
                         $true
                     } else {
                         $false
@@ -394,6 +415,7 @@ Test-UserStateCommandConsumers
 foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recurse -Filter "*.cs") {
     $content = [IO.File]::ReadAllText($file.FullName)
     $bytes = [IO.File]::ReadAllBytes($file.FullName)
+    $codeOnly = Remove-CSharpCommentsAndLiterals $content
 
     if ($bytes.Length -gt 0 -and $bytes[$bytes.Length - 1] -in 10, 13) {
         Add-ArchitectureError "C# file has a trailing newline: $($file.FullName)"
@@ -401,6 +423,19 @@ foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recu
 
     if ($content -match "\bFormerlySerializedAs\s*\(") {
         Add-ArchitectureError "FormerlySerializedAs is not allowed; migrate serialized keys: $($file.FullName)"
+    }
+
+    $unaryNotMatch = [regex]::Match(
+        $codeOnly,
+        "(?m)(?:^[ \t]*|[({\[=,:;?&|+\-*/%^<>][ \t]*|\b(?:return|case|throw)[ \t]+)" +
+            "!(?!=)[ \t]*(?=[A-Za-z_(])")
+
+    if ($unaryNotMatch.Success) {
+        $lineNumber = [regex]::Matches(
+            $codeOnly.Substring(0, $unaryNotMatch.Index),
+            "\r\n|\r|\n").Count + 1
+        Add-ArchitectureError (
+            "Use 'is false' instead of unary Boolean negation: $($file.FullName):$lineNumber")
     }
 
     if ($content -match "(?m)^[ \t]*\[[^\]\r\n]+\][ \t]*\[[^\]\r\n]+\]") {

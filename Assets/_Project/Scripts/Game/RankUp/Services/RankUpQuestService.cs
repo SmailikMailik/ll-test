@@ -16,7 +16,7 @@ namespace LL.Game.RankUp.Services
 
         public bool TryStart(RankUpQuest quest)
         {
-            if (quest == null)
+            if (quest is null)
                 throw new ArgumentNullException(nameof(quest));
 
             return _commands.TryStart(quest.QuestId, quest.Duration);

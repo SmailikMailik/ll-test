@@ -1,5 +1,7 @@
 using System;
+using LL.Game.Identifiers;
 using LL.Game.Items;
+using LL.Validation;
 
 namespace LL.Game.Cards
 {
@@ -10,10 +12,9 @@ namespace LL.Game.Cards
 
         internal Card(ItemId id, int experienceAmount)
         {
-            if (string.IsNullOrWhiteSpace(id.Value))
-                throw new ArgumentException("Card ID must be non-empty.", nameof(id));
+            IdentifierValidator.EnsureValid(id, nameof(id));
 
-            if (experienceAmount <= 0)
+            if (ValidationChecks.IsNonPositive(experienceAmount))
                 throw new ArgumentOutOfRangeException(
                     nameof(experienceAmount),
                     experienceAmount,

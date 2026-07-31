@@ -1,6 +1,7 @@
 using System;
 using LL.Game.Identifiers;
 using LL.Game.Quests;
+using LL.Validation;
 
 namespace LL.User.Snapshots
 {
@@ -17,7 +18,9 @@ namespace LL.User.Snapshots
             long deadlineUnixMilliseconds,
             bool isCompleted)
         {
-            if (string.IsNullOrWhiteSpace(questId.Value))
+            var hasQuest = ValidationChecks.IsNotEmpty(questId.Value);
+
+            if (hasQuest is false)
             {
                 if (deadlineUnixMilliseconds != 0L)
                     throw new ArgumentException(
@@ -37,7 +40,7 @@ namespace LL.User.Snapshots
                     "Rank-up quest deadline must be greater than zero.");
             }
 
-            if (string.IsNullOrWhiteSpace(questId.Value) is false)
+            if (hasQuest)
                 IdentifierValidator.EnsureValid(questId, nameof(questId));
 
             QuestId = questId;

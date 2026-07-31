@@ -1,6 +1,7 @@
 using System;
 using LL.Game.Identifiers;
 using LL.Game.Ranks;
+using LL.Validation;
 
 namespace LL.User.Snapshots
 {
@@ -11,7 +12,7 @@ namespace LL.User.Snapshots
 
         internal UserProgressSnapshot(RankId rankId, int experience)
         {
-            if (experience < 0)
+            if (ValidationChecks.IsNegative(experience))
                 throw new ArgumentOutOfRangeException(
                     nameof(experience),
                     experience,

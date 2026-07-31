@@ -35,6 +35,12 @@
 - Write every empty C# body inline as `{ }` after its declaration. This applies to types, methods, constructors,
   local functions, operators, and accessors. For a multiline declaration, place `{ }` after its final signature
   line. Do not expand an empty body across separate lines.
+- Do not use the unary `!` operator to negate Boolean expressions in project C# code; write an explicit
+  `expression is false` pattern instead. This rule does not apply to the `!=` inequality operator or preprocessor
+  expressions, where C# pattern syntax is unavailable.
+- Check ordinary managed references for null with `is null` and `is not null`, not `== null` or `!= null`. Check
+  `UnityEngine.Object` instances and derived Unity objects with `== null` and `!= null` so destroyed-object fake-null
+  semantics are preserved; do not use `is null` or `is not null` for them.
 - Add `[DisallowMultipleComponent]` to `MonoBehaviour` components when multiple instances on one `GameObject` have no valid use.
 - Declare serialized fields first in a type, without `[Required]` by default; place constants immediately after them.
 - Declare every project enum with `byte` as its underlying type and assign explicit sequential values starting at `0`.

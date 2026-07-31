@@ -9,7 +9,7 @@ namespace LL.Game.Data.Persistence
     {
         internal static GameDataDeclaration ToDeclaration(GameDataDocument document)
         {
-            if (document == null)
+            if (document is null)
                 throw new ArgumentNullException(nameof(document));
 
             return new GameDataDeclaration(
@@ -34,7 +34,7 @@ namespace LL.Game.Data.Persistence
 
         private static RankUpDeclaration ToDeclaration(RankUpDocumentEntry rankUp)
         {
-            if (rankUp == null)
+            if (rankUp is null)
                 throw new ArgumentException("Rank-up data cannot contain null entries.");
 
             return new RankUpDeclaration(
@@ -50,7 +50,7 @@ namespace LL.Game.Data.Persistence
 
         private static PaymentDeclaration ToDeclaration(PaymentDocumentEntry payment)
         {
-            if (payment == null)
+            if (payment is null)
                 throw new ArgumentNullException(nameof(payment));
 
             return new PaymentDeclaration(payment.ItemId, payment.Amount);

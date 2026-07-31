@@ -214,7 +214,7 @@ namespace LL.UI.Windows.RankUp
 
         private void OnLocaleChanged()
         {
-            if (_rankUpQuestDefinition != null && _quest != null)
+            if (_rankUpQuestDefinition is not null && _quest is not null)
                 RefreshText(_rankUpQuestDefinition, _quest);
 
             RefreshButtonText();

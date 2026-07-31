@@ -20,7 +20,7 @@ namespace LL.Presentation.Countries.Configuration
             {
                 var entry = flags[index];
 
-                if (entry == null)
+                if (entry is null)
                     continue;
 
                 var entryContext = context.At(index);

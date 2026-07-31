@@ -3,6 +3,7 @@ using LL.Game.Heroes;
 using LL.Game.Identifiers;
 using LL.Game.Payments;
 using LL.Game.Quests;
+using LL.Validation;
 
 namespace LL.Game.RankUp
 {
@@ -24,7 +25,7 @@ namespace LL.Game.RankUp
             IdentifierValidator.EnsureValid(questId, nameof(questId));
             IdentifierValidator.EnsureValid(heroId, nameof(heroId));
 
-            if (requiredAmount <= 0)
+            if (ValidationChecks.IsNonPositive(requiredAmount))
                 throw new ArgumentOutOfRangeException(nameof(requiredAmount));
 
             if (duration <= TimeSpan.Zero)

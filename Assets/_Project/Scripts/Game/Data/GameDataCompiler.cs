@@ -29,7 +29,7 @@ namespace LL.Game.Data
 
         public GameDataSnapshot Compile(GameDataDeclaration declaration)
         {
-            if (declaration == null)
+            if (declaration is null)
                 throw new ArgumentNullException(nameof(declaration));
 
             ValidationRunner.EnsureValid(
@@ -169,7 +169,7 @@ namespace LL.Game.Data
 
         private static Payment ToPayment(PaymentDeclaration payment)
         {
-            if (payment == null)
+            if (payment is null)
                 throw new ArgumentNullException(nameof(payment));
 
             return new Payment(new ItemId(payment.ItemId), payment.Amount);

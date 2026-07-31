@@ -25,7 +25,7 @@ namespace LL.Game.Quests.Configuration
             {
                 var quest = quests[index];
 
-                if (quest == null)
+                if (quest is null)
                     continue;
 
                 var questContext = context.At(index);

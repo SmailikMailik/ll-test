@@ -23,7 +23,7 @@ namespace LL.Validation
 
         internal void Add(ValidationIssue issue)
         {
-            if (issue == null)
+            if (issue is null)
                 throw new ArgumentNullException(nameof(issue));
 
             _issues.Add(issue);

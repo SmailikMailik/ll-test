@@ -25,7 +25,7 @@ namespace LL.User.Configuration
             {
                 var item = items[index];
 
-                if (item == null)
+                if (item is null)
                     continue;
 
                 ValidationRules.NonNegative(

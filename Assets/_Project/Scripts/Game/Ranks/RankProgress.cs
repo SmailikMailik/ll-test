@@ -17,7 +17,7 @@ namespace LL.Game.Ranks
             RankDefinition nextRank,
             int experience)
         {
-            if (rank == null)
+            if (rank is null)
                 throw new ArgumentNullException(nameof(rank));
 
             RankId = rank.Id;
@@ -25,10 +25,10 @@ namespace LL.Game.Ranks
             NextRankId = nextRank?.Id ?? default;
             Experience = experience;
             RequiredExperience = nextRank?.RequiredExperience ?? 0;
-            RemainingExperience = nextRank != null
+            RemainingExperience = nextRank is not null
                 ? Math.Max(0, RequiredExperience - experience)
                 : 0;
-            HasNextRank = nextRank != null;
+            HasNextRank = nextRank is not null;
         }
 
         internal float GetNormalizedExperience(int experience)

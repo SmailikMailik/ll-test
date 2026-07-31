@@ -12,7 +12,7 @@ namespace LL.User.Persistence
     {
         internal static UserSnapshot ToSnapshot(UserSaveDocument saveData)
         {
-            if (saveData == null)
+            if (saveData is null)
                 throw new ArgumentNullException(nameof(saveData));
 
             return new UserSnapshot(
@@ -31,7 +31,7 @@ namespace LL.User.Persistence
 
         internal static UserSaveDocument ToDocument(UserSnapshot snapshot)
         {
-            if (snapshot == null)
+            if (snapshot is null)
                 throw new ArgumentNullException(nameof(snapshot));
 
             return new UserSaveDocument(

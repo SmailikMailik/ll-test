@@ -1,4 +1,6 @@
 using System;
+using LL.Game.Identifiers;
+using LL.Validation;
 
 namespace LL.Game.Quests
 {
@@ -13,13 +15,12 @@ namespace LL.Game.Quests
             string titleLocalizationKey,
             string descriptionLocalizationKey)
         {
-            if (string.IsNullOrWhiteSpace(id.Value))
-                throw new ArgumentException("Quest ID must be non-empty.", nameof(id));
+            IdentifierValidator.EnsureValid(id, nameof(id));
 
-            if (string.IsNullOrWhiteSpace(titleLocalizationKey))
+            if (ValidationChecks.IsEmpty(titleLocalizationKey))
                 throw new ArgumentException("Quest title localization key must be non-empty.");
 
-            if (string.IsNullOrWhiteSpace(descriptionLocalizationKey))
+            if (ValidationChecks.IsEmpty(descriptionLocalizationKey))
                 throw new ArgumentException("Quest description localization key must be non-empty.");
 
             Id = id;

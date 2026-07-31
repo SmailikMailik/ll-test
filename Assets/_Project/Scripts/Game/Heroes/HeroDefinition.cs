@@ -1,6 +1,7 @@
 using System;
 using LL.Game.Countries;
 using LL.Game.Identifiers;
+using LL.Validation;
 
 namespace LL.Game.Heroes
 {
@@ -17,7 +18,7 @@ namespace LL.Game.Heroes
         {
             IdentifierValidator.EnsureValid(id, nameof(id));
 
-            if (string.IsNullOrWhiteSpace(nameLocalizationKey))
+            if (ValidationChecks.IsEmpty(nameLocalizationKey))
                 throw new ArgumentException("Hero name localization key must be non-empty.", nameof(nameLocalizationKey));
 
             CountryIdValidator.EnsureValid(countryId, nameof(countryId));

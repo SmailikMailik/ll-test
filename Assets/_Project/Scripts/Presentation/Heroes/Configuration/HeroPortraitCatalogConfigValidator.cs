@@ -20,7 +20,7 @@ namespace LL.Presentation.Heroes.Configuration
             {
                 var entry = portraits[index];
 
-                if (entry == null)
+                if (entry is null)
                     continue;
 
                 var entryContext = context.At(index);

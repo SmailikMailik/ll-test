@@ -20,7 +20,7 @@ namespace LL.Infrastructure.Validation
 
         public void Report(ValidationResult result)
         {
-            if (result == null)
+            if (result is null)
                 throw new ArgumentNullException(nameof(result));
 
             foreach (var issue in result.Issues)

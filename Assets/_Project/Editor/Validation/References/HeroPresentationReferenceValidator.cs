@@ -35,7 +35,7 @@ namespace LLEditor.Validation.References
             {
                 var hero = heroes.Heroes[index];
 
-                if (hero == null || IdentifierValidator.IsValid(hero.Id) is false)
+                if (hero is null || IdentifierValidator.IsValid(hero.Id) is false)
                     continue;
 
                 ValidationRules.ReferenceExists(
@@ -56,7 +56,7 @@ namespace LLEditor.Validation.References
             {
                 var portrait = portraits.Portraits[index];
 
-                if (portrait == null || IdentifierValidator.IsValid(portrait.HeroId) is false)
+                if (portrait is null || IdentifierValidator.IsValid(portrait.HeroId) is false)
                     continue;
 
                 ValidationRules.ReferenceExists(
@@ -73,7 +73,7 @@ namespace LLEditor.Validation.References
 
             foreach (var flag in flags.Flags)
             {
-                if (flag != null && CountryIdValidator.IsValid(flag.CountryId))
+                if (flag is not null && CountryIdValidator.IsValid(flag.CountryId))
                     ids.Add(flag.CountryId);
             }
 
@@ -86,7 +86,7 @@ namespace LLEditor.Validation.References
 
             foreach (var portrait in portraits.Portraits)
             {
-                if (portrait != null && IdentifierValidator.IsValid(portrait.HeroId))
+                if (portrait is not null && IdentifierValidator.IsValid(portrait.HeroId))
                     ids.Add(portrait.HeroId);
             }
 
@@ -99,7 +99,7 @@ namespace LLEditor.Validation.References
 
             foreach (var hero in heroes.Heroes)
             {
-                if (hero != null && IdentifierValidator.IsValid(hero.Id))
+                if (hero is not null && IdentifierValidator.IsValid(hero.Id))
                     ids.Add(hero.Id);
             }
 

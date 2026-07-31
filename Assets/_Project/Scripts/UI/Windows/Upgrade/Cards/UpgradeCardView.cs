@@ -61,11 +61,8 @@ namespace LL.UI.Windows.Upgrade.Cards
             if (_isInitialized)
                 throw new InvalidOperationException($"{nameof(UpgradeCardView)} is already initialized.");
 
-            if (card == null)
+            if (card is null)
                 throw new ArgumentNullException(nameof(card));
-
-            if (string.IsNullOrWhiteSpace(card.Id.Value))
-                throw new ArgumentException("Card Id cannot be empty.", nameof(card));
 
             if (_iconCatalog.TryGetSprite(card.Id, out var icon) is false)
                 throw new KeyNotFoundException($"Missing icon for Card Id: {card.Id}");

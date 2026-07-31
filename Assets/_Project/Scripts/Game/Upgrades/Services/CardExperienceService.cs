@@ -88,7 +88,7 @@ namespace LL.Game.Upgrades.Services
         {
             experience = MinAmount;
 
-            if (cards == null || cards.Count == MinAmount)
+            if (cards is null || cards.Count == MinAmount)
                 return false;
 
             foreach (var cardAmount in cards)

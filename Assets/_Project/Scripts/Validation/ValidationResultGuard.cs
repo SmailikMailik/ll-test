@@ -12,7 +12,7 @@ namespace LL.Validation
             ValidationResult result,
             string parameterName = null)
         {
-            if (result == null)
+            if (result is null)
                 throw new ArgumentNullException(nameof(result));
 
             if (result.IsValid)

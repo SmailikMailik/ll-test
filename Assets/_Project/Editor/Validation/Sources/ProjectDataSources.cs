@@ -39,7 +39,7 @@ namespace LLEditor.Validation.Sources
 
         internal int Count(Type sourceType)
         {
-            if (sourceType == null)
+            if (sourceType is null)
                 throw new ArgumentNullException(nameof(sourceType));
 
             return _sources.Count(sourceType.IsInstanceOfType);

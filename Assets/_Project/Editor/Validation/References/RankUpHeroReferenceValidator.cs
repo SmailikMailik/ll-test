@@ -25,7 +25,7 @@ namespace LLEditor.Validation.References
 
             foreach (var hero in heroes.Heroes)
             {
-                if (hero != null && IdentifierValidator.IsValid(hero.Id))
+                if (hero is not null && IdentifierValidator.IsValid(hero.Id))
                     heroIds.Add(hero.Id);
             }
 
@@ -36,7 +36,7 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUpEntries[index];
 
-                if (rankUp == null || IdentifierValidator.IsValid(rankUp.HeroId) is false)
+                if (rankUp is null || IdentifierValidator.IsValid(rankUp.HeroId) is false)
                     continue;
 
                 ValidationRules.ReferenceExists(

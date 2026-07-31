@@ -10,10 +10,10 @@ namespace LL.Composition.Installers
             this IContainerBuilder builder,
             IDataLoader<TData> loader)
         {
-            if (builder == null)
+            if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            if (loader == null)
+            if (loader is null)
                 throw new ArgumentNullException(nameof(loader));
 
             builder.RegisterInstance(loader);
@@ -22,7 +22,7 @@ namespace LL.Composition.Installers
 
         internal static void RegisterLoadedData<TData>(this IContainerBuilder builder)
         {
-            if (builder == null)
+            if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
             builder.Register(resolver => resolver.Resolve<IDataLoader<TData>>().Load(), Lifetime.Singleton);
@@ -32,10 +32,10 @@ namespace LL.Composition.Installers
             this IContainerBuilder builder,
             Func<TSnapshot, TData> selector)
         {
-            if (builder == null)
+            if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            if (selector == null)
+            if (selector is null)
                 throw new ArgumentNullException(nameof(selector));
 
             builder.Register(resolver => selector(resolver.Resolve<TSnapshot>()), Lifetime.Singleton);

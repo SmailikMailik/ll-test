@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using LL.Validation;
 using UnityEngine;
 
 namespace LL.Infrastructure.Saving.Storage
@@ -17,10 +18,10 @@ namespace LL.Infrastructure.Saving.Storage
 
         internal FileSaveStorage(string directoryPath, string fileExtension)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath))
+            if (ValidationChecks.IsEmpty(directoryPath))
                 throw new ArgumentException("Save directory path cannot be empty", nameof(directoryPath));
 
-            if (string.IsNullOrWhiteSpace(fileExtension) || fileExtension[0] != '.')
+            if (ValidationChecks.IsEmpty(fileExtension) || fileExtension[0] != '.')
                 throw new ArgumentException("File extension must start with a dot.", nameof(fileExtension));
 
             _directoryPath = directoryPath;
@@ -34,7 +35,7 @@ namespace LL.Infrastructure.Saving.Storage
 
         public bool TryWrite(string key, byte[] data)
         {
-            if (data == null)
+            if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
             var filePath = GetFilePath(key);
@@ -104,7 +105,7 @@ namespace LL.Infrastructure.Saving.Storage
 
         private static void ValidateKey(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
+            if (ValidationChecks.IsEmpty(key))
                 throw new ArgumentException("Save key cannot be empty", nameof(key));
 
             foreach (var character in key)

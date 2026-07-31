@@ -22,7 +22,7 @@ namespace LLEditor.Toolbar
 
         private static void OnEditorUpdate()
         {
-            if (_button?.panel != null)
+            if (_button?.panel is not null)
                 return;
 
             MainToolbar.TryAttachToPlayModeZone(_button);

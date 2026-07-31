@@ -11,7 +11,7 @@ namespace LL.Game.Data.Declarations
         internal RewardDeclaration(string id, IEnumerable<RewardItemDeclaration> items)
         {
             Id = id;
-            var copy = items == null
+            var copy = items is null
                 ? Array.Empty<RewardItemDeclaration>()
                 : new List<RewardItemDeclaration>(items).ToArray();
 

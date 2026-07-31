@@ -6,6 +6,7 @@ using LL.Infrastructure.Loading;
 using LL.Infrastructure.Saving;
 using LL.Infrastructure.Saving.Serialization;
 using LL.Infrastructure.Saving.Storage;
+using LL.Validation;
 
 namespace LL.Composition.Factories
 {
@@ -20,7 +21,7 @@ namespace LL.Composition.Factories
 
         internal static IDataLoader<GameDataSnapshot> CreateFromJsonFile(string directoryPath)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath))
+            if (ValidationChecks.IsEmpty(directoryPath))
                 throw new ArgumentException("Game data directory path cannot be empty.", nameof(directoryPath));
 
             return CreateSerializedLoader(new FileSaveStorage(directoryPath, ".json"));

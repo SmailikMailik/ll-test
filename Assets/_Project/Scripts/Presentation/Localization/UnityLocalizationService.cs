@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Validation;
 using R3;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -28,7 +29,7 @@ namespace LL.Presentation.Localization
         {
             GetUnityKey(key, out var table, out var entry);
 
-            if (variables == null || variables.Count == 0)
+            if (variables is null || variables.Count == 0)
                 return LocalizationSettings.StringDatabase.GetLocalizedString(table, entry);
 
             return LocalizationSettings.StringDatabase.GetLocalizedString(
@@ -49,7 +50,7 @@ namespace LL.Presentation.Localization
 
         private static void GetUnityKey(string key, out string table, out string entry)
         {
-            if (string.IsNullOrWhiteSpace(key))
+            if (ValidationChecks.IsEmpty(key))
                 throw new ArgumentException("Localization key cannot be empty.", nameof(key));
 
             var separatorIndex = key.IndexOf(ScopeSeparator);

@@ -63,7 +63,7 @@ namespace LLEditor.UI.Graphics
 
         private void FindProperties()
         {
-            if (_material != null)
+            if (_material is not null)
                 return;
 
             _material = serializedObject.FindProperty("m_Material");

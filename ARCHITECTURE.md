@@ -213,6 +213,39 @@ Owns concrete visual behavior: views, windows, controls, graphics, navigation, v
 Owns reusable validation primitives, results, contexts, rules, and reporting contracts.
 
 - Generic validation belongs in runtime `Scripts/Validation`.
+- `ValidationChecks` is the base validation layer. It owns stateless, context-free predicates and simple collection
+  checks; it must not report issues, throw for an invalid checked value, or depend on a game or presentation domain.
+  Complementary predicates such as `IsPositive` and `IsNonPositive` expose both readable call-site forms, but one
+  must delegate to the other so the underlying validity formula has a single implementation.
+- `ValidationRules` adapts `ValidationChecks` to `ValidationContext` and owns reusable issue messages. Rules must
+  delegate the validity decision to a base check instead of duplicating its predicate.
+- Configuration validators compose `ValidationRules` to accumulate multiple issues. Runtime facade validators such
+  as `IdentifierValidator` and `EnumValidator` expose convenient `Validate`, `IsValid`, and `EnsureValid` operations
+  over the same base checks. Guards may throw, but must not reimplement the underlying validity predicate.
+- Choose the validation API by intent:
+  - use `ValidationChecks` for a context-free fact about an input, representation, or invariant when that predicate
+    is shared or its named form makes the guard materially clearer;
+  - use `ValidationRules` only while composing a `ValidationContext`, when failures need stable issue codes, paths,
+    messages, or accumulation; do not use a rule as an ordinary business predicate;
+  - use a facade's `Validate` overload inside an existing validation composition, `IsValid` when rejection is an
+    expected non-throwing outcome, and `EnsureValid` at a construction or trust boundary that must reject an invalid
+    value;
+  - use `ValidationRunner` to start or guard a composed validation session, not for normal state transitions or UI
+    branching.
+- A direct guard remains appropriate for a one-off programmer contract, especially a dependency null check or a
+  type-local condition with no reusable validation meaning. Do not add a cross-area `Validation` dependency merely
+  to replace a clear language or framework predicate once.
+- Conditions that describe normal behavior are not validation. Capability checks, `Can...` and `Try...` rejection,
+  optional-state detection, UI visibility, clamping, loop bounds, and no-op decisions should use direct control flow
+  or a domain facade's non-throwing `IsValid` operation. They must not create validation issues or throw merely
+  because the outcome is false.
+- Reuse a domain facade when the validity grammar belongs to a named concept such as an identifier or country code.
+  Do not reconstruct that grammar from individual checks at call sites.
+- Ordinary behavior and presentation consumers of an already-valid `Definition`, `Snapshot`, catalog entry, or
+  domain object must not repeat invariants guaranteed by that object's construction. Validate only new caller input
+  or a relationship owned by the consumer, such as whether a domain identifier has a matching presentation
+  resource. Aggregate constructors may still reuse a collection validator to enforce entry presence, uniqueness, and
+  the aggregate boundary as one operation.
 - Validation of one configuration type stays beside that configuration.
 - Cross-asset and project-wide validation that uses `AssetDatabase` belongs in `Editor/Validation`.
 - Validation reports errors; it must not silently repair source data.
@@ -537,6 +570,12 @@ that semantically owns it or introduce a small contract at the consumer-facing b
   values when serialized or persisted.
 - C# attributes occupy separate lines except a serialized field's constraints and decorators, which share its
   `[SerializeField, ...]` list.
+- Boolean expressions use the explicit `expression is false` pattern instead of the unary `!` operator. The `!=`
+  inequality operator remains valid, as does `!` in preprocessor expressions where C# pattern syntax is unavailable.
+- Ordinary managed references use `is null` and `is not null`. References whose static type is
+  `UnityEngine.Object` or a derived Unity type use `== null` and `!= null` instead, because Unity's overloaded
+  equality operators treat destroyed native objects as null while C# pattern matching checks only the managed
+  reference.
 - Empty bodies are inline as `{ }`. Treat 120 characters as the point at which line wrapping deserves an explicit
   readability decision: lines from 121 through 140 characters may remain intact when the single-line form is clearer,
   and should be wrapped when the split reads better. Keep simple assignments and expressions on one line when they

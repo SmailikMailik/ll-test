@@ -24,7 +24,7 @@ namespace LL.Presentation.Icons.Configuration
             {
                 var entry = icons[index];
 
-                if (entry == null)
+                if (entry is null)
                     continue;
 
                 ValidationRules.NotNull(

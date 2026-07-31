@@ -20,7 +20,7 @@ namespace LLEditor.Validation.References.Items
             var config = sources.GetSingle<RewardCatalogConfig>();
             var rewards = config?.Rewards;
 
-            if (rewards == null)
+            if (rewards is null)
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
@@ -44,14 +44,14 @@ namespace LLEditor.Validation.References.Items
             {
                 var items = rewards[rewardIndex]?.Items;
 
-                if (items == null)
+                if (items is null)
                     continue;
 
                 for (var itemIndex = 0; itemIndex < items.Count; itemIndex++)
                 {
                     var item = items[itemIndex];
 
-                    if (item == null || IdentifierValidator.IsValid(item.Id) is false)
+                    if (item is null || IdentifierValidator.IsValid(item.Id) is false)
                         continue;
 
                     var idContext = configContext

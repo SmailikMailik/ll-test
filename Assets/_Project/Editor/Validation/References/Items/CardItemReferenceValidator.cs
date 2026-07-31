@@ -20,7 +20,7 @@ namespace LLEditor.Validation.References.Items
             var config = sources.GetSingle<CardCatalogConfig>();
             var cards = config?.Cards;
 
-            if (cards == null)
+            if (cards is null)
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
@@ -44,7 +44,7 @@ namespace LLEditor.Validation.References.Items
             {
                 var card = cards[index];
 
-                if (card == null || IdentifierValidator.IsValid(card.Id) is false)
+                if (card is null || IdentifierValidator.IsValid(card.Id) is false)
                     continue;
 
                 var idContext = configContext.At(index).At(nameof(CardEntry.Id));

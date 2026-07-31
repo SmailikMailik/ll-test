@@ -1,4 +1,5 @@
 using System;
+using LL.Game.Identifiers;
 using LL.Game.Quests;
 using LL.User.Snapshots;
 using R3;
@@ -22,13 +23,13 @@ namespace LL.User.State.RankUp
         private bool _isCompleted;
 
         private bool HasQuest =>
-            string.IsNullOrWhiteSpace(_questId.Value) is false &&
+            IdentifierValidator.IsValid(_questId) &&
             _deadlineUnixMilliseconds > NoDeadline;
 
         [Inject]
         internal UserRankUpQuest(UserRankUpQuestSnapshot snapshot)
         {
-            if (snapshot == null)
+            if (snapshot is null)
                 throw new ArgumentNullException(nameof(snapshot));
 
             _questId = snapshot.QuestId;
@@ -55,7 +56,7 @@ namespace LL.User.State.RankUp
 
         public bool TryStart(QuestId questId, TimeSpan duration)
         {
-            if (string.IsNullOrWhiteSpace(questId.Value) ||
+            if (IdentifierValidator.IsValid(questId) is false ||
                 duration <= TimeSpan.Zero ||
                 IsActive ||
                 IsCompleted)

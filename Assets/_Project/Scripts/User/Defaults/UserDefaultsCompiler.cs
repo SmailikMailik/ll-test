@@ -46,7 +46,7 @@ namespace LL.User.Defaults
 
         public UserDefaultsSnapshot Compile(UserDefaultsDeclaration declaration)
         {
-            if (declaration == null)
+            if (declaration is null)
                 throw new ArgumentNullException(nameof(declaration));
 
             var rankId = new RankId(declaration.RankId);
@@ -65,7 +65,7 @@ namespace LL.User.Defaults
         private static IReadOnlyList<ItemAmount> CompileItemAmounts(
             IReadOnlyList<UserItemDefaultsDeclaration> declarations)
         {
-            if (declarations == null)
+            if (declarations is null)
                 throw new ArgumentNullException(nameof(declarations));
 
             IdentifierCollectionValidator.EnsureValid(

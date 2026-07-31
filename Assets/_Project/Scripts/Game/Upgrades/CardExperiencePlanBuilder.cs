@@ -12,7 +12,7 @@ namespace LL.Game.Upgrades
             IReadOnlyList<ExperienceCardOption> cards,
             int requiredExperience)
         {
-            if (cards == null)
+            if (cards is null)
                 throw new ArgumentNullException(nameof(cards));
 
             if (CanReach(cards, requiredExperience) is false)
@@ -32,7 +32,7 @@ namespace LL.Game.Upgrades
             IReadOnlyList<ExperienceCardOption> cards,
             int requiredExperience)
         {
-            if (cards == null)
+            if (cards is null)
                 throw new ArgumentNullException(nameof(cards));
 
             if (requiredExperience <= MinAmount)
@@ -108,7 +108,7 @@ namespace LL.Game.Upgrades
             {
                 var currentPlan = plansWithoutCurrentCard[experience];
 
-                if (currentPlan == null)
+                if (currentPlan is null)
                     continue;
 
                 AddPossibleAmounts(
@@ -156,7 +156,7 @@ namespace LL.Game.Upgrades
             var storedPlan = plans[experience];
             var totalCards = currentPlan.TotalCards + amount;
 
-            if (storedPlan != null && storedPlan.TotalCards <= totalCards)
+            if (storedPlan is not null && storedPlan.TotalCards <= totalCards)
                 return;
 
             plans[experience] = currentPlan.Add(cardIndex, amount);
@@ -170,7 +170,7 @@ namespace LL.Game.Upgrades
                  experience < plans.Count;
                  experience++)
             {
-                if (plans[experience] != null)
+                if (plans[experience] is not null)
                     return plans[experience];
             }
 
@@ -181,7 +181,7 @@ namespace LL.Game.Upgrades
             IReadOnlyList<ExperienceCardOption> cards,
             Plan plan)
         {
-            if (plan == null)
+            if (plan is null)
                 return Array.Empty<ItemAmount>();
 
             var cardAmounts = new List<ItemAmount>(cards.Count);

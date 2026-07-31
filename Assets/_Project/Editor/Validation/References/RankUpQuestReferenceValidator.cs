@@ -27,7 +27,7 @@ namespace LLEditor.Validation.References
 
             foreach (var quest in quests.Quests)
             {
-                if (quest != null && IdentifierValidator.IsValid(quest.Id))
+                if (quest is not null && IdentifierValidator.IsValid(quest.Id))
                     questIds.Add(quest.Id);
             }
 
@@ -38,7 +38,7 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUpEntries[index];
 
-                if (rankUp == null || IdentifierValidator.IsValid(rankUp.QuestId) is false)
+                if (rankUp is null || IdentifierValidator.IsValid(rankUp.QuestId) is false)
                     continue;
 
                 ValidationRules.ReferenceExists(

@@ -6,6 +6,7 @@ using LL.Game.RankUp;
 using LL.Game.Ranks;
 using LL.User.Defaults;
 using LL.User.Snapshots;
+using LL.Validation;
 using VContainer;
 
 namespace LL.User.Persistence
@@ -35,7 +36,7 @@ namespace LL.User.Persistence
             reconciled = null;
             changed = false;
 
-            if (snapshot == null || IsProgressCompatible(snapshot.Progress) is false)
+            if (snapshot is null || IsProgressCompatible(snapshot.Progress) is false)
                 return false;
 
             var items = ReconcileItems(snapshot.Items, out var itemsChanged);
@@ -93,7 +94,7 @@ namespace LL.User.Persistence
         {
             changed = false;
 
-            if (string.IsNullOrWhiteSpace(rankUpQuest.QuestId.Value))
+            if (ValidationChecks.IsEmpty(rankUpQuest.QuestId.Value))
                 return rankUpQuest;
 
             var isExpired =

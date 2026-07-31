@@ -27,7 +27,7 @@ namespace LL.Game.RankUp.Configuration
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp == null)
+                if (rankUp is null)
                     continue;
 
                 var rankUpContext = context.At(index);

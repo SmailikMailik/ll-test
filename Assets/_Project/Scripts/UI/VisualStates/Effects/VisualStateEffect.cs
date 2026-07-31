@@ -67,11 +67,11 @@ namespace LL.UI.VisualStates.Effects
             out TValue stateValue)
             where TValue : StateValue
         {
-            if (values != null)
+            if (values is not null)
             {
                 foreach (var value in values)
                 {
-                    if (value != null && value.State == state)
+                    if (value is not null && value.State == state)
                     {
                         stateValue = value;
                         return true;
@@ -99,19 +99,19 @@ namespace LL.UI.VisualStates.Effects
             Func<int, string, TValue> createValue)
             where TValue : StateValue
         {
-            if (_source == null || values == null)
+            if (_source == null || values is null)
                 return;
 
             var stateType = _source.StateType;
 
-            if (stateType == null || stateType.IsEnum is false)
+            if (stateType is null || stateType.IsEnum is false)
                 return;
 
             var existingValues = new Dictionary<int, TValue>();
 
             foreach (var value in values)
             {
-                if (value != null)
+                if (value is not null)
                     existingValues.TryAdd(value.State, value);
             }
 

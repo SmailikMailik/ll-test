@@ -1,4 +1,5 @@
 using System;
+using LL.Game.Identifiers;
 using LL.Game.Payments;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
@@ -18,11 +19,8 @@ namespace LL.Game.RankUp
             Payment instantPayment,
             RewardId rewardId)
         {
-            if (string.IsNullOrWhiteSpace(rankId.Value))
-                throw new ArgumentException("Rank-up rank ID must be non-empty.", nameof(rankId));
-
-            if (string.IsNullOrWhiteSpace(rewardId.Value))
-                throw new ArgumentException("Rank-up reward ID must be non-empty.", nameof(rewardId));
+            IdentifierValidator.EnsureValid(rankId, nameof(rankId));
+            IdentifierValidator.EnsureValid(rewardId, nameof(rewardId));
 
             RankId = rankId;
             Quest = quest ?? throw new ArgumentNullException(nameof(quest));

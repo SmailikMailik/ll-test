@@ -23,7 +23,7 @@ namespace LLEditor.Validation.References.Items
             var config = sources.GetSingle<RankUpCatalogConfig>();
             var rankUps = config?.RankUps;
 
-            if (rankUps == null)
+            if (rankUps is null)
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
@@ -47,7 +47,7 @@ namespace LLEditor.Validation.References.Items
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp == null)
+                if (rankUp is null)
                     continue;
 
                 ValidatePayment(
@@ -75,7 +75,7 @@ namespace LLEditor.Validation.References.Items
             bool hasIcons,
             ISet<ItemId> iconIds)
         {
-            if (payment == null || IdentifierValidator.IsValid(payment.ItemId) is false)
+            if (payment is null || IdentifierValidator.IsValid(payment.ItemId) is false)
                 return;
 
             var idContext = context.At(nameof(PaymentEntry.ItemId));

@@ -12,12 +12,8 @@ namespace LL.Game.Identifiers
         internal static ValidationResult Validate<TEntry, TId>(
             IEnumerable<TEntry> entries,
             Func<TEntry, TId> getId)
-            where TId : struct, IIdentifier
-        {
-            var result = new ValidationResult();
-            Validate(entries, getId, new ValidationContext(result));
-            return result;
-        }
+            where TId : struct, IIdentifier =>
+            ValidationRunner.Run(context => Validate(entries, getId, context));
 
         internal static void Validate<TEntry, TId>(
             IEnumerable<TEntry> entries,
@@ -25,16 +21,16 @@ namespace LL.Game.Identifiers
             ValidationContext context)
             where TId : struct, IIdentifier
         {
-            if (getId == null)
+            if (getId is null)
                 throw new ArgumentNullException(nameof(getId));
 
-            if (context == null)
+            if (context is null)
                 throw new ArgumentNullException(nameof(context));
 
             var usedValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var index = 0;
 
-            if (entries == null)
+            if (entries is null)
                 return;
 
             foreach (var entry in entries)
@@ -51,7 +47,7 @@ namespace LL.Game.Identifiers
                 var idContext = entryContext.At("Id");
                 IdentifierValidator.Validate(id, idContext);
 
-                if (string.IsNullOrWhiteSpace(id.Value) is false)
+                if (ValidationChecks.IsNotEmpty(id.Value))
                 {
                     var comparisonValue = id.Value.Trim();
 
@@ -69,20 +65,14 @@ namespace LL.Game.Identifiers
         internal static bool IsValid<TEntry, TId>(
             IEnumerable<TEntry> entries,
             Func<TEntry, TId> getId)
-            where TId : struct, IIdentifier
-        {
-            return Validate(entries, getId).IsValid;
-        }
+            where TId : struct, IIdentifier =>
+            ValidationRunner.IsValid(context => Validate(entries, getId, context));
 
         internal static void EnsureValid<TEntry, TId>(
             IEnumerable<TEntry> entries,
             Func<TEntry, TId> getId,
             string parameterName)
-            where TId : struct, IIdentifier
-        {
-            ValidationResultGuard.EnsureValid(
-                Validate(entries, getId),
-                parameterName);
-        }
+            where TId : struct, IIdentifier =>
+            ValidationRunner.EnsureValid(context => Validate(entries, getId, context), parameterName);
     }
 }

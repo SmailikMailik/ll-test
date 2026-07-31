@@ -56,7 +56,7 @@ namespace LL.User.State
 
         public TResult Execute<TResult>(Func<TResult> mutation)
         {
-            if (mutation == null)
+            if (mutation is null)
                 throw new ArgumentNullException(nameof(mutation));
 
             _changeBatchDepth++;

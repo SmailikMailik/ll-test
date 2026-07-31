@@ -9,14 +9,14 @@ namespace LL.UI.Windows
 
         internal WindowCatalog(IEnumerable<WindowDefinition> definitions)
         {
-            if (definitions == null)
+            if (definitions is null)
                 throw new ArgumentNullException(nameof(definitions));
 
             var definitionsByParameterType = new Dictionary<Type, WindowDefinition>();
 
             foreach (var definition in definitions)
             {
-                if (definition == null)
+                if (definition is null)
                     throw new ArgumentException("Window definition cannot be null.", nameof(definitions));
 
                 if (definitionsByParameterType.TryAdd(definition.ParameterType, definition) is false)
@@ -32,7 +32,7 @@ namespace LL.UI.Windows
 
         internal bool TryGetDefinition(Type parameterType, out WindowDefinition definition)
         {
-            if (parameterType == null)
+            if (parameterType is null)
                 throw new ArgumentNullException(nameof(parameterType));
 
             return _definitions.TryGetValue(parameterType, out definition);

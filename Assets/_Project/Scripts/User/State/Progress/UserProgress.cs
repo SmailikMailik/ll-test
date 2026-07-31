@@ -23,7 +23,7 @@ namespace LL.User.State.Progress
             UserProgressSnapshot snapshot,
             IRankProgression rankProgression)
         {
-            if (snapshot == null)
+            if (snapshot is null)
                 throw new ArgumentNullException(nameof(snapshot));
 
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));

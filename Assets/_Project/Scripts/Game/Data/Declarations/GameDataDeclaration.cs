@@ -30,7 +30,7 @@ namespace LL.Game.Data.Declarations
 
         private static IReadOnlyList<T> Copy<T>(IEnumerable<T> entries)
         {
-            return Array.AsReadOnly(entries == null ? Array.Empty<T>() : new List<T>(entries).ToArray());
+            return Array.AsReadOnly(entries is null ? Array.Empty<T>() : new List<T>(entries).ToArray());
         }
     }
 }

@@ -20,7 +20,7 @@ namespace LL.Game.Heroes.Configuration
             {
                 var hero = heroes[index];
 
-                if (hero == null)
+                if (hero is null)
                     continue;
 
                 var heroContext = context.At(index);

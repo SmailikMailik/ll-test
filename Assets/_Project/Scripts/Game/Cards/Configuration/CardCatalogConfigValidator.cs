@@ -24,7 +24,7 @@ namespace LL.Game.Cards.Configuration
             {
                 var card = cards[index];
 
-                if (card == null)
+                if (card is null)
                     continue;
 
                 var cardContext = context.At(index);

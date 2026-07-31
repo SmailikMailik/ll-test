@@ -1,4 +1,6 @@
 using System;
+using LL.Game.Identifiers;
+using LL.Validation;
 
 namespace LL.Game.Items
 {
@@ -9,10 +11,9 @@ namespace LL.Game.Items
 
         internal ItemAmount(ItemId id, int amount)
         {
-            if (string.IsNullOrWhiteSpace(id.Value))
-                throw new ArgumentException("Item amount ID must be non-empty.", nameof(id));
+            IdentifierValidator.EnsureValid(id, nameof(id));
 
-            if (amount < 0)
+            if (ValidationChecks.IsNegative(amount))
                 throw new ArgumentOutOfRangeException(
                     nameof(amount),
                     amount,

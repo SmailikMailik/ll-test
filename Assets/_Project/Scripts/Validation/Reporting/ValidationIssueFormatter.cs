@@ -6,7 +6,7 @@ namespace LL.Validation.Reporting
     {
         public string Format(ValidationIssue issue)
         {
-            if (issue == null)
+            if (issue is null)
                 throw new ArgumentNullException(nameof(issue));
 
             var location = string.IsNullOrEmpty(issue.Path)

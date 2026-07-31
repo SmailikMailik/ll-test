@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Identifiers;
 using LL.Game.Items;
+using LL.Validation;
 
 namespace LL.Game.Rewards
 {
@@ -15,8 +16,7 @@ namespace LL.Game.Rewards
             RewardId id,
             IEnumerable<ItemAmount> items)
         {
-            if (string.IsNullOrWhiteSpace(id.Value))
-                throw new ArgumentException("Reward ID must be non-empty.", nameof(id));
+            IdentifierValidator.EnsureValid(id, nameof(id));
 
             Id = id;
             Items = CreateItems(items);
@@ -26,7 +26,7 @@ namespace LL.Game.Rewards
         {
             var copy = items?.ToArray() ?? Array.Empty<ItemAmount>();
 
-            if (copy.Length == 0)
+            if (ValidationChecks.IsEmpty(copy))
                 throw new ArgumentException(
                     "Reward must contain at least one item.",
                     nameof(items));
@@ -36,7 +36,7 @@ namespace LL.Game.Rewards
                 item => item.Id,
                 nameof(items));
 
-            if (copy.Any(item => item.Amount <= 0))
+            if (copy.Any(item => ValidationChecks.IsNonPositive(item.Amount)))
                 throw new ArgumentException("Reward item amounts must be greater than zero.", nameof(items));
 
             return Array.AsReadOnly(copy);

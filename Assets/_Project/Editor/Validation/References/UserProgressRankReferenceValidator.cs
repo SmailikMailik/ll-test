@@ -39,9 +39,9 @@ namespace LLEditor.Validation.References
             IReadOnlyList<RankEntry> ranks,
             ValidationContext context)
         {
-            if (progress == null ||
+            if (progress is null ||
                 IdentifierValidator.IsValid(progress.RankId) is false ||
-                ranks == null ||
+                ranks is null ||
                 ranks.Count == 0)
             {
                 return;
@@ -53,7 +53,7 @@ namespace LLEditor.Validation.References
             {
                 var rank = ranks[index];
 
-                if (rank != null && IdentifierValidator.IsValid(rank.Id))
+                if (rank is not null && IdentifierValidator.IsValid(rank.Id))
                     rankIds.Add(rank.Id);
             }
 

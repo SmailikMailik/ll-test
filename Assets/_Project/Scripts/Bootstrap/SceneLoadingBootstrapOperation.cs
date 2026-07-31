@@ -15,7 +15,7 @@ namespace LL.Bootstrap
 
         private AsyncOperation _operation;
 
-        public float Progress => _operation == null
+        public float Progress => _operation is null
             ? MinProgress
             : Mathf.Clamp01(_operation.progress / SceneReadyProgress);
 
@@ -34,7 +34,7 @@ namespace LL.Bootstrap
         {
             _operation = SceneManager.LoadSceneAsync(_sceneName, LoadSceneMode.Single);
 
-            if (_operation == null)
+            if (_operation is null)
                 throw new InvalidOperationException($"Failed to start loading scene '{_sceneName}'.");
 
             _operation.allowSceneActivation = false;

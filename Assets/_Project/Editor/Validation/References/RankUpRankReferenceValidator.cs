@@ -36,7 +36,7 @@ namespace LLEditor.Validation.References
             IReadOnlyList<RankEntry> ranks,
             ValidationContext context)
         {
-            if (ranks == null || ranks.Count == 0)
+            if (ranks is null || ranks.Count == 0)
                 return;
 
             var rankIds = new HashSet<RankId>();
@@ -46,7 +46,7 @@ namespace LLEditor.Validation.References
             {
                 var rank = ranks[index];
 
-                if (rank != null && IdentifierValidator.IsValid(rank.Id))
+                if (rank is not null && IdentifierValidator.IsValid(rank.Id))
                 {
                     rankIds.Add(rank.Id);
                     orderedRankIds.Add(rank.Id);
@@ -60,7 +60,7 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp == null || IdentifierValidator.IsValid(rankUp.RankId) is false)
+                if (rankUp is null || IdentifierValidator.IsValid(rankUp.RankId) is false)
                     continue;
 
                 rankUpRankIds.Add(rankUp.RankId);
@@ -84,7 +84,7 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp == null || IdentifierValidator.IsValid(rankUp.RankId) is false)
+                if (rankUp is null || IdentifierValidator.IsValid(rankUp.RankId) is false)
                     continue;
 
                 ValidationRules.NotEqual(

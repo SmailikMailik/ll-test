@@ -12,7 +12,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (value is not null)
+            if (ValidationChecks.IsNotNull(value))
                 return true;
 
             ReportError(context, code, "Value must not be null.");
@@ -26,7 +26,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (string.IsNullOrWhiteSpace(value) is false)
+            if (ValidationChecks.IsNotEmpty(value))
                 return true;
 
             ReportError(context, code, "Value must not be empty.");
@@ -40,7 +40,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (value == value?.Trim())
+            if (ValidationChecks.IsTrimmed(value))
                 return true;
 
             ReportError(context, code, "Value must not contain leading or trailing whitespace.");
@@ -54,7 +54,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (value == value?.ToUpperInvariant())
+            if (ValidationChecks.IsUppercase(value))
                 return true;
 
             ReportError(context, code, "Value must be uppercase.");
@@ -68,7 +68,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (value == value?.ToLowerInvariant())
+            if (ValidationChecks.IsLowercase(value))
                 return true;
 
             ReportError(context, code, "Value must be lowercase.");
@@ -82,7 +82,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (values != null && values.Count > 0)
+            if (ValidationChecks.IsNotEmpty(values))
                 return true;
 
             ReportError(context, code, "Collection must contain at least one value.");
@@ -96,7 +96,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (value > 0)
+            if (ValidationChecks.IsPositive(value))
                 return true;
 
             ReportError(context, code, "Value must be greater than zero.");
@@ -110,7 +110,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (value >= 0)
+            if (ValidationChecks.IsNonNegative(value))
                 return true;
 
             ReportError(context, code, "Value must not be negative.");
@@ -126,9 +126,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            comparer ??= EqualityComparer<T>.Default;
-
-            if (comparer.Equals(value, expectedValue))
+            if (ValidationChecks.AreEqual(value, expectedValue, comparer))
                 return true;
 
             ReportError(context, code, $"Value '{value}' must equal '{expectedValue}'.");
@@ -144,9 +142,7 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            comparer ??= EqualityComparer<T>.Default;
-
-            if (comparer.Equals(value, forbiddenValue) is false)
+            if (ValidationChecks.AreNotEqual(value, forbiddenValue, comparer))
                 return true;
 
             ReportError(context, code, $"Value '{value}' must not equal '{forbiddenValue}'.");
@@ -161,10 +157,25 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (value <= maximumValue)
+            if (ValidationChecks.IsLessThanOrEqual(value, maximumValue))
                 return true;
 
             ReportError(context, code, $"Value '{value}' must not exceed '{maximumValue}'.");
+            return false;
+        }
+
+        internal static bool DefinedEnum<TEnum>(
+            TEnum value,
+            ValidationContext context,
+            string code)
+            where TEnum : struct, Enum
+        {
+            EnsureArguments(context, code);
+
+            if (ValidationChecks.IsDefined(value))
+                return true;
+
+            ReportError(context, code, $"Value '{value}' is not supported.");
             return false;
         }
 
@@ -176,10 +187,10 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (availableValues == null)
+            if (availableValues is null)
                 throw new ArgumentNullException(nameof(availableValues));
 
-            if (availableValues.Contains(value))
+            if (ValidationChecks.Contains(value, availableValues))
                 return true;
 
             ReportError(context, code, $"Referenced value '{value}' does not exist.");
@@ -194,10 +205,10 @@ namespace LL.Validation
         {
             EnsureArguments(context, code);
 
-            if (usedValues == null)
+            if (usedValues is null)
                 throw new ArgumentNullException(nameof(usedValues));
 
-            if (usedValues.Add(value))
+            if (ValidationChecks.TryAddUnique(value, usedValues))
                 return true;
 
             ReportError(context, code, $"Value '{value}' must be unique.");
@@ -216,10 +227,10 @@ namespace LL.Validation
             ValidationContext context,
             string code)
         {
-            if (context == null)
+            if (ValidationChecks.IsNull(context))
                 throw new ArgumentNullException(nameof(context));
 
-            if (string.IsNullOrWhiteSpace(code))
+            if (ValidationChecks.IsEmpty(code))
                 throw new ArgumentException("Validation issue code must be non-empty.", nameof(code));
         }
     }

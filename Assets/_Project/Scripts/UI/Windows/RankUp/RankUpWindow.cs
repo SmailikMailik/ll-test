@@ -94,13 +94,13 @@ namespace LL.UI.Windows.RankUp
                 _instantPriceLabel.text = string.Empty;
             }
 
-            _questView.gameObject.SetActive(_definition != null);
+            _questView.gameObject.SetActive(_definition is not null);
             RefreshActions();
         }
 
         private void RequestRankUp(Payment payment)
         {
-            if (_definition == null || _userProgress.CanRankUp is false)
+            if (_definition is null || _userProgress.CanRankUp is false)
                 return;
 
             _rankUpFlow.RequestRankUp(
@@ -111,13 +111,13 @@ namespace LL.UI.Windows.RankUp
 
         private void OnQuestRankUpClicked()
         {
-            if (_definition != null)
+            if (_definition is not null)
                 RequestRankUp(_definition.Quest.Payment);
         }
 
         private void OnInstantRankUpClicked()
         {
-            if (_definition != null)
+            if (_definition is not null)
                 RequestRankUp(_definition.InstantPayment);
         }
 
@@ -138,7 +138,7 @@ namespace LL.UI.Windows.RankUp
 
         private void RefreshActions()
         {
-            var hasRankUp = _definition != null;
+            var hasRankUp = _definition is not null;
             var canRankUp = _userProgress.CanRankUp;
 
             _questView.SetAvailable(hasRankUp && canRankUp);

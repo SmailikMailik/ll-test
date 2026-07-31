@@ -13,10 +13,10 @@ namespace LLEditor.Validation.References.Items
             out HashSet<ItemId> ids)
             where TEntry : class
         {
-            if (getId == null)
+            if (getId is null)
                 throw new ArgumentNullException(nameof(getId));
 
-            if (entries == null)
+            if (entries is null)
             {
                 ids = null;
                 return false;
@@ -26,7 +26,7 @@ namespace LLEditor.Validation.References.Items
 
             foreach (var entry in entries)
             {
-                if (entry == null)
+                if (entry is null)
                     continue;
 
                 var id = getId(entry);
