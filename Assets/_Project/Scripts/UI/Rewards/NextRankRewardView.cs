@@ -5,7 +5,6 @@ using LL.Game.Ranks;
 using LL.Game.Rewards;
 using LL.Presentation.Localization;
 using LL.Presentation.RankUp;
-using LL.UI.Rewards;
 using R3;
 using TMPro;
 using UnityEngine;

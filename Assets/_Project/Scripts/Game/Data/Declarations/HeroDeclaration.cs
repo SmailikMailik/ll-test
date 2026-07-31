@@ -4,13 +4,13 @@ namespace LL.Game.Data.Declarations
     {
         internal string Id { get; }
         internal string NameLocalizationKey { get; }
-        internal string CountryId { get; }
+        internal string FlagId { get; }
 
-        internal HeroDeclaration(string id, string nameLocalizationKey, string countryId)
+        internal HeroDeclaration(string id, string nameLocalizationKey, string flagId)
         {
             Id = id;
             NameLocalizationKey = nameLocalizationKey;
-            CountryId = countryId;
+            FlagId = flagId;
         }
     }
 }

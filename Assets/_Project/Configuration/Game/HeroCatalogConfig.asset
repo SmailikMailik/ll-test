@@ -15,4 +15,4 @@ MonoBehaviour:
   _heroes:
   - _id: soldier
     _nameLocalizationKey: Game/heroes.soldier
-    _countryId: ca
+    _flagId: canada

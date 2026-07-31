@@ -1,4 +1,3 @@
-using LL.Game.Countries;
 using LL.Game.Identifiers;
 using LL.Validation;
 
@@ -28,9 +27,9 @@ namespace LL.Game.Heroes.Configuration
                     hero.NameLocalizationKey,
                     heroContext.At(nameof(HeroEntry.NameLocalizationKey)),
                     NameKeyCode);
-                CountryIdValidator.Validate(
-                    hero.CountryId,
-                    heroContext.At(nameof(HeroEntry.CountryId)));
+                IdentifierValidator.Validate(
+                    hero.FlagId,
+                    heroContext.At(nameof(HeroEntry.FlagId)));
             }
         }
     }

@@ -22,11 +22,11 @@ $presentationAttributes = @(
     "SpritePreview")
 $spriteCatalogNames = @(
     "ItemIconCatalogConfig.cs",
-    "CountryFlagCatalogConfig.cs",
+    "FlagCatalogConfig.cs",
     "HeroPortraitCatalogConfig.cs")
 $spriteCatalogIdentifierLabels = @{
     "ItemIconCatalogConfig.cs" = @{ Label = "Item ID"; Field = "_itemId" }
-    "CountryFlagCatalogConfig.cs" = @{ Label = "Country ID"; Field = "_countryId" }
+    "FlagCatalogConfig.cs" = @{ Label = "Flag ID"; Field = "_flagId" }
     "HeroPortraitCatalogConfig.cs" = @{ Label = "Hero ID"; Field = "_heroId" }
 }
 $attributePattern = "(?m)^[ \t]*\[(?:[A-Za-z_][A-Za-z0-9_]*\.)?(?<name>" +

@@ -7,7 +7,7 @@ using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
 using LL.Presentation.Items.Configuration;
-using LL.Presentation.Countries.Configuration;
+using LL.Presentation.Flags.Configuration;
 using LL.Presentation.Heroes.Configuration;
 using LL.UI.Windows.Configuration;
 using LL.User.Configuration;
@@ -30,7 +30,7 @@ namespace LLEditor.Validation.Sources
             typeof(RankUpCatalogConfig),
             typeof(RewardCatalogConfig),
             typeof(ItemIconCatalogConfig),
-            typeof(CountryFlagCatalogConfig),
+            typeof(FlagCatalogConfig),
             typeof(HeroPortraitCatalogConfig),
             typeof(WindowCatalogConfig),
             typeof(UserDefaultsConfig)

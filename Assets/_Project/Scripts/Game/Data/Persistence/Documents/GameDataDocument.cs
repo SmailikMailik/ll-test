@@ -4,7 +4,7 @@ namespace LL.Game.Data.Persistence.Documents
 {
     internal sealed class GameDataDocument
     {
-        internal const int CurrentVersion = 2;
+        internal const int CurrentVersion = 3;
 
         public int Version { get; }
         public RankDocumentEntry[] Ranks { get; }

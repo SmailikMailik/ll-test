@@ -18,7 +18,7 @@ namespace LL.Game.Data.Persistence
                 document.Cards.Select(card =>
                     new CardDeclaration(card.Id, card.ExperienceAmount)),
                 document.Heroes.Select(hero =>
-                    new HeroDeclaration(hero.Id, hero.NameLocalizationKey, hero.CountryId)),
+                    new HeroDeclaration(hero.Id, hero.NameLocalizationKey, hero.FlagId)),
                 document.Quests.Select(quest =>
                     new QuestDeclaration(
                         quest.Id,

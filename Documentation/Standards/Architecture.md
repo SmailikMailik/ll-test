@@ -64,9 +64,9 @@ group of closely related types. Do not create a one-type folder merely to make t
 | --- | --- | --- |
 | `Bootstrap` | First-scene startup coordination | Localization readiness, minimum display time, scene activation |
 | `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
-| `Game` | Game rules and reference data | Cards, countries, heroes, items, payments, rank-up, quests, ranks, rewards, upgrades |
+| `Game` | Game rules and reference data | Cards, flags, heroes, items, payments, rank-up, quests, ranks, rewards, upgrades |
 | `Infrastructure` | Reusable technical adapters | Compilation and loading contracts, serialization, storage, reporting |
-| `Presentation` | Display meaning without visual lifecycle | Country flags, hero portraits, item icons, localization, formatting, text tokens, confirmations |
+| `Presentation` | Display meaning without visual lifecycle | Flags, hero portraits, item icons, localization, formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
 | `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, rank-up quest |
 | `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
@@ -132,9 +132,9 @@ and use-case services.
   capability names that describe the player action. Use `RankUp`, never `Promotion`, as the code and folder vocabulary
   for this feature.
 - `Game/Heroes` owns hero identity and immutable hero definitions. A hero definition contains its localized-name key
-  and ISO country reference, while rank-up and other game capabilities refer to it only through `HeroId`.
-- `Game/Countries` owns `CountryId` and its ISO 3166-1 alpha-2 validation. It does not model country presentation or
-  localized country metadata until those concepts are required.
+  and `FlagId`, while rank-up and other game capabilities refer to it only through `HeroId`.
+- `Game/Flags` owns the semantic identity of flags. A `FlagId` names the represented flag directly and must not be
+  constrained to a country-code standard because flags may represent fictional countries, factions, or organizations.
 - Unity-dependent authoring adapters are allowed under the owning capability's `Configuration` folder.
 - Cross-capability workflows belong to the capability that owns the outcome; create a new capability only when no
   existing owner is correct.
@@ -188,8 +188,8 @@ catalogs, and presentation-facing confirmations.
 - `Presentation/Items` owns item formatting and item icon sprites keyed by `ItemId`.
 - `Presentation/Heroes` owns the independently loaded small and large portrait resources keyed by `HeroId`.
   Portrait data remains static sprites; optional animation is view behavior and does not change hero definitions.
-- `Presentation/Countries` owns country flag sprites keyed by `CountryId`. Game hero definitions never reference
-  Unity sprites directly.
+- `Presentation/Flags` owns flag sprites keyed by `FlagId`. Game hero definitions reference only the semantic ID and
+  never reference Unity sprites directly.
 
 ### `UI`
 

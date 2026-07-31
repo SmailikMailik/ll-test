@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Countries;
+using LL.Game.Flags;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -32,10 +32,10 @@ namespace LL.Game.Heroes.Configuration
     {
         [SerializeField] private string _id;
         [SerializeField] private string _nameLocalizationKey;
-        [SerializeField] private string _countryId;
+        [SerializeField] private string _flagId;
 
         internal HeroId Id => new(_id);
         internal string NameLocalizationKey => _nameLocalizationKey;
-        internal CountryId CountryId => new(_countryId);
+        internal FlagId FlagId => new(_flagId);
     }
 }

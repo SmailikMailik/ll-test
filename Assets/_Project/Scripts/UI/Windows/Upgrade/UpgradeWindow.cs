@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using LL.Game.Items;
 using LL.Game.Ranks;
-using LL.Game.Upgrades;
 using LL.Game.Upgrades.Services;
 using LL.Presentation.Upgrades;
 using LL.UI.Controls;

@@ -125,5 +125,9 @@ WindowCatalogConfig
 ```text
 ItemIconCatalogConfig
     -> ScriptableObjectItemIconCatalogLoader
-    -> IconCatalog<ItemId>
+    -> SpriteCatalog<ItemId>
+
+FlagCatalogConfig
+    -> ScriptableObjectFlagCatalogLoader
+    -> SpriteCatalog<FlagId>
 ```

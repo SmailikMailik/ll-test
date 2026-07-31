@@ -1,4 +1,4 @@
-using LL.Presentation.Countries.Configuration;
+using LL.Presentation.Flags.Configuration;
 using LL.Presentation.Heroes.Configuration;
 using LL.Presentation.Items.Configuration;
 using UnityEditor;
@@ -13,10 +13,10 @@ namespace LLEditor.Menu
             ProjectAssetSelector.Select<ItemIconCatalogConfig>(ItemIconCatalogConfig.CreationPath);
         }
 
-        [MenuItem(LastLevelMenu.Content.Path + "Country Flag Catalog", false, LastLevelMenu.Content.PresentationPriority + 1)]
-        private static void SelectCountryFlagCatalog()
+        [MenuItem(LastLevelMenu.Content.Path + "Flag Catalog", false, LastLevelMenu.Content.PresentationPriority + 1)]
+        private static void SelectFlagCatalog()
         {
-            ProjectAssetSelector.Select<CountryFlagCatalogConfig>(CountryFlagCatalogConfig.CreationPath);
+            ProjectAssetSelector.Select<FlagCatalogConfig>(FlagCatalogConfig.CreationPath);
         }
 
         [MenuItem(LastLevelMenu.Content.Path + "Hero Portrait Catalog", false, LastLevelMenu.Content.PresentationPriority + 2)]

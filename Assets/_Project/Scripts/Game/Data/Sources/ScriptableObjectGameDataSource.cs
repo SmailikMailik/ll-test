@@ -61,7 +61,7 @@ namespace LL.Game.Data.Sources
             return new HeroDeclaration(
                 hero.Id.Value,
                 hero.NameLocalizationKey,
-                hero.CountryId.Value);
+                hero.FlagId.Value);
         }
 
         private static QuestDeclaration ToQuestDeclaration(QuestEntry quest)

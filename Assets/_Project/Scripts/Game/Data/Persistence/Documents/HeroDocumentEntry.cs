@@ -4,13 +4,13 @@ namespace LL.Game.Data.Persistence.Documents
     {
         public string Id { get; }
         public string NameLocalizationKey { get; }
-        public string CountryId { get; }
+        public string FlagId { get; }
 
-        public HeroDocumentEntry(string id, string nameLocalizationKey, string countryId)
+        public HeroDocumentEntry(string id, string nameLocalizationKey, string flagId)
         {
             Id = id;
             NameLocalizationKey = nameLocalizationKey;
-            CountryId = countryId;
+            FlagId = flagId;
         }
     }
 }

@@ -1,5 +1,5 @@
 using System;
-using LL.Game.Countries;
+using LL.Game.Flags;
 using LL.Game.Heroes;
 using LL.Game.Items;
 using LL.Infrastructure.Loading;
@@ -14,16 +14,16 @@ namespace LL.Composition.Installers
     internal sealed class PresentationInstaller : IInstaller
     {
         private readonly IDataLoader<SpriteCatalog<ItemId>> _itemIconCatalogLoader;
-        private readonly IDataLoader<SpriteCatalog<CountryId>> _countryFlagCatalogLoader;
+        private readonly IDataLoader<SpriteCatalog<FlagId>> _flagCatalogLoader;
         private readonly IDataLoader<SpriteVariantCatalog<HeroId, HeroPortraitSize>> _heroPortraitCatalogLoader;
 
         internal PresentationInstaller(
             IDataLoader<SpriteCatalog<ItemId>> itemIconCatalogLoader,
-            IDataLoader<SpriteCatalog<CountryId>> countryFlagCatalogLoader,
+            IDataLoader<SpriteCatalog<FlagId>> flagCatalogLoader,
             IDataLoader<SpriteVariantCatalog<HeroId, HeroPortraitSize>> heroPortraitCatalogLoader)
         {
             _itemIconCatalogLoader = itemIconCatalogLoader ?? throw new ArgumentNullException(nameof(itemIconCatalogLoader));
-            _countryFlagCatalogLoader = countryFlagCatalogLoader ?? throw new ArgumentNullException(nameof(countryFlagCatalogLoader));
+            _flagCatalogLoader = flagCatalogLoader ?? throw new ArgumentNullException(nameof(flagCatalogLoader));
             _heroPortraitCatalogLoader = heroPortraitCatalogLoader ?? throw new ArgumentNullException(nameof(heroPortraitCatalogLoader));
         }
 
@@ -31,7 +31,7 @@ namespace LL.Composition.Installers
         {
             builder.Register<UnityLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
             builder.RegisterLoadedData(_itemIconCatalogLoader);
-            builder.RegisterLoadedData(_countryFlagCatalogLoader);
+            builder.RegisterLoadedData(_flagCatalogLoader);
             builder.RegisterLoadedData(_heroPortraitCatalogLoader);
         }
     }

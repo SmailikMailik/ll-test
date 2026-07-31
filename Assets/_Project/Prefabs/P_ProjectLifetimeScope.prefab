@@ -51,6 +51,6 @@ MonoBehaviour:
   _windowCatalogConfig: {fileID: 11400000, guid: eb1646ea480b2cc4fb2985ea08cc1104, type: 2}
   _gameDataManifestConfig: {fileID: 11400000, guid: c7a0920a0c914e3f9b0c92cf5ceaa4a8, type: 2}
   _itemIconCatalogConfig: {fileID: 11400000, guid: a0f86a11d13b4dc3b7ea62ec0e009846, type: 2}
-  _countryFlagCatalogConfig: {fileID: 11400000, guid: b2222222222222222222222222222222, type: 2}
+  _flagCatalogConfig: {fileID: 11400000, guid: b2222222222222222222222222222222, type: 2}
   _heroPortraitCatalogConfig: {fileID: 11400000, guid: c3333333333333333333333333333333, type: 2}
   _userDefaultsConfig: {fileID: 11400000, guid: 08915e9948d847e18fc2884bf8f88076, type: 2}

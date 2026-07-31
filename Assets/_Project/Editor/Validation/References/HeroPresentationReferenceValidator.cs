@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using LL.Game.Countries;
+using LL.Game.Flags;
 using LL.Game.Heroes;
 using LL.Game.Heroes.Configuration;
 using LL.Game.Identifiers;
-using LL.Presentation.Countries.Configuration;
+using LL.Presentation.Flags.Configuration;
 using LL.Presentation.Heroes.Configuration;
 using LL.Validation;
 using LLEditor.Validation.Sources;
@@ -13,20 +13,20 @@ namespace LLEditor.Validation.References
 {
     internal sealed class HeroPresentationReferenceValidator : IProjectDataReferenceValidation
     {
-        private const string CountryFlagExistsCode = "hero.country-flag.exists";
+        private const string HeroFlagExistsCode = "hero.flag.exists";
         private const string HeroPortraitExistsCode = "hero.portrait.exists";
         private const string PortraitHeroExistsCode = "hero-portrait.hero.exists";
 
         public void Validate(ProjectDataSources sources, ValidationContext context)
         {
             var heroes = sources.GetSingle<HeroCatalogConfig>();
-            var flags = sources.GetSingle<CountryFlagCatalogConfig>();
+            var flags = sources.GetSingle<FlagCatalogConfig>();
             var portraits = sources.GetSingle<HeroPortraitCatalogConfig>();
 
             if (heroes == null || flags == null || portraits == null)
                 return;
 
-            var countryIds = CollectCountryIds(flags);
+            var flagIds = CollectFlagIds(flags);
             var portraitHeroIds = CollectPortraitHeroIds(portraits);
             var heroIds = CollectHeroIds(heroes);
             var heroContext = context.At(AssetDatabase.GetAssetPath(heroes));
@@ -39,10 +39,10 @@ namespace LLEditor.Validation.References
                     continue;
 
                 ValidationRules.ReferenceExists(
-                    hero.CountryId,
-                    countryIds,
-                    heroContext.At(index).At(nameof(HeroEntry.CountryId)),
-                    CountryFlagExistsCode);
+                    hero.FlagId,
+                    flagIds,
+                    heroContext.At(index).At(nameof(HeroEntry.FlagId)),
+                    HeroFlagExistsCode);
                 ValidationRules.ReferenceExists(
                     hero.Id,
                     portraitHeroIds,
@@ -67,14 +67,14 @@ namespace LLEditor.Validation.References
             }
         }
 
-        private static HashSet<CountryId> CollectCountryIds(CountryFlagCatalogConfig flags)
+        private static HashSet<FlagId> CollectFlagIds(FlagCatalogConfig flags)
         {
-            var ids = new HashSet<CountryId>();
+            var ids = new HashSet<FlagId>();
 
             foreach (var flag in flags.Flags)
             {
-                if (flag is not null && CountryIdValidator.IsValid(flag.CountryId))
-                    ids.Add(flag.CountryId);
+                if (flag is not null && IdentifierValidator.IsValid(flag.Id))
+                    ids.Add(flag.Id);
             }
 
             return ids;

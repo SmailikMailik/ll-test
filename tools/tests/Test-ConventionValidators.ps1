@@ -267,6 +267,23 @@ try {
         -ExpectedExitCode 0 `
         -ExpectedOutput "Odin Inspector validation passed."
 
+    $validFlagOdinRoot = Join-Path $fixtureRoot "odin-valid-flag-catalog"
+    [IO.Directory]::CreateDirectory((Join-Path $validFlagOdinRoot "Scripts/Presentation/Flags/Configuration")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $validFlagOdinRoot "Scripts/Presentation/Flags/Configuration/FlagCatalogConfig.cs"),
+        "using Sirenix.OdinInspector;`n`ninternal sealed class FlagCatalogConfig`n{`n" +
+            "    [TableList(AlwaysExpanded = true, DrawScrollView = false)]`n" +
+            "    [ValidateInput(nameof(IsValid))]`n    [SerializeField] private FlagEntry[] _flags;`n}`n`n" +
+            "internal sealed class FlagEntry`n{`n    [LabelText(`"Flag ID`")]`n    [SerializeField] private string _flagId;`n" +
+            "    [SpritePreview]`n" +
+            "    [SerializeField, Required] private Sprite _flag;`n}")
+    Invoke-ExpectedResult `
+        -Name "Valid compact flag catalog" `
+        -Script $odinInspectorValidator `
+        -Arguments @("-ProjectAssetsRoot", $validFlagOdinRoot) `
+        -ExpectedExitCode 0 `
+        -ExpectedOutput "Odin Inspector validation passed."
+
     $invalidOdinRoot = Join-Path $fixtureRoot "odin-invalid-catalog"
     [IO.Directory]::CreateDirectory((Join-Path $invalidOdinRoot "Scripts/Game/Configuration")) | Out-Null
     [IO.File]::WriteAllText(
@@ -289,6 +306,18 @@ try {
         -Name "Missing compact item icon presentation" `
         -Script $odinInspectorValidator `
         -Arguments @("-ProjectAssetsRoot", $invalidItemIconOdinRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Sprite catalog must use the approved compact sprite table"
+
+    $invalidFlagOdinRoot = Join-Path $fixtureRoot "odin-invalid-flag-catalog"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidFlagOdinRoot "Scripts/Presentation/Flags/Configuration")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidFlagOdinRoot "Scripts/Presentation/Flags/Configuration/FlagCatalogConfig.cs"),
+        "internal sealed class FlagCatalogConfig`n{`n    private object[] _flags;`n}")
+    Invoke-ExpectedResult `
+        -Name "Missing compact flag presentation" `
+        -Script $odinInspectorValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidFlagOdinRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "Sprite catalog must use the approved compact sprite table"
 } finally {

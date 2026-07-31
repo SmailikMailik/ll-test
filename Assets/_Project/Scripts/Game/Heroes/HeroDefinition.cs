@@ -1,5 +1,5 @@
 using System;
-using LL.Game.Countries;
+using LL.Game.Flags;
 using LL.Game.Identifiers;
 using LL.Validation;
 
@@ -9,23 +9,23 @@ namespace LL.Game.Heroes
     {
         internal HeroId Id { get; }
         internal string NameLocalizationKey { get; }
-        internal CountryId CountryId { get; }
+        internal FlagId FlagId { get; }
 
         internal HeroDefinition(
             HeroId id,
             string nameLocalizationKey,
-            CountryId countryId)
+            FlagId flagId)
         {
             IdentifierValidator.EnsureValid(id, nameof(id));
 
             if (ValidationChecks.IsEmpty(nameLocalizationKey))
                 throw new ArgumentException("Hero name localization key must be non-empty.", nameof(nameLocalizationKey));
 
-            CountryIdValidator.EnsureValid(countryId, nameof(countryId));
+            IdentifierValidator.EnsureValid(flagId, nameof(flagId));
 
             Id = id;
             NameLocalizationKey = nameLocalizationKey;
-            CountryId = countryId;
+            FlagId = flagId;
         }
     }
 }

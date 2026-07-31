@@ -112,6 +112,7 @@ Assets/_Project/Configuration/
 │   ├── RankUpCatalogConfig.asset
 │   └── RewardCatalogConfig.asset
 ├── Presentation/
+│   ├── FlagCatalogConfig.asset
 │   └── ItemIconCatalogConfig.asset
 ├── UI/
 │   └── WindowCatalogConfig.asset

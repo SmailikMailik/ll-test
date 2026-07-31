@@ -59,15 +59,15 @@ allowed for the same reason.
 
 ### Sprite catalog presentation
 
-Apply the compact sprite-catalog presentation to `ItemIconCatalogConfig`, `CountryFlagCatalogConfig`, and
+Apply the compact sprite-catalog presentation to `ItemIconCatalogConfig`, `FlagCatalogConfig`, and
 `HeroPortraitCatalogConfig`:
 
 - Render the entries with `[TableList(AlwaysExpanded = true, DrawScrollView = false)]` so each entry occupies one
   row and the complete catalog remains visible without a nested scroll view.
 - Keep identifier fields as flexible text columns and label them by their domain identifier type: `Item ID`,
-  `Country ID`, or `Hero ID`. Preserve `ID` capitalization explicitly with `LabelText` rather than relying on field
+  `Flag ID`, or `Hero ID`. Preserve `ID` capitalization explicitly with `LabelText` rather than relying on field
   name humanization.
-- Name identifier fields by the same domain type (`_itemId`, `_countryId`, `_heroId`). Use a generic `_id` only in a
+- Name identifier fields by the same domain type (`_itemId`, `_flagId`, `_heroId`). Use a generic `_id` only in a
   genuinely generic entry type whose identifier domain is supplied by a type parameter.
 - Render every sprite field with `[SpritePreview]`. `SpritePreviewAttribute` composes
   `PreviewField(48, ObjectFieldAlignment.Center)` and `TableColumnWidth(64)`; change those values centrally rather

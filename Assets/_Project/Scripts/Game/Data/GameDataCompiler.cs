@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Data.Declarations;
-using LL.Game.Countries;
+using LL.Game.Flags;
 using LL.Game.Heroes;
 using LL.Game.Identifiers;
 using LL.Game.Items;
@@ -130,7 +130,7 @@ namespace LL.Game.Data
             return new HeroDefinition(
                 new HeroId(declaration.Id),
                 declaration.NameLocalizationKey,
-                new CountryId(declaration.CountryId));
+                new FlagId(declaration.FlagId));
         }
 
         private static QuestDefinition ToQuestDefinition(QuestDeclaration declaration)
