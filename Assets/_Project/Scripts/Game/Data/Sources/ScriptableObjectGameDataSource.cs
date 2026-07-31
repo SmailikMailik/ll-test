@@ -83,12 +83,12 @@ namespace LL.Game.Data.Sources
         {
             return new RewardDeclaration(
                 reward.Id.Value,
-                reward.Items.Select(ToItemAmountDeclaration));
+                reward.Items.Select(ToRewardItemDeclaration));
         }
 
-        private static ItemAmountDeclaration ToItemAmountDeclaration(RewardItemEntry item)
+        private static RewardItemDeclaration ToRewardItemDeclaration(RewardItemEntry item)
         {
-            return new ItemAmountDeclaration(item.Id.Value, item.Amount);
+            return new RewardItemDeclaration(item.Id.Value, item.Amount);
         }
     }
 }

@@ -5,12 +5,12 @@ namespace LL.Game.Data.Persistence.Documents
     internal sealed class RewardDocumentEntry
     {
         public string Id { get; }
-        public ItemAmountDocumentEntry[] Items { get; }
+        public RewardItemDocumentEntry[] Items { get; }
 
-        public RewardDocumentEntry(string id, ItemAmountDocumentEntry[] items)
+        public RewardDocumentEntry(string id, RewardItemDocumentEntry[] items)
         {
             Id = id;
-            Items = items ?? Array.Empty<ItemAmountDocumentEntry>();
+            Items = items ?? Array.Empty<RewardItemDocumentEntry>();
         }
     }
 }

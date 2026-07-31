@@ -27,7 +27,7 @@ namespace LL.Game.Data.Persistence
                     new RewardDeclaration(
                         reward.Id,
                         reward.Items.Select(item =>
-                            new ItemAmountDeclaration(item.Id, item.Amount)))));
+                            new RewardItemDeclaration(item.Id, item.Amount)))));
         }
 
         private static RankUpDeclaration ToDeclaration(RankUpDocumentEntry rankUp)

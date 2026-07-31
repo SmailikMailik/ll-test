@@ -45,7 +45,7 @@ namespace LL.User.Persistence
                     snapshot.RankUpQuest.DeadlineUnixMilliseconds,
                     snapshot.RankUpQuest.IsCompleted),
                 snapshot.Items.Amounts
-                    .Select(item => new ItemAmountDocumentEntry(item.Id.Value, item.Amount))
+                    .Select(item => new UserItemDocumentEntry(item.Id.Value, item.Amount))
                     .ToArray());
         }
     }

@@ -1,11 +1,11 @@
 namespace LL.Game.Data.Persistence.Documents
 {
-    internal sealed class ItemAmountDocumentEntry
+    internal sealed class RewardItemDocumentEntry
     {
         public string Id { get; }
         public int Amount { get; }
 
-        public ItemAmountDocumentEntry(string id, int amount)
+        public RewardItemDocumentEntry(string id, int amount)
         {
             Id = id;
             Amount = amount;

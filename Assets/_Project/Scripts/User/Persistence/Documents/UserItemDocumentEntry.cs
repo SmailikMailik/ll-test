@@ -1,11 +1,11 @@
 namespace LL.User.Persistence.Documents
 {
-    internal sealed class ItemAmountDocumentEntry
+    internal sealed class UserItemDocumentEntry
     {
         public string Id { get; }
         public int Amount { get; }
 
-        public ItemAmountDocumentEntry(string id, int amount)
+        public UserItemDocumentEntry(string id, int amount)
         {
             Id = id;
             Amount = amount;

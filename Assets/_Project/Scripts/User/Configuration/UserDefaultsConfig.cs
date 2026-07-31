@@ -23,19 +23,18 @@ namespace LL.User.Configuration
         [BoxGroup("Items")]
         [ValidateInput(nameof(HasValidItems), "User item defaults are invalid.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
-        [SerializeField] private ItemAmountEntry[] _items;
+        [SerializeField] private UserItemDefaultsEntry[] _items;
 
         internal const string CreationPath = "LL/User/User Defaults Config";
 
-        private static readonly IDataValidator<IReadOnlyList<ItemAmountEntry>> _itemsValidator = new UserItemsDefaultsValidator();
-
+        private static readonly IDataValidator<IReadOnlyList<UserItemDefaultsEntry>> _itemsValidator = new UserItemsDefaultsValidator();
         private static readonly IDataValidator<UserDefaultsConfig> _validator = new UserDefaultsConfigValidator(_itemsValidator);
 
         internal UserIdentityDefaults Identity => _identity;
         internal UserProgressDefaults Progress => _progress;
-        internal IReadOnlyList<ItemAmountEntry> Items => _items;
+        internal IReadOnlyList<UserItemDefaultsEntry> Items => _items;
 
-        private static bool HasValidItems(ItemAmountEntry[] entries)
+        private static bool HasValidItems(UserItemDefaultsEntry[] entries)
         {
             return ValidationRunner.IsValid(entries, _itemsValidator);
         }
@@ -76,7 +75,7 @@ namespace LL.User.Configuration
     }
 
     [Serializable]
-    internal sealed class ItemAmountEntry
+    internal sealed class UserItemDefaultsEntry
     {
         [LabelText("ID")]
         [SerializeField] private string _id;

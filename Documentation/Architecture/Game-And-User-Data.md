@@ -75,7 +75,7 @@ Game/Data/
 │   ├── RankUpDeclaration.cs
 │   ├── PaymentDeclaration.cs
 │   ├── RewardDeclaration.cs
-│   └── ItemAmountDeclaration.cs
+│   └── RewardItemDeclaration.cs
 ├── Persistence/
 │   ├── Documents/
 │   │   ├── GameDataDocument.cs
@@ -170,7 +170,7 @@ classDiagram
     GameDataDocument *-- RankUpDocumentEntry
     GameDataDocument *-- RewardDocumentEntry
     RankUpDocumentEntry *-- PaymentDocumentEntry
-    RewardDocumentEntry *-- ItemAmountDocumentEntry
+    RewardDocumentEntry *-- RewardItemDocumentEntry
 
     GameDataDeclaration *-- RankDeclaration
     GameDataDeclaration *-- CardDeclaration
@@ -178,7 +178,7 @@ classDiagram
     GameDataDeclaration *-- RankUpDeclaration
     GameDataDeclaration *-- RewardDeclaration
     RankUpDeclaration *-- PaymentDeclaration
-    RewardDeclaration *-- ItemAmountDeclaration
+    RewardDeclaration *-- RewardItemDeclaration
 ```
 
 Файлы разделены, но агрегаты не раздроблены: источник всё ещё возвращает один `GameDataDeclaration`, а сериализатор

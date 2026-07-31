@@ -10,20 +10,20 @@ namespace LL.User.Persistence.Documents
         public UserIdentityDocumentEntry Identity { get; }
         public UserProgressDocumentEntry Progress { get; }
         public UserRankUpQuestDocumentEntry RankUpQuest { get; }
-        public ItemAmountDocumentEntry[] Items { get; }
+        public UserItemDocumentEntry[] Items { get; }
 
         public UserSaveDocument(
             int version,
             UserIdentityDocumentEntry identity,
             UserProgressDocumentEntry progress,
             UserRankUpQuestDocumentEntry rankUpQuest,
-            ItemAmountDocumentEntry[] items)
+            UserItemDocumentEntry[] items)
         {
             Version = version;
             Identity = identity ?? throw new ArgumentNullException(nameof(identity));
             Progress = progress ?? throw new ArgumentNullException(nameof(progress));
             RankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
-            Items = items ?? Array.Empty<ItemAmountDocumentEntry>();
+            Items = items ?? Array.Empty<UserItemDocumentEntry>();
         }
     }
 }
