@@ -65,7 +65,7 @@ group of closely related types. Do not create a one-type folder merely to make t
 | `Bootstrap` | First-scene startup coordination | Localization readiness, minimum display time, scene activation |
 | `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
 | `Game` | Game rules and reference data | Cards, flags, heroes, items, payments, rank-up, quests, ranks, rewards, upgrades |
-| `Infrastructure` | Reusable technical adapters | Compilation and loading contracts, serialization, storage, reporting |
+| `Infrastructure` | Reusable technical mechanisms | Collection snapshots, compilation and loading contracts, serialization, storage, reporting |
 | `Presentation` | Display meaning without visual lifecycle | Flags, hero portraits, item icons, localization, formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
 | `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, rank-up quest |
@@ -163,6 +163,8 @@ Owns reusable technical mechanisms such as loading contracts, serialization, sto
 
 - Infrastructure must not encode game, user, presentation, or UI policy.
 - Infrastructure must not depend on `Game`, `User`, `Presentation`, `UI`, `Composition`, or `Editor`.
+- `Infrastructure/Collections` owns generic collection-copying helpers. These helpers may define snapshot mechanics
+  such as defensive copying, but they must not define domain collection policy or validation.
 - Prefer capability folders such as `Saving/Serialization` and `Saving/Storage` over technology-only folders.
 - A technology name belongs on the concrete implementation, for example `JsonSaveSerializer` or
   `PlayerPrefsSaveStorage`.

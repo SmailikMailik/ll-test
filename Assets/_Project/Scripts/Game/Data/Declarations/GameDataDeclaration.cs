@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using LL.Infrastructure.Collections;
 
 namespace LL.Game.Data.Declarations
 {
@@ -20,17 +20,12 @@ namespace LL.Game.Data.Declarations
             IEnumerable<RankUpDeclaration> rankUps,
             IEnumerable<RewardDeclaration> rewards)
         {
-            Ranks = Copy(ranks);
-            Cards = Copy(cards);
-            Heroes = Copy(heroes);
-            Quests = Copy(quests);
-            RankUps = Copy(rankUps);
-            Rewards = Copy(rewards);
-        }
-
-        private static IReadOnlyList<T> Copy<T>(IEnumerable<T> entries)
-        {
-            return Array.AsReadOnly(entries is null ? Array.Empty<T>() : new List<T>(entries).ToArray());
+            Ranks = ranks.ToReadOnlyCopy();
+            Cards = cards.ToReadOnlyCopy();
+            Heroes = heroes.ToReadOnlyCopy();
+            Quests = quests.ToReadOnlyCopy();
+            RankUps = rankUps.ToReadOnlyCopy();
+            Rewards = rewards.ToReadOnlyCopy();
         }
     }
 }

@@ -1,6 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using LL.Infrastructure.Collections;
 
 namespace LL.User.Defaults.Declarations
 {
@@ -23,7 +22,7 @@ namespace LL.User.Defaults.Declarations
             RegionCode = regionCode;
             RankId = rankId;
             Experience = experience;
-            Items = Array.AsReadOnly(items?.ToArray() ?? Array.Empty<UserItemDefaultsDeclaration>());
+            Items = items.ToReadOnlyCopy();
         }
     }
 }

@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using LL.Infrastructure.Collections;
 
 namespace LL.Game.Data.Declarations
 {
@@ -11,11 +11,7 @@ namespace LL.Game.Data.Declarations
         internal RewardDeclaration(string id, IEnumerable<RewardItemDeclaration> items)
         {
             Id = id;
-            var copy = items is null
-                ? Array.Empty<RewardItemDeclaration>()
-                : new List<RewardItemDeclaration>(items).ToArray();
-
-            Items = Array.AsReadOnly(copy);
+            Items = items.ToReadOnlyCopy();
         }
     }
 }
