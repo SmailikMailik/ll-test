@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Items;
+using LL.Presentation.Inspector;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -34,12 +35,13 @@ namespace LL.Presentation.Icons.Configuration
     [Serializable]
     internal sealed class ItemIconEntry
     {
-        [SerializeField] private string _id;
+        [LabelText("Item ID")]
+        [SerializeField] private string _itemId;
 
-        [PreviewField(48, ObjectFieldAlignment.Center), TableColumnWidth(64)]
+        [SpritePreview]
         [SerializeField, Required] private Sprite _icon;
 
-        internal ItemId Id => new(_id);
+        internal ItemId Id => new(_itemId);
         internal Sprite Icon => _icon;
 
         internal KeyValuePair<ItemId, Sprite> ToPair() => new(Id, Icon);

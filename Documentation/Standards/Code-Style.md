@@ -69,7 +69,7 @@ exception set.
 - For example:
 
   ```csharp
-  [PreviewField(48, ObjectFieldAlignment.Center), TableColumnWidth(64)]
+  [SpritePreview]
   [SerializeField, Required] private Sprite _icon;
   ```
 - Serialized-field migration rules belong to the authored-asset section of `Architecture.md` because they protect

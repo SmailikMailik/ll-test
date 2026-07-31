@@ -257,8 +257,8 @@ try {
         "using Sirenix.OdinInspector;`n`ninternal sealed class ItemIconCatalogConfig`n{`n" +
             "    [TableList(AlwaysExpanded = true, DrawScrollView = false)]`n" +
             "    [ValidateInput(nameof(IsValid))]`n    [SerializeField] private ItemIconEntry[] _icons;`n}`n`n" +
-            "internal sealed class ItemIconEntry`n{`n    private string _id;`n" +
-            "    [PreviewField(48, ObjectFieldAlignment.Center), TableColumnWidth(64)]`n" +
+            "internal sealed class ItemIconEntry`n{`n    [LabelText(`"Item ID`")]`n    [SerializeField] private string _itemId;`n" +
+            "    [SpritePreview]`n" +
             "    [SerializeField, Required] private Sprite _icon;`n}")
     Invoke-ExpectedResult `
         -Name "Valid compact item icon catalog" `
@@ -290,7 +290,7 @@ try {
         -Script $odinInspectorValidator `
         -Arguments @("-ProjectAssetsRoot", $invalidItemIconOdinRoot) `
         -ExpectedExitCode 1 `
-        -ExpectedOutput "Item icon catalog must use the approved compact sprite table"
+        -ExpectedOutput "Sprite catalog must use the approved compact sprite table"
 } finally {
     $resolvedFixtureRoot = [IO.Path]::GetFullPath($fixtureRoot)
     $resolvedTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())

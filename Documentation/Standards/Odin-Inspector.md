@@ -22,6 +22,22 @@ their scope.
   attributes occupy the presentation layer, Odin value checks occupy the validation layer, and field-contract
   attributes remain in the inline declaration layer.
 
+## Reusable presentation attributes
+
+- Create a composite attribute when one approved presentation recipe is repeated by multiple fields or config
+  types and should evolve as a unit. Do not create one merely to shorten a single call site.
+- Name the class after the visual concept with the `Attribute` suffix and use it without the suffix, for example
+  `SpritePreviewAttribute` and `[SpritePreview]`.
+- Place presentation-owned composites under `Assets/_Project/Scripts/Presentation/Inspector` in the
+  `LL.Presentation.Inspector` namespace. A capability-specific composite stays in that capability's `Inspector`
+  folder instead.
+- Build a purely declarative composite with Odin's `[IncludeMyAttributes]`. Do not introduce a custom drawer or
+  attribute processor when composing existing Odin attributes is sufficient.
+- Keep fixed recipe values inside the composite. Add parameters only when the standard defines multiple meaningful
+  variants; do not expose arbitrary per-field styling.
+- A composite presentation attribute occupies exactly one presentation-layer line above validation and declaration
+  layers.
+
 ## Catalog baseline
 
 Catalog configuration assets and their serialized entry types use the default inspector layout. Do not apply these
@@ -35,25 +51,31 @@ presentation-only Odin attributes in a `*CatalogConfig.cs` file:
 - `PropertyOrder`
 - `TableColumnWidth`
 - `DisplayAsString`
+- `SpritePreview`
 
 Functional attributes such as `ValidateInput`, `Required`, `AssetsOnly`, `MinValue`, `ShowInInspector`, and `Button`
 remain allowed when they provide real authoring behavior rather than arranging the inspector. Helper members remain
 allowed for the same reason.
 
-### Item icon catalog pilot
+### Sprite catalog presentation
 
-`ItemIconCatalogConfig` is the reference implementation for a compact sprite catalog while this presentation is
-being evaluated:
+Apply the compact sprite-catalog presentation to `ItemIconCatalogConfig`, `CountryFlagCatalogConfig`, and
+`HeroPortraitCatalogConfig`:
 
 - Render the entries with `[TableList(AlwaysExpanded = true, DrawScrollView = false)]` so each entry occupies one
   row and the complete catalog remains visible without a nested scroll view.
-- Keep the ID as the default flexible text column.
-- Render the sprite with `PreviewField(48, ObjectFieldAlignment.Center)` in a column whose initial width is 64 pixels.
-- Keep `PreviewField` and `TableColumnWidth` together in the presentation layer above the field declaration.
+- Keep identifier fields as flexible text columns and label them by their domain identifier type: `Item ID`,
+  `Country ID`, or `Hero ID`. Preserve `ID` capitalization explicitly with `LabelText` rather than relying on field
+  name humanization.
+- Name identifier fields by the same domain type (`_itemId`, `_countryId`, `_heroId`). Use a generic `_id` only in a
+  genuinely generic entry type whose identifier domain is supplied by a type parameter.
+- Render every sprite field with `[SpritePreview]`. `SpritePreviewAttribute` composes
+  `PreviewField(48, ObjectFieldAlignment.Center)` and `TableColumnWidth(64)`; change those values centrally rather
+  than overriding them at a call site.
 - Do not add custom labels, groups, colors, titles, or other decoration.
 
-This pilot applies only to `ItemIconCatalogConfig`. Keep other catalog configurations on the default baseline until
-the presentation has been reviewed and its scope is explicitly expanded here.
+Keep catalog configurations without sprite fields on the default baseline until another presentation rule is
+explicitly added here.
 
 ## Enforcement
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Countries;
+using LL.Presentation.Inspector;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace LL.Presentation.Countries.Configuration
     [CreateAssetMenu(fileName = nameof(CountryFlagCatalogConfig), menuName = CreationPath)]
     internal sealed class CountryFlagCatalogConfig : ScriptableObject, IValidationSource
     {
+        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [ValidateInput(nameof(HasValidFlags), "Country flag data is invalid.")]
         [SerializeField] private CountryFlagEntry[] _flags;
 
@@ -30,8 +32,10 @@ namespace LL.Presentation.Countries.Configuration
     [Serializable]
     internal sealed class CountryFlagEntry
     {
+        [LabelText("Country ID")]
         [SerializeField] private string _countryId;
 
+        [SpritePreview]
         [SerializeField, Required] private Sprite _flag;
 
         internal CountryId CountryId => new(_countryId);

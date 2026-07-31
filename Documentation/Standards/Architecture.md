@@ -180,6 +180,9 @@ catalogs, and presentation-facing confirmations.
 - Presentation must not own reusable visual controls, concrete feature views, navigation, or game rules.
 - Presentation must not depend on `UI`.
 - Presentation-specific configuration stays with its presentation capability.
+- `Presentation/Inspector` owns reusable declarative inspector attributes for presentation configuration. These
+  attributes compose authoring metadata only; they do not contain editor workflows, asset-database access, or
+  runtime presentation behavior.
 - `Presentation/Sprites` owns reusable runtime sprite catalogs. `SpriteCatalog<TId>` maps one sprite to a domain ID;
   `SpriteVariantCatalog<TId, TVariant>` maps multiple explicitly named variants to each domain ID.
 - `Presentation/Heroes` owns the independently loaded small and large portrait resources keyed by `HeroId`.

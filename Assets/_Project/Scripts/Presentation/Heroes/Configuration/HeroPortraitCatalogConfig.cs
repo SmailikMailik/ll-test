@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Heroes;
+using LL.Presentation.Inspector;
 using LL.Presentation.Sprites;
 using LL.Validation;
 using Sirenix.OdinInspector;
@@ -11,6 +12,7 @@ namespace LL.Presentation.Heroes.Configuration
     [CreateAssetMenu(fileName = nameof(HeroPortraitCatalogConfig), menuName = CreationPath)]
     internal sealed class HeroPortraitCatalogConfig : ScriptableObject, IValidationSource
     {
+        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [ValidateInput(nameof(HasValidPortraits), "Hero portrait data is invalid.")]
         [SerializeField] private HeroPortraitEntry[] _portraits;
 
@@ -31,9 +33,13 @@ namespace LL.Presentation.Heroes.Configuration
     [Serializable]
     internal sealed class HeroPortraitEntry
     {
+        [LabelText("Hero ID")]
         [SerializeField] private string _heroId;
 
+        [SpritePreview]
         [SerializeField, Required] private Sprite _smallPortrait;
+
+        [SpritePreview]
         [SerializeField, Required] private Sprite _largePortrait;
 
         internal HeroId HeroId => new(_heroId);
