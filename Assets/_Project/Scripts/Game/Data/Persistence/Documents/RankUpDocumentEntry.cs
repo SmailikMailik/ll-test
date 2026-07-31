@@ -6,7 +6,7 @@ namespace LL.Game.Data.Persistence.Documents
     {
         public string RankId { get; }
         public string QuestId { get; }
-        public string HeroLocalizationKey { get; }
+        public string HeroId { get; }
         public int RequiredAmount { get; }
         public int DurationMinutes { get; }
         public PaymentDocumentEntry QuestPayment { get; }
@@ -16,7 +16,7 @@ namespace LL.Game.Data.Persistence.Documents
         public RankUpDocumentEntry(
             string rankId,
             string questId,
-            string heroLocalizationKey,
+            string heroId,
             int requiredAmount,
             int durationMinutes,
             PaymentDocumentEntry questPayment,
@@ -25,7 +25,7 @@ namespace LL.Game.Data.Persistence.Documents
         {
             RankId = rankId;
             QuestId = questId;
-            HeroLocalizationKey = heroLocalizationKey;
+            HeroId = heroId;
             RequiredAmount = requiredAmount;
             DurationMinutes = durationMinutes;
             QuestPayment = questPayment ?? throw new ArgumentNullException(nameof(questPayment));

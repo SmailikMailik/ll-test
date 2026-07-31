@@ -1,6 +1,7 @@
 using System;
 using LL.Game.Data;
 using LL.Game.Cards;
+using LL.Game.Heroes;
 using LL.Game.RankUp;
 using LL.Game.Quests;
 using LL.Game.Ranks;
@@ -25,6 +26,7 @@ namespace LL.Composition.Installers
             builder.RegisterLoadedData(_loader);
             builder.RegisterSnapshotPart<GameDataSnapshot, RankCatalog>(snapshot => snapshot.Ranks);
             builder.RegisterSnapshotPart<GameDataSnapshot, CardCatalog>(snapshot => snapshot.Cards);
+            builder.RegisterSnapshotPart<GameDataSnapshot, HeroCatalog>(snapshot => snapshot.Heroes);
             builder.RegisterSnapshotPart<GameDataSnapshot, QuestCatalog>(snapshot => snapshot.Quests);
             builder.RegisterSnapshotPart<GameDataSnapshot, RankUpCatalog>(snapshot => snapshot.RankUps);
             builder.RegisterSnapshotPart<GameDataSnapshot, RewardCatalog>(snapshot => snapshot.Rewards);

@@ -4,7 +4,7 @@ namespace LL.Game.Data.Declarations
     {
         internal string RankId { get; }
         internal string QuestId { get; }
-        internal string HeroLocalizationKey { get; }
+        internal string HeroId { get; }
         internal int RequiredAmount { get; }
         internal int DurationMinutes { get; }
         internal PaymentDeclaration QuestPayment { get; }
@@ -14,7 +14,7 @@ namespace LL.Game.Data.Declarations
         internal RankUpDeclaration(
             string rankId,
             string questId,
-            string heroLocalizationKey,
+            string heroId,
             int requiredAmount,
             int durationMinutes,
             PaymentDeclaration questPayment,
@@ -23,7 +23,7 @@ namespace LL.Game.Data.Declarations
         {
             RankId = rankId;
             QuestId = questId;
-            HeroLocalizationKey = heroLocalizationKey;
+            HeroId = heroId;
             RequiredAmount = requiredAmount;
             DurationMinutes = durationMinutes;
             QuestPayment = questPayment;

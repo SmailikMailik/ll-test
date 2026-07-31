@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Payments.Configuration;
+using LL.Game.Heroes;
 using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
@@ -38,7 +39,7 @@ namespace LL.Game.RankUp.Configuration
     {
         [SerializeField] private string _rankId;
         [SerializeField] private string _questId;
-        [SerializeField] private string _heroLocalizationKey;
+        [SerializeField] private string _heroId;
 
         [SerializeField, MinValue(1)] private int _requiredAmount = 1;
         [SerializeField, MinValue(1)] private int _durationMinutes = 1440;
@@ -49,7 +50,7 @@ namespace LL.Game.RankUp.Configuration
 
         internal RankId RankId => new(_rankId);
         internal QuestId QuestId => new(_questId);
-        internal string HeroLocalizationKey => _heroLocalizationKey;
+        internal HeroId HeroId => new(_heroId);
         internal int RequiredAmount => _requiredAmount;
         internal int DurationMinutes => _durationMinutes;
         internal PaymentEntry QuestPayment => _questPayment;

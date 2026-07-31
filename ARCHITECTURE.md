@@ -62,9 +62,9 @@ group of closely related types. Do not create a one-type folder merely to make t
 | --- | --- | --- |
 | `Bootstrap` | First-scene startup coordination | Localization readiness, minimum display time, scene activation |
 | `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
-| `Game` | Game rules and reference data | Cards, items, payments, rank-up, quests, ranks, rewards, upgrades |
+| `Game` | Game rules and reference data | Cards, countries, heroes, items, payments, rank-up, quests, ranks, rewards, upgrades |
 | `Infrastructure` | Reusable technical adapters | Compilation and loading contracts, serialization, storage, reporting |
-| `Presentation` | Display meaning without visual lifecycle | Icons, localization, display formatting, text tokens, confirmations |
+| `Presentation` | Display meaning without visual lifecycle | Country flags, hero portraits, icons, localization, formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
 | `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, rank-up quest |
 | `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
@@ -129,6 +129,10 @@ and use-case services.
   feature, use `Definition` for APIs and variables that expose the immutable rule set, and `RankUp` for commands and
   capability names that describe the player action. Use `RankUp`, never `Promotion`, as the code and folder vocabulary
   for this feature.
+- `Game/Heroes` owns hero identity and immutable hero definitions. A hero definition contains its localized-name key
+  and ISO country reference, while rank-up and other game capabilities refer to it only through `HeroId`.
+- `Game/Countries` owns `CountryId` and its ISO 3166-1 alpha-2 validation. It does not model country presentation or
+  localized country metadata until those concepts are required.
 - Unity-dependent authoring adapters are allowed under the owning capability's `Configuration` folder.
 - Cross-capability workflows belong to the capability that owns the outcome; create a new capability only when no
   existing owner is correct.
@@ -174,6 +178,12 @@ catalogs, and presentation-facing confirmations.
 - Presentation must not own reusable visual controls, concrete feature views, navigation, or game rules.
 - Presentation must not depend on `UI`.
 - Presentation-specific configuration stays with its presentation capability.
+- `Presentation/Heroes` owns the independently loaded small and large portrait resources keyed by `HeroId`.
+  Portrait data remains static sprites; optional animation is view behavior and does not change hero definitions.
+  The current large portrait is a single composed hero-and-background image. When separate art becomes available,
+  the lobby prefab will retain its background layer and bind only the isolated hero layer to the portrait catalog.
+- `Presentation/Countries` owns country flag sprites keyed by `CountryId`. Game hero definitions never reference
+  Unity sprites directly.
 
 ### `UI`
 
@@ -372,9 +382,8 @@ methods, then passes the resulting `IDataLoader<GameDataSnapshot>`, `IUserDefaul
 ScriptableObject, file, PlayerPrefs, or another storage technology. Changing a runtime data source is therefore a
 composition-root change rather than an installer or consumer change.
 
-The same scope constructs the focused `ScriptableObjectItemIconCatalogLoader` and
-`ScriptableObjectWindowCatalogLoader` adapters and passes them to presentation and window installers as
-`IDataLoader<T>`.
+The same scope constructs the focused item-icon, country-flag, hero-portrait, and window-catalog ScriptableObject
+loaders and passes them to presentation and window installers as `IDataLoader<T>`.
 
 The project scope is auto-created from `VContainerSettings`; the bootstrap scene must not create another project
 scope. Scene scopes inherit project registrations through the configured parent relationship.
@@ -401,6 +410,8 @@ ISaveStorage -> ISaveService -> SerializedGameDataSource
 
 Both sources end at the same declaration. A source may check transport shape and document version, but only the
 compiler validates aggregate identifiers and references or creates domain definitions and catalogs.
+Current game-data documents use version `2`; this version adds heroes and replaces rank-up hero localization keys
+with `HeroId` references.
 
 ### User state
 
@@ -450,7 +461,13 @@ The focused presentation catalog follows the same authored-resource boundary:
 
 ```text
 ItemIconCatalogConfig -> ScriptableObjectItemIconCatalogLoader -> IconCatalog<ItemId>
+CountryFlagCatalogConfig -> ScriptableObjectCountryFlagCatalogLoader -> IconCatalog<CountryId>
+HeroPortraitCatalogConfig -> ScriptableObjectHeroPortraitCatalogLoader -> HeroPortraitCatalog
 ```
+
+`HeroView` resolves a hero name and country flag from `HeroId` and composes a small `HeroPortraitView`.
+`HeroPortraitView` selects either the small or large portrait and may own lightweight visual animation without
+moving that behavior into game or presentation data.
 
 `RankUpFlow` and `UpgradeFlow` coordinate use cases and windows. Game services own rule execution; flows own
 sequencing and presentation decisions; windows own visual behavior.

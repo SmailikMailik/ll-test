@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Data.Declarations;
+using LL.Game.Countries;
+using LL.Game.Heroes;
 using LL.Game.Identifiers;
 using LL.Game.Items;
 using LL.Game.Payments;
@@ -20,6 +22,7 @@ namespace LL.Game.Data
         private const string RankEntriesCode = "rank-catalog.entries.not-empty";
         private const string RankReferenceCode = "rank-up.rank.exists";
         private const string QuestReferenceCode = "rank-up.quest.exists";
+        private const string HeroReferenceCode = "rank-up.hero.exists";
         private const string RewardReferenceCode = "rank-up.reward.exists";
         private const string FinalRankCode = "rank-up.rank.not-final";
         private const string RankUpRequiredCode = "rank-up.rank.required";
@@ -44,6 +47,10 @@ namespace LL.Game.Data
                 declaration.Cards,
                 entry => new ItemId(entry.Id),
                 nameof(declaration.Cards));
+            var heroIds = EnsureValidAndCollectIds(
+                declaration.Heroes,
+                entry => new HeroId(entry.Id),
+                nameof(declaration.Heroes));
             var questIds = EnsureValidAndCollectIds(
                 declaration.Quests,
                 entry => new QuestId(entry.Id),
@@ -61,16 +68,18 @@ namespace LL.Game.Data
                 declaration,
                 rankIds,
                 questIds,
+                heroIds,
                 rewardIds,
                 rankUpRankIds);
 
             var ranks = CompileRanks(declaration.Ranks);
             var cards = CompileCards(declaration.Cards);
+            var heroes = CompileHeroes(declaration.Heroes);
             var quests = CompileQuests(declaration.Quests);
             var rankUps = CompileRankUps(declaration.RankUps);
             var rewards = CompileRewards(declaration.Rewards);
 
-            return new GameDataSnapshot(ranks, cards, quests, rankUps, rewards);
+            return new GameDataSnapshot(ranks, cards, heroes, quests, rankUps, rewards);
         }
 
         private static RankCatalog CompileRanks(IReadOnlyList<RankDeclaration> declarations)
@@ -81,6 +90,11 @@ namespace LL.Game.Data
         private static CardCatalog CompileCards(IReadOnlyList<CardDeclaration> declarations)
         {
             return new CardCatalog(declarations.Select(ToCard));
+        }
+
+        private static HeroCatalog CompileHeroes(IReadOnlyList<HeroDeclaration> declarations)
+        {
+            return new HeroCatalog(declarations.Select(ToHeroDefinition));
         }
 
         private static QuestCatalog CompileQuests(IReadOnlyList<QuestDeclaration> declarations)
@@ -111,6 +125,14 @@ namespace LL.Game.Data
             return new Card(new ItemId(declaration.Id), declaration.ExperienceAmount);
         }
 
+        private static HeroDefinition ToHeroDefinition(HeroDeclaration declaration)
+        {
+            return new HeroDefinition(
+                new HeroId(declaration.Id),
+                declaration.NameLocalizationKey,
+                new CountryId(declaration.CountryId));
+        }
+
         private static QuestDefinition ToQuestDefinition(QuestDeclaration declaration)
         {
             return new QuestDefinition(
@@ -125,7 +147,7 @@ namespace LL.Game.Data
                 new RankId(declaration.RankId),
                 new RankUpQuest(
                     new QuestId(declaration.QuestId),
-                    declaration.HeroLocalizationKey,
+                    new HeroId(declaration.HeroId),
                     declaration.RequiredAmount,
                     TimeSpan.FromMinutes(declaration.DurationMinutes),
                     ToPayment(declaration.QuestPayment)),
@@ -176,6 +198,7 @@ namespace LL.Game.Data
             GameDataDeclaration declaration,
             ISet<RankId> rankIds,
             ISet<QuestId> questIds,
+            ISet<HeroId> heroIds,
             ISet<RewardId> rewardIds,
             ISet<RankId> rankUpRankIds)
         {
@@ -201,6 +224,11 @@ namespace LL.Game.Data
                             questIds,
                             rankUpContext.At(nameof(rankUp.QuestId)),
                             QuestReferenceCode);
+                        ValidationRules.ReferenceExists(
+                            new HeroId(rankUp.HeroId),
+                            heroIds,
+                            rankUpContext.At(nameof(rankUp.HeroId)),
+                            HeroReferenceCode);
                         ValidationRules.ReferenceExists(
                             new RewardId(rankUp.RewardId),
                             rewardIds,

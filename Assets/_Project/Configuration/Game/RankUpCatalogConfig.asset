@@ -15,7 +15,7 @@ MonoBehaviour:
   _rankUps:
   - _rankId: rank_1
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:
@@ -27,7 +27,7 @@ MonoBehaviour:
     _rewardId: rank_1_rank_up
   - _rankId: rank_2
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:
@@ -39,7 +39,7 @@ MonoBehaviour:
     _rewardId: rank_2_rank_up
   - _rankId: rank_3
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:
@@ -51,7 +51,7 @@ MonoBehaviour:
     _rewardId: rank_3_rank_up
   - _rankId: rank_4
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:
@@ -63,7 +63,7 @@ MonoBehaviour:
     _rewardId: rank_4_rank_up
   - _rankId: rank_5
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:
@@ -75,7 +75,7 @@ MonoBehaviour:
     _rewardId: rank_5_rank_up
   - _rankId: rank_6
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:
@@ -87,7 +87,7 @@ MonoBehaviour:
     _rewardId: rank_6_rank_up
   - _rankId: rank_7
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:
@@ -99,7 +99,7 @@ MonoBehaviour:
     _rewardId: rank_7_rank_up
   - _rankId: rank_8
     _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
+    _heroId: soldier
     _requiredAmount: 20
     _durationMinutes: 1440
     _questPayment:

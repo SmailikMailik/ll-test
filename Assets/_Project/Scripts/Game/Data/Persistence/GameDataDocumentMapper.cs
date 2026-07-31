@@ -17,6 +17,8 @@ namespace LL.Game.Data.Persistence
                     new RankDeclaration(rank.Id, rank.RequiredExperience)),
                 document.Cards.Select(card =>
                     new CardDeclaration(card.Id, card.ExperienceAmount)),
+                document.Heroes.Select(hero =>
+                    new HeroDeclaration(hero.Id, hero.NameLocalizationKey, hero.CountryId)),
                 document.Quests.Select(quest =>
                     new QuestDeclaration(
                         quest.Id,
@@ -38,7 +40,7 @@ namespace LL.Game.Data.Persistence
             return new RankUpDeclaration(
                 rankUp.RankId,
                 rankUp.QuestId,
-                rankUp.HeroLocalizationKey,
+                rankUp.HeroId,
                 rankUp.RequiredAmount,
                 rankUp.DurationMinutes,
                 ToDeclaration(rankUp.QuestPayment),

@@ -36,6 +36,7 @@ namespace LL.UI.Windows.Flows
             Action onFailed)
         {
             if (_isPending ||
+                _rankUpService.TryGetDefinition(out var definition) is false ||
                 _rankUpService.CanRankUp(payment) is false)
             {
                 onFailed?.Invoke();
@@ -44,6 +45,7 @@ namespace LL.UI.Windows.Flows
 
             _isPending = true;
             _confirmation.Confirm(
+                definition.Quest.HeroId,
                 payment,
                 () => OnRankUpConfirmed(payment, onSucceeded, onFailed),
                 () => OnRankUpRejected(onFailed));

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
 using LL.Game.RankUp;
 using LL.Game.RankUp.Services;
 using LL.Game.Quests;
@@ -38,6 +39,7 @@ namespace LL.UI.Windows.RankUp
         private readonly Subject<Unit> _completed = new();
 
         private IQuestCompletionConfirmation _completionConfirmation;
+        private HeroCatalog _heroes;
         private ILocalizationService _localization;
         private IUserRankUpQuest _rankUpQuest;
         private IRankUpQuestService _rankUpQuestService;
@@ -52,11 +54,13 @@ namespace LL.UI.Windows.RankUp
         [Inject]
         private void Construct(
             IQuestCompletionConfirmation completionConfirmation,
+            HeroCatalog heroes,
             ILocalizationService localization,
             IUserRankUpQuest rankUpQuest,
             IRankUpQuestService rankUpQuestService)
         {
             _completionConfirmation = completionConfirmation ?? throw new ArgumentNullException(nameof(completionConfirmation));
+            _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
             _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
             _rankUpQuestService = rankUpQuestService ?? throw new ArgumentNullException(nameof(rankUpQuestService));
@@ -105,6 +109,7 @@ namespace LL.UI.Windows.RankUp
             RankUpQuest rankUpQuest,
             QuestDefinition quest)
         {
+            var hero = _heroes.GetHero(rankUpQuest.HeroId);
             var unlockText = TextTags.Style(
                 _localization.GetText(RankUpLocalizationKeys.Unlock),
                 TextStyle.Accent);
@@ -123,7 +128,7 @@ namespace LL.UI.Windows.RankUp
                 new Dictionary<string, object>
                 {
                     [CountVariable] = countText,
-                    [HeroVariable] = _localization.GetText(rankUpQuest.HeroLocalizationKey)
+                    [HeroVariable] = _localization.GetText(hero.NameLocalizationKey)
                 });
         }
 

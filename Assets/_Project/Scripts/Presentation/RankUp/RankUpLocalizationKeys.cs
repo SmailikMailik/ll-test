@@ -9,6 +9,5 @@ namespace LL.Presentation.RankUp
         internal const string CancelAction = "Upgrade/actions.cancel_rank_up";
         internal const string Unlock = "Upgrade/fragments.rank_up_unlock";
         internal const string PriceLabel = "Upgrade/labels.price";
-        internal const string Hero = "Game/heroes.soldier";
     }
 }

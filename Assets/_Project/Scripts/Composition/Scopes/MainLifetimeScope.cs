@@ -2,6 +2,7 @@ using LL.Game.RankUp.Services;
 using LL.Presentation.RankUp;
 using LL.Presentation.Quests;
 using LL.Presentation.Upgrades;
+using LL.UI.Views.Heroes;
 using LL.UI.Windows;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Modal;
@@ -15,10 +16,12 @@ namespace LL.Composition.Scopes
     internal sealed class MainLifetimeScope : LifetimeScope
     {
         [SerializeField] private WindowController _windowController;
+        [SerializeField] private HeroPortraitView _heroPortraitView;
 
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterComponent(_windowController);
+            builder.RegisterComponent(_heroPortraitView);
             RegisterConfirmations(builder);
             RegisterRankUp(builder);
             RegisterUpgradeFlow(builder);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
 using LL.Game.Payments;
 using LL.Presentation.Localization;
 using LL.Presentation.Payments;
@@ -16,25 +17,29 @@ namespace LL.UI.Windows.Modal
 
         private readonly WindowController _windowController;
         private readonly ILocalizationService _localization;
+        private readonly HeroCatalog _heroes;
 
         [Inject]
         internal ModalRankUpConfirmation(
             WindowController windowController,
-            ILocalizationService localization)
+            ILocalizationService localization,
+            HeroCatalog heroes)
         {
             _windowController = windowController ?? throw new ArgumentNullException(nameof(windowController));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+            _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
         }
 
-        public void Confirm(Payment payment, Action onConfirmed, Action onRejected)
+        public void Confirm(HeroId heroId, Payment payment, Action onConfirmed, Action onRejected)
         {
+            var hero = _heroes.GetHero(heroId);
             var priceText = PaymentFormatter.Format(payment);
             var priceLabel = TextTags.Style(
                 _localization.GetText(RankUpLocalizationKeys.PriceLabel),
                 TextStyle.Muted);
             var priceLine = $"{priceLabel} {priceText}";
             var heroText = TextTags.Style(
-                _localization.GetText(RankUpLocalizationKeys.Hero),
+                _localization.GetText(hero.NameLocalizationKey),
                 TextStyle.Accent);
 
             _windowController.Show(new ModalWindowParameters

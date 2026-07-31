@@ -3,6 +3,7 @@ using System.Linq;
 using LL.Game.Cards.Configuration;
 using LL.Game.Data.Configuration;
 using LL.Game.Data.Declarations;
+using LL.Game.Heroes.Configuration;
 using LL.Game.Payments.Configuration;
 using LL.Game.RankUp.Configuration;
 using LL.Game.Quests.Configuration;
@@ -28,6 +29,7 @@ namespace LL.Game.Data.Sources
             return new GameDataDeclaration(
                 _manifest.Ranks.Ranks.Select(ToRankDeclaration),
                 _manifest.Cards.Cards.Select(ToCardDeclaration),
+                _manifest.Heroes.Heroes.Select(ToHeroDeclaration),
                 _manifest.Quests.Quests.Select(ToQuestDeclaration),
                 _manifest.RankUps.RankUps.Select(ToRankUpDeclaration),
                 _manifest.Rewards.Rewards.Select(ToRewardDeclaration));
@@ -38,6 +40,7 @@ namespace LL.Game.Data.Sources
             ValidationRunner.EnsureValid(_manifest);
             ValidationRunner.EnsureValid(_manifest.Ranks);
             ValidationRunner.EnsureValid(_manifest.Cards);
+            ValidationRunner.EnsureValid(_manifest.Heroes);
             ValidationRunner.EnsureValid(_manifest.Quests);
             ValidationRunner.EnsureValid(_manifest.RankUps);
             ValidationRunner.EnsureValid(_manifest.Rewards);
@@ -53,6 +56,14 @@ namespace LL.Game.Data.Sources
             return new CardDeclaration(card.Id.Value, card.ExperienceAmount);
         }
 
+        private static HeroDeclaration ToHeroDeclaration(HeroEntry hero)
+        {
+            return new HeroDeclaration(
+                hero.Id.Value,
+                hero.NameLocalizationKey,
+                hero.CountryId.Value);
+        }
+
         private static QuestDeclaration ToQuestDeclaration(QuestEntry quest)
         {
             return new QuestDeclaration(
@@ -66,7 +77,7 @@ namespace LL.Game.Data.Sources
             return new RankUpDeclaration(
                 rankUp.RankId.Value,
                 rankUp.QuestId.Value,
-                rankUp.HeroLocalizationKey,
+                rankUp.HeroId.Value,
                 rankUp.RequiredAmount,
                 rankUp.DurationMinutes,
                 ToPaymentDeclaration(rankUp.QuestPayment),

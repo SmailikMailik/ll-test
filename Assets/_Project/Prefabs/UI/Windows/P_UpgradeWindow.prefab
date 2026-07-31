@@ -4358,7 +4358,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 409117881327649629, guid: 742589c37b71e3641bb710222d788c87, type: 3}
       propertyPath: m_Name
-      value: P_CharacterView
+      value: P_HeroView
       objectReference: {fileID: 0}
     - target: {fileID: 3590696994899624306, guid: 742589c37b71e3641bb710222d788c87, type: 3}
       propertyPath: m_Pivot.x

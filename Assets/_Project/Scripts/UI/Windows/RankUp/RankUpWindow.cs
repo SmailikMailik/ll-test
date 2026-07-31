@@ -9,6 +9,7 @@ using LL.Presentation.Payments;
 using LL.Presentation.Typography;
 using LL.UI.Controls;
 using LL.UI.Rewards;
+using LL.UI.Views.Heroes;
 using LL.UI.Windows.Flows;
 using LL.User.State.Progress;
 using R3;
@@ -33,6 +34,7 @@ namespace LL.UI.Windows.RankUp
 
         [SerializeField] private NextRankRewardView _nextRankRewardView;
 
+        [SerializeField] private HeroView _heroView;
         [SerializeField] private RankUpQuestView _questView;
 
         private IUserProgress _userProgress;
@@ -79,6 +81,7 @@ namespace LL.UI.Windows.RankUp
             {
                 _questPriceLabel.text = PaymentFormatter.Format(_definition.Quest.Payment);
                 _instantPriceLabel.text = PaymentFormatter.Format(_definition.InstantPayment);
+                _heroView.Show(_definition.Quest.HeroId);
                 _questView.Refresh(
                     _definition.Quest,
                     quest,

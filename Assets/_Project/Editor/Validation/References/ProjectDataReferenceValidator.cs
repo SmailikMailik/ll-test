@@ -9,13 +9,15 @@ namespace LLEditor.Validation.References
         private readonly IProjectDataReferenceValidation[] _validations =
         {
             new RankUpQuestReferenceValidator(),
+            new RankUpHeroReferenceValidator(),
             new RankUpRankReferenceValidator(),
             new RankUpRewardReferenceValidator(),
             new UserProgressRankReferenceValidator(),
             new BuiltInUserItemReferenceValidator(),
             new CardItemReferenceValidator(),
             new RankUpPaymentReferenceValidator(),
-            new RewardItemReferenceValidator()
+            new RewardItemReferenceValidator(),
+            new HeroPresentationReferenceValidator()
         };
 
         internal void Validate(
