@@ -277,6 +277,46 @@ function Test-UserStateCommandConsumers {
     }
 }
 
+function Test-ContentMenuCoverage {
+    $menuRoot = Join-Path $editorRoot "Menu"
+    $menuContent = ""
+
+    if (Test-Path -LiteralPath $menuRoot) {
+        foreach ($menuFile in Get-ChildItem -LiteralPath $menuRoot -Recurse -Filter "*.cs") {
+            $menuContent += [IO.File]::ReadAllText($menuFile.FullName)
+            $menuContent += "`n"
+        }
+    }
+
+    foreach ($configFile in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*Config.cs") {
+        $content = [IO.File]::ReadAllText($configFile.FullName)
+
+        if ($content -notmatch "\[CreateAssetMenu\b") {
+            continue
+        }
+
+        $configTypeMatch = [regex]::Match(
+            $content,
+            "\bclass\s+(?<name>[A-Za-z_][A-Za-z0-9_]*Config)\b")
+
+        if ($configTypeMatch.Success -eq $false) {
+            Add-ArchitectureError "CreateAssetMenu config type could not be identified: $($configFile.FullName)"
+            continue
+        }
+
+        $configType = $configTypeMatch.Groups["name"].Value
+        $selectorPattern = "\bProjectAssetSelector\s*\.\s*Select\s*<\s*" +
+            [regex]::Escape($configType) +
+            "\s*>\s*\("
+
+        if ($menuContent -notmatch $selectorPattern) {
+            Add-ArchitectureError (
+                "Root authored config must be exposed through Last Level/Content: " +
+                "$($configFile.FullName) ($configType)")
+        }
+    }
+}
+
 $allowedCompositionFolders = @("Scopes", "Installers", "Factories")
 $allowedRuntimeFolders = @(
     "Bootstrap",
@@ -352,6 +392,7 @@ Test-DiRegistrations
 Test-DomainDataLoaders
 Test-DataBoundaryRoles
 Test-UserStateCommandConsumers
+Test-ContentMenuCoverage
 
 foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recurse -Filter "*.cs") {
     $content = [IO.File]::ReadAllText($file.FullName)

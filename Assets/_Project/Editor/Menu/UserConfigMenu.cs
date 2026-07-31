@@ -5,7 +5,7 @@ namespace LLEditor.Menu
 {
     internal static class UserConfigMenu
     {
-        [MenuItem(LastLevelMenu.ContentPath + "User Defaults", false, LastLevelMenu.UserContentPriority)]
+        [MenuItem(LastLevelMenu.Content.Path + "User Defaults", false, LastLevelMenu.Content.UserPriority)]
         private static void SelectUserDefaultsConfig()
         {
             ProjectAssetSelector.Select<UserDefaultsConfig>(UserDefaultsConfig.CreationPath);

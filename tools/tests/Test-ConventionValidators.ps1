@@ -81,11 +81,31 @@ try {
         -ExpectedExitCode 1 `
         -ExpectedOutput "Unsupported runtime top-level area"
 
+    $missingContentMenuRoot = New-ArchitectureFixture "architecture-missing-content-menu"
+    [IO.Directory]::CreateDirectory(
+        (Join-Path $missingContentMenuRoot "Assets/_Project/Scripts/Game/Configuration")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $missingContentMenuRoot "Assets/_Project/Scripts/Game/Configuration/ExampleConfig.cs"),
+        "using UnityEngine;`n`nnamespace LL.Game.Configuration`n{`n    [CreateAssetMenu]`n" +
+            "    internal sealed class ExampleConfig : ScriptableObject { }`n}")
+    Invoke-ExpectedResult `
+        -Name "Missing Content menu entry" `
+        -Script $architectureValidator `
+        -Arguments @("-ProjectRoot", $missingContentMenuRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Root authored config must be exposed through Last Level/Content"
+
     $validStyleRoot = Join-Path $fixtureRoot "style-valid"
     [IO.Directory]::CreateDirectory((Join-Path $validStyleRoot "Scripts/Game")) | Out-Null
     [IO.File]::WriteAllText(
         (Join-Path $validStyleRoot "Scripts/Game/Mode.cs"),
         "namespace LL.Game;`n`ninternal enum Mode : byte`n{`n    First = 0,`n    Second = 1`n}")
+    [IO.Directory]::CreateDirectory((Join-Path $validStyleRoot "Editor/Menu")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $validStyleRoot "Editor/Menu/ProjectMenu.cs"),
+        "using UnityEditor;`n`ninternal static class ProjectMenu`n{`n" +
+            "    [MenuItem(`"Project/Deliberately Long Menu Item That Must Remain On One Physical Line Regardless Of The General Hard Line Limit`", false, 123)]`n" +
+            "    private static void Run() { }`n}")
     Invoke-ExpectedResult `
         -Name "Valid code style" `
         -Script $codeStyleValidator `
@@ -154,6 +174,19 @@ try {
         -Arguments @("-ProjectAssetsRoot", $invalidFileEndingRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "C# file must end without a trailing newline"
+
+    $invalidMenuItemRoot = Join-Path $fixtureRoot "style-invalid-menu-item"
+    [IO.Directory]::CreateDirectory((Join-Path $invalidMenuItemRoot "Editor/Menu")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidMenuItemRoot "Editor/Menu/ProjectMenu.cs"),
+        "using UnityEditor;`n`ninternal static class ProjectMenu`n{`n    [MenuItem(`n" +
+            "        `"Project/Action`",`n        false,`n        0)]`n    private static void Run() { }`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid MenuItem layout" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidMenuItemRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "MenuItem attribute must remain on one physical line"
 } finally {
     $resolvedFixtureRoot = [IO.Path]::GetFullPath($fixtureRoot)
     $resolvedTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())

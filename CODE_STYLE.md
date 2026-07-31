@@ -10,7 +10,7 @@ These rules apply to C# under `Assets/_Project`. Generated and third-party code 
 
 - Treat 120 characters as the point at which wrapping deserves a readability decision.
 - Lines from 121 through 140 characters may remain intact when the single-line form is clearer.
-- Never exceed 140 characters. There are no exceptions to this hard limit.
+- Never exceed 140 characters except for a single-line Unity Editor `[MenuItem(...)]` attribute.
 - Keep a simple assignment, expression, or invocation with one expression or lambda argument on one line when it
   fits within 120 characters.
 - Do not break immediately after an assignment operator merely to shorten a line.
@@ -44,6 +44,8 @@ These rules apply to C# under `Assets/_Project`. Generated and third-party code 
 ## Attributes and serialized fields
 
 - Place attributes applied to types, constructors, methods, properties, and other members on separate lines.
+- Keep each Unity Editor `[MenuItem(...)]` attribute complete on one physical line regardless of its length. This is
+  the only exception to the 140-character hard limit.
 - Keep `[SerializeField]` and `[JsonProperty]` inline with the field declaration.
 - Combine serialized-field constraints and decorators into the same attribute list, for example
   `[SerializeField, Min(0f), Tooltip("Duration in seconds.")] private float _duration;`.

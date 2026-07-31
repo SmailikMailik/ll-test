@@ -5,7 +5,7 @@ namespace LLEditor.Menu
 {
     internal static class WindowCatalogMenu
     {
-        [MenuItem(LastLevelMenu.ContentPath + "Window Catalog", false, LastLevelMenu.ProjectContentPriority + 1)]
+        [MenuItem(LastLevelMenu.Content.Path + "Window Catalog", false, LastLevelMenu.Content.UIPriority)]
         private static void SelectWindowCatalog()
         {
             ProjectAssetSelector.Select<WindowCatalogConfig>(WindowCatalogConfig.CreationPath);

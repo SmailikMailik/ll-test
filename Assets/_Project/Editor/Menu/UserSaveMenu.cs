@@ -6,7 +6,7 @@ namespace LLEditor.Menu
 {
     internal static class UserSaveMenu
     {
-        [MenuItem(LastLevelMenu.DeleteSavedUserDataPath, false, LastLevelMenu.DeleteSavedUserDataPriority)]
+        [MenuItem(LastLevelMenu.Commands.DeleteSavedUserDataPath, false, LastLevelMenu.Commands.DeleteSavedUserDataPriority)]
         private static void DeleteSavedUserData()
         {
             var repository = UserSaveRepositoryFactory.CreateJsonFile();
@@ -30,7 +30,7 @@ namespace LLEditor.Menu
                 Debug.Log("Saved user data was deleted.");
         }
 
-        [MenuItem(LastLevelMenu.DeleteSavedUserDataPath, true, LastLevelMenu.DeleteSavedUserDataPriority)]
+        [MenuItem(LastLevelMenu.Commands.DeleteSavedUserDataPath, true, LastLevelMenu.Commands.DeleteSavedUserDataPriority)]
         private static bool CanDeleteSavedUserData() => EditorApplication.isPlayingOrWillChangePlaymode is false;
     }
 }

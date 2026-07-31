@@ -348,6 +348,12 @@ the runtime catalog.
   settings capability and integration so the expected resource key remains unchanged.
 - Do not mix framework settings with authored game, presentation, UI, or user data merely because both use
   `ScriptableObject`.
+- Expose every project-authored root configuration declared with `CreateAssetMenu` through `Last Level/Content`, using
+  `ProjectAssetSelector` so the command selects the existing asset or starts its normal creation flow.
+- Group `Last Level/Content` entries by the configuration's owning runtime area and separate the groups with menu
+  priority gaps. Keep presentation image catalogs, including icons, flags, and portraits, together in their own
+  Presentation group, separate from Game, UI, and User content.
+- Add the Content menu entry and its automated coverage in the same change as a new root authored configuration.
 - Keep shared Unity swatch and preset libraries under `Assets/_Project/Presets`.
 - Place Unity project preset-library files in a nested `Editor` folder so Unity discovers them without mixing them
   with the editor-tooling source assembly.

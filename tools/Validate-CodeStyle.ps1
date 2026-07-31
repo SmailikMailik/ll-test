@@ -174,6 +174,19 @@ foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter
         Add-CodeStyleError "C# file must end without a trailing newline: $($file.FullName)"
     }
 
+    foreach ($menuItemMatch in [regex]::Matches(
+        $content,
+        "(?s)\[MenuItem\s*\([^\]]*?\)\]")) {
+        if ($menuItemMatch.Value -match "\r|\n") {
+            $lineNumber = [regex]::Matches(
+                $content.Substring(0, $menuItemMatch.Index),
+                "\r\n|\r|\n").Count + 1
+            Add-CodeStyleError (
+                "MenuItem attribute must remain on one physical line: " +
+                "$($file.FullName):$lineNumber")
+        }
+    }
+
     foreach ($callbackMatch in [regex]::Matches(
         $codeOnly,
         "\.Subscribe\s*\(\s*(?<name>(?!On)[A-Za-z_][A-Za-z0-9_]*)\s*\)")) {
@@ -264,7 +277,7 @@ foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter
     foreach ($line in [IO.File]::ReadLines($file.FullName)) {
         $lineNumber++
 
-        if ($line.Length -gt 140) {
+        if ($line.Length -gt 140 -and $line -notmatch "^\s*\[MenuItem\s*\(") {
             Add-CodeStyleError "Line exceeds the hard limit of 140 characters: $($file.FullName):$lineNumber"
         }
     }
