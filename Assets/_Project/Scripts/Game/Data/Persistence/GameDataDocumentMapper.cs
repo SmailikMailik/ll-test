@@ -13,26 +13,38 @@ namespace LL.Game.Data.Persistence
                 throw new ArgumentNullException(nameof(document));
 
             return new GameDataDeclaration(
-                document.Ranks.Select(rank =>
-                    new RankDeclaration(rank.Id, rank.RequiredExperience)),
-                document.Cards.Select(card =>
-                    new CardDeclaration(card.Id, card.ExperienceAmount)),
-                document.Heroes.Select(hero =>
-                    new HeroDeclaration(hero.Id, hero.NameLocalizationKey, hero.FlagId)),
-                document.Quests.Select(quest =>
-                    new QuestDeclaration(
-                        quest.Id,
-                        quest.TitleLocalizationKey,
-                        quest.DescriptionLocalizationKey)),
-                document.RankUps.Select(ToDeclaration),
-                document.Rewards.Select(reward =>
-                    new RewardDeclaration(
-                        reward.Id,
-                        reward.Items.Select(item =>
-                            new RewardItemDeclaration(item.Id, item.Amount)))));
+                document.Ranks.Select(ToRankDeclaration),
+                document.Cards.Select(ToCardDeclaration),
+                document.Heroes.Select(ToHeroDeclaration),
+                document.Quests.Select(ToQuestDeclaration),
+                document.RankUps.Select(ToRankUpDeclaration),
+                document.Rewards.Select(ToRewardDeclaration));
         }
 
-        private static RankUpDeclaration ToDeclaration(RankUpDocumentEntry rankUp)
+        private static RankDeclaration ToRankDeclaration(RankDocumentEntry rank)
+        {
+            return new RankDeclaration(rank.Id, rank.RequiredExperience);
+        }
+
+        private static CardDeclaration ToCardDeclaration(CardDocumentEntry card)
+        {
+            return new CardDeclaration(card.Id, card.ExperienceAmount);
+        }
+
+        private static HeroDeclaration ToHeroDeclaration(HeroDocumentEntry hero)
+        {
+            return new HeroDeclaration(hero.Id, hero.NameLocalizationKey, hero.FlagId);
+        }
+
+        private static QuestDeclaration ToQuestDeclaration(QuestDocumentEntry quest)
+        {
+            return new QuestDeclaration(
+                quest.Id,
+                quest.TitleLocalizationKey,
+                quest.DescriptionLocalizationKey);
+        }
+
+        private static RankUpDeclaration ToRankUpDeclaration(RankUpDocumentEntry rankUp)
         {
             if (rankUp is null)
                 throw new ArgumentException("Rank-up data cannot contain null entries.");
@@ -43,17 +55,29 @@ namespace LL.Game.Data.Persistence
                 rankUp.HeroId,
                 rankUp.RequiredCount,
                 rankUp.DurationMinutes,
-                ToDeclaration(rankUp.QuestPayment),
-                ToDeclaration(rankUp.InstantPayment),
+                ToPaymentDeclaration(rankUp.QuestPayment),
+                ToPaymentDeclaration(rankUp.InstantPayment),
                 rankUp.RewardId);
         }
 
-        private static PaymentDeclaration ToDeclaration(PaymentDocumentEntry payment)
+        private static PaymentDeclaration ToPaymentDeclaration(PaymentDocumentEntry payment)
         {
             if (payment is null)
                 throw new ArgumentNullException(nameof(payment));
 
             return new PaymentDeclaration(payment.ItemId, payment.Amount);
+        }
+
+        private static RewardDeclaration ToRewardDeclaration(RewardDocumentEntry reward)
+        {
+            return new RewardDeclaration(
+                reward.Id,
+                reward.Items.Select(ToRewardItemDeclaration));
+        }
+
+        private static RewardItemDeclaration ToRewardItemDeclaration(RewardItemDocumentEntry item)
+        {
+            return new RewardItemDeclaration(item.Id, item.Amount);
         }
     }
 }

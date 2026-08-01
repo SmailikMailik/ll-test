@@ -52,6 +52,19 @@ exception set.
 - Use `Min` and `Max`, rather than `Minimum` and `Maximum`, in identifiers that represent bounds. Keep words
   unabbreviated in user-facing text.
 
+## Aggregate mappings
+
+- In a mapper or source adapter that constructs an aggregate `Document`, `Declaration`, or `Snapshot`, keep the root
+  method as an overview of the aggregate's top-level parts. Move field-by-field conversion of each distinct nested
+  type into a private static helper.
+- Name each conversion helper after its destination type in the form `To<DestinationType>`, such as
+  `ToRankDeclaration` or `ToUserItemDocumentEntry`. Do not rely on overloaded generic names such as `ToDeclaration`
+  when a mapper converts more than one source type.
+- Use a method group such as `entries.Select(ToRewardItemDeclaration)` for a context-free element conversion. Keep a
+  lambda only when the conversion needs call-site context that the helper cannot receive naturally.
+- Preserve validation semantics when extracting conversions. Root trust-boundary validation and nested-entry guards
+  remain at the same logical boundary; readability refactoring must not silently add, remove, or relocate validation.
+
 ## Attributes and serialized fields
 
 - Place attributes applied to types, constructors, methods, properties, and other members on separate lines.

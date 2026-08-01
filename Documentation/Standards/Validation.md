@@ -71,7 +71,7 @@ Coverage labels mean:
 | Attribute layout, empty bodies, and simple expression wrapping | Partial | `tools/Validate-CodeStyle.ps1` |
 | DI constructor marking, R3 lifetime, and component multiplicity | Partial | `tools/Validate-CodeStyle.ps1` |
 | Unity null semantics, callback prefixes, and bound identifiers | Partial | `tools/Validate-CodeStyle.ps1` |
-| Naming clarity, member order, managed null semantics, and lifecycle intent | Review | Code review |
+| Naming clarity, member order, aggregate-mapping structure, managed null semantics, and lifecycle intent | Review | Code review |
 | Unity serialized keys, GUIDs, asset references, and data validity | Partial | Unity validation plus targeted search and review |
 
 When adding or materially changing a structural rule, add focused positive and negative fixtures for the validator

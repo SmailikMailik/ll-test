@@ -16,17 +16,10 @@ namespace LL.User.Persistence
                 throw new ArgumentNullException(nameof(document));
 
             return new UserSnapshot(
-                new UserIdentitySnapshot(document.Identity.UserId, document.Identity.RegionCode),
-                new UserItemsSnapshot(
-                    document.Items.Select(item =>
-                        new ItemAmount(new ItemId(item.Id), item.Amount))),
-                new UserProgressSnapshot(
-                    new RankId(document.Progress.RankId),
-                    document.Progress.Experience),
-                new UserRankUpQuestSnapshot(
-                    new QuestId(document.RankUpQuest.QuestId),
-                    document.RankUpQuest.DeadlineUnixMilliseconds,
-                    document.RankUpQuest.IsCompleted));
+                ToUserIdentitySnapshot(document.Identity),
+                new UserItemsSnapshot(document.Items.Select(ToItemAmount)),
+                ToUserProgressSnapshot(document.Progress),
+                ToUserRankUpQuestSnapshot(document.RankUpQuest));
         }
 
         internal static UserSaveDocument ToDocument(UserSnapshot snapshot)
@@ -36,17 +29,58 @@ namespace LL.User.Persistence
 
             return new UserSaveDocument(
                 UserSaveDocument.CurrentVersion,
-                new UserIdentityDocumentEntry(snapshot.Identity.UserId, snapshot.Identity.RegionCode),
-                new UserProgressDocumentEntry(
-                    snapshot.Progress.RankId.Value,
-                    snapshot.Progress.Experience),
-                new UserRankUpQuestDocumentEntry(
-                    snapshot.RankUpQuest.QuestId.Value,
-                    snapshot.RankUpQuest.DeadlineUnixMilliseconds,
-                    snapshot.RankUpQuest.IsCompleted),
+                ToUserIdentityDocumentEntry(snapshot.Identity),
+                ToUserProgressDocumentEntry(snapshot.Progress),
+                ToUserRankUpQuestDocumentEntry(snapshot.RankUpQuest),
                 snapshot.Items.Amounts
-                    .Select(item => new UserItemDocumentEntry(item.Id.Value, item.Amount))
+                    .Select(ToUserItemDocumentEntry)
                     .ToArray());
+        }
+
+        private static UserIdentitySnapshot ToUserIdentitySnapshot(UserIdentityDocumentEntry identity)
+        {
+            return new UserIdentitySnapshot(identity.UserId, identity.RegionCode);
+        }
+
+        private static ItemAmount ToItemAmount(UserItemDocumentEntry item)
+        {
+            return new ItemAmount(new ItemId(item.Id), item.Amount);
+        }
+
+        private static UserProgressSnapshot ToUserProgressSnapshot(UserProgressDocumentEntry progress)
+        {
+            return new UserProgressSnapshot(new RankId(progress.RankId), progress.Experience);
+        }
+
+        private static UserRankUpQuestSnapshot ToUserRankUpQuestSnapshot(UserRankUpQuestDocumentEntry rankUpQuest)
+        {
+            return new UserRankUpQuestSnapshot(
+                new QuestId(rankUpQuest.QuestId),
+                rankUpQuest.DeadlineUnixMilliseconds,
+                rankUpQuest.IsCompleted);
+        }
+
+        private static UserIdentityDocumentEntry ToUserIdentityDocumentEntry(UserIdentitySnapshot identity)
+        {
+            return new UserIdentityDocumentEntry(identity.UserId, identity.RegionCode);
+        }
+
+        private static UserItemDocumentEntry ToUserItemDocumentEntry(ItemAmount item)
+        {
+            return new UserItemDocumentEntry(item.Id.Value, item.Amount);
+        }
+
+        private static UserProgressDocumentEntry ToUserProgressDocumentEntry(UserProgressSnapshot progress)
+        {
+            return new UserProgressDocumentEntry(progress.RankId.Value, progress.Experience);
+        }
+
+        private static UserRankUpQuestDocumentEntry ToUserRankUpQuestDocumentEntry(UserRankUpQuestSnapshot rankUpQuest)
+        {
+            return new UserRankUpQuestDocumentEntry(
+                rankUpQuest.QuestId.Value,
+                rankUpQuest.DeadlineUnixMilliseconds,
+                rankUpQuest.IsCompleted);
         }
     }
 }
