@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using LL.UI.VisualStates.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 namespace LL.UI.VisualStates.Effects
 {
-    [AddComponentMenu("LL/UI/Visual States/Effects/Object Toggle Effect")]
-    [HideMonoScript]
-    internal sealed class ObjectToggleEffect : VisualStateEffect
+    [Serializable]
+    [MovedFrom(true, "LL.UI.VisualStates.Effects", null, "ObjectToggleEffect")]
+    internal sealed class GameObjectActiveEffect : VisualStateEffect
     {
-        [ValidateInput(nameof(IsValidTarget), "Target cannot be this GameObject or one of its parents.")]
+        [ValidateInput(nameof(IsValidTarget), "Target cannot be the source GameObject or one of its parents.")]
         [SerializeField, Required] private GameObject _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<ActiveStateValue> _states = new();
 
-        private bool _initialActive;
+        [NonSerialized] private bool _initialActive;
 
         protected override void CaptureInitialValue()
         {
@@ -42,26 +43,20 @@ namespace LL.UI.VisualStates.Effects
                 _target.SetActive(_initialActive);
         }
 
-#if UNITY_EDITOR
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            SynchronizeValues();
-        }
-
-        private void SynchronizeValues()
+        protected override void SynchronizeValues(Type stateType)
         {
             _states ??= new List<ActiveStateValue>();
             var defaultActive = _target != null && _target.activeSelf;
             SynchronizeStateValues(
                 _states,
+                stateType,
                 (state, stateName) => new ActiveStateValue(state, stateName, defaultActive));
         }
-#endif
 
         private bool IsValidTarget(GameObject target) =>
             target == null ||
-            target != gameObject && transform.IsChildOf(target.transform) is false;
+            Source == null ||
+            target != Source.gameObject && Source.transform.IsChildOf(target.transform) is false;
 
         [Serializable]
         private sealed class ActiveStateValue : StateValue<bool>

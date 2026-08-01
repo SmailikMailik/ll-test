@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2625412757655965793}
   - component: {fileID: 7225047986168113795}
   - component: {fileID: 7419062748502947183}
-  - component: {fileID: 4662536458133563002}
   m_Layer: 5
   m_Name: P_UpgradeCardView
   m_TagString: Untagged
@@ -54,10 +53,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cf08aa113d94cc284a6681321bf9dc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _stateSource: {fileID: 7419062748502947183}
   _iconImage: {fileID: 3736454698003732823}
-  _addButton: {fileID: 7502684135798462419}
   _progressLabel: {fileID: 1525261692928005945}
+  _addButton: {fileID: 7502684135798462419}
+  _stateSource: {fileID: 7419062748502947183}
 --- !u!114 &7419062748502947183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,27 +69,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57053300145848cca02c8da5f64762fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4662536458133563002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 232170048491682585}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c651c7418b3a4138b983a20a111b855f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _source: {fileID: 7419062748502947183}
-  _target: {fileID: 8897623689837278141}
-  _states:
-  - _state: 0
-    _stateName: Normal
-    _value: 0
-  - _state: 1
-    _stateName: Selected
-    _value: 1
+  _effects:
+  - rid: 1664193352940388378
+  references:
+    version: 2
+    RefIds:
+    - rid: 1664193352940388378
+      type: {class: GameObjectActiveEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      data:
+        _target: {fileID: 8897623689837278141}
+        _states:
+        - _state: 0
+          _stateName: Normal
+          _value: 0
+        - _state: 1
+          _stateName: Selected
+          _value: 1
 --- !u!1 &3603188880253601164
 GameObject:
   m_ObjectHideFlags: 0

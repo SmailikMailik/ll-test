@@ -86,8 +86,6 @@ GameObject:
   - component: {fileID: 7358197253307477832}
   - component: {fileID: 6924140768945000809}
   - component: {fileID: 8428503926411970011}
-  - component: {fileID: 4144094152000328299}
-  - component: {fileID: 8563111371980756099}
   m_Layer: 5
   m_Name: P_IconButton
   m_TagString: Untagged
@@ -140,55 +138,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad43ca90c2434655a2f97bfd6680ae4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4144094152000328299
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2723066229655186564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37d0e63950aa4ee6b35318695b2ca082, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _source: {fileID: 8428503926411970011}
-  _transitionSeconds: 0.08
-  _ease: 6
-  _target: {fileID: 7358197253307477832}
-  _states:
-  - _state: 0
-    _stateName: Normal
-    _value: {x: 1, y: 1, z: 1}
-  - _state: 1
-    _stateName: Pressed
-    _value: {x: 1.05, y: 1.05, z: 1.05}
-  - _state: 2
-    _stateName: Disabled
-    _value: {x: 1, y: 1, z: 1}
---- !u!114 &8563111371980756099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2723066229655186564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 616355a5c11a4c0c8f7af9038fb8d320, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _source: {fileID: 8428503926411970011}
-  _transitionSeconds: 0.08
-  _ease: 6
-  _target: {fileID: 8062787203873096402}
-  _states:
-  - _state: 0
-    _stateName: Normal
-    _value: 1
-  - _state: 1
-    _stateName: Pressed
-    _value: 1
-  - _state: 2
-    _stateName: Disabled
-    _value: 0.2
+  _effects:
+  - rid: 4144094152000328299
+  - rid: 8563111371980756099
+  references:
+    version: 2
+    RefIds:
+    - rid: 4144094152000328299
+      type: {class: ScaleEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      data:
+        _transitionSeconds: 0.08
+        _ease: 6
+        _target: {fileID: 7358197253307477832}
+        _states:
+        - _state: 0
+          _stateName: Normal
+          _value: {x: 1, y: 1, z: 1}
+        - _state: 1
+          _stateName: Pressed
+          _value: {x: 1.05, y: 1.05, z: 1.05}
+        - _state: 2
+          _stateName: Disabled
+          _value: {x: 1, y: 1, z: 1}
+    - rid: 8563111371980756099
+      type: {class: GraphicAlphaEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      data:
+        _transitionSeconds: 0.08
+        _ease: 6
+        _target: {fileID: 8062787203873096402}
+        _states:
+        - _state: 0
+          _stateName: Normal
+          _value: 1
+        - _state: 1
+          _stateName: Pressed
+          _value: 1
+        - _state: 2
+          _stateName: Disabled
+          _value: 0.2

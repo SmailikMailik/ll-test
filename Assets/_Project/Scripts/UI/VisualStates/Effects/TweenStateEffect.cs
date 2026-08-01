@@ -1,9 +1,11 @@
+using System;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace LL.UI.VisualStates.Effects
 {
+    [Serializable]
     internal abstract class TweenStateEffect : VisualStateEffect
     {
         [PropertyOrder(100)]
@@ -15,7 +17,7 @@ namespace LL.UI.VisualStates.Effects
 
         protected float TransitionSeconds => _transitionSeconds;
 
-        private Tween _transition;
+        [NonSerialized] private Tween _transition;
 
         protected bool ShouldApplyImmediately(bool instantly) => instantly || _transitionSeconds <= 0f;
 
@@ -35,12 +37,9 @@ namespace LL.UI.VisualStates.Effects
             _transition = null;
         }
 
-#if UNITY_EDITOR
-        protected override void OnValidate()
+        protected override void Normalize()
         {
-            base.OnValidate();
             _transitionSeconds = Mathf.Max(0f, _transitionSeconds);
         }
-#endif
     }
 }

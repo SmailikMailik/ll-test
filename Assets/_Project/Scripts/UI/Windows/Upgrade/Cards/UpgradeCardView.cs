@@ -20,11 +20,10 @@ namespace LL.UI.Windows.Upgrade.Cards
     [DisallowMultipleComponent]
     internal sealed class UpgradeCardView : MonoBehaviour, IPointerClickHandler
     {
-        [SerializeField] private SelectionStateSource _stateSource;
-
         [SerializeField] private Image _iconImage;
         [SerializeField] private TMP_Text _progressLabel;
         [SerializeField] private InteractiveButton _addButton;
+        [SerializeField] private SelectionStateSource _stateSource;
 
         private const int AddAmount = 1;
         private const int MinAmount = 0;

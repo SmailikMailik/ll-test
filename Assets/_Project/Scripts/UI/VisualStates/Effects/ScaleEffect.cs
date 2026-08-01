@@ -7,8 +7,7 @@ using UnityEngine;
 
 namespace LL.UI.VisualStates.Effects
 {
-    [AddComponentMenu("LL/UI/Visual States/Effects/Scale Effect")]
-    [HideMonoScript]
+    [Serializable]
     internal sealed class ScaleEffect : TweenStateEffect
     {
         [SerializeField, Required] private RectTransform _target;
@@ -16,7 +15,7 @@ namespace LL.UI.VisualStates.Effects
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<ScaleStateValue> _states = new();
 
-        private Vector3 _initialScale;
+        [NonSerialized] private Vector3 _initialScale;
 
         protected override void CaptureInitialValue()
         {
@@ -49,29 +48,15 @@ namespace LL.UI.VisualStates.Effects
                 _target.localScale = _initialScale;
         }
 
-#if UNITY_EDITOR
-        protected override void Reset()
-        {
-            base.Reset();
-            _target = (RectTransform)transform;
-            SynchronizeValues();
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            SynchronizeValues();
-        }
-
-        private void SynchronizeValues()
+        protected override void SynchronizeValues(Type stateType)
         {
             _states ??= new List<ScaleStateValue>();
             var defaultScale = _target == null ? Vector3.one : _target.localScale;
             SynchronizeStateValues(
                 _states,
+                stateType,
                 (state, stateName) => new ScaleStateValue(state, stateName, defaultScale));
         }
-#endif
 
         [Serializable]
         private sealed class ScaleStateValue : StateValue<Vector3>

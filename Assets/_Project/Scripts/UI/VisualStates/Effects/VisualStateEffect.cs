@@ -2,64 +2,45 @@ using System;
 using System.Collections.Generic;
 using LL.UI.VisualStates.Effects.Values;
 using LL.UI.VisualStates.Sources;
-using R3;
-using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace LL.UI.VisualStates.Effects
 {
-    internal abstract class VisualStateEffect : MonoBehaviour
+    [Serializable]
+    internal abstract class VisualStateEffect
     {
-        [SerializeField, Required] private VisualStateSource _source;
+        [NonSerialized] private VisualStateSource _source;
 
-        private bool _isStarted;
+        protected VisualStateSource Source => _source;
 
-        private void Start()
+        internal void Initialize(VisualStateSource source)
         {
-            if (_source == null)
-            {
-                Debug.LogError(
-                    $"{GetType().Name} requires a {nameof(VisualStateSource)}.",
-                    this);
-                enabled = false;
-                return;
-            }
-
+            _source = source;
             CaptureInitialValue();
-            _isStarted = true;
-
-            var applyInstantly = true;
-
-            _source.State
-                .Subscribe(state =>
-                {
-                    if (isActiveAndEnabled)
-                        ApplyState(state, applyInstantly);
-
-                    applyInstantly = false;
-                })
-                .AddTo(this);
         }
 
-        private void OnEnable()
+        internal void Apply(int state, bool instantly)
         {
-            if (_isStarted)
-                ApplyState(_source.State.Value, true);
+            ApplyState(state, instantly);
         }
 
-        private void OnDisable()
+        internal void Restore()
         {
-            if (_isStarted is false)
-                return;
-
             StopTransition();
             RestoreInitialValue();
+        }
+
+        internal void Synchronize(VisualStateSource source)
+        {
+            _source = source;
+            Normalize();
+            SynchronizeValues(source.StateType);
         }
 
         protected abstract void CaptureInitialValue();
         protected abstract void ApplyState(int state, bool instantly);
         protected virtual void StopTransition() { }
         protected abstract void RestoreInitialValue();
+        protected virtual void Normalize() { }
 
         protected bool TryGetStateValue<TValue>(
             IReadOnlyList<TValue> values,
@@ -83,28 +64,15 @@ namespace LL.UI.VisualStates.Effects
             return false;
         }
 
-#if UNITY_EDITOR
-        protected virtual void Reset()
-        {
-            TryAssignSource();
-        }
-
-        protected virtual void OnValidate()
-        {
-            TryAssignSource();
-        }
+        protected virtual void SynchronizeValues(Type stateType) { }
 
         protected void SynchronizeStateValues<TValue>(
             List<TValue> values,
+            Type stateType,
             Func<int, string, TValue> createValue)
             where TValue : StateValue
         {
-            if (_source == null || values is null)
-                return;
-
-            var stateType = _source.StateType;
-
-            if (stateType is null || stateType.IsEnum is false)
+            if (values is null || stateType is null || stateType.IsEnum is false)
                 return;
 
             var existingValues = new Dictionary<int, TValue>();
@@ -129,17 +97,5 @@ namespace LL.UI.VisualStates.Effects
                 values.Add(stateValue);
             }
         }
-
-        private void TryAssignSource()
-        {
-            if (_source != null)
-                return;
-
-            var sources = GetComponentsInParent<VisualStateSource>(true);
-
-            if (sources.Length == 1)
-                _source = sources[0];
-        }
-#endif
     }
 }

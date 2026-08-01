@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using LL.UI.Extensions;
@@ -8,8 +9,7 @@ using UnityEngine.UI;
 
 namespace LL.UI.VisualStates.Effects
 {
-    [AddComponentMenu("LL/UI/Visual States/Effects/Graphic Alpha Effect")]
-    [HideMonoScript]
+    [Serializable]
     internal sealed class GraphicAlphaEffect : TweenStateEffect
     {
         [SerializeField, Required] private Graphic _target;
@@ -17,7 +17,7 @@ namespace LL.UI.VisualStates.Effects
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<AlphaStateValue> _states = new();
 
-        private float _initialAlpha;
+        [NonSerialized] private float _initialAlpha;
 
         protected override void CaptureInitialValue()
         {
@@ -50,32 +50,17 @@ namespace LL.UI.VisualStates.Effects
                 _target.SetAlpha(_initialAlpha);
         }
 
-#if UNITY_EDITOR
-        protected override void Reset()
-        {
-            base.Reset();
-            _target = GetComponent<Graphic>();
-            SynchronizeValues();
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            SynchronizeValues();
-        }
-
-        private void SynchronizeValues()
+        protected override void SynchronizeValues(Type stateType)
         {
             _states ??= new List<AlphaStateValue>();
             var defaultAlpha = _target == null ? 1f : _target.color.a;
             SynchronizeStateValues(
                 _states,
+                stateType,
                 (state, stateName) => new AlphaStateValue(state, stateName, defaultAlpha));
 
             foreach (var state in _states)
                 state.Clamp();
         }
-#endif
-
     }
 }
