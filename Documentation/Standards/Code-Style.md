@@ -1,95 +1,103 @@
-# C# Code Style and Lifecycle Conventions
+# Стиль кода C# и соглашения о жизненном цикле
 
-This document is the source of truth for project-owned C# style and lifecycle conventions. Architectural ownership,
-placement, dependencies, and type-role naming belong to [`Architecture.md`](Architecture.md). Validation semantics
-and required checks belong to [`Validation.md`](Validation.md).
+Этот документ — источник истины для правил проекта по стилю C# и жизненному циклу. Владение архитектурными
+областями, размещение, зависимости и именование ролей типов определены в
+[`Architecture.md`](Architecture.md). Семантика валидации и обязательные проверки определены в
+[`Validation.md`](Validation.md).
 
-These rules apply to C# under `Assets/_Project`. Generated and third-party code is outside their scope.
+Эти правила применяются к C#-коду в `Assets/_Project`. Сгенерированный и сторонний код находится вне их области
+действия.
 
-## Readability and line length
+## Читаемость и длина строк
 
-- Treat 120 characters as the point at which wrapping deserves a readability decision.
-- Lines from 121 through 140 characters may remain intact when the single-line form is clearer.
-- Never exceed 140 characters except for the constructs listed under [Hard-limit exceptions](#hard-limit-exceptions).
-- Keep a simple assignment, expression, or invocation with one expression or lambda argument on one line when it
-  fits within 120 characters.
-- Do not break immediately after an assignment operator merely to shorten a line.
-- End every C# file immediately after its final non-empty line, without a trailing `LF` or `CRLF` character.
+- Считайте 120 символов границей, после которой следует принять осознанное решение о переносе ради читаемости.
+- Строки длиной от 121 до 140 символов могут оставаться без переноса, если однострочная форма понятнее.
+- Никогда не превышайте 140 символов, кроме конструкций, перечисленных в разделе
+  [Исключения из жёсткого ограничения](#исключения-из-жёсткого-ограничения).
+- Оставляйте простое присваивание, выражение или вызов с одним выражением либо lambda-аргументом в одной строке,
+  если она укладывается в 120 символов.
+- Не переносите строку сразу после оператора присваивания только ради её сокращения.
+- Завершайте каждый C#-файл сразу после последней непустой строки, без завершающего символа `LF` или `CRLF`.
 
-### Hard-limit exceptions
+### Исключения из жёсткого ограничения
 
-The following constructs must remain complete on one physical line regardless of length. They are the only
-exceptions to the 140-character hard limit:
+Следующие конструкции должны целиком находиться в одной физической строке независимо от её длины. Это единственные
+исключения из жёсткого ограничения в 140 символов:
 
-- A Unity Editor `[MenuItem(...)]` attribute.
-- A null-coalescing throw expression containing `?? throw`, from its left operand through the thrown expression.
+- Атрибут Unity Editor `[MenuItem(...)]`.
+- Выражение с null-объединением и выбрасыванием исключения, содержащее `?? throw`, от левого операнда до выражения
+  выбрасываемого исключения включительно.
 
-Add any future hard-limit exception to this list and make narrower sections link here instead of restating the
-exception set.
+Добавляйте любое будущее исключение из жёсткого ограничения в этот список, а в более узких разделах ссылайтесь на
+него вместо повторения набора исключений.
 
-## Expressions and null checks
+## Выражения и проверки на null
 
-- Prefer positive predicate names and conditions when they make control flow easier to read. Both unary `!` and an
-  explicit `expression is false` pattern are allowed; choose the clearer form at the call site.
-- Check ordinary managed references with `is null` and `is not null`, not `== null` or `!= null`.
-- Check references whose static type is `UnityEngine.Object` or a derived Unity type with `== null` and `!= null` so
-  Unity's destroyed-object fake-null semantics are preserved.
-- Keep every null-coalescing throw expression in the form
-  `_dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));` on one physical line, as
-  required by [Hard-limit exceptions](#hard-limit-exceptions).
-- When a dependency is not assigned directly, use a conventional `if` guard followed by
+- Отдавайте предпочтение положительным именам предикатов и условиям, если они упрощают чтение потока управления.
+  Допустимы как унарный `!`, так и явный шаблон `expression is false`; выбирайте более понятную форму в месте вызова.
+- Проверяйте обычные управляемые ссылки с помощью `is null` и `is not null`, а не `== null` или `!= null`.
+- Проверяйте ссылки, статический тип которых — `UnityEngine.Object` или производный Unity-тип, с помощью `== null` и
+  `!= null`, чтобы сохранить семантику Unity fake-null для уничтоженных объектов.
+- Оставляйте каждое выражение с null-объединением и выбрасыванием исключения в форме
+  `_dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));` в одной физической строке, как
+  требует раздел [Исключения из жёсткого ограничения](#исключения-из-жёсткого-ограничения).
+- Если зависимость не присваивается напрямую, используйте обычную проверку `if`, за которой следует
   `throw new ArgumentNullException(...)`.
 
-## Declarations and member organization
+## Объявления и организация членов
 
-- Write every empty C# body inline as `{ }` after its declaration. For a multiline declaration, place `{ }` after
-  the final signature line.
-- Declare serialized fields first in a type. Do not add `[Required]` by default.
-- Place constants immediately after serialized fields. Other fields, properties, constructors, lifecycle methods,
-  public or internal behavior, and private helpers follow in that order when practical.
-- Declare every project enum with `byte` as its underlying type and explicit sequential values starting at `0`.
-  Preserve existing numeric values when an enum is serialized or persisted.
-- Use `Min` and `Max`, rather than `Minimum` and `Maximum`, in identifiers that represent bounds. Keep words
-  unabbreviated in user-facing text.
+- Записывайте каждое пустое тело C# в одну строку как `{ }` после объявления. Для многострочного объявления
+  размещайте `{ }` после последней строки сигнатуры.
+- Сначала объявляйте сериализованные поля типа. Не добавляйте `[Required]` по умолчанию.
+- Размещайте константы сразу после сериализованных полей. Затем, когда это целесообразно, следуют остальные поля,
+  свойства, конструкторы, методы жизненного цикла, публичное или internal-поведение и приватные вспомогательные методы.
+- Объявляйте каждое проектное перечисление с базовым типом `byte` и явными последовательными значениями, начиная с
+  `0`. Сохраняйте существующие числовые значения, если перечисление сериализуется или хранится постоянно.
+- Используйте `Min` и `Max`, а не `Minimum` и `Maximum`, в идентификаторах, обозначающих границы. В тексте для
+  пользователя не сокращайте слова.
 
-## Aggregate representations and mappings
+## Агрегатные представления и преобразования
 
-- Give every aggregate one canonical semantic order for its top-level parts. Preserve that order across its
-  `Config`, `Document`, `Declaration`, `Snapshot`, and `State` representations: use it for properties, constructor
-  parameters and assignments, and aggregate construction calls in sources, compilers, and mappers. Representation
-  metadata such as a document version precedes the aggregate parts. A member's shape as a scalar, nested object, or
-  collection does not by itself determine its position.
-- In a mapper or source adapter that constructs an aggregate `Document`, `Declaration`, or `Snapshot`, keep the root
-  method as an overview of the aggregate's top-level parts. Move field-by-field conversion of each distinct nested
-  type into a private static helper.
-- Order a mapper's conversion helpers by direction and then by the destination aggregate's canonical part order.
-- Name each conversion helper after its destination type in the form `To<DestinationType>`, such as
-  `ToRankDeclaration` or `ToUserItemDocumentEntry`. Do not rely on overloaded generic names such as `ToDeclaration`
-  when a mapper converts more than one source type.
-- Use a method group such as `entries.Select(ToRewardItemDeclaration)` for a context-free element conversion. Keep a
-  lambda only when the conversion needs call-site context that the helper cannot receive naturally.
-- Preserve validation semantics when extracting conversions. Root trust-boundary validation and nested-entry guards
-  remain at the same logical boundary; readability refactoring must not silently add, remove, or relocate validation.
+- Задавайте каждому агрегату один канонический семантический порядок его частей верхнего уровня. Сохраняйте этот
+  порядок в представлениях `Config`, `Document`, `Declaration`, `Snapshot` и `State`: применяйте его к свойствам,
+  параметрам и присваиваниям конструктора, а также к вызовам создания агрегата в источниках, компиляторах и mapper-ах.
+  Метаданные представления, например версия документа, предшествуют частям агрегата. Форма члена — скаляр, вложенный
+  объект или коллекция — сама по себе не определяет его положение.
+- В mapper-е или адаптере источника, создающем агрегат `Document`, `Declaration` или `Snapshot`, оставляйте корневой
+  метод обзором частей агрегата верхнего уровня. Переносите поэлементное преобразование каждого отдельного вложенного
+  типа в приватный статический вспомогательный метод.
+- Упорядочивайте вспомогательные методы преобразования mapper-а сначала по направлению, затем по каноническому
+  порядку частей целевого агрегата.
+- Именуйте каждый вспомогательный метод преобразования по его целевому типу в форме `To<DestinationType>`, например
+  `ToRankDeclaration` или `ToUserItemDocumentEntry`. Не полагайтесь на перегруженные общие имена вроде
+  `ToDeclaration`, если mapper преобразует больше одного исходного типа.
+- Используйте группу методов, например `entries.Select(ToRewardItemDeclaration)`, для преобразования элементов без
+  контекста. Оставляйте lambda-выражение только тогда, когда преобразованию нужен контекст места вызова, который
+  невозможно естественно передать вспомогательному методу.
+- При извлечении преобразований сохраняйте семантику валидации. Валидация корневой границы доверия и проверки
+  вложенных элементов остаются на прежней логической границе; рефакторинг ради читаемости не должен незаметно
+  добавлять, удалять или переносить валидацию.
 
-## Attributes and serialized fields
+## Атрибуты и сериализованные поля
 
-- Place attributes applied to types, constructors, methods, properties, and other members on separate lines.
-- Follow the single-line `[MenuItem(...)]` rule in [Hard-limit exceptions](#hard-limit-exceptions).
-- Keep `[SerializeField]` and `[JsonProperty]` inline with the field declaration.
-- Organize a serialized field's attributes into responsibility layers, ordered from inspector presentation to value
-  validation to the field declaration. Put each non-empty layer on its own physical line.
-- Combine attributes that belong to the same layer in one attribute list. Never combine presentation or value
-  validation attributes with the inline declaration layer.
-- The declaration layer contains `[SerializeField]` or `[JsonProperty]` and field-contract attributes such as
-  `Required` and `AssetsOnly`; keep the complete layer inline with the field declaration.
-- Presentation attributes such as `PreviewField`, `TableColumnWidth`, `SuffixLabel`, and `Tooltip` belong on the
-  first line. Value constraints such as `ValidateInput`, `Min`, `Max`, `Range`, `MinValue`, and `MaxValue` belong on
-  the next line. Omit a layer when it has no attributes.
-- Treat the attribute lines and declaration as one field block. When such a block starts with an attribute on its
-  own line and follows another field, put one blank line before the block. Keep the block itself contiguous: do not
-  put blank lines between its attribute layers or between the final attribute layer and the declaration. Fields
-  whose attributes all remain inline with their declarations may stay adjacent without blank lines.
-- For example:
+- Размещайте атрибуты типов, конструкторов, методов, свойств и других членов на отдельных строках.
+- Соблюдайте правило одной строки для `[MenuItem(...)]` из раздела
+  [Исключения из жёсткого ограничения](#исключения-из-жёсткого-ограничения).
+- Оставляйте `[SerializeField]` и `[JsonProperty]` в одной строке с объявлением поля.
+- Организуйте атрибуты сериализованного поля по слоям ответственности: от представления в инспекторе через
+  валидацию значения к объявлению поля. Каждый непустой слой размещайте на отдельной физической строке.
+- Объединяйте атрибуты одного слоя в одном списке атрибутов. Никогда не объединяйте атрибуты представления или
+  валидации значения со встроенным в объявление слоем.
+- Слой объявления содержит `[SerializeField]` или `[JsonProperty]` и атрибуты контракта поля, например `Required` и
+  `AssetsOnly`; весь этот слой должен находиться в одной строке с объявлением поля.
+- Атрибуты представления, например `PreviewField`, `TableColumnWidth`, `SuffixLabel` и `Tooltip`, находятся в первой
+  строке. Ограничения значения, например `ValidateInput`, `Min`, `Max`, `Range`, `MinValue` и `MaxValue`, находятся в
+  следующей строке. Пропускайте слой, если в нём нет атрибутов.
+- Считайте строки атрибутов и объявление единым блоком поля. Если такой блок начинается с атрибута на отдельной строке
+  и следует за другим полем, добавляйте перед блоком одну пустую строку. Сам блок оставляйте непрерывным: не вставляйте
+  пустые строки между слоями атрибутов или между последним слоем атрибутов и объявлением. Поля, все атрибуты которых
+  остаются в одной строке с объявлениями, могут располагаться подряд без пустых строк.
+- Например:
 
   ```csharp
   [SerializeField] private string _itemId;
@@ -97,39 +105,40 @@ exception set.
   [MinValue(1)]
   [SerializeField] private int _amount = 1;
   ```
-- Serialized-field migration rules belong to the authored-asset section of `Architecture.md` because they protect
-  persisted data rather than formatting.
+- Правила миграции сериализованных полей относятся к разделу о создаваемых ассетах в `Architecture.md`, поскольку
+  защищают сохранённые данные, а не форматирование.
 
-## Dependency injection
+## Внедрение зависимостей
 
-- Mark every constructor selected by VContainer with `[Inject]`, including a sole or parameterless constructor.
-- Mark VContainer injection methods named `Construct` with `[Inject]`.
-- Constructors called explicitly with `new`, including installer, DTO, snapshot, definition, value-object, and
-  factory-product constructors, are manual composition and must not use `[Inject]`.
-- A `Construct` method only validates and assigns dependencies. It must not subscribe, initialize state, update UI,
-  or perform other side effects.
+- Помечайте `[Inject]` каждый конструктор, выбираемый VContainer, включая единственный конструктор или конструктор без
+  параметров.
+- Помечайте `[Inject]` методы внедрения VContainer с именем `Construct`.
+- Конструкторы, явно вызываемые через `new`, включая конструкторы installer-ов, DTO, snapshot-ов, definition-ов,
+  value object-ов и продуктов factory, относятся к ручной композиции и не должны использовать `[Inject]`.
+- Метод `Construct` только проверяет и присваивает зависимости. Он не должен создавать подписки, инициализировать
+  состояние, обновлять UI или выполнять другие побочные действия.
 
-## Reactive and event lifecycle
+## Жизненный цикл реактивных объектов и событий
 
-- Create long-lived R3 subscriptions owned by a `MonoBehaviour` in `Start` and bind them to the component lifetime
-  with `AddTo(this)`.
-- Give dynamically created or replaced subscriptions an explicit active lifetime and still dispose them when the
-  component is destroyed.
-- Name event and reactive-notification callbacks with the `On...` prefix.
-- Reserve `Handle...` for non-event command or workflow processing.
+- Создавайте долгоживущие подписки R3, которыми владеет `MonoBehaviour`, в `Start` и связывайте их с жизненным циклом
+  компонента через `AddTo(this)`.
+- Назначайте динамически создаваемым или заменяемым подпискам явный активный жизненный цикл и в любом случае
+  освобождайте их при уничтожении компонента.
+- Именуйте callbacks событий и реактивных уведомлений с префиксом `On...`.
+- Оставляйте `Handle...` для обработки команд или рабочих процессов, не являющейся событием.
 
-## Unity components
+## Unity-компоненты
 
-- Add `[DisallowMultipleComponent]` to a concrete `MonoBehaviour` when multiple instances on one `GameObject` have no
-  defined behavior. Abstract component bases need not declare it.
+- Добавляйте `[DisallowMultipleComponent]` к конкретному `MonoBehaviour`, если поведение нескольких экземпляров на
+  одном `GameObject` не определено. Абстрактные базовые компоненты могут не объявлять этот атрибут.
 
-## Enforcement
+## Контроль соблюдения
 
-Run the code-style check after changing project-owned C#:
+После изменения проектного C#-кода запускайте проверку стиля:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-CodeStyle.ps1
 ```
 
-The script enforces only rules that can be checked reliably without interpreting design intent. Rules not covered
-by the script remain review requirements; see the coverage table in `Validation.md`.
+Скрипт обеспечивает только те правила, которые можно надёжно проверить без интерпретации проектного замысла.
+Правила, не покрытые скриптом, остаются требованиями ревью; см. таблицу покрытия в `Validation.md`.

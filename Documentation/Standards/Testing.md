@@ -1,25 +1,28 @@
-# Testing Standard
+# Стандарт тестирования
 
-This document owns project-wide conventions for test placement, fixture design, test data, test doubles, and test
-readability. [`Validation.md`](Validation.md) defines which checks a change requires; this document defines how tests
-are authored. Commands and environment details remain in [`CI.md`](../Development/CI.md).
+Этот документ определяет проектные соглашения по размещению тестов, устройству фикстур, тестовым данным, тестовым
+заменителям и читаемости тестов. [`Validation.md`](Validation.md) определяет, какие проверки требуются для изменения;
+этот документ определяет, как создаются тесты. Команды и сведения об окружении находятся в
+[`CI.md`](../Development/CI.md).
 
-## Test assemblies and placement
+## Тестовые сборки и размещение
 
-- Put deterministic runtime, mapping, serialization, and editor-API tests in `Assets/_Project/Tests/EditMode`.
-- Use `Assets/_Project/Tests/PlayMode` only when the behavior requires a running player loop, scene loading, or Unity
-  component lifecycle that EditMode cannot represent faithfully.
-- Below an assembly root, mirror the production owner and capability. For example, tests for `User/Persistence`
-  belong in `EditMode/User/Persistence`, while generic save infrastructure belongs in
+- Размещайте детерминированные тесты runtime-кода, mapping-а, сериализации и Editor API в
+  `Assets/_Project/Tests/EditMode`.
+- Используйте `Assets/_Project/Tests/PlayMode` только тогда, когда поведение требует работающего player loop, загрузки
+  сцен или жизненного цикла Unity-компонентов, которые невозможно достоверно представить в EditMode.
+- Ниже корня сборки повторяйте владельца и функциональность production-кода. Например, тесты для `User/Persistence`
+  находятся в `EditMode/User/Persistence`, а общая инфраструктура сохранений — в
   `EditMode/Infrastructure/Saving`.
-- Match namespaces to physical paths. A fixture in `EditMode/User/Persistence` uses
+- Согласовывайте пространства имён с физическими путями. Фикстура в `EditMode/User/Persistence` использует
   `LL.Tests.EditMode.User.Persistence`.
-- Keep one fixture per system under test and name its file `<SystemUnderTest>Tests.cs`.
-- Create folders for stable production owners or capabilities, or for a coherent group of related test files. Do not
-  create a folder merely to repeat one fixture's class name.
-- Preserve Unity `.meta` GUIDs when moving existing tests and commit `.meta` files for new folders and files.
+- Оставляйте по одной фикстуре на тестируемую систему и именуйте её файл `<SystemUnderTest>Tests.cs`.
+- Создавайте каталоги для стабильных владельцев или функциональностей production-кода либо для связной группы
+  связанных тестовых файлов. Не создавайте каталог только для повторения имени класса одной фикстуры.
+- Сохраняйте GUID файлов Unity `.meta` при перемещении существующих тестов и добавляйте `.meta`-файлы новых каталогов
+  и файлов в коммит.
 
-The current EditMode organization is:
+Текущая организация EditMode:
 
 ```text
 EditMode/
@@ -37,47 +40,51 @@ EditMode/
 └── Validation
 ```
 
-## Fixture boundaries
+## Границы фикстур
 
-- A fixture tests one production type or one indivisible public contract. Split tests when setup, vocabulary, or
-  failure modes belong to different owners.
-- Name tests after observable behavior, such as `UnsupportedVersionIsResetToDefaultsAndSavedAsCurrentVersion`.
-- Keep the scenario linear: arrange the relevant state, perform the behavior, then assert its observable result.
-  Separate these phases with blank lines when that improves scanning.
-- Keep values that define the scenario visible in the test. Replace unexplained literals with narrowly named
-  constants when their meaning or historical role matters.
-- Prefer semantic lookups over incidental collection positions unless order is the behavior being tested.
-- Assert externally observable results. Do not duplicate the production algorithm inside the test.
-- Test both the successful contract and meaningful failure boundaries. For persisted data, cover the current version,
-  unsupported versions, mapping, and the chosen reset or rejection policy.
+- Фикстура тестирует один production-тип или один неделимый публичный контракт. Разделяйте тесты, если настройка,
+  терминология или виды отказов принадлежат разным владельцам.
+- Именуйте тесты по наблюдаемому поведению, например `UnsupportedVersionIsResetToDefaultsAndSavedAsCurrentVersion`.
+- Сохраняйте линейность сценария: подготовьте значимое состояние, выполните действие, затем проверьте наблюдаемый
+  результат. Разделяйте эти фазы пустыми строками, если это упрощает просмотр.
+- Оставляйте значения, определяющие сценарий, видимыми в тесте. Заменяйте необъяснимые литералы узко названными
+  константами, если важны их смысл или историческая роль.
+- Отдавайте предпочтение семантическому поиску перед случайными позициями в коллекции, кроме случаев, когда
+  проверяется порядок.
+- Проверяйте внешне наблюдаемые результаты. Не повторяйте production-алгоритм внутри теста.
+- Тестируйте как успешный контракт, так и значимые границы отказа. Для сохраняемых данных покрывайте текущую версию,
+  неподдерживаемые версии, mapping и выбранную политику сброса или отклонения.
 
-## Test data and doubles
+## Тестовые данные и заменители
 
-- Put reusable domain setup in `EditMode/TestData` and name it by owner, such as `GameTestData` or `UserTestData`.
-  Do not create a generic `Helpers`, `Common`, or catch-all factory.
-- A test-data method returns a small valid baseline and accepts only variations used by multiple fixtures. Keep
-  scenario-specific construction in the fixture so the important difference remains visible.
-- Keep controllable technical dependencies, such as `ManualTimeProvider`, in `TestData` when they are shared across
-  owners.
-- Place a reusable test double beside the technical contract it implements. For example, `MemorySaveStorage` belongs
-  in `Infrastructure/Saving/Storage`.
-- Keep a double or context used by one fixture beside that fixture. A context may own repetitive construction and
-  cleanup, but it must not hide the action or outcome under test.
-- Test helpers must not contain alternative production rules. They assemble inputs, control dependencies, expose
-  recorded interactions, and release resources.
+- Размещайте переиспользуемую подготовку домена в `EditMode/TestData` и именуйте её по владельцу, например
+  `GameTestData` или `UserTestData`. Не создавайте общую фабрику `Helpers`, `Common` или другую свалку.
+- Метод тестовых данных возвращает небольшой валидный базовый вариант и принимает только изменения, используемые в
+  нескольких фикстурах. Создание данных конкретного сценария оставляйте в фикстуре, чтобы важное отличие оставалось
+  видимым.
+- Размещайте управляемые технические зависимости, например `ManualTimeProvider`, в `TestData`, если они совместно
+  используются несколькими владельцами.
+- Размещайте переиспользуемый тестовый заменитель рядом с реализуемым им техническим контрактом. Например,
+  `MemorySaveStorage` находится в `Infrastructure/Saving/Storage`.
+- Оставляйте заменитель или context, используемый одной фикстурой, рядом с этой фикстурой. Context может владеть
+  повторяющимся созданием и очисткой, но не должен скрывать тестируемое действие или результат.
+- Вспомогательные средства тестов не должны содержать альтернативные production-правила. Они собирают входные
+  данные, управляют зависимостями, предоставляют записанные взаимодействия и освобождают ресурсы.
 
-## Determinism and cleanup
+## Детерминированность и очистка
 
-- Inject controllable time instead of waiting in real time.
-- Do not depend on test execution order, existing save files, or state left by another fixture.
-- Release subscriptions, Unity objects, temporary files, and other owned resources in `TearDown`, `Dispose`, or a
-  `finally` block appropriate to the fixture.
-- Use a unique fixture-owned path below the system temporary directory for filesystem tests and clean up only that
-  path.
-- A test must fail when required setup cannot be established; do not continue after a failed save, load, or lookup.
+- Внедряйте управляемое время вместо ожидания в реальном времени.
+- Не полагайтесь на порядок выполнения тестов, существующие файлы сохранений или состояние, оставленное другой
+  фикстурой.
+- Освобождайте подписки, Unity-объекты, временные файлы и другие принадлежащие тесту ресурсы в `TearDown`, `Dispose`
+  или подходящем для фикстуры блоке `finally`.
+- Для файловых тестов используйте уникальный путь, принадлежащий фикстуре, внутри системного временного каталога и
+  очищайте только этот путь.
+- Тест должен завершаться ошибкой, если обязательную настройку невозможно выполнить; не продолжайте работу после
+  неудачного сохранения, загрузки или поиска.
 
-## What to verify after changing tests
+## Что проверять после изменения тестов
 
-Follow the change matrix in [`Validation.md`](Validation.md). At minimum, test moves and helper changes require
-architecture validation, code-style validation, compilation, and the affected EditMode or PlayMode suite. Use the
-commands documented in [`CI.md`](../Development/CI.md).
+Следуйте матрице изменений в [`Validation.md`](Validation.md). Как минимум, перемещение тестов и изменение
+вспомогательных средств требуют валидации архитектуры, валидации стиля кода, компиляции и запуска затронутого набора
+EditMode- или PlayMode-тестов. Используйте команды из [`CI.md`](../Development/CI.md).

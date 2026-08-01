@@ -1,47 +1,47 @@
-# Odin Inspector Authoring Standard
+# Стандарт авторинга с Odin Inspector
 
-This document is the source of truth for project-owned Odin Inspector presentation and authoring UI conventions.
-C# formatting belongs to [`Code-Style.md`](Code-Style.md), authored-asset ownership and placement to
-[`Architecture.md`](Architecture.md), and validation coverage to [`Validation.md`](Validation.md).
+Этот документ — источник истины для проектных соглашений по представлению Odin Inspector и интерфейсу авторинга.
+Форматирование C# определено в [`Code-Style.md`](Code-Style.md), владение создаваемыми ассетами и их размещение — в
+[`Architecture.md`](Architecture.md), а покрытие валидацией — в [`Validation.md`](Validation.md).
 
-These rules apply to project C# under `Assets/_Project`. Third-party code and Odin's own configuration are outside
-their scope.
+Эти правила применяются к проектному C#-коду в `Assets/_Project`. Сторонний код и собственная конфигурация Odin
+находятся вне их области действия.
 
-## Attribute responsibilities
+## Ответственность атрибутов
 
-- Treat an Odin attribute as presentation-only when it changes grouping, ordering, labels, sizing, previews, or
-  other visual layout without adding authoring behavior or a data constraint.
-- Treat buttons, inspector callbacks, validation, selection constraints, value constraints, and deliberately
-  exposed helper members as functional authoring behavior. Do not remove or restyle them as part of a visual-layout
-  cleanup unless a narrower rule explicitly covers them.
-- Keep the serialized model independent of inspector presentation. Adding or removing a presentation-only attribute
-  must not change serialized field names, types, or data.
-- Add visual conventions incrementally in this document. Do not copy an isolated layout from another inspector
-  before the corresponding shared rule has been approved.
-- Apply the serialized-field attribute layers defined in [`Code-Style.md`](Code-Style.md): Odin presentation
-  attributes occupy the presentation layer, Odin value checks occupy the validation layer, and field-contract
-  attributes remain in the inline declaration layer.
+- Считайте атрибут Odin относящимся только к представлению, если он меняет группировку, порядок, подписи, размеры,
+  предпросмотр или другую визуальную компоновку, не добавляя поведение авторинга или ограничение данных.
+- Считайте кнопки, callbacks инспектора, валидацию, ограничения выбора, ограничения значений и намеренно открытые
+  вспомогательные члены функциональным поведением авторинга. Не удаляйте и не меняйте их оформление при очистке
+  визуальной компоновки, если более узкое правило явно этого не предусматривает.
+- Сохраняйте независимость сериализованной модели от представления в инспекторе. Добавление или удаление атрибута,
+  относящегося только к представлению, не должно менять имена, типы или данные сериализованных полей.
+- Добавляйте визуальные соглашения в этот документ постепенно. Не копируйте отдельную компоновку из другого
+  инспектора до утверждения соответствующего общего правила.
+- Применяйте слои атрибутов сериализованного поля, определённые в [`Code-Style.md`](Code-Style.md): атрибуты
+  представления Odin занимают слой представления, проверки значений Odin — слой валидации, а атрибуты контракта поля
+  остаются во встроенном в объявление слое.
 
-## Reusable presentation attributes
+## Переиспользуемые атрибуты представления
 
-- Create a composite attribute when one approved presentation recipe is repeated by multiple fields or config
-  types and should evolve as a unit. Do not create one merely to shorten a single call site.
-- Name the class after the visual concept with the `Attribute` suffix and use it without the suffix, for example
-  `SpritePreviewAttribute` and `[SpritePreview]`.
-- Place presentation-owned composites under `Assets/_Project/Scripts/Presentation/Inspector` in the
-  `LL.Presentation.Inspector` namespace. A capability-specific composite stays in that capability's `Inspector`
-  folder instead.
-- Build a purely declarative composite with Odin's `[IncludeMyAttributes]`. Do not introduce a custom drawer or
-  attribute processor when composing existing Odin attributes is sufficient.
-- Keep fixed recipe values inside the composite. Add parameters only when the standard defines multiple meaningful
-  variants; do not expose arbitrary per-field styling.
-- A composite presentation attribute occupies exactly one presentation-layer line above validation and declaration
-  layers.
+- Создавайте составной атрибут, когда один утверждённый рецепт представления повторяется у нескольких полей или типов
+  config и должен развиваться как единое целое. Не создавайте его только ради сокращения одного места использования.
+- Именуйте класс по визуальной концепции с суффиксом `Attribute`, а используйте его без суффикса, например
+  `SpritePreviewAttribute` и `[SpritePreview]`.
+- Размещайте принадлежащие Presentation составные атрибуты в `Assets/_Project/Scripts/Presentation/Inspector` в
+  пространстве имён `LL.Presentation.Inspector`. Составной атрибут, относящийся к конкретной функциональности,
+  остаётся в её каталоге `Inspector`.
+- Создавайте чисто декларативный составной атрибут с помощью `[IncludeMyAttributes]` из Odin. Не вводите собственный
+  drawer или attribute processor, когда достаточно скомпоновать существующие атрибуты Odin.
+- Храните фиксированные значения рецепта внутри составного атрибута. Добавляйте параметры только тогда, когда
+  стандарт определяет несколько содержательных вариантов; не открывайте произвольную настройку стиля для каждого
+  поля.
+- Составной атрибут представления занимает ровно одну строку слоя представления над слоями валидации и объявления.
 
-## Catalog baseline
+## Базовое представление каталогов
 
-Catalog configuration assets and their serialized entry types use the default inspector layout. Do not apply these
-presentation-only Odin attributes in a `*CatalogConfig.cs` file:
+Ассеты конфигурации каталогов и их сериализованные типы элементов используют стандартную компоновку инспектора. Не
+применяйте следующие атрибуты Odin, относящиеся только к представлению, в файле `*CatalogConfig.cs`:
 
 - `HideMonoScript`
 - `TableList`
@@ -53,37 +53,37 @@ presentation-only Odin attributes in a `*CatalogConfig.cs` file:
 - `DisplayAsString`
 - `SpritePreview`
 
-Functional attributes such as `ValidateInput`, `Required`, `AssetsOnly`, `MinValue`, `ShowInInspector`, and `Button`
-remain allowed when they provide real authoring behavior rather than arranging the inspector. Helper members remain
-allowed for the same reason.
+Функциональные атрибуты, например `ValidateInput`, `Required`, `AssetsOnly`, `MinValue`, `ShowInInspector` и `Button`,
+остаются допустимыми, когда обеспечивают реальное поведение авторинга, а не компоновку инспектора. По той же причине
+допустимы вспомогательные члены.
 
-### Sprite catalog presentation
+### Представление каталогов спрайтов
 
-Apply the compact sprite-catalog presentation to `ItemIconCatalogConfig`, `FlagCatalogConfig`, and
+Применяйте компактное представление каталога спрайтов к `ItemIconCatalogConfig`, `FlagCatalogConfig` и
 `HeroPortraitCatalogConfig`:
 
-- Render the entries with `[TableList(AlwaysExpanded = true, DrawScrollView = false)]` so each entry occupies one
-  row and the complete catalog remains visible without a nested scroll view.
-- Keep identifier fields as flexible text columns and label them by their domain identifier type: `Item ID`,
-  `Flag ID`, or `Hero ID`. Preserve `ID` capitalization explicitly with `LabelText` rather than relying on field
-  name humanization.
-- Name identifier fields by the same domain type (`_itemId`, `_flagId`, `_heroId`). Use a generic `_id` only in a
-  genuinely generic entry type whose identifier domain is supplied by a type parameter.
-- Render every sprite field with `[SpritePreview]`. `SpritePreviewAttribute` composes
-  `PreviewField(48, ObjectFieldAlignment.Center)` and `TableColumnWidth(64)`; change those values centrally rather
-  than overriding them at a call site.
-- Do not add custom labels, groups, colors, titles, or other decoration.
+- Отображайте элементы с помощью `[TableList(AlwaysExpanded = true, DrawScrollView = false)]`, чтобы каждый элемент
+  занимал одну строку, а весь каталог оставался видимым без вложенной прокрутки.
+- Оставляйте поля идентификаторов гибкими текстовыми столбцами и подписывайте их по типу доменного идентификатора:
+  `Item ID`, `Flag ID` или `Hero ID`. Явно сохраняйте написание `ID` с помощью `LabelText`, не полагаясь на
+  автоматическое преобразование имени поля в читаемый вид.
+- Именуйте поля идентификаторов по тому же доменному типу (`_itemId`, `_flagId`, `_heroId`). Используйте общее `_id`
+  только в действительно обобщённом типе элемента, домен идентификатора которого задаётся параметром типа.
+- Отображайте каждое поле спрайта с помощью `[SpritePreview]`. `SpritePreviewAttribute` объединяет
+  `PreviewField(48, ObjectFieldAlignment.Center)` и `TableColumnWidth(64)`; изменяйте эти значения централизованно,
+  а не переопределяйте их в месте использования.
+- Не добавляйте собственные подписи, группы, цвета, заголовки или другие украшения.
 
-Keep catalog configurations without sprite fields on the default baseline until another presentation rule is
-explicitly added here.
+Оставляйте конфигурации каталогов без полей спрайтов на стандартном базовом представлении, пока здесь явно не будет
+добавлено другое правило представления.
 
-## Enforcement
+## Контроль соблюдения
 
-Run the Odin Inspector convention check after changing a catalog inspector or this agreement:
+После изменения инспектора каталога или этого соглашения запускайте проверку соглашений Odin Inspector:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-OdinInspector.ps1
 ```
 
-The script enforces the catalog baseline. Other Odin presentation choices remain review requirements until a
-specific rule and reliable check are added here.
+Скрипт обеспечивает базовое представление каталогов. Другие решения по представлению Odin остаются требованиями
+ревью, пока для них не будут добавлены конкретное правило и надёжная проверка.

@@ -1,49 +1,55 @@
-# Project Rules
+# Правила проекта
 
-Before changing the project, use the agreement that owns the decision:
+## Язык Markdown-файлов
 
-- [`Architecture.md`](Documentation/Standards/Architecture.md) defines ownership, placement, dependency direction,
-  data boundaries, naming,
-  composition, and authored-asset layout.
-- [`Code-Style.md`](Documentation/Standards/Code-Style.md) defines C# formatting, member organization, DI and reactive
-  lifecycle conventions,
-  and Unity component conventions.
-- [`Odin-Inspector.md`](Documentation/Standards/Odin-Inspector.md) defines Odin-powered inspector presentation and
-  authoring UI conventions.
-- [`Validation.md`](Documentation/Standards/Validation.md) defines validation semantics, validator ownership,
-  automated-rule coverage, and the checks required for each kind of change.
-- [`Testing.md`](Documentation/Standards/Testing.md) defines test placement, fixture boundaries, test data and doubles,
-  readability, determinism, and cleanup conventions.
-- [`CI.md`](Documentation/Development/CI.md) defines the commands and environment used to run validation, tests, and
-  builds.
+Пишите на русском языке все создаваемые и поддерживаемые в проекте Markdown-файлы (`*.md`), включая файлы во всех
+вложенных каталогах. Сохраняйте в исходном виде идентификаторы кода, названия API и типов, пути к файлам, команды и
+технические термины, перевод которых снизил бы точность. Это правило не распространяется на сторонние или
+сгенерированные Markdown-файлы, которые проект не поддерживает самостоятельно.
 
-## Agreement ownership
+Перед изменением проекта используйте соглашение, которому принадлежит соответствующее решение:
 
-Each project-wide convention has exactly one owning agreement file. Other documents link to that agreement instead
-of repeating its normative rules. `AGENTS.md` is the concise index and working contract, not a second copy of the
-agreements.
+- [`Architecture.md`](Documentation/Standards/Architecture.md) определяет владение, размещение, направление
+  зависимостей, границы данных, именование, композицию и размещение создаваемых ассетов.
+- [`Code-Style.md`](Documentation/Standards/Code-Style.md) определяет форматирование C#, организацию членов, соглашения
+  по DI и жизненному циклу реактивных объектов, а также соглашения по Unity-компонентам.
+- [`Odin-Inspector.md`](Documentation/Standards/Odin-Inspector.md) определяет представление инспектора и соглашения по
+  интерфейсу авторинга на основе Odin.
+- [`Validation.md`](Documentation/Standards/Validation.md) определяет семантику валидации, владение валидаторами,
+  покрытие автоматизированными правилами и проверки, необходимые для каждого вида изменений.
+- [`Testing.md`](Documentation/Standards/Testing.md) определяет размещение тестов, границы фикстур, тестовые данные и
+  заменители, читаемость, детерминированность и соглашения по очистке.
+- [`CI.md`](Documentation/Development/CI.md) определяет команды и окружение для запуска валидации, тестов и сборок.
 
-Create a separate agreement only when a subject has a distinct responsibility, vocabulary, and change cadence that
-would make an existing agreement harder to navigate. Keep a short or feature-local rule in the nearest existing
-agreement or feature document. When splitting or moving rules, preserve their meaning, update every inbound link,
-and remove the old normative copy in the same change.
+## Владение соглашениями
 
-Approved production code and serialized assets are the source of truth for current behavior and actual placement.
-The agreements above are the source of truth for intended conventions. Validators enforce approved decisions; they
-do not establish them. Resolve the intended design before changing production code to satisfy a stale validator,
-then update the applicable agreement, validator, and tests together.
+У каждого соглашения уровня проекта есть ровно один файл-владелец. Другие документы ссылаются на это соглашение,
+а не повторяют его нормативные правила. `AGENTS.md` — это краткий указатель и рабочий договор, а не вторая копия
+соглашений.
 
-Apply the placement procedure in `Documentation/Standards/Architecture.md` before creating or moving a type. Preserve
-Unity `.meta` GUIDs and follow that agreement's serialized-identity and field-migration rules when moving or renaming
-Unity types, assets, or fields.
+Создавайте отдельное соглашение только тогда, когда у темы есть самостоятельная ответственность, терминология и
+темп изменений, из-за которых существующее соглашение стало бы сложнее использовать. Краткое или локальное для
+функциональности правило размещайте в ближайшем существующем соглашении или документе функциональности. При
+разделении или переносе правил сохраняйте их смысл, обновляйте все входящие ссылки и в том же изменении удаляйте
+старую нормативную копию.
 
-After a change, run every check required by the change matrix in `Documentation/Standards/Validation.md`. An
-architectural change must update the architecture agreement and every affected overview, validator, and validator
-test in the same change.
+Утверждённый production-код и сериализованные ассеты — источник истины о текущем поведении и фактическом размещении.
+Перечисленные выше соглашения — источник истины о принятых правилах. Валидаторы обеспечивают соблюдение утверждённых
+решений, а не устанавливают их. Перед изменением production-кода ради устаревшего валидатора сначала определите
+принятое устройство, а затем совместно обновите применимое соглашение, валидатор и тесты.
 
-When generating code, prioritize readability and clear separation of responsibilities. Reuse existing code where
-possible, and introduce an abstraction only when it creates a meaningful boundary, replacement point, or reuse
-point.
+Перед созданием или перемещением типа применяйте процедуру размещения из
+`Documentation/Standards/Architecture.md`. При перемещении или переименовании Unity-типов, ассетов или полей
+сохраняйте GUID файлов `.meta` и следуйте правилам этого соглашения по сериализованной идентичности и миграции полей.
 
-When asked for a commit message, output only a concise English imperative phrase as plain text: start with a capital
-letter and do not use quotation marks, backticks, explanations, conventional prefixes, or a trailing period.
+После изменения запускайте все проверки, требуемые матрицей изменений в
+`Documentation/Standards/Validation.md`. Архитектурное изменение должно в рамках одной правки обновлять соглашение
+по архитектуре, все затронутые обзоры, валидатор и тесты валидатора.
+
+При генерации кода отдавайте приоритет читаемости и чёткому разделению ответственности. По возможности повторно
+используйте существующий код и вводите абстракцию только тогда, когда она создаёт значимую границу, точку замены или
+точку повторного использования.
+
+Если вас просят составить сообщение коммита, выводите только краткую повелительную фразу на английском языке в виде
+обычного текста: начинайте её с заглавной буквы и не используйте кавычки, обратные кавычки, пояснения, стандартные
+префиксы или точку в конце.

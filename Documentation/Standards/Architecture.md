@@ -1,502 +1,542 @@
-# Project Architecture and Naming Standard
+# Стандарт архитектуры и именования проекта
 
-This document is the source of truth for intended project-wide placement and naming conventions. Approved production
-code and serialized assets are the source of truth for current behavior and actual placement. Keep this standard,
-the implementation, and its validators synchronized after an architectural decision.
+Этот документ — источник истины для принятых в проекте правил размещения и именования. Утверждённый production-код и
+сериализованные ассеты — источник истины о текущем поведении и фактическом размещении. После архитектурного решения
+поддерживайте этот стандарт, реализацию и валидаторы согласованными.
 
-For a concise map of runtime areas, lifetime boundaries, and core flows, see
+Краткая карта runtime-областей, границ жизненного цикла и основных потоков приведена в
 [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md).
-For detailed walkthroughs of the runtime data pipelines, see
-[`Game-Data.md`](../Architecture/Game-Data.md) and [`User-Data.md`](../Architecture/User-Data.md).
-For the feature-level agreement on hero experience, rank progression, and configurable rank-up options, see
-[`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md).
-For C# syntax and lifecycle conventions, see [`Code-Style.md`](Code-Style.md). For validation semantics, automated
-coverage, and required verification, see [`Validation.md`](Validation.md).
+Подробное описание runtime-конвейеров данных приведено в
+[`Game-Data.md`](../Architecture/Game-Data.md) и [`User-Data.md`](../Architecture/User-Data.md).
+Соглашение уровня функциональности об опыте героев, развитии рангов и настраиваемых вариантах повышения ранга
+приведено в [`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md).
+Синтаксис C# и соглашения о жизненном цикле определены в [`Code-Style.md`](Code-Style.md). Семантика валидации,
+автоматизированное покрытие и обязательные проверки определены в [`Validation.md`](Validation.md).
 
-The rules describe the intended architecture, not merely the current directory tree. New code must follow them.
-When existing code is changed substantially, move it toward this standard when that can be done safely within the
-task scope.
+Правила описывают принятую архитектуру, а не только текущее дерево каталогов. Новый код обязан им соответствовать.
+При существенном изменении существующего кода приближайте его к этому стандарту, если это можно безопасно сделать в
+рамках задачи.
 
-## Scope and enforcement
+## Область действия и контроль соблюдения
 
-The project-owned runtime code is the `LL.Runtime` assembly rooted at `Assets/_Project/Scripts`. Its top-level
-folders are logical modules inside one physical assembly. The single assembly keeps iteration and Unity integration
-simple, but it does not enforce module boundaries by itself; `tools/Validate-Architecture.ps1` therefore treats
-paths, namespaces, and `using LL...` directives as enforceable architecture.
+Runtime-код проекта находится в сборке `LL.Runtime`, корень которой — `Assets/_Project/Scripts`. Её каталоги верхнего
+уровня являются логическими модулями внутри одной физической сборки. Единая сборка упрощает итерации и интеграцию с
+Unity, но сама по себе не обеспечивает границы модулей; поэтому `tools/Validate-Architecture.ps1` рассматривает пути,
+пространства имён и директивы `using LL...` как контролируемую архитектуру.
 
-Split a logical module into another runtime assembly only when at least one of these conditions is true:
+Выделяйте логический модуль в отдельную runtime-сборку только при выполнении хотя бы одного условия:
 
-- Unity must compile or load the module independently.
-- A platform or optional-package boundary requires separate references.
-- The dependency boundary is stable enough that assembly-level enforcement is worth the added compilation and
-  integration cost.
-- A separately testable pure-C# core can avoid Unity references without duplicating contracts.
+- Unity должна компилировать или загружать модуль независимо.
+- Граница платформы или необязательного пакета требует отдельных ссылок.
+- Граница зависимостей достаточно стабильна, чтобы контроль на уровне сборки оправдывал дополнительные затраты на
+  компиляцию и интеграцию.
+- Отдельно тестируемое чистое C#-ядро может исключить ссылки на Unity без дублирования контрактов.
 
-Do not create an assembly solely to mirror a folder. A new assembly requires an explicit dependency update in this
-document, an `.asmdef`, tests for its boundary, and an update to the runtime overview.
+Не создавайте сборку только для отражения каталога. Новая сборка требует явного обновления зависимостей в этом
+документе, файла `.asmdef`, тестов её границы и обновления обзора runtime-кода.
 
-## Core principles
+## Основные принципы
 
-1. Organize by ownership first and technical role second.
-2. Dependencies point from outer, technical layers toward stable domain concepts.
-3. A folder and a type suffix must communicate one specific responsibility.
-4. Add a layer or abstraction only when it creates a real boundary, replacement point, or reuse point.
-5. Do not mirror an identical folder tree across features whose responsibilities are different.
-6. Keep Unity authoring models, serialized transport models, domain models, and live state distinct.
+1. Организуйте сначала по владельцу, затем по технической роли.
+2. Зависимости направлены от внешних технических слоёв к стабильным доменным понятиям.
+3. Каталог и суффикс типа должны сообщать об одной конкретной ответственности.
+4. Добавляйте слой или абстракцию только тогда, когда они создают реальную границу, точку замены или повторного
+   использования.
+5. Не повторяйте одинаковое дерево каталогов в функциональностях с разной ответственностью.
+6. Разделяйте модели авторинга Unity, сериализованные транспортные модели, доменные модели и живое состояние.
 
-## Placement procedure
+## Процедура размещения
 
-Before creating or moving a type, answer these questions in order:
+Перед созданием или перемещением типа последовательно ответьте на вопросы:
 
-1. Who owns the concept: `Game`, `User`, `Presentation`, `UI`, `Infrastructure`, `Validation`, `Composition`, or
+1. Кто владеет понятием: `Game`, `User`, `Presentation`, `UI`, `Infrastructure`, `Validation`, `Composition` или
    `Editor`?
-2. Within that owner, which feature or capability owns it?
-3. Is the type a core concept of that feature, or does it have a recognized technical role listed below?
-4. Does its proposed dependency direction comply with this document?
-5. Does its name use the most specific standard suffix?
+2. Какая функциональность или возможность владеет им внутри этой области?
+3. Является ли тип основным понятием функциональности или имеет одну из признанных технических ролей ниже?
+4. Соответствует ли предлагаемое направление его зависимостей этому документу?
+5. Использует ли имя наиболее конкретный стандартный суффикс?
 
-Place a core feature type at the feature root. Create a technical-role subfolder only for a coherent boundary or a
-group of closely related types. Do not create a one-type folder merely to make the tree look symmetrical.
+Размещайте основной тип функциональности в её корне. Создавайте подкаталог технической роли только для связной
+границы или группы тесно связанных типов. Не создавайте каталог для одного типа только ради симметрии дерева.
 
-## Runtime module map
+## Карта runtime-модулей
 
-`LL.Runtime` contains exactly these top-level areas:
+`LL.Runtime` содержит ровно следующие области верхнего уровня:
 
-| Area | Owns | Representative capabilities |
+| Область | Ответственность | Представительные возможности |
 | --- | --- | --- |
-| `Bootstrap` | First-scene startup coordination | Localization readiness, minimum display time, scene activation |
-| `Composition` | Object graph and lifetime wiring | Project, bootstrap, and main scopes; installers; factories |
-| `Game` | Game rules and reference data | Cards, flags, heroes, items, payments, rank-up, quests, ranks, rewards, upgrades |
-| `Infrastructure` | Reusable technical mechanisms | Collection snapshots, compilation and loading contracts, serialization, storage, reporting |
-| `Presentation` | Display meaning without visual lifecycle | Flags, hero portraits, item icons, localization, formatting, text tokens, confirmations |
-| `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
-| `User` | User defaults, persistence, snapshots, and live state | Identity, hero selection, inventory, per-hero rank progress, rank-up attempts |
-| `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
+| `Bootstrap` | Координация запуска первой сцены | Готовность локализации, минимальное время отображения, активация сцены |
+| `Composition` | Сборка графа объектов и жизненных циклов | Project-, bootstrap- и main-scope-ы; installer-ы; factory |
+| `Game` | Игровые правила и справочные данные | Карты, флаги, герои, предметы, платежи, повышение ранга, квесты, ранги, награды, улучшения |
+| `Infrastructure` | Переиспользуемые технические механизмы | Snapshot-ы коллекций, контракты компиляции и загрузки, сериализация, хранение, отчётность |
+| `Presentation` | Смысл отображения без визуального жизненного цикла | Флаги, портреты героев, иконки предметов, локализация, форматирование, текстовые токены, подтверждения |
+| `UI` | Конкретный визуальный жизненный цикл и навигация | Controls, graphics, views, визуальные состояния, окна, UI-потоки |
+| `User` | Пользовательские значения по умолчанию, хранение, snapshot-ы и живое состояние | Идентичность, выбор героя, инвентарь, прогресс ранга каждого героя, попытки повышения ранга |
+| `Validation` | Переиспользуемая терминология валидации | Context-ы, проблемы, результаты, правила, контракты отчётности |
 
-`AssemblyInfo.cs` and `LL.Runtime.asmdef` are the only files allowed directly at the runtime root. Adding another
-top-level area is an architecture change, not a local folder choice.
+`AssemblyInfo.cs` и `LL.Runtime.asmdef` — единственные файлы, допустимые непосредственно в корне runtime-кода.
+Добавление другой области верхнего уровня является архитектурным изменением, а не локальным выбором каталога.
 
-## Top-level ownership
+## Владение областей верхнего уровня
 
 ### `Composition`
 
-Owns application assembly: concrete implementation selection, manual object construction, DI registrations, and
-lifetime configuration.
+Отвечает за сборку приложения: выбор конкретных реализаций, ручное создание объектов, DI-регистрации и настройку
+жизненного цикла.
 
-- `Scopes` contains VContainer lifetime scopes. A scope stores serialized Unity references, defines a lifetime
-  boundary, performs small scene-local registrations, and orchestrates larger installers.
-- `Installers` contains cohesive registration modules that implement VContainer's `IInstaller`. Construct installers
-  manually from a scope; do not resolve them through DI.
-- `Factories` contains concrete construction policies that are reused by installers, scopes, or editor tooling.
-  Factories construct objects but never register them.
-- Do not place C# files directly in `Composition` and do not add other composition subfolders without updating this
-  standard.
-- Composition may depend on every runtime area.
-- Runtime areas must never depend on `Composition`.
-- Composition contains no domain decisions, mapping, validation rules, I/O implementation, or mutable application
-  state.
-- A scope may register its serialized scene components and a small cohesive set of scene-local services or entry
-  points directly when keeping the registrations visible makes the scene composition easier to understand.
-- Move registrations to an installer when they form a named subsystem, are reused by more than one scope, require
-  their own construction policy, or change independently from the scene boundary. Do not create an installer merely
-  to shorten a scope.
-- An installer owns one cohesive registration module, such as game-data loading or the user lifecycle. Do not create
-  an installer for a single trivial registration.
-- A factory method exposes its concrete policy in its name, such as `CreateFromJsonFile` or `CreateJsonFile`.
+- `Scopes` содержит lifetime scope-ы VContainer. Scope хранит сериализованные Unity-ссылки, определяет границу
+  жизненного цикла, выполняет небольшие локальные для сцены регистрации и координирует более крупные installer-ы.
+- `Installers` содержит связные модули регистрации, реализующие `IInstaller` VContainer. Создавайте installer-ы
+  вручную из scope-а; не разрешайте их через DI.
+- `Factories` содержит конкретные политики создания, переиспользуемые installer-ами, scope-ами или Editor tooling.
+  Factory создают объекты, но никогда их не регистрируют.
+- Не размещайте C#-файлы непосредственно в `Composition` и не добавляйте другие подкаталоги композиции без обновления
+  этого стандарта.
+- Composition может зависеть от любой runtime-области.
+- Runtime-области никогда не должны зависеть от `Composition`.
+- Composition не содержит доменных решений, mapping-а, правил валидации, реализации I/O или изменяемого состояния
+  приложения.
+- Scope может напрямую регистрировать сериализованные компоненты своей сцены и небольшой связный набор локальных
+  сервисов или точек входа, если видимость регистраций упрощает понимание композиции сцены.
+- Переносите регистрации в installer, когда они образуют именованную подсистему, переиспользуются несколькими
+  scope-ами, требуют собственной политики создания или изменяются независимо от границы сцены. Не создавайте
+  installer только для сокращения scope-а.
+- Installer отвечает за один связный модуль регистрации, например загрузку игровых данных или жизненный цикл
+  пользователя. Не создавайте installer для одной тривиальной регистрации.
+- Метод factory раскрывает конкретную политику в имени, например `CreateFromJsonFile` или `CreateJsonFile`.
 
 ### `Bootstrap`
 
-Owns the application's first-scene startup flow and temporary loading presentation.
+Отвечает за поток запуска первой сцены приложения и временное представление загрузки.
 
-- The Bootstrap scene is the first enabled build scene and transitions to the first application scene.
-- The bootstrap flow may display initialization progress and coordinate scene activation.
-- Independent startup work is modeled as parallel bootstrap operations collected and coordinated by one bootstrap
-  flow.
-- It must not create a second project lifetime scope when VContainer already auto-creates the configured root scope.
-- It must not own game rules, user persistence, or long-lived application state.
+- Сцена Bootstrap является первой включённой сценой сборки и переходит к первой сцене приложения.
+- Поток bootstrap может отображать прогресс инициализации и координировать активацию сцены.
+- Независимая работа запуска моделируется как параллельные bootstrap-операции, собираемые и координируемые одним
+  потоком bootstrap.
+- Он не должен создавать второй project lifetime scope, если VContainer уже автоматически создаёт настроенный
+  корневой scope.
+- Он не должен владеть игровыми правилами, сохранением пользователя или долгоживущим состоянием приложения.
 
 ### `Game`
 
-Owns game rules and game concepts: identifiers, definitions, catalogs, calculations, progression, rewards, payments,
-and use-case services.
+Отвечает за игровые правила и игровые понятия: идентификаторы, definitions, каталоги, вычисления, развитие, награды,
+платежи и сервисы use case-ов.
 
-- Organize first by game capability, for example `Ranks`, `Quests`, or `Rewards`.
-- Core game models must not depend on `User`, `Presentation`, `UI`, `Composition`, or `Editor`.
-- Game application services may coordinate user state through focused `User.State` interfaces. Domain definitions and
-  calculations must remain independent of concrete user-state implementations.
-- UI may consume read-only user-state interfaces for display and queries. Only game application services may consume
-  `*Commands` interfaces and mutate user state; UI actions must cross a game service boundary.
-- `Game/RankUp` owns the rules for advancing a specific hero to the next rank. A `RankUpDefinition` is selected by
-  `(HeroId, RankId)` and exposes a non-empty collection of alternative `RankUpOptionDefinition` values. Each option
-  contains zero or more conjunctive `RankUpRequirementDefinition` values; options are alternatives, and an empty
-  requirement collection intentionally represents a free option. Quest completion, payment, accumulated progress,
-  observed state, and external confirmation are concrete requirement kinds rather than fixed rank-up paths.
-  `RankUpService` activates and completes the option selected by `RankUpOptionId`; UI may observe read-only option
-  status but must issue mutations through this game-service boundary. Detailed semantics and the polymorphic
-  requirement representations are defined in
-  [`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). Within this feature, use `Definition` for APIs and
-  variables that expose immutable rule sets, and `RankUp` for commands and capability names that describe the player
-  action. Use `RankUp`, never `Promotion`, as the code and folder vocabulary for this feature.
-- `Game/Heroes` owns hero identity and immutable hero definitions. A hero definition contains its localized-name key
-  and `FlagId`, while rank-up and other game capabilities refer to it only through `HeroId`.
-- `Game/Flags` owns the semantic identity of flags. A `FlagId` names the represented flag directly and must not be
-  constrained to a country-code standard because flags may represent fictional countries, factions, or organizations.
-- Unity-dependent authoring adapters are allowed under the owning capability's `Configuration` folder.
-- Cross-capability workflows belong to the capability that owns the outcome; create a new capability only when no
-  existing owner is correct.
-- `Game/Data` is reserved for the aggregate game-data loading boundary. It is not a general dumping ground.
-- `Game/Data/Declarations` owns the source-neutral, not-yet-trusted aggregate representation produced by every
-  game-data source and consumed by `GameDataCompiler`.
+- Сначала организуйте по игровой возможности, например `Ranks`, `Quests` или `Rewards`.
+- Основные игровые модели не должны зависеть от `User`, `Presentation`, `UI`, `Composition` или `Editor`.
+- Игровые application services могут координировать пользовательское состояние через узкие интерфейсы `User.State`.
+  Доменные definitions и вычисления должны оставаться независимыми от конкретных реализаций пользовательского
+  состояния.
+- UI может использовать read-only интерфейсы пользовательского состояния для отображения и запросов. Только игровые
+  application services могут использовать интерфейсы `*Commands` и изменять пользовательское состояние; действия
+  UI должны проходить через границу игрового сервиса.
+- `Game/RankUp` владеет правилами повышения конкретного героя до следующего ранга. `RankUpDefinition` выбирается по
+  `(HeroId, RankId)` и предоставляет непустую коллекцию альтернативных значений `RankUpOptionDefinition`. Каждый
+  вариант содержит ноль или больше объединённых конъюнкцией значений `RankUpRequirementDefinition`; варианты являются
+  альтернативами, а пустая коллекция требований намеренно обозначает бесплатный вариант. Завершение квеста, платёж,
+  накопленный прогресс, наблюдаемое состояние и внешнее подтверждение являются конкретными видами требований, а не
+  фиксированными путями повышения ранга. `RankUpService` активирует и завершает вариант, выбранный по
+  `RankUpOptionId`; UI может наблюдать read-only состояние варианта, но обязан выполнять изменения через границу
+  игрового сервиса. Подробная семантика и полиморфные представления требований определены в
+  [`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). В этой функциональности используйте `Definition` для
+  API и переменных, предоставляющих неизменяемые наборы правил, и `RankUp` — для команд и названий возможностей,
+  описывающих действие игрока. Используйте в коде и именах каталогов этой функциональности только `RankUp`, а не
+  `Promotion`.
+- `Game/Heroes` владеет идентичностью героев и неизменяемыми definitions героев. Definition героя содержит ключ
+  локализованного имени и `FlagId`, а повышение ранга и другие игровые возможности обращаются к герою только через
+  `HeroId`.
+- `Game/Flags` владеет семантической идентичностью флагов. `FlagId` напрямую именует представленный флаг и не должен
+  ограничиваться стандартом кодов стран, поскольку флаги могут представлять вымышленные страны, фракции или
+  организации.
+- Зависящие от Unity адаптеры авторинга допустимы в каталоге `Configuration` владеющей возможности.
+- Межфункциональные workflows принадлежат возможности, владеющей результатом; создавайте новую возможность только
+  тогда, когда ни один существующий владелец не подходит.
+- `Game/Data` зарезервирован для границы загрузки агрегата игровых данных. Это не каталог общего назначения.
+- `Game/Data/Declarations` владеет независимым от источника, ещё не доверенным агрегатным представлением, которое
+  создаётся каждым источником игровых данных и потребляется `GameDataCompiler`.
 
 ### `User`
 
-Owns user-specific defaults, persisted user representation, immutable loaded snapshots, and live mutable user state.
+Отвечает за пользовательские значения по умолчанию, сохраняемое представление пользователя, неизменяемые загруженные
+snapshot-ы и живое изменяемое пользовательское состояние.
 
-- `Configuration` owns authored defaults and their validation.
-- `Defaults` owns the source-neutral defaults pipeline: declarations, source adapters, runtime compilation, and the
-  immutable defaults snapshot used to initialize a user without a valid save.
-- `Persistence` owns the user repository, session loading and save coordination, document mapping, and version
-  handling.
-- `Snapshots` owns immutable point-in-time user data.
-- `State` owns long-lived mutable runtime state, grouped by capability.
-- Each mutable state capability exposes a read interface separately from its `*Commands` interface. Register both
-  against one concrete singleton so consumers receive the same state instance with compile-time-appropriate access.
-- `User` may depend on stable `Game` value objects and definitions.
+- `Configuration` владеет созданными значениями по умолчанию и их валидацией.
+- `Defaults` владеет независимым от источника конвейером значений по умолчанию: declarations, адаптерами источников,
+  runtime-компиляцией и неизменяемым snapshot-ом значений по умолчанию, используемым для инициализации пользователя
+  без валидного сохранения.
+- `Persistence` владеет репозиторием пользователя, координацией загрузки и сохранения сессии, mapping-ом документов и
+  обработкой версий.
+- `Snapshots` владеет неизменяемыми пользовательскими данными на определённый момент времени.
+- `State` владеет долгоживущим изменяемым runtime-состоянием, сгруппированным по возможностям.
+- Каждая возможность изменяемого состояния предоставляет интерфейс чтения отдельно от интерфейса `*Commands`.
+  Регистрируйте оба на один конкретный singleton, чтобы потребители получали один экземпляр состояния с доступом,
+  соответствующим их контракту на этапе компиляции.
+- `User` может зависеть от стабильных value object-ов и definitions из `Game`.
 
 ### `Infrastructure`
 
-Owns reusable technical mechanisms such as loading contracts, serialization, storage, and platform adapters.
+Отвечает за переиспользуемые технические механизмы, например контракты загрузки, сериализацию, хранение и адаптеры
+платформы.
 
-- Infrastructure must not encode game, user, presentation, or UI policy.
-- Infrastructure must not depend on `Game`, `User`, `Presentation`, `UI`, `Composition`, or `Editor`.
-- `Infrastructure/Loading` owns the generic `IDataSource<TDeclaration>`, `IDataLoader<TData>`, and compiled-loading
-  chain. Domain sources implement the generic source contract, while declarations and compilers remain with their
-  domain owner.
-- `Infrastructure/Collections` owns generic collection-copying helpers. These helpers may define snapshot mechanics
-  such as defensive copying, but they must not define domain collection policy or validation.
-- Prefer capability folders such as `Saving/Serialization` and `Saving/Storage` over technology-only folders.
-- Read-only storage and document-loading contracts remain separate from writable save contracts. A static-data
-  source consumes only read capabilities; repositories that persist mutable state consume the writable extension.
-- A technology name belongs on the concrete implementation, for example `JsonSaveSerializer` or
-  `PlayerPrefsSaveStorage`.
+- Infrastructure не должна кодировать политику game, user, presentation или UI.
+- Infrastructure не должна зависеть от `Game`, `User`, `Presentation`, `UI`, `Composition` или `Editor`.
+- `Infrastructure/Loading` владеет общей цепочкой `IDataSource<TDeclaration>`, `IDataLoader<TData>` и
+  скомпилированной загрузки. Доменные источники реализуют общий контракт источника, а declarations и compilers
+  остаются у своего доменного владельца.
+- `Infrastructure/Collections` владеет общими средствами копирования коллекций. Они могут определять механику
+  snapshot-а, например защитное копирование, но не должны определять доменную политику коллекций или валидацию.
+- Предпочитайте каталоги возможностей, например `Saving/Serialization` и `Saving/Storage`, каталогам, названным
+  только по технологии.
+- Контракты read-only хранения и загрузки документов остаются отдельными от изменяющих контрактов сохранения.
+  Источник статических данных использует только возможности чтения; репозитории, сохраняющие изменяемое состояние,
+  используют расширение для записи.
+- Имя технологии указывается у конкретной реализации, например `JsonSaveSerializer` или `PlayerPrefsSaveStorage`.
 
 ### `Presentation`
 
-Owns transformations and adapters that turn domain meaning into display meaning: localization, formatting, display
-catalogs, and presentation-facing confirmations.
+Отвечает за преобразования и адаптеры, превращающие доменный смысл в смысл отображения: локализацию, форматирование,
+каталоги отображения и обращённые к presentation подтверждения.
 
-- Presentation may depend on `Game`, `User`, `Infrastructure.Loading`, and `Validation`.
-- `Typography` owns pure rich-text tokens, tags, symbols, styles, and formatting. These types produce display strings
-  and must not depend on TMPro, Unity components, windows, or concrete views.
-- Confirmation interfaces and their localization keys belong to the presentation capability that defines the user
-  decision. A concrete confirmation implemented with a window belongs to `UI/Windows`.
-- Presentation must not own reusable visual controls, concrete feature views, navigation, or game rules.
-- Presentation must not depend on `UI`.
-- Presentation-specific configuration stays with its presentation capability.
-- `Presentation/Inspector` owns reusable declarative inspector attributes for presentation configuration. These
-  attributes compose authoring metadata only; they do not contain editor workflows, asset-database access, or
-  runtime presentation behavior.
-- `Presentation/Sprites` owns reusable runtime sprite catalogs. `SpriteCatalog<TId>` maps one sprite to a domain ID;
-  `SpriteVariantCatalog<TId, TVariant>` maps multiple explicitly named variants to each domain ID.
-- `Presentation/Items` owns item formatting and item icon sprites keyed by `ItemId`.
-- `Presentation/Heroes` owns the independently loaded small and large portrait resources keyed by `HeroId`.
-  Portrait data remains static sprites; optional animation is view behavior and does not change hero definitions.
-- `Presentation/Flags` owns flag sprites keyed by `FlagId`. Game hero definitions reference only the semantic ID and
-  never reference Unity sprites directly.
+- Presentation может зависеть от `Game`, `User`, `Infrastructure.Loading` и `Validation`.
+- `Typography` владеет чистыми rich-text токенами, тегами, символами, стилями и форматированием. Эти типы создают
+  строки отображения и не должны зависеть от TMPro, Unity-компонентов, окон или конкретных views.
+- Интерфейсы подтверждения и их ключи локализации принадлежат возможности presentation, определяющей решение
+  пользователя. Конкретное подтверждение, реализованное через окно, принадлежит `UI/Windows`.
+- Presentation не должна владеть переиспользуемыми визуальными controls, конкретными feature views, навигацией или
+  игровыми правилами.
+- Presentation не должна зависеть от `UI`.
+- Конфигурация, относящаяся к presentation, остаётся со своей возможностью presentation.
+- `Presentation/Inspector` владеет переиспользуемыми декларативными атрибутами инспектора для конфигурации
+  presentation. Эти атрибуты только компонуют метаданные авторинга; они не содержат Editor workflows, доступ к базе
+  ассетов или runtime-поведение presentation.
+- `Presentation/Sprites` владеет переиспользуемыми runtime-каталогами спрайтов. `SpriteCatalog<TId>` сопоставляет один
+  спрайт доменному ID; `SpriteVariantCatalog<TId, TVariant>` сопоставляет несколько явно именованных вариантов
+  каждому доменному ID.
+- `Presentation/Items` владеет форматированием предметов и спрайтами иконок предметов с ключом `ItemId`.
+- `Presentation/Heroes` владеет независимо загружаемыми ресурсами малых и больших портретов с ключом `HeroId`.
+  Данные портретов остаются статическими спрайтами; необязательная анимация является поведением view и не меняет
+  definitions героев.
+- `Presentation/Flags` владеет спрайтами флагов с ключом `FlagId`. Игровые definitions героев ссылаются только на
+  семантический ID и никогда напрямую не ссылаются на Unity-спрайты.
 
 ### `UI`
 
-Owns concrete visual behavior: views, windows, controls, graphics, navigation, visual state, and visual flows.
+Отвечает за конкретное визуальное поведение: views, окна, controls, graphics, навигацию, визуальное состояние и
+визуальные потоки.
 
-- UI may depend on `Presentation`, `Game`, and `User`.
-- `MonoBehaviour`, visual components, and window implementations normally belong here.
-- `Controls` owns self-contained reusable UI elements, including both interactive controls and display-only elements
-  such as progress bars and formatted labels.
-- `Views` owns composed visual blocks that present a specific UI concept and can be embedded in more than one screen.
-  Feature-owned views stay with their feature instead of moving to a generic shared folder.
-- Specialized rendering and visual-state behavior belongs in role folders such as `Graphics` or `VisualStates`.
-- UI consumes `Presentation/Typography`; it does not define a second text-token vocabulary.
-- `Localization` owns concrete localized UI components; localization services and presentation wording remain under
-  `Presentation`.
-- `Windows` owns window definitions, navigation, window flows, and concrete windows. Place each concrete window and
-  its feature-specific parts directly under a feature folder such as `Windows/RankUp` or `Windows/Upgrade`.
-- Keep only foundational UI mechanisms at the `UI` root. A reusable element with a recognized role must use its role
-  folder.
-- Feature-specific views stay under their feature or window view hierarchy.
-- UI must not contain persistence, storage, or domain rules.
+- UI может зависеть от `Presentation`, `Game` и `User`.
+- `MonoBehaviour`, визуальные компоненты и реализации окон обычно находятся здесь.
+- `Controls` владеет самодостаточными переиспользуемыми элементами UI, включая интерактивные controls и элементы
+  только для отображения, например progress bars и форматированные labels.
+- `Views` владеет составными визуальными блоками, которые представляют конкретное понятие UI и могут встраиваться в
+  несколько экранов. Views, принадлежащие функциональности, остаются с ней, а не перемещаются в общий каталог.
+- Специализированный rendering и поведение визуального состояния находятся в каталогах ролей, например `Graphics`
+  или `VisualStates`.
+- UI использует `Presentation/Typography`; он не определяет вторую терминологию текстовых токенов.
+- `Localization` владеет конкретными локализованными UI-компонентами; сервисы локализации и формулировки presentation
+  остаются в `Presentation`.
+- `Windows` владеет definitions окон, навигацией, потоками окон и конкретными окнами. Размещайте каждое конкретное
+  окно и его части, относящиеся к функциональности, непосредственно в каталоге функциональности, например
+  `Windows/RankUp` или `Windows/Upgrade`.
+- В корне `UI` оставляйте только фундаментальные механизмы UI. Переиспользуемый элемент с признанной ролью должен
+  находиться в каталоге этой роли.
+- Views конкретной функциональности остаются в иерархии views своей функциональности или окна.
+- UI не должен содержать хранение, сохранение или доменные правила.
 
 ### `Validation`
 
-Owns reusable validation primitives, results, contexts, rules, and reporting contracts.
+Отвечает за переиспользуемые примитивы, результаты, context-ы, правила и контракты отчётности валидации.
 
-- Generic validation belongs in runtime `Scripts/Validation`.
-- Validation of one configuration type stays beside that configuration.
-- Cross-asset and project-wide validation that uses `AssetDatabase` belongs in `Editor/Validation`.
-- Validation reports errors; it must not silently repair source data.
-- Validation vocabulary, behavior, and verification rules are defined in [`Validation.md`](Validation.md).
+- Общая валидация находится в runtime-каталоге `Scripts/Validation`.
+- Валидация одного типа конфигурации остаётся рядом с этой конфигурацией.
+- Межассетная и общепроектная валидация с использованием `AssetDatabase` находится в `Editor/Validation`.
+- Валидация сообщает об ошибках и не исправляет исходные данные незаметно.
+- Терминология, поведение и правила проверки валидации определены в [`Validation.md`](Validation.md).
 
 ### `Editor`
 
-Owns Unity Editor-only tooling, menus, inspectors, build checks, and asset-database integration.
+Отвечает за tooling только для Unity Editor, меню, инспекторы, проверки сборки и интеграцию с базой ассетов.
 
-- Runtime code must never depend on `Editor`.
-- Mirror a runtime capability below `Editor` when the tool is feature-specific.
-- Keep project-wide editor workflows in a role folder such as `Menu`, `Creation`, or `Validation`.
-- `Toolbar` contains compact controls for frequently used project workflows in Unity's main or window toolbars.
-  Unity-version-specific toolbar integration stays isolated here and delegates behavior to editor workflow commands.
-- `CI` contains provider-independent batch-mode entry points for validation, tests, and player builds. Provider
-  configuration calls these entry points and must not duplicate their project rules.
+- Runtime-код никогда не должен зависеть от `Editor`.
+- Повторяйте runtime-возможность внутри `Editor`, когда инструмент относится к конкретной функциональности.
+- Размещайте общепроектные Editor workflows в каталоге роли, например `Menu`, `Creation` или `Validation`.
+- `Toolbar` содержит компактные controls для часто используемых workflows проекта в основной панели инструментов
+  Unity или панелях окон. Зависящая от версии Unity интеграция toolbar изолируется здесь и делегирует поведение
+  командам Editor workflow.
+- `CI` содержит не зависящие от провайдера точки входа batch mode для валидации, тестов и player-сборок.
+  Конфигурация провайдера вызывает эти точки входа и не дублирует правила проекта.
 
-## Reserved architectural role folders
+## Зарезервированные каталоги архитектурных ролей
 
-The following names have project-wide architectural meaning and must be used consistently:
+Следующие имена имеют общепроектное архитектурное значение и должны использоваться последовательно:
 
-- `Configuration`: Unity-authored or otherwise author-authored input for one owning capability.
-- `Declarations`: source-neutral, not-yet-trusted aggregate input normalized from multiple concrete sources.
-- `Persistence`: durable/external serialized representation, version handling, mapping, and save/load orchestration.
-- `Documents`: versioned external serialized contracts owned by a `Persistence` boundary.
-- `Snapshots`: immutable point-in-time representation composed at a loading boundary.
-- `State`: live mutable runtime state.
-- `Sources`: source-specific adapters that read external or authored data into a source-neutral declaration.
-- `Loading`: adapters and orchestration that produce one fully constructed runtime resource or aggregate.
-- `Serialization`: object-to-byte or object-to-text format conversion.
-- `Storage`: raw byte or text access to a medium, addressed without domain knowledge.
-- `Services`: cohesive domain or application operations with no more specific feature role.
-- `Views`: concrete visual representations.
-- `Controls`: self-contained reusable interactive or display-only UI elements; only under `UI`.
-- `Graphics`: reusable custom rendering components; only under `UI`.
-- `Typography`: pure display text vocabulary and formatting; only under `Presentation`.
-- `VisualStates`: reusable visual-state sources, effects, and state values; only under `UI`.
-- `Flows`: multi-step application or UI workflows.
-- `Extensions`: extension methods only.
-- `Reporting`: formatting or delivery of diagnostic and validation results.
-- `Scopes`: DI lifetime boundaries and their serialized Unity references; only under `Composition`.
-- `Installers`: cohesive `IInstaller` registration modules; only under `Composition`.
-- `Factories`: reusable concrete construction policies; under `Composition` when they select application technology.
+- `Configuration`: созданные в Unity или иным автором входные данные одной владеющей возможности.
+- `Declarations`: независимые от источника, ещё не доверенные агрегатные входные данные, нормализованные из нескольких
+  конкретных источников.
+- `Persistence`: долговечное или внешнее сериализованное представление, обработка версий, mapping и координация
+  сохранения и загрузки.
+- `Documents`: версионированные внешние сериализованные контракты, принадлежащие границе `Persistence`.
+- `Snapshots`: неизменяемое представление на определённый момент времени, составленное на границе загрузки.
+- `State`: живое изменяемое runtime-состояние.
+- `Sources`: зависящие от источника адаптеры, читающие внешние или созданные данные в независимую от источника
+  declaration.
+- `Loading`: адаптеры и координация, создающие один полностью сформированный runtime-ресурс или агрегат.
+- `Serialization`: преобразование объекта в байты или текст и обратно.
+- `Storage`: доступ к необработанным байтам или тексту носителя, адресуемому без знания домена.
+- `Services`: связные доменные или прикладные операции без более конкретной роли функциональности.
+- `Views`: конкретные визуальные представления.
+- `Controls`: самодостаточные переиспользуемые интерактивные элементы UI или элементы только для отображения; только
+  внутри `UI`.
+- `Graphics`: переиспользуемые компоненты собственного rendering-а; только внутри `UI`.
+- `Typography`: чистая терминология и форматирование отображаемого текста; только внутри `Presentation`.
+- `VisualStates`: переиспользуемые источники, эффекты и значения визуальных состояний; только внутри `UI`.
+- `Flows`: многошаговые прикладные или UI-workflows.
+- `Extensions`: только extension methods.
+- `Reporting`: форматирование или доставка результатов диагностики и валидации.
+- `Scopes`: границы жизненного цикла DI и их сериализованные Unity-ссылки; только внутри `Composition`.
+- `Installers`: связные модули регистрации `IInstaller`; только внутри `Composition`.
+- `Factories`: переиспользуемые конкретные политики создания; внутри `Composition`, когда они выбирают технологию
+  приложения.
 
-This is not a closed list of every legal folder. A feature-local folder such as `Effects`, `Modal`, `Progress`, or
-`Values` is valid when its owner and responsibility are clear and it does not redefine a reserved role. Avoid vague
-folders such as `Common`, `Misc`, `Helpers`, `Managers`, `Runtime`, or `Data` without a narrowly documented meaning.
-A broadly reusable type still needs a concrete owner and responsibility.
+Это не исчерпывающий список всех допустимых каталогов. Локальный для функциональности каталог, например `Effects`,
+`Modal`, `Progress` или `Values`, допустим, если его владелец и ответственность понятны и он не переопределяет
+зарезервированную роль. Избегайте расплывчатых каталогов вроде `Common`, `Misc`, `Helpers`, `Managers`, `Runtime` или
+`Data` без узко документированного смысла. Даже широко переиспользуемому типу нужны конкретный владелец и
+ответственность.
 
-## Type naming vocabulary
+## Терминология именования типов
 
-Use the most specific applicable suffix:
+Используйте наиболее конкретный применимый суффикс:
 
-- `LifetimeScope`: VContainer lifetime boundary hosted by a Unity component.
-- `Installer`: cohesive VContainer registration module implementing `IInstaller`.
-- `Factory`: constructs a concrete object graph without registering it or retaining its runtime ownership.
-- `Config`: root authoring object, normally a `ScriptableObject`.
-- `ManifestConfig`: root authoring object that references every configuration required to build one aggregate.
-- `Entry`: one serialized authoring row nested under a configuration.
-- `DocumentEntry`: one serialized transport row nested under a `Document`.
-- `Declaration`: normalized, source-neutral, not-yet-trusted data prepared for compilation into runtime meaning.
-- `Definition`: immutable domain description used by game rules.
-- `Catalog`: immutable indexed collection of definitions or resources.
-- `Snapshot`: immutable, internally consistent point-in-time aggregate.
-- `Document`: versioned external serialized contract, including both reference data and persisted user state.
-- `Compiler`: validates and resolves an aggregate `Declaration`, then constructs its immutable runtime snapshot.
-- `Mapper`: pure conversion between representations; it performs no I/O and owns no state.
-- `Loader`: performs one load operation and returns a fully constructed result.
-- `Repository`: loads and saves one semantic aggregate without exposing serialization or storage technology.
-- `Coordinator`: owns the lifecycle and side effects of a continuing process but contains no domain rules.
-- `Storage`: reads and writes raw bytes or text to one storage technology.
-- `Serializer`: converts between an object representation and bytes or text.
-- `Provider`: provides access to an already available resource or a stable creation policy without exposing storage
-  details.
-- `Source`: represents a concrete origin of data when neither `Loader`, `Storage`, nor `Provider` describes it more
-  precisely.
-- `State`: mutable runtime representation.
-- `Service`: cohesive domain or application operation that does not fit a more specific role.
-- `Controller`: coordinates lifecycle, commands, and side effects for an owned process.
-- `Flow`: coordinates a multi-step user or application workflow.
-- `BootstrapOperation`: one independently started and polled unit of temporary bootstrap work that reports progress,
-  readiness, and failure without coordinating other operations.
-- `View`: concrete visual representation.
-- `Validator`: checks input and reports issues without changing it.
-- `Formatter`: converts a value into presentation text or tokens without I/O.
+- `LifetimeScope`: граница жизненного цикла VContainer, размещённая в Unity-компоненте.
+- `Installer`: связный модуль регистрации VContainer, реализующий `IInstaller`.
+- `Factory`: создаёт конкретный граф объектов, не регистрируя его и не сохраняя владение им во время работы.
+- `Config`: корневой объект авторинга, обычно `ScriptableObject`.
+- `ManifestConfig`: корневой объект авторинга, ссылающийся на каждую конфигурацию, необходимую для создания одного
+  агрегата.
+- `Entry`: одна сериализованная строка авторинга, вложенная в конфигурацию.
+- `DocumentEntry`: одна сериализованная транспортная строка, вложенная в `Document`.
+- `Declaration`: нормализованные, независимые от источника, ещё не доверенные данные, подготовленные для компиляции в
+  runtime-смысл.
+- `Definition`: неизменяемое доменное описание, используемое игровыми правилами.
+- `Catalog`: неизменяемая индексированная коллекция definitions или ресурсов.
+- `Snapshot`: неизменяемый, внутренне согласованный агрегат на определённый момент времени.
+- `Document`: версионированный внешний сериализованный контракт, включая справочные данные и сохраняемое состояние
+  пользователя.
+- `Compiler`: валидирует и разрешает агрегатную `Declaration`, затем создаёт её неизменяемый runtime-snapshot.
+- `Mapper`: чистое преобразование между представлениями; не выполняет I/O и не владеет состоянием.
+- `Loader`: выполняет одну операцию загрузки и возвращает полностью сформированный результат.
+- `Repository`: загружает и сохраняет один семантический агрегат, не раскрывая технологию сериализации или хранения.
+- `Coordinator`: владеет жизненным циклом и побочными действиями продолжающегося процесса, но не содержит доменных
+  правил.
+- `Storage`: читает и записывает необработанные байты или текст с помощью одной технологии хранения.
+- `Serializer`: преобразует объектное представление в байты или текст и обратно.
+- `Provider`: предоставляет доступ к уже доступному ресурсу или стабильной политике создания, не раскрывая детали
+  хранения.
+- `Source`: представляет конкретное происхождение данных, когда ни `Loader`, ни `Storage`, ни `Provider` не описывают
+  его точнее.
+- `State`: изменяемое runtime-представление.
+- `Service`: связная доменная или прикладная операция, не соответствующая более конкретной роли.
+- `Controller`: координирует жизненный цикл, команды и побочные действия принадлежащего ему процесса.
+- `Flow`: координирует многошаговый пользовательский или прикладной workflow.
+- `BootstrapOperation`: одна независимо запускаемая и опрашиваемая единица временной bootstrap-работы, сообщающая о
+  прогрессе, готовности и ошибке, но не координирующая другие операции.
+- `View`: конкретное визуальное представление.
+- `Validator`: проверяет входные данные и сообщает о проблемах, не изменяя их.
+- `Formatter`: преобразует значение в presentation-текст или токены без I/O.
 
-Interfaces use the same role name with an `I` prefix. Concrete technology adapters use a technology prefix, such as
-`Json`, `File`, `PlayerPrefs`, `Unity`, or `ScriptableObject`.
+Интерфейсы используют то же имя роли с префиксом `I`. Конкретные технологические адаптеры используют префикс
+технологии, например `Json`, `File`, `PlayerPrefs`, `Unity` или `ScriptableObject`.
 
-Do not use `Manager`, `Helper`, `Utility`, `Processor`, or `Handler` when a standard responsibility name is available.
-Event callbacks use the `On...` prefix; `Handle...` remains reserved for non-event command or workflow processing.
+Не используйте `Manager`, `Helper`, `Utility`, `Processor` или `Handler`, если доступно стандартное имя
+ответственности. Callbacks событий используют префикс `On...`; `Handle...` остаётся зарезервированным для обработки
+команд или workflows, не являющейся событием.
 
-## Data representation boundaries
+## Границы представлений данных
 
-Keep the following representations separate:
+Разделяйте следующие представления:
 
-1. `Config` and `Entry` types optimize authoring and Unity serialization.
-2. `Document` and `DocumentEntry` types define stable external serialization contracts and versions.
-3. `Declaration` types normalize every source into one source-neutral shape without asserting runtime validity.
-4. `Compiler` types validate declarations, resolve references, and construct runtime meaning.
-5. `Snapshot`, `Definition`, and `Catalog` types express immutable, already-valid runtime meaning.
-6. `State` types represent mutable runtime behavior and can produce an aggregate snapshot.
+1. Типы `Config` и `Entry` оптимизированы для авторинга и сериализации Unity.
+2. Типы `Document` и `DocumentEntry` определяют стабильные внешние контракты сериализации и версии.
+3. Типы `Declaration` нормализуют каждый источник в единую независимую от источника форму без утверждения runtime-
+   валидности.
+4. Типы `Compiler` валидируют declarations, разрешают ссылки и создают runtime-смысл.
+5. Типы `Snapshot`, `Definition` и `Catalog` выражают неизменяемый, уже валидный runtime-смысл.
+6. Типы `State` представляют изменяемое runtime-поведение и могут создавать агрегатный snapshot.
 
-Sources and repositories own I/O. Mappers only convert representations. Compilers own aggregate validation and
-reference resolution. Domain and state code must not read JSON, files, PlayerPrefs, or `ScriptableObject` fields
-directly.
+Sources и repositories владеют I/O. Mappers только преобразуют представления. Compilers владеют агрегатной
+валидацией и разрешением ссылок. Доменный код и код состояния не должны напрямую читать JSON, файлы, PlayerPrefs или
+поля `ScriptableObject`.
 
-Compilers implement `IDataCompiler<TDeclaration, TSnapshot>`. Their source-neutral declaration is the only input to
-`Compile`; stable catalogs or other services required to resolve it are constructor dependencies.
+Compilers реализуют `IDataCompiler<TDeclaration, TSnapshot>`. Их независимая от источника declaration является
+единственным входом `Compile`; стабильные каталоги или другие сервисы, необходимые для её разрешения, передаются как
+зависимости конструктора.
 
-For game and user domain data, use `IDataLoader<T>` only for an application-level aggregate such as
-`GameDataSnapshot`, `UserDefaultsSnapshot`, or `UserSnapshot`. Do not implement it on individual domain catalog
-configs or other partial domain data. A whole-data load registers one aggregate once; consumers receive the
-aggregate or its owned parts, never a concrete source, repository, or compiler. Presentation and UI resource
-catalogs may retain focused loaders because they are independently owned runtime resources rather than partial
-domain aggregates. A `Config` remains an authoring and validation object; a technology-specific loader such as
-`ScriptableObjectItemIconCatalogLoader` or `ScriptableObjectWindowCatalogLoader` validates that config and constructs
-the runtime catalog.
+Для доменных данных игры и пользователя используйте `IDataLoader<T>` только для агрегата уровня приложения, например
+`GameDataSnapshot`, `UserDefaultsSnapshot` или `UserSnapshot`. Не реализуйте его у config-ов отдельных доменных
+каталогов или других частичных доменных данных. Полная загрузка данных один раз регистрирует один агрегат; потребители
+получают агрегат или принадлежащие ему части, но не конкретный источник, repository или compiler. Каталоги ресурсов
+Presentation и UI могут сохранять узкие loaders, поскольку являются независимо принадлежащими runtime-ресурсами, а
+не частями доменных агрегатов. `Config` остаётся объектом авторинга и валидации; зависящий от технологии loader,
+например `ScriptableObjectItemIconCatalogLoader` или `ScriptableObjectWindowCatalogLoader`, валидирует этот config и
+создаёт runtime-каталог.
 
-## Authored asset placement
+## Размещение создаваемых ассетов
 
-- Keep project-authored configuration assets under `Assets/_Project/Configuration`.
-- Organize configuration assets by their owning runtime area first, for example `Game`, `Presentation`, `UI`, or
+- Храните созданные проектом конфигурационные ассеты в `Assets/_Project/Configuration`.
+- Сначала организуйте конфигурационные ассеты по владеющей runtime-области, например `Game`, `Presentation`, `UI` или
   `User`.
-- Keep assets directly under their owning runtime area while each feature contributes only one authored asset. Add a
-  feature subfolder only when it contains a coherent group of multiple related assets or needs meaningful nested
-  structure; do not create one-asset folders solely to mirror the C# hierarchy.
-- Keep the C# configuration types beside the subsystem whose data they author; do not mirror the asset folder by
-  centralizing unrelated configuration code.
-- Keep framework, package, and application assembly settings under `Assets/_Project/Settings`, grouped by the
-  capability or integration they configure.
-- When an integration loads settings through `Resources`, place its required `Resources` folder below the owning
-  settings capability and integration so the expected resource key remains unchanged.
-- Do not mix framework settings with authored game, presentation, UI, or user data merely because both use
-  `ScriptableObject`.
-- Expose every project-authored root configuration declared with `CreateAssetMenu` through `Last Level/Content`, using
-  `ProjectAssetSelector` so the command selects the existing asset or starts its normal creation flow.
-- Group `Last Level/Content` entries by the configuration's owning runtime area and separate the groups with menu
-  priority gaps. Keep presentation image catalogs, including icons, flags, and portraits, together in their own
-  Presentation group, separate from Game, UI, and User content.
-- Add the Content menu entry and its automated coverage in the same change as a new root authored configuration.
-- Keep shared Unity swatch and preset libraries under `Assets/_Project/Presets`.
-- Place Unity project preset-library files in a nested `Editor` folder so Unity discovers them without mixing them
-  with the editor-tooling source assembly.
-- Organize UI prefabs by the same ownership vocabulary as UI code: reusable controls under `Controls`, composed
-  display blocks under `Views`, feature-owned views under their feature, and window roots under `Windows`.
-- Name prefab assets `P_<SemanticName>`. The prefab root object must match the asset name, while an instance override
-  may use a more specific contextual name.
-- Prefab names must describe purpose or visual role. Do not use sequence-only variants such as `_01`; use a semantic
-  variant such as `Primary`, `Outlined`, or `Timed`, and add dimensions only when they distinguish intentional sizes.
-- Use `Layouts` only for reusable components whose responsibility is arranging children. Do not classify a composed
-  display block as a layout merely because it contains several visual elements.
+- Храните ассеты непосредственно в своей runtime-области, пока каждая функциональность предоставляет только один
+  созданный ассет. Добавляйте подкаталог функциональности только тогда, когда он содержит связную группу нескольких
+  связанных ассетов или нуждается в значимой вложенной структуре; не создавайте каталоги для одного ассета только
+  ради повторения иерархии C#.
+- Храните типы конфигурации C# рядом с подсистемой, данные которой они создают; не повторяйте каталог ассетов,
+  централизуя несвязанный код конфигурации.
+- Храните настройки framework, пакетов и сборок приложения в `Assets/_Project/Settings`, сгруппированными по
+  настраиваемой возможности или интеграции.
+- Если интеграция загружает настройки через `Resources`, размещайте требуемый каталог `Resources` внутри владеющей
+  настройки возможности и интеграции, чтобы ожидаемый ключ ресурса не менялся.
+- Не смешивайте настройки framework с созданными данными game, presentation, UI или user только потому, что и те и
+  другие используют `ScriptableObject`.
+- Предоставляйте каждую созданную проектом корневую конфигурацию, объявленную через `CreateAssetMenu`, в
+  `Last Level/Content`, используя `ProjectAssetSelector`, чтобы команда выбирала существующий ассет или запускала
+  обычный поток его создания.
+- Группируйте элементы `Last Level/Content` по владеющей конфигурацией runtime-области и разделяйте группы разрывами
+  приоритетов меню. Храните каталоги изображений presentation, включая иконки, флаги и портреты, в собственной группе
+  Presentation, отдельно от содержимого Game, UI и User.
+- Добавляйте пункт меню Content и его автоматизированное покрытие в одном изменении с новой корневой создаваемой
+  конфигурацией.
+- Храните общие библиотеки образцов и presets Unity в `Assets/_Project/Presets`.
+- Размещайте файлы библиотек presets проекта Unity во вложенном каталоге `Editor`, чтобы Unity обнаруживала их, не
+  смешивая со сборкой исходного кода Editor tooling.
+- Организуйте UI-prefabs по той же терминологии владения, что и UI-код: переиспользуемые controls в `Controls`,
+  составные блоки отображения в `Views`, views функциональности внутри неё, а корни окон в `Windows`.
+- Именуйте prefab-ассеты `P_<SemanticName>`. Корневой объект prefab должен совпадать с именем ассета, а override
+  экземпляра может иметь более конкретное контекстное имя.
+- Имена prefabs должны описывать назначение или визуальную роль. Не используйте варианты только с порядковым номером,
+  например `_01`; используйте семантический вариант, например `Primary`, `Outlined` или `Timed`, и добавляйте размеры
+  только тогда, когда они различают намеренные размеры.
+- Используйте `Layouts` только для переиспользуемых компонентов, отвечающих за расположение дочерних объектов. Не
+  классифицируйте составной блок отображения как layout только потому, что он содержит несколько визуальных элементов.
 
-## Lifetime and composition model
+## Модель жизненного цикла и композиции
 
-The application uses one process-wide project scope and scene-owned child scopes. A scene scope adds objects whose
-lifetime and serialized references belong to that scene; it must not recreate the project scope. The current scope
-inventory and registrations are documented in
+Приложение использует один project scope на весь процесс и принадлежащие сценам дочерние scope-ы. Scope сцены
+добавляет объекты, жизненный цикл и сериализованные ссылки которых принадлежат этой сцене; он не должен повторно
+создавать project scope. Текущий список scope-ов и регистраций описан в
 [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md).
 
-A scope keeps small scene-local registrations visible and constructs larger installers manually with `new`.
-Installers register supplied policies but do not select storage, serialization, authoring, or loading technologies.
-Factories make those concrete construction choices without performing DI registration. Changing a runtime data
-source is therefore a composition-root change rather than an installer or consumer change.
+Scope сохраняет небольшие локальные для сцены регистрации видимыми и вручную создаёт более крупные installer-ы через
+`new`. Installers регистрируют предоставленные политики, но не выбирают технологии хранения, сериализации, авторинга
+или загрузки. Factories делают этот конкретный выбор создания без выполнения DI-регистрации. Поэтому изменение
+runtime-источника данных является изменением composition root, а не installer-а или потребителя.
 
-## Current runtime documentation
+## Текущая документация runtime-кода
 
-Current runtime flows, concrete participants, and document versions are descriptive implementation information. Keep
-them synchronized in [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md)
-and the focused [`Game-Data.md`](../Architecture/Game-Data.md) and
-[`User-Data.md`](../Architecture/User-Data.md) documents. Feature-level target behavior for hero experience,
-rank progression, and rank-up options is defined in
-[`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). The normative representation boundaries that those
-flows must follow remain in this document.
+Текущие runtime-потоки, конкретные участники и версии документов являются описательной информацией о реализации.
+Поддерживайте их актуальность в [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md) и специализированных
+документах [`Game-Data.md`](../Architecture/Game-Data.md) и
+[`User-Data.md`](../Architecture/User-Data.md). Целевое поведение уровня функциональности для опыта героев, развития
+рангов и вариантов повышения ранга определено в
+[`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). Нормативные границы представлений, которым должны
+следовать эти потоки, остаются в этом документе.
 
-## Dependency rules
+## Правила зависимостей
 
-The top-level project dependency matrix is:
+Матрица зависимостей проекта верхнего уровня:
 
-| From | May depend on |
+| Откуда | Допустимые зависимости |
 | --- | --- |
-| `Composition` | Every runtime area |
-| `Bootstrap` | `UI.Controls` and stable framework APIs |
-| `UI` | `Presentation`, `User`, `Game`; `UI.Windows.Configuration` and `UI.Windows.Loading` may also use `Infrastructure` and `Validation` |
-| `Presentation` | `Game`, `User`; capability-owned `Configuration` and `Loading` adapters may also use `Infrastructure` and `Validation` |
+| `Composition` | Все runtime-области |
+| `Bootstrap` | `UI.Controls` и стабильные API framework |
+| `UI` | `Presentation`, `User`, `Game`; `UI.Windows.Configuration` и `UI.Windows.Loading` также могут использовать `Infrastructure` и `Validation` |
+| `Presentation` | `Game`, `User`; адаптеры `Configuration` и `Loading`, принадлежащие возможности, также могут использовать `Infrastructure` и `Validation` |
 | `User` | `Game`, `Infrastructure`, `Validation` |
-| `Game` core | Other `Game` capabilities and generic `Validation` |
-| `Game` services | `Game` core and focused `User.State` contracts |
-| `Game` configuration/data adapters | `Game` core, `Infrastructure`, and `Validation` |
-| `Infrastructure` | Stable framework APIs and generic `Validation` reporting contracts |
-| `Validation` | Stable framework APIs |
-| `Editor` | Runtime assemblies and Unity Editor APIs |
+| Ядро `Game` | Другие возможности `Game` и общая `Validation` |
+| Сервисы `Game` | Ядро `Game` и узкие контракты `User.State` |
+| Адаптеры конфигурации и данных `Game` | Ядро `Game`, `Infrastructure` и `Validation` |
+| `Infrastructure` | Стабильные API framework и общие контракты отчётности `Validation` |
+| `Validation` | Стабильные API framework |
+| `Editor` | Runtime-сборки и API Unity Editor |
 
-The matrix is a maximum permission, not a reason to add a dependency. Folder-specific exceptions do not grant the
-same dependency to the rest of their top-level area.
+Матрица задаёт максимальное разрешение, а не повод добавлять зависимость. Исключения для конкретных каталогов не
+предоставляют ту же зависимость остальной части области верхнего уровня.
 
-The following directions are always forbidden:
+Следующие направления запрещены всегда:
 
-- Any runtime area to `Composition` or `Editor`.
-- `Presentation` to `UI`.
-- `Game` core models, definitions, catalogs, identifiers, and calculations to `User`, `Presentation`, or `UI`.
-- `Infrastructure` or `Validation` to game, user, presentation, or UI policy.
-- `User` to `Presentation` or `UI`.
+- Из любой runtime-области в `Composition` или `Editor`.
+- Из `Presentation` в `UI`.
+- Из моделей ядра `Game`, definitions, каталогов, идентификаторов и вычислений в `User`, `Presentation` или `UI`.
+- Из `Infrastructure` или `Validation` в политику game, user, presentation или UI.
+- Из `User` в `Presentation` или `UI`.
 
-Avoid bidirectional feature dependencies. If two features need the same concept, move that concept to the feature
-that semantically owns it or introduce a small contract at the consumer-facing boundary.
+Избегайте двунаправленных зависимостей функциональностей. Если двум функциональностям нужно одно понятие, перенесите
+его к семантическому владельцу или введите небольшой контракт на обращённой к потребителю границе.
 
-## Namespace and file rules
+## Правила пространств имён и файлов
 
-- Namespace segments mirror folders inside their containing assembly.
-- A file is named after its primary type.
-- Prefer one primary type per file. Small DTOs or entries may share a file only when they form one inseparable
-  serialized contract and are not reused independently.
-- Keep configuration types with the subsystem whose data they author or construct.
-- Moving or renaming a serialized Unity type requires preserving its `.meta` GUID and adding `MovedFrom` when Unity
-  needs the old assembly, namespace, or type identity.
-- Renaming a serialized field requires explicitly migrating its key in every scene, prefab, and asset, then verifying
-  that the old key no longer exists. Do not use `FormerlySerializedAs`.
-- Do not introduce a new top-level area or architectural role folder without updating this document.
+- Сегменты пространства имён повторяют каталоги внутри содержащей их сборки.
+- Файл именуется по своему основному типу.
+- Предпочитайте один основной тип на файл. Небольшие DTO или entries могут находиться в одном файле, только если
+  образуют единый неразделимый сериализованный контракт и не переиспользуются независимо.
+- Храните типы конфигурации с подсистемой, данные которой они создают или конструируют.
+- Перемещение или переименование сериализованного Unity-типа требует сохранения GUID его `.meta` и добавления
+  `MovedFrom`, когда Unity нужна прежняя идентичность сборки, пространства имён или типа.
+- Переименование сериализованного поля требует явной миграции его ключа в каждой сцене, prefab и ассете с последующей
+  проверкой отсутствия старого ключа. Не используйте `FormerlySerializedAs`.
+- Не вводите новую область верхнего уровня или каталог архитектурной роли без обновления этого документа.
 
-## Related conventions
+## Связанные соглашения
 
-C# syntax, declaration layout, DI marking, reactive lifecycle, and Unity component conventions are defined only in
-[`Code-Style.md`](Code-Style.md). Validation vocabulary, automated coverage, and required change verification are
-defined only in [`Validation.md`](Validation.md).
+Синтаксис C#, расположение объявлений, маркировка DI, жизненный цикл реактивных объектов и соглашения по
+Unity-компонентам определены только в [`Code-Style.md`](Code-Style.md). Терминология валидации, автоматизированное
+покрытие и обязательные проверки изменений определены только в [`Validation.md`](Validation.md).
 
-## Changing the architecture
+## Изменение архитектуры
 
-An architectural change is any new top-level area, role folder, dependency direction, assembly, lifetime boundary,
-type suffix, or project-wide naming convention. Make such a change in this order:
+Архитектурным изменением является любая новая область верхнего уровня, каталог роли, направление зависимости, сборка,
+граница жизненного цикла, суффикс типа или общепроектное соглашение по именованию. Выполняйте такое изменение в
+следующем порядке:
 
-1. Identify the semantic owner and the consumers.
-2. Update this document with the new boundary and allowed direction.
-3. Move or add code while preserving Unity GUIDs and serialized keys.
-4. Extend `tools/Validate-Architecture.ps1` for every mechanically enforceable part.
-5. Update the runtime overview when the change affects its modules, lifetime boundaries, or core flows.
-6. Run the checks required by the change matrix in `Validation.md`.
+1. Определите семантического владельца и потребителей.
+2. Обновите этот документ, добавив новую границу и разрешённое направление.
+3. Переместите или добавьте код с сохранением GUID Unity и сериализованных ключей.
+4. Расширьте `tools/Validate-Architecture.ps1` для каждой части, соблюдение которой можно обеспечить механически.
+5. Обновите обзор runtime-кода, если изменение затрагивает его модули, границы жизненного цикла или основные потоки.
+6. Запустите проверки, требуемые матрицей изменений в `Validation.md`.
 
-Exceptions must be narrow, named by folder or type, and documented beside the rule they qualify. Do not weaken a
-top-level dependency rule to accommodate one adapter.
+Исключения должны быть узкими, именованными по каталогу или типу и документированными рядом с уточняемым правилом.
+Не ослабляйте правило зависимостей верхнего уровня ради одного адаптера.
 
-## Review checklist
+## Контрольный список ревью
 
-For every new or moved type, verify:
+Для каждого нового или перемещённого типа проверьте:
 
-- The path identifies one clear owner and feature.
-- The folder name has a defined meaning in this document.
-- The namespace mirrors the path.
-- The suffix matches the type's actual responsibility.
-- Dependencies point in an allowed direction.
-- Domain code does not know its persistence or authoring format.
-- Configuration remains beside its owning subsystem.
-- Composition contains wiring only and uses only the documented `Scopes`, `Installers`, and `Factories` roles.
-- Lifetime scopes keep small scene-local composition visible and delegate named subsystems to installers.
-- No vague catch-all folder or type name was introduced.
-- External representations are versioned where compatibility matters.
-- Unity asset GUIDs and serialized references remain valid after moves.
-- Validators and their discovery paths reflect the current code, asset layout, data flow, and domain invariants.
+- Путь определяет одного понятного владельца и функциональность.
+- Имя каталога имеет определённый в этом документе смысл.
+- Пространство имён повторяет путь.
+- Суффикс соответствует фактической ответственности типа.
+- Зависимости направлены в разрешённую сторону.
+- Доменный код не знает формат хранения или авторинга.
+- Конфигурация остаётся рядом с владеющей подсистемой.
+- Composition содержит только сборку и использует только документированные роли `Scopes`, `Installers` и
+  `Factories`.
+- Lifetime scope-ы оставляют небольшую локальную для сцены композицию видимой и делегируют именованные подсистемы
+  installer-ам.
+- Не введён расплывчатый каталог или имя типа общего назначения.
+- Внешние представления версионируются там, где важна совместимость.
+- GUID ассетов Unity и сериализованные ссылки остаются валидными после перемещений.
+- Валидаторы и их пути обнаружения отражают текущий код, размещение ассетов, поток данных и доменные инварианты.
 
-If a type cannot be placed confidently using these rules, pause and resolve its ownership before adding a new folder.
+Если тип невозможно уверенно разместить по этим правилам, остановитесь и определите владельца до добавления нового
+каталога.
 
-Run the structural architecture check after adding or moving code:
+После добавления или перемещения кода запускайте структурную проверку архитектуры:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-Architecture.ps1
 ```
 
-The script checks the mechanically enforceable subset of this standard. The semantic ownership and dependency
-questions in the checklist still require review. Automated-coverage classifications and additional checks are
-defined in [`Validation.md`](Validation.md).
+Скрипт проверяет ту часть стандарта, соблюдение которой можно обеспечить механически. Семантические вопросы владения
+и зависимостей из контрольного списка всё равно требуют ревью. Классификации автоматизированного покрытия и
+дополнительные проверки определены в [`Validation.md`](Validation.md).

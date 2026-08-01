@@ -1,115 +1,120 @@
-# Validation Standard
+# Стандарт валидации
 
-This document is the source of truth for validation semantics, validator ownership, automated convention coverage,
-and required project checks. Architecture rules belong to [`Architecture.md`](Architecture.md), C# conventions to
-[`Code-Style.md`](Code-Style.md), Odin authoring conventions to [`Odin-Inspector.md`](Odin-Inspector.md), and command
-details to [`CI.md`](../Development/CI.md).
-Test placement, fixture design, test data, and test-double conventions belong to [`Testing.md`](Testing.md).
+Этот документ — источник истины для семантики валидации, владения валидаторами, автоматизированного покрытия
+соглашений и обязательных проверок проекта. Архитектурные правила определены в
+[`Architecture.md`](Architecture.md), соглашения C# — в [`Code-Style.md`](Code-Style.md), соглашения авторинга Odin —
+в [`Odin-Inspector.md`](Odin-Inspector.md), а подробности команд — в [`CI.md`](../Development/CI.md).
+Соглашения по размещению тестов, устройству фикстур, тестовым данным и тестовым заменителям определены в
+[`Testing.md`](Testing.md).
 
-Validators enforce approved production, asset, and agreement decisions; they do not define those decisions. Do not
-relocate production code or assets solely because a stale validator expects another layout. Resolve the intended
-design first, then update the applicable agreement, validator, discovery path, and tests together.
+Валидаторы обеспечивают соблюдение утверждённых решений по production-коду, ассетам и соглашениям, но не определяют
+эти решения. Не перемещайте production-код или ассеты только потому, что устаревший валидатор ожидает другую
+структуру. Сначала определите принятое устройство, а затем совместно обновите применимое соглашение, валидатор, путь
+обнаружения и тесты.
 
-## Runtime validation vocabulary
+## Терминология runtime-валидации
 
-Generic validation primitives belong in `Assets/_Project/Scripts/Validation`.
+Общие примитивы валидации находятся в `Assets/_Project/Scripts/Validation`.
 
-- `ValidationChecks` owns stateless, context-free predicates and simple collection checks. It does not report issues,
-  throw because a checked value is invalid, or depend on a project domain.
-- Complementary predicates such as `IsPositive` and `IsNonPositive` may provide readable call-site forms, but one
-  delegates to the other so the validity formula has one implementation.
-- `ValidationRules` adapts checks to `ValidationContext` and owns reusable issue codes and messages. A rule delegates
-  its validity decision to the corresponding check rather than duplicating the predicate.
-- Configuration validators compose rules to accumulate multiple issues.
-- Domain facades such as `IdentifierValidator` and `EnumValidator` may expose `Validate`, `IsValid`, and `EnsureValid`
-  over the same underlying checks. They must not reimplement the validity grammar.
+- `ValidationChecks` владеет не сохраняющими состояние и не зависящими от контекста предикатами, а также простыми
+  проверками коллекций. Он не сообщает о проблемах, не выбрасывает исключение из-за невалидности проверяемого
+  значения и не зависит от домена проекта.
+- Дополняющие друг друга предикаты, например `IsPositive` и `IsNonPositive`, могут предоставлять читаемые формы в
+  местах вызова, но один делегирует другому, чтобы формула валидности имела единственную реализацию.
+- `ValidationRules` адаптирует проверки к `ValidationContext` и владеет переиспользуемыми кодами и сообщениями
+  проблем. Правило делегирует решение о валидности соответствующей проверке, а не дублирует предикат.
+- Валидаторы конфигурации компонуют правила, чтобы накапливать несколько проблем.
+- Доменные фасады, например `IdentifierValidator` и `EnumValidator`, могут предоставлять `Validate`, `IsValid` и
+  `EnsureValid` поверх одних и тех же базовых проверок. Они не должны заново реализовывать грамматику валидности.
 
-Choose an API by intent:
+Выбирайте API по назначению:
 
-- Use `ValidationChecks` for a shared context-free fact about an input, representation, or invariant.
-- Use `ValidationRules` while composing a `ValidationContext`, when failures need stable issue codes, paths,
-  messages, or accumulation.
-- Use a facade's `Validate` inside an existing validation composition, `IsValid` for an expected non-throwing
-  rejection, and `EnsureValid` at a construction or trust boundary that must reject invalid input.
-- Use `ValidationRunner` to start or guard a composed validation session, not for normal state transitions or UI
-  branching.
+- Используйте `ValidationChecks` для общего, не зависящего от контекста факта о входных данных, представлении или
+  инварианте.
+- Используйте `ValidationRules` при формировании `ValidationContext`, когда ошибкам нужны стабильные коды, пути,
+  сообщения или накопление.
+- Используйте `Validate` фасада внутри существующей композиции валидации, `IsValid` — для ожидаемого отклонения без
+  исключения, а `EnsureValid` — на границе создания или доверия, которая обязана отклонить невалидные данные.
+- Используйте `ValidationRunner` для запуска или защиты составного сеанса валидации, а не для обычных переходов
+  состояния или ветвления UI.
 
-## Validation boundaries
+## Границы валидации
 
-- Use a direct guard for a one-off programmer contract, especially a dependency null check or a type-local condition
-  with no reusable validation meaning.
-- Normal behavior is not validation. `Can...` and `Try...` rejection, optional-state detection, UI visibility,
-  clamping, loop bounds, and no-op decisions use ordinary control flow and do not create validation issues.
-- Reuse a domain facade when validity belongs to a named concept such as an identifier or country code. Do not
-  reconstruct that grammar from individual checks at call sites.
-- Consumers of an already-valid `Definition`, `Snapshot`, catalog entry, or domain object do not repeat invariants
-  guaranteed at construction. Validate only new input or a relationship owned by the consumer.
-- Validation of untrusted `Config`, `Document`, and `Declaration` data accumulates issues through
-  `ValidationContext`. Constructor and method guards protect programmer-facing runtime contracts and are not a
-  second validation pipeline.
-- Validation reports errors and does not silently repair source data.
-- Validation for one configuration type stays beside that configuration. Cross-asset or project-wide validation
-  using `AssetDatabase` belongs in `Assets/_Project/Editor/Validation`.
+- Используйте прямую проверку для разового контракта программиста, особенно для проверки зависимости на null или
+  локального для типа условия, не имеющего переиспользуемого смысла валидации.
+- Обычное поведение не является валидацией. Отклонение через `Can...` и `Try...`, обнаружение необязательного
+  состояния, видимость UI, ограничение значений, границы циклов и решения ничего не делать используют обычный поток
+  управления и не создают проблем валидации.
+- Переиспользуйте доменный фасад, когда валидность принадлежит именованному понятию, например идентификатору или коду
+  страны. Не собирайте эту грамматику заново из отдельных проверок в местах вызова.
+- Потребители уже валидных `Definition`, `Snapshot`, элемента каталога или доменного объекта не повторяют инварианты,
+  гарантированные при создании. Валидируйте только новые входные данные или отношение, принадлежащее потребителю.
+- Валидация недоверенных данных `Config`, `Document` и `Declaration` накапливает проблемы через
+  `ValidationContext`. Проверки конструкторов и методов защищают runtime-контракты для программиста и не являются
+  вторым конвейером валидации.
+- Валидация сообщает об ошибках и не исправляет исходные данные незаметно.
+- Валидация одного типа конфигурации остаётся рядом с этой конфигурацией. Межассетная или общепроектная валидация с
+  использованием `AssetDatabase` находится в `Assets/_Project/Editor/Validation`.
 
-## Automated convention coverage
+## Автоматизированное покрытие соглашений
 
-Coverage labels mean:
+Метки покрытия означают:
 
-- **Automated**: the repository check is intended to reject every violation of the stated rule.
-- **Partial**: automation detects common violations, but review is still required.
-- **Review**: design intent cannot be established reliably by a structural check.
+- **Автоматизировано**: проверка репозитория должна отклонять каждое нарушение указанного правила.
+- **Частично**: автоматизация обнаруживает распространённые нарушения, но ревью всё равно необходимо.
+- **Ревью**: проектный замысел невозможно надёжно установить структурной проверкой.
 
-| Agreement area | Coverage | Repository check |
+| Область соглашения | Покрытие | Проверка репозитория |
 | --- | --- | --- |
-| Runtime top-level folders and Composition roles | Automated | `tools/Validate-Architecture.ps1` |
-| Namespace-to-folder correspondence | Automated | `tools/Validate-Architecture.ps1` |
-| Top-level runtime dependency directions | Partial | `tools/Validate-Architecture.ps1` checks `using LL...` directives |
-| Selected DI, data-boundary, and user-state dependencies | Partial | `tools/Validate-Architecture.ps1` |
-| Root authored-configuration coverage in `Last Level/Content` | Automated | `tools/Validate-Architecture.ps1` |
-| Ownership, abstraction value, and feature placement | Review | Architecture review |
-| Enum representation, C# file ending, hard-limit exception layout, and hard line length | Automated | `tools/Validate-CodeStyle.ps1` |
-| Default Odin presentation in catalog configuration files | Automated | `tools/Validate-OdinInspector.ps1` |
-| Attribute layout, empty bodies, and simple expression wrapping | Partial | `tools/Validate-CodeStyle.ps1` |
-| DI constructor marking, R3 lifetime, and component multiplicity | Partial | `tools/Validate-CodeStyle.ps1` |
-| Unity null semantics, callback prefixes, and bound identifiers | Partial | `tools/Validate-CodeStyle.ps1` |
-| Naming clarity, member order, aggregate-mapping structure, managed null semantics, and lifecycle intent | Review | Code review |
-| Unity serialized keys, GUIDs, asset references, and data validity | Partial | Unity validation plus targeted search and review |
+| Каталоги верхнего уровня runtime-кода и роли Composition | Автоматизировано | `tools/Validate-Architecture.ps1` |
+| Соответствие пространств имён каталогам | Автоматизировано | `tools/Validate-Architecture.ps1` |
+| Направления зависимостей верхнего уровня runtime-кода | Частично | `tools/Validate-Architecture.ps1` проверяет директивы `using LL...` |
+| Выбранные зависимости DI, границ данных и состояния пользователя | Частично | `tools/Validate-Architecture.ps1` |
+| Покрытие корневых создаваемых конфигураций в `Last Level/Content` | Автоматизировано | `tools/Validate-Architecture.ps1` |
+| Владение, ценность абстракций и размещение функциональности | Ревью | Архитектурное ревью |
+| Представление enum, окончание C#-файла, компоновка исключений из жёсткого ограничения и максимальная длина строки | Автоматизировано | `tools/Validate-CodeStyle.ps1` |
+| Стандартное представление Odin в файлах конфигурации каталогов | Автоматизировано | `tools/Validate-OdinInspector.ps1` |
+| Компоновка атрибутов, пустые тела и перенос простых выражений | Частично | `tools/Validate-CodeStyle.ps1` |
+| Маркировка DI-конструкторов, жизненный цикл R3 и множественность компонентов | Частично | `tools/Validate-CodeStyle.ps1` |
+| Семантика Unity null, префиксы callbacks и идентификаторы границ | Частично | `tools/Validate-CodeStyle.ps1` |
+| Понятность именования, порядок членов, структура mapping-а агрегатов, семантика managed null и назначение жизненного цикла | Ревью | Ревью кода |
+| Сериализованные ключи Unity, GUID, ссылки на ассеты и валидность данных | Частично | Валидация Unity, целевой поиск и ревью |
 
-When adding or materially changing a structural rule, add focused positive and negative fixtures for the validator
-whenever the rule depends on parsing or regular expressions. A validator change is incomplete when its discovery
-scope or behavior can regress without a failing test.
+При добавлении или существенном изменении структурного правила добавляйте направленные положительные и отрицательные
+фикстуры валидатора, если правило зависит от parsing-а или регулярных выражений. Изменение валидатора не завершено,
+если его область обнаружения или поведение могут регрессировать без падения теста.
 
-## Change verification matrix
+## Матрица проверок изменений
 
-Run every row that applies to a change:
+Выполняйте каждую строку, применимую к изменению:
 
-| Change | Required verification |
+| Изменение | Обязательная проверка |
 | --- | --- |
-| Project-owned C# | Code-style validation and compilation |
-| Catalog inspector or Odin authoring convention | Odin Inspector validation and compilation |
-| Path, namespace, type role, or dependency | Architecture validation, code-style validation, and compilation |
-| New or moved runtime/editor code | Architecture validation and relevant tests |
-| DI registration or lifecycle | Architecture validation, code-style validation, compilation, and relevant tests |
-| Serialized field or Unity type identity | Explicit asset migration, old-key search, Unity validation, and reference verification |
-| Config, document, declaration, snapshot, identifier, or domain invariant | Unity validation and focused compiler, mapper, or domain tests |
-| Validator or validation discovery | Positive and negative validator fixtures plus the affected validation command |
-| Build scenes, player settings, or platform configuration | Full validation and a relevant player build |
-| Architecture boundary or convention | Agreements, overview documents, validators, and validator tests updated together |
+| Проектный C#-код | Валидация стиля кода и компиляция |
+| Инспектор каталога или соглашение авторинга Odin | Валидация Odin Inspector и компиляция |
+| Путь, пространство имён, роль типа или зависимость | Валидация архитектуры, валидация стиля кода и компиляция |
+| Новый или перемещённый runtime-/Editor-код | Валидация архитектуры и соответствующие тесты |
+| DI-регистрация или жизненный цикл | Валидация архитектуры, валидация стиля кода, компиляция и соответствующие тесты |
+| Сериализованное поле или идентичность Unity-типа | Явная миграция ассетов, поиск старого ключа, валидация Unity и проверка ссылок |
+| Config, document, declaration, snapshot, identifier или доменный инвариант | Валидация Unity и направленные тесты compiler-а, mapper-а или домена |
+| Валидатор или обнаружение валидации | Положительные и отрицательные фикстуры валидатора и соответствующая команда валидации |
+| Сцены сборки, player settings или конфигурация платформы | Полная валидация и соответствующая player-сборка |
+| Архитектурная граница или соглашение | Совместное обновление соглашений, обзорных документов, валидаторов и тестов валидаторов |
 
-Use the narrow checks while iterating and the combined validation command before handing off a change that touches
-multiple rows:
+Во время работы используйте узкие проверки, а перед передачей изменения, затрагивающего несколько строк матрицы,
+запускайте объединённую команду валидации:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/tests/Test-ConventionValidators.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Validate.ps1
 ```
 
-## Exceptions
+## Исключения
 
-An exception to a project-wide rule must be:
+Исключение из общепроектного правила должно:
 
-1. Narrowly scoped to a named folder, type, asset, or integration.
-2. Documented beside the rule it qualifies, with the reason the general rule does not apply.
-3. Reflected in automation without weakening unrelated cases.
-4. Covered by a test when the exception affects validator behavior.
-5. Removed when its stated reason no longer exists.
+1. Иметь узкую область действия, ограниченную именованным каталогом, типом, ассетом или интеграцией.
+2. Быть документировано рядом с уточняемым правилом с указанием причины неприменимости общего правила.
+3. Отражаться в автоматизации без ослабления не связанных с ним случаев.
+4. Покрываться тестом, если исключение влияет на поведение валидатора.
+5. Удаляться, когда указанная причина перестаёт существовать.

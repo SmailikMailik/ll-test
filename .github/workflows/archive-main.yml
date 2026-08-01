@@ -43,7 +43,6 @@ jobs:
           mkdir -p "${package_root}" "${output_directory}"
 
           include_paths=(
-            "ARCHITECTURE.md"
             "Assets"
             "Documentation"
             "Packages"
@@ -90,12 +89,10 @@ jobs:
           unzip -q "${archive_path}" -d "${validation_root}"
 
           required_paths=(
-            "ARCHITECTURE.md"
             "Assets"
             "Assets/_Project/Scenes/Bootstrap.unity"
             "Assets/_Project/Scenes/Main.unity"
-            "Documentation/Architecture/Game-And-User-Data.md"
-            "Documentation/Architecture/LL-Runtime-Overview.md"
+            "Documentation"
             "Packages/manifest.json"
             "Packages/packages-lock.json"
             "ProjectSettings/ProjectVersion.txt"
@@ -118,7 +115,6 @@ jobs:
             "AGENTS.md"
             "artifacts"
             "Builds"
-            "CI.md"
             "Library"
             "Logs"
             "obj"

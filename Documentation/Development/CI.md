@@ -1,24 +1,25 @@
-# Local CI Commands
+# Локальные команды CI
 
-The repository exposes provider-independent CI entry points. Run them from the project root with the Unity Editor
-closed. Set `UNITY_EDITOR_PATH` when Unity is not installed in one of the paths detected by `tools/ci/Common.ps1`.
+Репозиторий предоставляет не зависящие от CI-провайдера точки входа. Запускайте их из корня проекта при закрытом
+Unity Editor. Задайте `UNITY_EDITOR_PATH`, если Unity не установлен ни по одному из путей, обнаруживаемых
+`tools/ci/Common.ps1`.
 
-The current GitHub Actions workflow packages `main` and verifies archive integrity only; it does not run these Unity
-validation, test, or build entry points. Add a licensed Unity runner before treating archive publication as a code
-quality gate.
+Текущий workflow GitHub Actions только упаковывает `main` и проверяет целостность архива; он не запускает эти точки
+входа для валидации, тестирования или сборки Unity. Добавьте лицензированный Unity runner, прежде чем считать
+публикацию архива проверкой качества кода.
 
-## Validate
+## Валидация
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Validate.ps1
 ```
 
-Runs structural architecture validation, imports and compiles the Unity project, validates enabled build scenes, and
-runs project-data validation. Before Unity starts, the command runs convention-validator fixtures, structural
-architecture validation, C# code-style validation, and Odin Inspector convention validation. Logs are written to
+Запускает структурную валидацию архитектуры, импортирует и компилирует Unity-проект, проверяет включённые сцены сборки
+и запускает валидацию данных проекта. Перед запуском Unity команда выполняет фикстуры валидаторов соглашений,
+структурную валидацию архитектуры, валидацию стиля C# и валидацию соглашений Odin Inspector. Логи записываются в
 `artifacts/unity-validation.log`.
 
-Use the focused checks while iterating:
+Во время работы используйте направленные проверки:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/tests/Test-ConventionValidators.ps1
@@ -27,21 +28,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-CodeStyle.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Validate-OdinInspector.ps1
 ```
 
-The change-to-check mapping is defined in [`Validation.md`](../Standards/Validation.md); this document defines only how the
-commands run.
+Соответствие видов изменений проверкам определено в [`Validation.md`](../Standards/Validation.md); этот документ
+определяет только порядок запуска команд.
 
-## Test
+## Тестирование
 
-Test placement and authoring conventions are defined in [`Testing.md`](../Standards/Testing.md).
+Размещение тестов и соглашения по их созданию определены в [`Testing.md`](../Standards/Testing.md).
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Test.ps1 -Platform EditMode
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Test.ps1 -Platform PlayMode
 ```
 
-Writes NUnit-compatible XML and Unity logs to `artifacts`.
+Записывает совместимый с NUnit XML и логи Unity в `artifacts`.
 
-## Build
+## Сборка
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Build.ps1 `
@@ -51,18 +52,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Build.ps1 `
   -BuildNumber 1
 ```
 
-Supported default output paths exist for `StandaloneWindows64`, `Android`, and `WebGL`. Other targets must pass an
-explicit output path. Build scenes are read from `EditorBuildSettings`; `Bootstrap` must be the first enabled scene.
+Стандартные пути вывода поддерживаются для `StandaloneWindows64`, `Android` и `WebGL`. Для остальных targets
+необходимо передать явный путь вывода. Сцены сборки читаются из `EditorBuildSettings`; `Bootstrap` должен быть первой
+включённой сценой.
 
-## CI environment
+## Окружение CI
 
-The pipeline should publish the complete `artifacts` directory even when a Unity command fails. The following
-environment variables are supported:
+Конвейер должен публиковать весь каталог `artifacts`, даже если команда Unity завершилась с ошибкой. Поддерживаются
+следующие переменные окружения:
 
-- `UNITY_EDITOR_PATH`: full path to the Unity executable.
-- `LL_BUILD_OUTPUT`: player build output path; set by `Build.ps1`.
-- `LL_BUILD_VERSION`: `PlayerSettings.bundleVersion`; set by `Build.ps1`.
-- `LL_BUILD_NUMBER`: positive Android version code; set by `Build.ps1`.
+- `UNITY_EDITOR_PATH`: полный путь к исполняемому файлу Unity.
+- `LL_BUILD_OUTPUT`: путь вывода player-сборки; задаётся `Build.ps1`.
+- `LL_BUILD_VERSION`: `PlayerSettings.bundleVersion`; задаётся `Build.ps1`.
+- `LL_BUILD_NUMBER`: положительный код версии Android; задаётся `Build.ps1`.
 
-Do not store Unity activation data, signing credentials, or store credentials in the repository. Supply them through
-the selected CI provider's secret storage.
+Не храните данные активации Unity, учётные данные подписи или учётные данные магазинов в репозитории. Передавайте их
+через хранилище секретов выбранного CI-провайдера.
