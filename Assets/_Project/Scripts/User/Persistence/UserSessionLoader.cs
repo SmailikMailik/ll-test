@@ -30,12 +30,17 @@ namespace LL.User.Persistence
 
             if (result.Status == UserLoadStatus.Loaded)
             {
-                if (_reconciler.TryReconcile(result.Snapshot, out var reconciled, out var changed))
-                {
-                    if (changed && _repository.Save(reconciled) is false)
-                        Debug.LogError("Reconciled user data could not be saved.");
+                var reconciliation = _reconciler.Reconcile(result.Snapshot);
 
-                    return reconciled;
+                if (reconciliation.Status != UserReconciliationStatus.Incompatible)
+                {
+                    if (reconciliation.Status == UserReconciliationStatus.Changed &&
+                        _repository.Save(reconciliation.Snapshot) is false)
+                    {
+                        Debug.LogError("Reconciled user data could not be saved.");
+                    }
+
+                    return reconciliation.Snapshot;
                 }
 
                 Debug.LogWarning("User data is incompatible with current game data. Resetting user data.");

@@ -9,11 +9,12 @@ using LL.Game.RankUp.Configuration;
 using LL.Game.Quests.Configuration;
 using LL.Game.Ranks.Configuration;
 using LL.Game.Rewards.Configuration;
+using LL.Infrastructure.Loading;
 using LL.Validation;
 
 namespace LL.Game.Data.Sources
 {
-    internal sealed class ScriptableObjectGameDataSource : IGameDataSource
+    internal sealed class ScriptableObjectGameDataSource : IDataSource<GameDataDeclaration>
     {
         private readonly GameDataManifestConfig _manifest;
 

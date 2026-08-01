@@ -163,9 +163,14 @@ Owns reusable technical mechanisms such as loading contracts, serialization, sto
 
 - Infrastructure must not encode game, user, presentation, or UI policy.
 - Infrastructure must not depend on `Game`, `User`, `Presentation`, `UI`, `Composition`, or `Editor`.
+- `Infrastructure/Loading` owns the generic `IDataSource<TDeclaration>`, `IDataLoader<TData>`, and compiled-loading
+  chain. Domain sources implement the generic source contract, while declarations and compilers remain with their
+  domain owner.
 - `Infrastructure/Collections` owns generic collection-copying helpers. These helpers may define snapshot mechanics
   such as defensive copying, but they must not define domain collection policy or validation.
 - Prefer capability folders such as `Saving/Serialization` and `Saving/Storage` over technology-only folders.
+- Read-only storage and document-loading contracts remain separate from writable save contracts. A static-data
+  source consumes only read capabilities; repositories that persist mutable state consume the writable extension.
 - A technology name belongs on the concrete implementation, for example `JsonSaveSerializer` or
   `PlayerPrefsSaveStorage`.
 

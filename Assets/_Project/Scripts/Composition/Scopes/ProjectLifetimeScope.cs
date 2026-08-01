@@ -1,6 +1,8 @@
 using LL.Composition.Factories;
 using LL.Composition.Installers;
 using LL.Game.Data.Configuration;
+using LL.Infrastructure.Saving.Serialization;
+using LL.Infrastructure.Saving.Storage;
 using LL.Presentation.Flags.Configuration;
 using LL.Presentation.Flags.Loading;
 using LL.Presentation.Heroes.Configuration;
@@ -43,7 +45,9 @@ namespace LL.Composition.Scopes
             var heroPortraitCatalogLoader = new ScriptableObjectHeroPortraitCatalogLoader(_heroPortraitCatalogConfig);
             var windowCatalogLoader = new ScriptableObjectWindowCatalogLoader(_windowCatalogConfig);
             var userDefaultsSource = UserDefaultsSourceFactory.CreateFromScriptableObject(_userDefaultsConfig);
-            var userSaveRepository = UserSaveRepositoryFactory.CreateJsonFile();
+            var userSaveRepository = UserSaveRepositoryFactory.CreateSerialized(
+                new JsonSaveSerializer(),
+                new FileSaveStorage());
 
             new WindowInstaller(windowCatalogLoader).Install(builder);
             new PresentationInstaller(

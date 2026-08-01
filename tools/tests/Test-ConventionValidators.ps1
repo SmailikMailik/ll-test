@@ -65,6 +65,16 @@ try {
     [IO.Directory]::CreateDirectory($fixtureRoot) | Out-Null
 
     $validArchitectureRoot = New-ArchitectureFixture "architecture-valid"
+    [IO.Directory]::CreateDirectory(
+        (Join-Path $validArchitectureRoot "Assets/_Project/Scripts/Infrastructure/Loading")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $validArchitectureRoot "Assets/_Project/Scripts/Infrastructure/Loading/CompiledDataLoader.cs"),
+        "namespace LL.Infrastructure.Loading;`n`ninternal sealed class CompiledDataLoader : IDataLoader<int> { }")
+    [IO.Directory]::CreateDirectory(
+        (Join-Path $validArchitectureRoot "Assets/_Project/Scripts/User/Persistence")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $validArchitectureRoot "Assets/_Project/Scripts/User/Persistence/UserSessionLoader.cs"),
+        "namespace LL.User.Persistence;`n`ninternal sealed class UserSessionLoader : IDataLoader<int> { }")
     Invoke-ExpectedResult `
         -Name "Valid architecture" `
         -Script $architectureValidator `
@@ -81,6 +91,17 @@ try {
         -Arguments @("-ProjectRoot", $invalidArchitectureRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "Unsupported runtime top-level area"
+
+    $invalidDomainLoaderRoot = New-ArchitectureFixture "architecture-invalid-domain-loader"
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidDomainLoaderRoot "Assets/_Project/Scripts/Game/DirectLoader.cs"),
+        "namespace LL.Game;`n`ninternal sealed class DirectLoader : IDataLoader<int> { }")
+    Invoke-ExpectedResult `
+        -Name "Game domain loader outside aggregate boundary" `
+        -Script $architectureValidator `
+        -Arguments @("-ProjectRoot", $invalidDomainLoaderRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Game domain data may use IDataLoader only at GameDataSnapshot boundary"
 
     $missingContentMenuRoot = New-ArchitectureFixture "architecture-missing-content-menu"
     [IO.Directory]::CreateDirectory(

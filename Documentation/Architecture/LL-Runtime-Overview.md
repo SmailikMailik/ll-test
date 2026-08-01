@@ -60,9 +60,9 @@ Bootstrap scene
 
 ```text
 GameDataManifestConfig
-    -> ScriptableObjectGameDataSource
+    -> ScriptableObjectGameDataSource : IDataSource<GameDataDeclaration>
     -> GameDataDeclaration
-    -> GameDataCompiler
+    -> CompiledDataLoader + GameDataCompiler
     -> GameDataSnapshot
     -> неизменяемые каталоги
 ```
@@ -75,7 +75,7 @@ GameDataManifestConfig
 
 ```text
 UserDefaultsConfig
-    -> IUserDefaultsSource
+    -> IDataSource<UserDefaultsDeclaration>
     -> UserDefaultsDeclaration
     -> UserDefaultsCompiler
     -> UserDefaultsSnapshot -----\
@@ -94,9 +94,11 @@ UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
 всех предметов, на которые ссылаются встроенные правила, карты, оплаты и награды, после чего создаёт неизменяемый
 снимок начальных значений. `UserSessionLoader` загружает сохранённый снимок или создаёт новый пользовательский снимок
 из начального.
-`UserSnapshotReconciler` согласует старое сохранение с актуальными каталогами и обязательными предметами.
-`UserState` объединяет изменения составной синхронной операции в одно уведомление, а `UserSaveCoordinator` выполняет
-одну запись итогового снимка и безопасно повторяет её после временной ошибки.
+`UserSnapshotReconciler` возвращает явный результат согласования старого сохранения с актуальными каталогами и
+обязательными предметами. Время истечения заданий поступает через зарегистрированный `TimeProvider`.
+`UserState` объединяет изменения составной синхронной операции в одно уведомление, а `UserSaveCoordinator` применяет
+короткий debounce, последовательно сохраняет последний снимок, повторяет временно неудачную запись и выполняет
+финальный flush при завершении.
 
 UI наблюдает `IUserItems`, `IUserProgress` и `IUserRankUpQuest`, но не получает mutating API. Игровые сервисы изменяют
 те же singleton-состояния через отдельные `IUserItemsCommands`, `IUserProgressCommands` и

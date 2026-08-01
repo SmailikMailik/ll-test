@@ -57,6 +57,32 @@ namespace LL.Game.Ranks
             return new RankProgress(rank, nextRank, experience);
         }
 
+        public bool TryGetProgress(RankId rankId, int experience, out RankProgress progress)
+        {
+            progress = default;
+
+            if (_catalog.TryGetRank(rankId, out var rank) is false ||
+                ValidationChecks.IsNegative(experience))
+            {
+                return false;
+            }
+
+            var rankIndex = rank.Number - 1;
+            var hasNextRank = rankIndex + 1 < _catalog.Ranks.Count;
+            var nextRank = hasNextRank
+                ? _catalog.Ranks[rankIndex + 1]
+                : null;
+
+            if (hasNextRank && experience > nextRank.RequiredExperience ||
+                hasNextRank is false && experience != 0)
+            {
+                return false;
+            }
+
+            progress = new RankProgress(rank, nextRank, experience);
+            return true;
+        }
+
         public bool CanRankUp(RankId rankId, int experience)
         {
             var progress = GetProgress(rankId, experience);

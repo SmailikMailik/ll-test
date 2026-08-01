@@ -17,6 +17,7 @@ namespace LL.User.State.RankUp
         public Observable<Unit> Changed => _changed;
 
         private readonly Subject<Unit> _changed = new();
+        private readonly TimeProvider _timeProvider;
 
         private QuestId _questId;
         private long _deadlineUnixMilliseconds;
@@ -27,10 +28,14 @@ namespace LL.User.State.RankUp
             _deadlineUnixMilliseconds > NoDeadline;
 
         [Inject]
-        internal UserRankUpQuest(UserRankUpQuestSnapshot snapshot)
+        internal UserRankUpQuest(
+            UserRankUpQuestSnapshot snapshot,
+            TimeProvider timeProvider)
         {
             if (snapshot is null)
                 throw new ArgumentNullException(nameof(snapshot));
+
+            _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
 
             _questId = snapshot.QuestId;
             _deadlineUnixMilliseconds = snapshot.DeadlineUnixMilliseconds;
@@ -42,7 +47,7 @@ namespace LL.User.State.RankUp
             if (HasQuest is false)
                 return TimeSpan.Zero;
 
-            var remainingMilliseconds = _deadlineUnixMilliseconds - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var remainingMilliseconds = _deadlineUnixMilliseconds - _timeProvider.GetUtcNow().ToUnixTimeMilliseconds();
             return TimeSpan.FromMilliseconds(Math.Max(0L, remainingMilliseconds));
         }
 
@@ -63,7 +68,7 @@ namespace LL.User.State.RankUp
                 return false;
 
             _questId = questId;
-            _deadlineUnixMilliseconds = DateTimeOffset.UtcNow.Add(duration).ToUnixTimeMilliseconds();
+            _deadlineUnixMilliseconds = _timeProvider.GetUtcNow().Add(duration).ToUnixTimeMilliseconds();
             _isCompleted = false;
             NotifyChanged();
             return true;

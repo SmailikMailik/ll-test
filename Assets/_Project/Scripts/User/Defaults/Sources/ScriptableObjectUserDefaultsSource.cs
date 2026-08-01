@@ -2,11 +2,12 @@ using System;
 using System.Linq;
 using LL.User.Configuration;
 using LL.User.Defaults.Declarations;
+using LL.Infrastructure.Loading;
 using LL.Validation;
 
 namespace LL.User.Defaults.Sources
 {
-    internal sealed class ScriptableObjectUserDefaultsSource : IUserDefaultsSource
+    internal sealed class ScriptableObjectUserDefaultsSource : IDataSource<UserDefaultsDeclaration>
     {
         private readonly UserDefaultsConfig _config;
 

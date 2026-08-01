@@ -19,7 +19,8 @@
         "Newtonsoft.Json.dll",
         "Sirenix.OdinInspector.Attributes.dll",
         "Sirenix.Serialization.dll",
-        "R3.dll"
+        "R3.dll",
+        "Microsoft.Bcl.TimeProvider.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

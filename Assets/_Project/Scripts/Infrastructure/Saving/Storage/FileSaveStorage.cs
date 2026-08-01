@@ -45,9 +45,20 @@ namespace LL.Infrastructure.Saving.Storage
             {
                 Directory.CreateDirectory(_directoryPath);
 
-                File.WriteAllBytes(temporaryPath, data);
-                File.Copy(temporaryPath, filePath, true);
-                File.Delete(temporaryPath);
+                using (var stream = new FileStream(
+                           temporaryPath,
+                           FileMode.Create,
+                           FileAccess.Write,
+                           FileShare.None))
+                {
+                    stream.Write(data, 0, data.Length);
+                    stream.Flush(true);
+                }
+
+                if (File.Exists(filePath))
+                    File.Replace(temporaryPath, filePath, null);
+                else
+                    File.Move(temporaryPath, filePath);
 
                 return true;
             }

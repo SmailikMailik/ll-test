@@ -11,7 +11,8 @@
 - пользовательские данные описывают состояние конкретного игрока: идентификатор, инвентарь, прогресс и активное
   задание повышения ранга.
 
-Обе системы загружаются одним согласованным агрегатом, но жизненный цикл агрегатов различается:
+Обе системы загружаются одним согласованным агрегатом через общий `IDataSource<TDeclaration>` и
+`CompiledDataLoader<TDeclaration, TSnapshot>`, но жизненный цикл агрегатов различается:
 
 - `GameDataSnapshot` создаётся при запуске и затем только читается;
 - `UserSnapshot` создаётся при загрузке сессии, из него строится изменяемый `UserState`, а изменения состояния снова
@@ -41,11 +42,12 @@
 flowchart LR
     Manifest["GameDataManifestConfig<br/>ссылки на Unity-конфиги"]
     Json["JSON / PlayerPrefs"]
-    SO_Source["ScriptableObjectGameDataSource"]
-    Serialized_Source["SerializedGameDataSource"]
+    SO_Source["ScriptableObjectGameDataSource<br/>IDataSource&lt;GameDataDeclaration&gt;"]
+    Serialized_Source["SerializedGameDataSource<br/>IDataSource&lt;GameDataDeclaration&gt;"]
     Document["GameDataDocument<br/>Version + DocumentEntry[]"]
     Mapper["GameDataDocumentMapper"]
     Declaration["GameDataDeclaration<br/>единая нейтральная форма"]
+    Loader["CompiledDataLoader"]
     Compiler["GameDataCompiler<br/>ID, дубликаты и ссылки"]
     Snapshot["GameDataSnapshot"]
     Catalogs["RankCatalog · CardCatalog<br/>QuestCatalog · RankUpCatalog · RewardCatalog"]
@@ -56,14 +58,16 @@ flowchart LR
     Serialized_Source --> Document
     Document --> Mapper
     Mapper --> Declaration
-    Declaration --> Compiler
-    Compiler --> Snapshot
+    Declaration --> Loader
+    Compiler --> Loader
+    Loader --> Snapshot
     Snapshot --> Catalogs
 ```
 
 В текущей композиции `ProjectLifetimeScope` выбирает путь через `ScriptableObjectGameDataSource` и передаёт готовый
-`IDataLoader<GameDataSnapshot>` в `GameDataInstaller`. Альтернативные пути через JSON-файл и PlayerPrefs уже
-предоставляет `GameDataLoaderFactory`, поэтому переключение не меняет installer или потребителей.
+`IDataLoader<GameDataSnapshot>` в `GameDataInstaller`. Для сериализованного пути `GameDataLoaderFactory` принимает
+независимо выбранные serializer и read-only storage, поэтому формат и среда хранения комбинируются без новых
+factory-методов и не меняют installer или потребителей.
 
 ### Физическая раскладка игровых данных
 
@@ -89,9 +93,7 @@ Game/Data/
 │   ├── ScriptableObjectGameDataSource.cs
 │   └── SerializedGameDataSource.cs
 ├── GameDataCompiler.cs
-├── GameDataLoader.cs
-├── GameDataSnapshot.cs
-└── IGameDataSource.cs
+└── GameDataSnapshot.cs
 ```
 
 Корень `Game/Data` координирует загрузку агрегата. `Declarations` содержит только единое промежуточное представление,
@@ -128,7 +130,7 @@ Assets/_Project/Configuration/
 | Файл или группа | Ответственность |
 | --- | --- |
 | `Configuration/GameDataManifestConfig.cs` | Корневой Unity-ассет, который ссылается на конфиги всех игровых каталогов |
-| `IGameDataSource.cs` | Контракт источника: вернуть один `GameDataDeclaration` |
+| `Infrastructure/Loading/IDataSource.cs` | Общий контракт источника: вернуть одну source-neutral декларацию |
 | `Sources/ScriptableObjectGameDataSource.cs` | Проверить Unity-конфиги и нормализовать их в `Declaration` |
 | `Sources/SerializedGameDataSource.cs` | Загрузить и проверить версию внешнего `GameDataDocument` |
 | `Persistence/Documents/GameDataDocument.cs` | Корневой версионируемый внешний контракт игровых данных |
@@ -138,7 +140,7 @@ Assets/_Project/Configuration/
 | `Declarations/*Declaration.cs` | Непроверенные объявления отдельных игровых сущностей |
 | `GameDataCompiler.cs` | Найти пустые и повторяющиеся ID, проверить ссылки, создать доменные определения и каталоги |
 | `GameDataSnapshot.cs` | Один неизменяемый согласованный результат загрузки |
-| `GameDataLoader.cs` | Выполнить цепочку `source.Read()` → `compiler.Compile()` |
+| `Infrastructure/Loading/CompiledDataLoader.cs` | Выполнить общую цепочку `source.Read()` → `compiler.Compile()` |
 | `Composition/Factories/GameDataLoaderFactory.cs` | Собрать загрузчик для выбранной технологии хранения |
 | `Composition/Installers/GameDataInstaller.cs` | Загрузить снимок и зарегистрировать его каталоги в DI |
 
@@ -200,7 +202,7 @@ flowchart LR
     Snapshot["UserSnapshot"]
     Loader["UserSessionLoader"]
     Config["UserDefaultsConfig"]
-    Source["IUserDefaultsSource"]
+    Source["IDataSource&lt;UserDefaultsDeclaration&gt;"]
     Declaration["UserDefaultsDeclaration"]
     Compiler["UserDefaultsCompiler"]
     Defaults["UserDefaultsSnapshot"]
@@ -230,21 +232,23 @@ flowchart LR
     Document --> Storage
 ```
 
-`IUserDefaultsSource` преобразует конкретный источник начальных значений в `UserDefaultsDeclaration`.
+`IDataSource<UserDefaultsDeclaration>` преобразует конкретный источник начальных значений в
+`UserDefaultsDeclaration`.
 `UserDefaultsCompiler` проверяет стартовый ранг, допустимый опыт и наличие всех предметов, используемых встроенными
 правилами, картами, оплатами и наградами, после чего создаёт `UserDefaultsSnapshot`. `UserSessionLoader` сначала
 пытается загрузить сохранение. `UserSnapshotReconciler` проверяет его относительно текущих игровых каталогов,
 добавляет отсутствующие обязательные предметы и очищает устаревшее rank-up задание. Несовместимый прогресс приводит
 к явному сбросу на defaults. Во время сессии `UserState` объединяет изменяемые части состояния и сворачивает все
-изменения одной синхронной игровой операции в одно уведомление. `UserSaveCoordinator` сохраняет итоговый снимок;
-ошибка записи не прерывает уже выполненную игровую операцию и повторно проверяется при следующем изменении.
+изменения одной синхронной игровой операции в одно уведомление. `UserSaveCoordinator` собирает частые изменения
+в течение короткого интервала, сохраняет последний итоговый снимок, последовательно повторяет временно неудачную
+запись и принудительно записывает dirty-состояние при завершении.
 
 ### Файлы пользовательского потока
 
 | Файл или группа | Ответственность |
 | --- | --- |
 | `Configuration/UserDefaultsConfig.cs` | Unity-authoring начальных значений пользователя |
-| `Defaults/Sources/IUserDefaultsSource.cs` | Контракт любого источника начальных значений |
+| `Infrastructure/Loading/IDataSource.cs` | Общий контракт любого статического источника деклараций |
 | `Defaults/Sources/ScriptableObjectUserDefaultsSource.cs` | Преобразование Unity-конфига в source-neutral declaration |
 | `Defaults/Declarations/*Declaration.cs` | Не проверенное представление начальных значений без зависимости от источника |
 | `Defaults/UserDefaultsCompiler.cs` | Runtime-проверка ссылок и построение согласованного снимка начальных значений |
@@ -256,12 +260,12 @@ flowchart LR
 | `Persistence/SerializedUserSaveRepository.cs` | I/O, проверка версии и классификация ошибок загрузки |
 | `Persistence/UserLoadResult.cs` и `UserLoadStatus.cs` | Результат загрузки: loaded, not found, corrupted или unsupported version |
 | `Persistence/UserSessionLoader.cs` | Выбрать согласованный сохранённый снимок либо создать значения по умолчанию |
-| `Persistence/UserSnapshotReconciler.cs` | Согласовать сохранение с текущими рангами, предметами и rank-up заданием |
+| `Persistence/UserSnapshotReconciler.cs` | Вернуть явный результат согласования с текущими рангами, предметами и rank-up заданием |
 | `Snapshots/UserSnapshot.cs` | Корень неизменяемого снимка пользователя |
 | `Snapshots/*Snapshot.cs` | Неизменяемые части identity, inventory, progress и rank-up quest |
 | `State/UserState.cs` | Объединить части сессии и пакетировать уведомления составных операций |
 | `State/Items`, `State/Progress`, `State/RankUp` | Read-интерфейсы, command-интерфейсы и состояние пользовательских возможностей |
-| `Persistence/UserSaveCoordinator.cs` | Сохранять новый снимок после изменения состояния |
+| `Persistence/UserSaveCoordinator.cs` | Debounce, последовательный retry и финальный flush нового снимка состояния |
 | `Composition/Factories/UserDefaultsSourceFactory.cs` | Выбрать конкретный источник начальных значений |
 | `Composition/Factories/UserSaveRepositoryFactory.cs` | Собрать JSON-сериализацию, файловое хранилище и репозиторий |
 | `Composition/Installers/UserInstaller.cs` | Зарегистрировать загрузку снимка, состояние и автосохранение в DI |

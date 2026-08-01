@@ -7,20 +7,28 @@ using VContainer.Unity;
 
 namespace LL.User.Persistence
 {
-    internal sealed class UserSaveCoordinator : IInitializable, IDisposable
+    internal sealed class UserSaveCoordinator : IInitializable, ITickable, IDisposable
     {
+        private static readonly TimeSpan _saveDelay = TimeSpan.FromMilliseconds(500d);
+
         private readonly UserState _state;
         private readonly IUserSaveRepository _repository;
+        private readonly TimeProvider _timeProvider;
 
         private IDisposable _subscription;
+        private DateTimeOffset _saveDueAt;
         private bool _isDirty;
         private bool _saveFailureReported;
 
         [Inject]
-        internal UserSaveCoordinator(UserState state, IUserSaveRepository repository)
+        internal UserSaveCoordinator(
+            UserState state,
+            IUserSaveRepository repository,
+            TimeProvider timeProvider)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         }
 
         public void Initialize()
@@ -37,10 +45,16 @@ namespace LL.User.Persistence
                 TrySave();
         }
 
+        public void Tick()
+        {
+            if (_isDirty && _timeProvider.GetUtcNow() >= _saveDueAt)
+                TrySave();
+        }
+
         private void OnStateChanged(Unit _)
         {
             _isDirty = true;
-            TrySave();
+            _saveDueAt = _timeProvider.GetUtcNow().Add(_saveDelay);
         }
 
         private void TrySave()
@@ -53,10 +67,14 @@ namespace LL.User.Persistence
             }
 
             if (_saveFailureReported)
+            {
+                _saveDueAt = _timeProvider.GetUtcNow().Add(_saveDelay);
                 return;
+            }
 
             _saveFailureReported = true;
-            Debug.LogError("User state could not be saved. The next state change will retry.");
+            _saveDueAt = _timeProvider.GetUtcNow().Add(_saveDelay);
+            Debug.LogError("User state could not be saved. Saving will retry automatically.");
         }
     }
 }

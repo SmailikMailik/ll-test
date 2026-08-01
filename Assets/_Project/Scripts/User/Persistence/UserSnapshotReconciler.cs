@@ -16,28 +16,28 @@ namespace LL.User.Persistence
         private readonly UserDefaultsSnapshot _defaults;
         private readonly IRankProgression _rankProgression;
         private readonly RankUpCatalog _rankUps;
+        private readonly TimeProvider _timeProvider;
 
         [Inject]
         internal UserSnapshotReconciler(
             UserDefaultsSnapshot defaults,
             IRankProgression rankProgression,
-            RankUpCatalog rankUps)
+            RankUpCatalog rankUps,
+            TimeProvider timeProvider)
         {
             _defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _rankUps = rankUps ?? throw new ArgumentNullException(nameof(rankUps));
+            _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         }
 
-        internal bool TryReconcile(
-            UserSnapshot snapshot,
-            out UserSnapshot reconciled,
-            out bool changed)
+        internal UserReconciliationResult Reconcile(UserSnapshot snapshot)
         {
-            reconciled = null;
-            changed = false;
-
-            if (snapshot is null || IsProgressCompatible(snapshot.Progress) is false)
-                return false;
+            if (snapshot is null ||
+                _rankProgression.TryGetProgress(snapshot.Progress.RankId, snapshot.Progress.Experience, out _) is false)
+            {
+                return UserReconciliationResult.Incompatible();
+            }
 
             var items = ReconcileItems(snapshot.Items, out var itemsChanged);
             var rankUpQuest = ReconcileRankUpQuest(
@@ -45,24 +45,11 @@ namespace LL.User.Persistence
                 snapshot.RankUpQuest,
                 out var rankUpQuestChanged);
 
-            changed = itemsChanged || rankUpQuestChanged;
-            reconciled = changed
-                ? new UserSnapshot(snapshot.Identity, items, snapshot.Progress, rankUpQuest)
-                : snapshot;
-            return true;
-        }
+            if (itemsChanged is false && rankUpQuestChanged is false)
+                return UserReconciliationResult.Unchanged(snapshot);
 
-        private bool IsProgressCompatible(UserProgressSnapshot progress)
-        {
-            try
-            {
-                _rankProgression.GetProgress(progress.RankId, progress.Experience);
-                return true;
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
+            return UserReconciliationResult.Changed(
+                new UserSnapshot(snapshot.Identity, items, snapshot.Progress, rankUpQuest));
         }
 
         private UserItemsSnapshot ReconcileItems(
@@ -99,7 +86,7 @@ namespace LL.User.Persistence
 
             var isExpired =
                 rankUpQuest.IsCompleted is false &&
-                rankUpQuest.DeadlineUnixMilliseconds <= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                rankUpQuest.DeadlineUnixMilliseconds <= _timeProvider.GetUtcNow().ToUnixTimeMilliseconds();
             var matchesCurrentRank =
                 _rankUps.TryGetDefinition(progress.RankId, out var definition) &&
                 definition.Quest.QuestId.Equals(rankUpQuest.QuestId);

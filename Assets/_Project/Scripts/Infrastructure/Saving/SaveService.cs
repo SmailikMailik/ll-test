@@ -8,6 +8,7 @@ namespace LL.Infrastructure.Saving
     {
         private readonly ISaveSerializer _serializer;
         private readonly ISaveStorage _storage;
+        private readonly SaveReader _reader;
 
         internal SaveService(
             ISaveSerializer serializer,
@@ -15,9 +16,10 @@ namespace LL.Infrastructure.Saving
         {
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+            _reader = new SaveReader(_serializer, _storage);
         }
 
-        public bool Exists(string key) => _storage.Exists(key);
+        public bool Exists(string key) => _reader.Exists(key);
 
         public bool TrySave<T>(string key, T data) where T : class
         {
@@ -27,10 +29,7 @@ namespace LL.Infrastructure.Saving
 
         public bool TryLoad<T>(string key, out T data) where T : class
         {
-            data = null;
-
-            return _storage.TryRead(key, out var bytes) &&
-                   _serializer.TryDeserialize(bytes, out data);
+            return _reader.TryLoad(key, out data);
         }
 
         public bool TryDelete(string key) => _storage.TryDelete(key);

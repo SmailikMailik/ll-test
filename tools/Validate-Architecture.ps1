@@ -204,8 +204,7 @@ function Test-DomainDataLoaders {
         $content = [IO.File]::ReadAllText($file.FullName)
 
         if (
-            $content -match "IDataLoader<" -and
-            $file.Name -ne "GameDataLoader.cs") {
+            $content -match "IDataLoader<") {
             Add-ArchitectureError (
                 "Game domain data may use IDataLoader only at GameDataSnapshot boundary: " +
                 "$($file.FullName)")
@@ -217,7 +216,7 @@ function Test-DomainDataLoaders {
 
         if (
             $content -match "IDataLoader<" -and
-            $file.Name -notin @("UserDefaultsLoader.cs", "UserSessionLoader.cs")) {
+            $file.Name -ne "UserSessionLoader.cs") {
             Add-ArchitectureError (
                 "User domain data may use IDataLoader only at UserDefaultsSnapshot or UserSnapshot boundary: " +
                 "$($file.FullName)")

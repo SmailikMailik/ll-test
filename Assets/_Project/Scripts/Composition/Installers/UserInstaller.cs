@@ -18,11 +18,11 @@ namespace LL.Composition.Installers
 {
     internal sealed class UserInstaller : IInstaller
     {
-        private readonly IUserDefaultsSource _defaultsSource;
+        private readonly IDataSource<UserDefaultsDeclaration> _defaultsSource;
         private readonly IUserSaveRepository _saveRepository;
 
         internal UserInstaller(
-            IUserDefaultsSource defaultsSource,
+            IDataSource<UserDefaultsDeclaration> defaultsSource,
             IUserSaveRepository saveRepository)
         {
             _defaultsSource = defaultsSource ?? throw new ArgumentNullException(nameof(defaultsSource));
@@ -33,10 +33,17 @@ namespace LL.Composition.Installers
         {
             builder.RegisterInstance(_defaultsSource);
             builder.RegisterInstance(_saveRepository);
+            builder.RegisterInstance(TimeProvider.System);
             builder
                 .Register<UserDefaultsCompiler>(Lifetime.Singleton)
                 .As<IDataCompiler<UserDefaultsDeclaration, UserDefaultsSnapshot>>();
-            builder.Register<UserDefaultsLoader>(Lifetime.Singleton).As<IDataLoader<UserDefaultsSnapshot>>();
+            builder
+                .Register(
+                    resolver => new CompiledDataLoader<UserDefaultsDeclaration, UserDefaultsSnapshot>(
+                        resolver.Resolve<IDataSource<UserDefaultsDeclaration>>(),
+                        resolver.Resolve<IDataCompiler<UserDefaultsDeclaration, UserDefaultsSnapshot>>()),
+                    Lifetime.Singleton)
+                .As<IDataLoader<UserDefaultsSnapshot>>();
             builder.RegisterLoadedData<UserDefaultsSnapshot>();
             builder.Register<UserSnapshotReconciler>(Lifetime.Singleton);
             builder.Register<UserSessionLoader>(Lifetime.Singleton).As<IDataLoader<UserSnapshot>>();

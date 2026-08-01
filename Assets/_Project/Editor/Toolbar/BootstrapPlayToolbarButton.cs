@@ -9,8 +9,8 @@ namespace LLEditor.Toolbar
     internal static class BootstrapPlayToolbarButton
     {
         private const string ButtonText = "B";
-        private const string ButtonName = "LastLevelBootstrapPlayButton";
-        private const string ButtonTooltip = "Play Last Level from the Bootstrap scene.";
+        private const string ButtonName = "BootstrapPlayButton";
+        private const string ButtonTooltip = "Play from the Bootstrap scene";
 
         private static readonly Button _button = CreateButton();
 

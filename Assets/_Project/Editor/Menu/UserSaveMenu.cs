@@ -1,4 +1,6 @@
 using LL.Composition.Factories;
+using LL.Infrastructure.Saving.Serialization;
+using LL.Infrastructure.Saving.Storage;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +11,9 @@ namespace LLEditor.Menu
         [MenuItem(LastLevelMenu.Commands.DeleteSavedUserDataPath, false, LastLevelMenu.Commands.DeleteSavedUserDataPriority)]
         private static void DeleteSavedUserData()
         {
-            var repository = UserSaveRepositoryFactory.CreateJsonFile();
+            var repository = UserSaveRepositoryFactory.CreateSerialized(
+                new JsonSaveSerializer(),
+                new FileSaveStorage());
 
             if (repository.Exists() is false)
             {
