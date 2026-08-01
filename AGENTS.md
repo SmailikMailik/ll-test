@@ -12,6 +12,8 @@ Before changing the project, use the agreement that owns the decision:
   authoring UI conventions.
 - [`Validation.md`](Documentation/Standards/Validation.md) defines validation semantics, validator ownership,
   automated-rule coverage, and the checks required for each kind of change.
+- [`Testing.md`](Documentation/Standards/Testing.md) defines test placement, fixture boundaries, test data and doubles,
+  readability, determinism, and cleanup conventions.
 - [`CI.md`](Documentation/Development/CI.md) defines the commands and environment used to run validation, tests, and
   builds.
 

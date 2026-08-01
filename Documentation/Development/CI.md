@@ -32,6 +32,8 @@ commands run.
 
 ## Test
 
+Test placement and authoring conventions are defined in [`Testing.md`](../Standards/Testing.md).
+
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Test.ps1 -Platform EditMode
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/ci/Test.ps1 -Platform PlayMode

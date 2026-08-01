@@ -4,6 +4,7 @@ This document is the source of truth for validation semantics, validator ownersh
 and required project checks. Architecture rules belong to [`Architecture.md`](Architecture.md), C# conventions to
 [`Code-Style.md`](Code-Style.md), Odin authoring conventions to [`Odin-Inspector.md`](Odin-Inspector.md), and command
 details to [`CI.md`](../Development/CI.md).
+Test placement, fixture design, test data, and test-double conventions belong to [`Testing.md`](Testing.md).
 
 Validators enforce approved production, asset, and agreement decisions; they do not define those decisions. Do not
 relocate production code or assets solely because a stale validator expects another layout. Resolve the intended
