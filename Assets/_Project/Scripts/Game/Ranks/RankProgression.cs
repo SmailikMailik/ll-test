@@ -26,7 +26,7 @@ namespace LL.Game.Ranks
             var nextRank = hasNextRank
                 ? _catalog.Ranks[rankIndex + 1]
                 : null;
-            var requiredExperience = nextRank?.RequiredExperience ?? 0;
+            var experienceRequiredForRankUp = nextRank?.RequiredExperience ?? 0;
 
             ValidationRunner.EnsureValid(
                 context =>
@@ -40,7 +40,7 @@ namespace LL.Game.Ranks
                     {
                         ValidationRules.LessThanOrEqual(
                             experience,
-                            requiredExperience,
+                            experienceRequiredForRankUp,
                             experienceContext,
                             ExperienceMaxCode);
                         return;
@@ -88,7 +88,7 @@ namespace LL.Game.Ranks
             var progress = GetProgress(rankId, experience);
 
             return progress.HasNextRank &&
-                   experience >= progress.RequiredExperience;
+                   experience >= progress.ExperienceRequiredForRankUp;
         }
     }
 }

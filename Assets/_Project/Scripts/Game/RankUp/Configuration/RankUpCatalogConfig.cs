@@ -42,7 +42,7 @@ namespace LL.Game.RankUp.Configuration
         [SerializeField] private string _heroId;
 
         [MinValue(1)]
-        [SerializeField] private int _requiredAmount = 1;
+        [SerializeField] private int _requiredCount = 1;
 
         [MinValue(1)]
         [SerializeField] private int _durationMinutes = 1440;
@@ -54,7 +54,7 @@ namespace LL.Game.RankUp.Configuration
         internal RankId RankId => new(_rankId);
         internal QuestId QuestId => new(_questId);
         internal HeroId HeroId => new(_heroId);
-        internal int RequiredAmount => _requiredAmount;
+        internal int RequiredCount => _requiredCount;
         internal int DurationMinutes => _durationMinutes;
         internal PaymentEntry QuestPayment => _questPayment;
         internal PaymentEntry InstantPayment => _instantPayment;

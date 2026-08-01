@@ -148,7 +148,7 @@ namespace LL.Game.Data
                 new RankUpQuest(
                     new QuestId(declaration.QuestId),
                     new HeroId(declaration.HeroId),
-                    declaration.RequiredAmount,
+                    declaration.RequiredCount,
                     TimeSpan.FromMinutes(declaration.DurationMinutes),
                     ToPayment(declaration.QuestPayment)),
                 ToPayment(declaration.InstantPayment),

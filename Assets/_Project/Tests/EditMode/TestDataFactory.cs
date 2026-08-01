@@ -58,11 +58,9 @@ namespace LL.Tests.EditMode
         internal static UserDefaultsSnapshot CreateUserDefaults(GameDataSnapshot gameData)
         {
             var declaration = new UserDefaultsDeclaration(
-                "test-user",
-                "RU",
-                "bronze",
-                0,
-                ItemIds.All.Select(id => new UserItemDefaultsDeclaration(id.Value, 0)));
+                new UserIdentityDefaultDeclaration("test-user", "RU"),
+                new UserProgressDefaultDeclaration("bronze", 0),
+                ItemIds.All.Select(id => new UserItemDefaultDeclaration(id.Value, 0)));
             var compiler = new UserDefaultsCompiler(
                 gameData.Ranks,
                 gameData.Cards,

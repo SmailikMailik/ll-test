@@ -31,13 +31,11 @@ namespace LL.Tests.EditMode
                 gameData.RankUps,
                 gameData.Rewards);
             var declaration = new UserDefaultsDeclaration(
-                "test-user",
-                "RU",
-                "bronze",
-                0,
+                new UserIdentityDefaultDeclaration("test-user", "RU"),
+                new UserProgressDefaultDeclaration("bronze", 0),
                 ItemIds.All
                     .Where(id => id.Equals(ItemIds.Hard) is false)
-                    .Select(id => new UserItemDefaultsDeclaration(id.Value, 0)));
+                    .Select(id => new UserItemDefaultDeclaration(id.Value, 0)));
 
             Assert.Throws<ArgumentException>(() => compiler.Compile(declaration));
         }

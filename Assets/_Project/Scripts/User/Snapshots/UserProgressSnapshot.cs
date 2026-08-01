@@ -13,10 +13,7 @@ namespace LL.User.Snapshots
         internal UserProgressSnapshot(RankId rankId, int experience)
         {
             if (ValidationChecks.IsNegative(experience))
-                throw new ArgumentOutOfRangeException(
-                    nameof(experience),
-                    experience,
-                    "User experience must not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(experience), experience, "User experience must not be negative.");
 
             IdentifierValidator.EnsureValid(rankId, nameof(rankId));
 

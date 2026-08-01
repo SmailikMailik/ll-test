@@ -7,7 +7,7 @@ namespace LL.Game.Data.Persistence.Documents
         public string RankId { get; }
         public string QuestId { get; }
         public string HeroId { get; }
-        public int RequiredAmount { get; }
+        public int RequiredCount { get; }
         public int DurationMinutes { get; }
         public PaymentDocumentEntry QuestPayment { get; }
         public PaymentDocumentEntry InstantPayment { get; }
@@ -17,7 +17,7 @@ namespace LL.Game.Data.Persistence.Documents
             string rankId,
             string questId,
             string heroId,
-            int requiredAmount,
+            int requiredCount,
             int durationMinutes,
             PaymentDocumentEntry questPayment,
             PaymentDocumentEntry instantPayment,
@@ -26,7 +26,7 @@ namespace LL.Game.Data.Persistence.Documents
             RankId = rankId;
             QuestId = questId;
             HeroId = heroId;
-            RequiredAmount = requiredAmount;
+            RequiredCount = requiredCount;
             DurationMinutes = durationMinutes;
             QuestPayment = questPayment ?? throw new ArgumentNullException(nameof(questPayment));
             InstantPayment = instantPayment ?? throw new ArgumentNullException(nameof(instantPayment));

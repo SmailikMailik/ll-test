@@ -7,7 +7,7 @@ namespace LL.User.State.Progress
     internal interface IUserProgress
     {
         RankId RankId { get; }
-        int Rank { get; }
+        int RankNumber { get; }
         int Experience { get; }
         bool CanRankUp { get; }
 

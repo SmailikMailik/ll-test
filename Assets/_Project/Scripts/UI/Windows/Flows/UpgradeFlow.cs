@@ -39,10 +39,10 @@ namespace LL.UI.Windows.Flows
                 _windowController.Replace(new UpgradeWindowParameters());
         }
 
-        internal void CompleteRankUp(int rank, IReadOnlyList<ItemAmount> rewardItems)
+        internal void CompleteRankUp(int rankNumber, IReadOnlyList<ItemAmount> rewardItems)
         {
             ReplaceCurrent();
-            _windowController.Show(new RewardWindowParameters(rank, rewardItems));
+            _windowController.Show(new RewardWindowParameters(rankNumber, rewardItems));
         }
     }
 }

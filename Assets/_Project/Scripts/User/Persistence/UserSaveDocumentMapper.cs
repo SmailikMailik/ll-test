@@ -10,23 +10,23 @@ namespace LL.User.Persistence
 {
     internal static class UserSaveDocumentMapper
     {
-        internal static UserSnapshot ToSnapshot(UserSaveDocument saveData)
+        internal static UserSnapshot ToSnapshot(UserSaveDocument document)
         {
-            if (saveData is null)
-                throw new ArgumentNullException(nameof(saveData));
+            if (document is null)
+                throw new ArgumentNullException(nameof(document));
 
             return new UserSnapshot(
-                new UserIdentitySnapshot(saveData.Identity.UserId, saveData.Identity.RegionCode),
+                new UserIdentitySnapshot(document.Identity.UserId, document.Identity.RegionCode),
                 new UserItemsSnapshot(
-                    saveData.Items.Select(item =>
+                    document.Items.Select(item =>
                         new ItemAmount(new ItemId(item.Id), item.Amount))),
                 new UserProgressSnapshot(
-                    new RankId(saveData.Progress.RankId),
-                    saveData.Progress.Experience),
+                    new RankId(document.Progress.RankId),
+                    document.Progress.Experience),
                 new UserRankUpQuestSnapshot(
-                    new QuestId(saveData.RankUpQuest.QuestId),
-                    saveData.RankUpQuest.DeadlineUnixMilliseconds,
-                    saveData.RankUpQuest.IsCompleted));
+                    new QuestId(document.RankUpQuest.QuestId),
+                    document.RankUpQuest.DeadlineUnixMilliseconds,
+                    document.RankUpQuest.IsCompleted));
         }
 
         internal static UserSaveDocument ToDocument(UserSnapshot snapshot)

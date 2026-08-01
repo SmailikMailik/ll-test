@@ -17,9 +17,9 @@ namespace LL.User.Configuration
         private const string ProgressCode = "user-defaults.progress.required";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
 
-        private readonly IDataValidator<IReadOnlyList<UserItemDefaultsEntry>> _itemsValidator;
+        private readonly IDataValidator<IReadOnlyList<UserItemDefaultEntry>> _itemsValidator;
 
-        internal UserDefaultsConfigValidator(IDataValidator<IReadOnlyList<UserItemDefaultsEntry>> itemsValidator)
+        internal UserDefaultsConfigValidator(IDataValidator<IReadOnlyList<UserItemDefaultEntry>> itemsValidator)
         {
             _itemsValidator = itemsValidator ?? throw new ArgumentNullException(nameof(itemsValidator));
         }

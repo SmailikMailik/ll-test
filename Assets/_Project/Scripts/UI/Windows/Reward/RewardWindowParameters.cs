@@ -7,12 +7,12 @@ namespace LL.UI.Windows.Reward
 {
     internal sealed class RewardWindowParameters : IWindowParameters
     {
-        internal int Rank { get; }
+        internal int RankNumber { get; }
         internal IReadOnlyList<ItemAmount> Items { get; }
 
-        internal RewardWindowParameters(int rank, IReadOnlyList<ItemAmount> items)
+        internal RewardWindowParameters(int rankNumber, IReadOnlyList<ItemAmount> items)
         {
-            Rank = rank;
+            RankNumber = rankNumber;
             Items = Array.AsReadOnly(items?.ToArray() ?? Array.Empty<ItemAmount>());
         }
     }

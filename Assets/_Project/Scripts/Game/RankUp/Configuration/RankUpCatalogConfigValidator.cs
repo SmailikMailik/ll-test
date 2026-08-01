@@ -7,7 +7,7 @@ namespace LL.Game.RankUp.Configuration
     internal sealed class RankUpCatalogConfigValidator : IDataValidator<RankUpEntry[]>
     {
         private const string EntriesCode = "rank-up.entries.required";
-        private const string RequiredAmountCode = "rank-up.quest.amount.positive";
+        private const string RequiredCountCode = "rank-up.quest.count.positive";
         private const string DurationCode = "rank-up.quest.duration.positive";
         private static readonly IDataValidator<PaymentEntry> _paymentValidator = new PaymentEntryValidator();
 
@@ -41,9 +41,9 @@ namespace LL.Game.RankUp.Configuration
                     rankUpContext.At(nameof(RankUpEntry.HeroId)));
 
                 ValidationRules.Positive(
-                    rankUp.RequiredAmount,
-                    rankUpContext.At(nameof(RankUpEntry.RequiredAmount)),
-                    RequiredAmountCode);
+                    rankUp.RequiredCount,
+                    rankUpContext.At(nameof(RankUpEntry.RequiredCount)),
+                    RequiredCountCode);
 
                 ValidationRules.Positive(
                     rankUp.DurationMinutes,

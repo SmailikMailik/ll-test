@@ -14,7 +14,7 @@ namespace LL.UI.Windows.Reward
 
         protected override void OnShow()
         {
-            _rankLabel.text = Parameters.Rank.ToString();
+            _rankLabel.text = Parameters.RankNumber.ToString();
             _rewardContainer.SetItems(Parameters.Items);
             _animation.Play();
         }

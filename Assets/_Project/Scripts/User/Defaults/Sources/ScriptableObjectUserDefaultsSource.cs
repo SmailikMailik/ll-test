@@ -21,11 +21,13 @@ namespace LL.User.Defaults.Sources
             ValidationRunner.EnsureValid(_config);
 
             return new UserDefaultsDeclaration(
-                _config.Identity.UserId,
-                _config.Identity.RegionCode,
-                _config.Progress.RankId.Value,
-                _config.Progress.Experience,
-                _config.Items.Select(item => new UserItemDefaultsDeclaration(item.Id.Value, item.Amount)));
+                new UserIdentityDefaultDeclaration(
+                    _config.Identity.UserId,
+                    _config.Identity.RegionCode),
+                new UserProgressDefaultDeclaration(
+                    _config.Progress.RankId.Value,
+                    _config.Progress.Experience),
+                _config.Items.Select(item => new UserItemDefaultDeclaration(item.Id.Value, item.Amount)));
         }
     }
 }

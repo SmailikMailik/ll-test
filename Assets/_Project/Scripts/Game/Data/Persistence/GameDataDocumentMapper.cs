@@ -41,7 +41,7 @@ namespace LL.Game.Data.Persistence
                 rankUp.RankId,
                 rankUp.QuestId,
                 rankUp.HeroId,
-                rankUp.RequiredAmount,
+                rankUp.RequiredCount,
                 rankUp.DurationMinutes,
                 ToDeclaration(rankUp.QuestPayment),
                 ToDeclaration(rankUp.InstantPayment),

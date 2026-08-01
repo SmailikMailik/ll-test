@@ -49,21 +49,23 @@ namespace LL.User.Defaults
             if (declaration is null)
                 throw new ArgumentNullException(nameof(declaration));
 
-            var rankId = new RankId(declaration.RankId);
-            EnsureProgressIsValid(rankId, declaration.Experience, _ranks);
+            var rankId = new RankId(declaration.Progress.RankId);
+            EnsureProgressIsValid(rankId, declaration.Progress.Experience, _ranks);
 
             var itemAmounts = CompileItemAmounts(declaration.Items);
             EnsureRequiredItemsExist(itemAmounts, _cards, _rankUps, _rewards);
 
-            var identity = new UserIdentitySnapshot(declaration.UserId, declaration.RegionCode);
+            var identity = new UserIdentitySnapshot(
+                declaration.Identity.UserId,
+                declaration.Identity.RegionCode);
             var items = new UserItemsSnapshot(itemAmounts);
-            var progress = new UserProgressSnapshot(rankId, declaration.Experience);
+            var progress = new UserProgressSnapshot(rankId, declaration.Progress.Experience);
 
             return new UserDefaultsSnapshot(identity, items, progress);
         }
 
         private static IReadOnlyList<ItemAmount> CompileItemAmounts(
-            IReadOnlyList<UserItemDefaultsDeclaration> declarations)
+            IReadOnlyList<UserItemDefaultDeclaration> declarations)
         {
             if (declarations is null)
                 throw new ArgumentNullException(nameof(declarations));
@@ -98,13 +100,17 @@ namespace LL.User.Defaults
                     if (ValidationRules.ReferenceExists(
                             rankId,
                             rankIds,
-                            context.At(nameof(UserDefaultsDeclaration.RankId)),
+                            context
+                                .At(nameof(UserDefaultsDeclaration.Progress))
+                                .At(nameof(UserProgressDefaultDeclaration.RankId)),
                             RankExistsCode) is false)
                     {
                         return;
                     }
 
-                    var experienceContext = context.At(nameof(UserDefaultsDeclaration.Experience));
+                    var experienceContext = context
+                        .At(nameof(UserDefaultsDeclaration.Progress))
+                        .At(nameof(UserProgressDefaultDeclaration.Experience));
 
                     if (ValidationRules.NonNegative(experience, experienceContext, ExperienceCode) is false)
                         return;

@@ -16,7 +16,7 @@ MonoBehaviour:
   - _rankId: rank_1
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft
@@ -28,7 +28,7 @@ MonoBehaviour:
   - _rankId: rank_2
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft
@@ -40,7 +40,7 @@ MonoBehaviour:
   - _rankId: rank_3
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft
@@ -52,7 +52,7 @@ MonoBehaviour:
   - _rankId: rank_4
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft
@@ -64,7 +64,7 @@ MonoBehaviour:
   - _rankId: rank_5
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft
@@ -76,7 +76,7 @@ MonoBehaviour:
   - _rankId: rank_6
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft
@@ -88,7 +88,7 @@ MonoBehaviour:
   - _rankId: rank_7
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft
@@ -100,7 +100,7 @@ MonoBehaviour:
   - _rankId: rank_8
     _questId: headshots
     _heroId: soldier
-    _requiredAmount: 20
+    _requiredCount: 20
     _durationMinutes: 1440
     _questPayment:
       _itemId: soft

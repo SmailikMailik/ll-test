@@ -4,13 +4,13 @@ using LL.Validation;
 
 namespace LL.User.Configuration
 {
-    internal sealed class UserItemsDefaultsValidator : IDataValidator<IReadOnlyList<UserItemDefaultsEntry>>
+    internal sealed class UserItemDefaultsValidator : IDataValidator<IReadOnlyList<UserItemDefaultEntry>>
     {
         private const string ItemsCode = "user-defaults.items.required";
         private const string AmountCode = "user-defaults.item.amount.non-negative";
 
         public void Validate(
-            IReadOnlyList<UserItemDefaultsEntry> items,
+            IReadOnlyList<UserItemDefaultEntry> items,
             ValidationContext context)
         {
             if (ValidationRules.NotNull(items, context, ItemsCode) is false)
@@ -30,7 +30,7 @@ namespace LL.User.Configuration
 
                 ValidationRules.NonNegative(
                     item.Amount,
-                    context.At(index).At(nameof(UserItemDefaultsEntry.Amount)),
+                    context.At(index).At(nameof(UserItemDefaultEntry.Amount)),
                     AmountCode);
             }
         }

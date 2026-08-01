@@ -79,7 +79,7 @@ namespace LL.Game.Data.Sources
                 rankUp.RankId.Value,
                 rankUp.QuestId.Value,
                 rankUp.HeroId.Value,
-                rankUp.RequiredAmount,
+                rankUp.RequiredCount,
                 rankUp.DurationMinutes,
                 ToPaymentDeclaration(rankUp.QuestPayment),
                 ToPaymentDeclaration(rankUp.InstantPayment),

@@ -18,7 +18,7 @@ namespace LL.UI.Windows.Upgrade.Progress
 
         internal void Show(RankProgress progress, int currentExperience, int addedExperience)
         {
-            _rankLabel.text = progress.Rank.ToString();
+            _rankLabel.text = progress.RankNumber.ToString();
 
             if (progress.HasNextRank is false)
             {
@@ -45,19 +45,19 @@ namespace LL.UI.Windows.Upgrade.Progress
 
         private void ShowCurrentProgress(RankProgress progress, int currentExperience)
         {
-            _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.RequiredExperience);
+            _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.ExperienceRequiredForRankUp);
             _addedExperienceLabel.text = string.Empty;
-            _maxExperienceMarker.SetActive(currentExperience >= progress.RequiredExperience);
+            _maxExperienceMarker.SetActive(currentExperience >= progress.ExperienceRequiredForRankUp);
             SetBarProgress(progress, currentExperience);
         }
 
         private void ShowPreviewProgress(RankProgress progress, int currentExperience, int addedExperience)
         {
-            var previewExperience = Math.Min(currentExperience + addedExperience, progress.RequiredExperience);
+            var previewExperience = Math.Min(currentExperience + addedExperience, progress.ExperienceRequiredForRankUp);
 
-            _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.RequiredExperience);
+            _experienceLabel.text = TextFormatter.Progress(currentExperience, progress.ExperienceRequiredForRankUp);
             _addedExperienceLabel.text = $"+ {TextFormatter.Number(addedExperience)}";
-            _maxExperienceMarker.SetActive(previewExperience >= progress.RequiredExperience);
+            _maxExperienceMarker.SetActive(previewExperience >= progress.ExperienceRequiredForRankUp);
             SetBarProgress(progress, currentExperience, previewExperience);
         }
 

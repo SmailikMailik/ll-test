@@ -149,7 +149,7 @@ Assets/_Project/Configuration/
 ```mermaid
 classDiagram
     class GameDataDocument {
-        +int Version
+        +int Version = 4
         +RankDocumentEntry[] Ranks
         +CardDocumentEntry[] Cards
         +QuestDocumentEntry[] Quests
@@ -187,6 +187,8 @@ classDiagram
     RankUpDeclaration *-- PaymentDeclaration
     RewardDeclaration *-- RewardItemDeclaration
 ```
+
+Текущая версия внешнего контракта игровых данных — `GameDataDocument.CurrentVersion = 4`.
 
 Файлы разделены, но агрегаты не раздроблены: источник всё ещё возвращает один `GameDataDeclaration`, а сериализатор
 всё ещё читает один `GameDataDocument`.
@@ -234,6 +236,7 @@ flowchart LR
 
 `IDataSource<UserDefaultsDeclaration>` преобразует конкретный источник начальных значений в
 `UserDefaultsDeclaration`.
+Декларация сохраняет те же смысловые группы, что и конфиг и снимок: `Identity`, `Progress` и `Items`.
 `UserDefaultsCompiler` проверяет стартовый ранг, допустимый опыт и наличие всех предметов, используемых встроенными
 правилами, картами, оплатами и наградами, после чего создаёт `UserDefaultsSnapshot`. `UserSessionLoader` сначала
 пытается загрузить сохранение. `UserSnapshotReconciler` проверяет его относительно текущих игровых каталогов,

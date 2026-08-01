@@ -69,11 +69,11 @@ namespace LL.UI.Windows.RankUp
         protected override void OnShow()
         {
             var progress = _rankProgression.GetProgress(_userProgress.RankId, _userProgress.Experience);
-            var rank = progress.Rank;
-            var nextRank = progress.HasNextRank ? rank + 1 : rank;
+            var rankNumber = progress.RankNumber;
+            var nextRankNumber = progress.HasNextRank ? rankNumber + 1 : rankNumber;
 
-            _currentRankLabel.text = TextFormatter.Number(rank);
-            _nextRankLabel.text = TextFormatter.Number(nextRank);
+            _currentRankLabel.text = TextFormatter.Number(rankNumber);
+            _nextRankLabel.text = TextFormatter.Number(nextRankNumber);
             _nextRankRewardView.ShowNextRank(_userProgress.RankId);
 
             if (_rankUpFlow.TryGetDefinition(out _definition) &&
@@ -123,7 +123,7 @@ namespace LL.UI.Windows.RankUp
 
         private void OnRankUpSucceeded(IReadOnlyList<ItemAmount> rewardItems)
         {
-            _upgradeFlow.CompleteRankUp(_userProgress.Rank, rewardItems);
+            _upgradeFlow.CompleteRankUp(_userProgress.RankNumber, rewardItems);
         }
 
         private void OnRankUpFailed()

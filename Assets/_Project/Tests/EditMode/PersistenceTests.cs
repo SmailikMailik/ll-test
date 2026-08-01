@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using LL.Game.Data.Persistence.Documents;
 using LL.Game.Items;
 using LL.Game.Ranks;
 using LL.Infrastructure.Saving;
@@ -54,6 +56,40 @@ namespace LL.Tests.EditMode
 
             Assert.That(loaded, Is.True);
             Assert.That(restored.Identity.UserId, Is.EqualTo("test-user"));
+        }
+
+        [Test]
+        public void GameDataDocumentRoundTripUsesRequiredCount()
+        {
+            var serializer = new JsonSaveSerializer();
+            var document = new GameDataDocument(
+                GameDataDocument.CurrentVersion,
+                Array.Empty<RankDocumentEntry>(),
+                Array.Empty<CardDocumentEntry>(),
+                Array.Empty<HeroDocumentEntry>(),
+                Array.Empty<QuestDocumentEntry>(),
+                new[]
+                {
+                    new RankUpDocumentEntry(
+                        "bronze",
+                        "quest",
+                        "hero",
+                        20,
+                        10,
+                        new PaymentDocumentEntry("soft", 1),
+                        new PaymentDocumentEntry("hard", 1),
+                        "reward")
+                },
+                Array.Empty<RewardDocumentEntry>());
+
+            Assert.That(serializer.TrySerialize(document, out var bytes), Is.True);
+
+            var json = Encoding.UTF8.GetString(bytes);
+            Assert.That(json, Does.Contain("\"RequiredCount\": 20"));
+            Assert.That(json, Does.Not.Contain("RequiredAmount"));
+            Assert.That(serializer.TryDeserialize(bytes, out GameDataDocument restored), Is.True);
+            Assert.That(restored.Version, Is.EqualTo(4));
+            Assert.That(restored.RankUps[0].RequiredCount, Is.EqualTo(20));
         }
 
         [Test]

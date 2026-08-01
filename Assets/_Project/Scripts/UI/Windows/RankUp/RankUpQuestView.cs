@@ -114,7 +114,7 @@ namespace LL.UI.Windows.RankUp
                 _localization.GetText(RankUpLocalizationKeys.Unlock),
                 TextStyle.Accent);
             var countText = TextTags.Style(
-                TextFormatter.Number(rankUpQuest.RequiredAmount),
+                TextFormatter.Number(rankUpQuest.RequiredCount),
                 TextStyle.Accent);
 
             _titleLabel.text = _localization.GetText(

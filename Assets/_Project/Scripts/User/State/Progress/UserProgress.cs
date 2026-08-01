@@ -9,7 +9,7 @@ namespace LL.User.State.Progress
     internal sealed class UserProgress : IUserProgress, IUserProgressCommands, IDisposable
     {
         public RankId RankId { get; private set; }
-        public int Rank { get; private set; }
+        public int RankNumber { get; private set; }
         public int Experience { get; private set; }
         public bool CanRankUp => _rankProgression.CanRankUp(RankId, Experience);
 
@@ -31,7 +31,7 @@ namespace LL.User.State.Progress
             var progress = _rankProgression.GetProgress(snapshot.RankId, snapshot.Experience);
 
             RankId = progress.RankId;
-            Rank = progress.Rank;
+            RankNumber = progress.RankNumber;
             Experience = progress.Experience;
         }
 
@@ -70,7 +70,7 @@ namespace LL.User.State.Progress
             var nextProgress = _rankProgression.GetProgress(progress.NextRankId, 0);
 
             RankId = nextProgress.RankId;
-            Rank = nextProgress.Rank;
+            RankNumber = nextProgress.RankNumber;
             Experience = 0;
 
             _changed.OnNext(Unit.Default);
