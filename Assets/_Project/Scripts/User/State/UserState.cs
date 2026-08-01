@@ -15,9 +15,9 @@ namespace LL.User.State
         internal Observable<Unit> Changed => _changed;
 
         private readonly UserIdentitySnapshot _identity;
-        private readonly IUserItems _items;
         private readonly IUserProgress _progress;
         private readonly IUserRankUpQuest _rankUpQuest;
+        private readonly IUserItems _items;
 
         private readonly Subject<Unit> _changed = new();
         private readonly List<IDisposable> _subscriptions = new();
@@ -28,14 +28,14 @@ namespace LL.User.State
         [Inject]
         internal UserState(
             UserIdentitySnapshot identity,
-            IUserItems items,
             IUserProgress progress,
-            IUserRankUpQuest rankUpQuest)
+            IUserRankUpQuest rankUpQuest,
+            IUserItems items)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            _items = items ?? throw new ArgumentNullException(nameof(items));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
+            _items = items ?? throw new ArgumentNullException(nameof(items));
         }
 
         public void Initialize()
@@ -49,9 +49,9 @@ namespace LL.User.State
         {
             return new UserSnapshot(
                 _identity,
-                _items.CreateSnapshot(),
                 _progress.CreateSnapshot(),
-                _rankUpQuest.CreateSnapshot());
+                _rankUpQuest.CreateSnapshot(),
+                _items.CreateSnapshot());
         }
 
         public TResult Execute<TResult>(Func<TResult> mutation)

@@ -58,10 +58,10 @@ namespace LL.User.Defaults
             var identity = new UserIdentitySnapshot(
                 declaration.Identity.UserId,
                 declaration.Identity.RegionCode);
-            var items = new UserItemsSnapshot(itemAmounts);
             var progress = new UserProgressSnapshot(rankId, declaration.Progress.Experience);
+            var items = new UserItemsSnapshot(itemAmounts);
 
-            return new UserDefaultsSnapshot(identity, items, progress);
+            return new UserDefaultsSnapshot(identity, progress, items);
         }
 
         private static IReadOnlyList<ItemAmount> CompileItemAmounts(

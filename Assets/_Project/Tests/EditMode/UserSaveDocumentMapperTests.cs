@@ -15,14 +15,14 @@ namespace LL.Tests.EditMode
         {
             var source = new UserSnapshot(
                 new UserIdentitySnapshot("test-user", "RU"),
+                new UserProgressSnapshot(new RankId("bronze"), 25),
+                new UserRankUpQuestSnapshot(new QuestId("quest"), 123456L, true),
                 new UserItemsSnapshot(
                     new[]
                     {
                         new ItemAmount(ItemIds.Soft, 15),
                         new ItemAmount(ItemIds.Hard, 3)
-                    }),
-                new UserProgressSnapshot(new RankId("bronze"), 25),
-                new UserRankUpQuestSnapshot(new QuestId("quest"), 123456L, true));
+                    }));
 
             var document = UserSaveDocumentMapper.ToDocument(source);
             var restored = UserSaveDocumentMapper.ToSnapshot(document);

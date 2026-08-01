@@ -52,11 +52,17 @@ exception set.
 - Use `Min` and `Max`, rather than `Minimum` and `Maximum`, in identifiers that represent bounds. Keep words
   unabbreviated in user-facing text.
 
-## Aggregate mappings
+## Aggregate representations and mappings
 
+- Give every aggregate one canonical semantic order for its top-level parts. Preserve that order across its
+  `Config`, `Document`, `Declaration`, `Snapshot`, and `State` representations: use it for properties, constructor
+  parameters and assignments, and aggregate construction calls in sources, compilers, and mappers. Representation
+  metadata such as a document version precedes the aggregate parts. A member's shape as a scalar, nested object, or
+  collection does not by itself determine its position.
 - In a mapper or source adapter that constructs an aggregate `Document`, `Declaration`, or `Snapshot`, keep the root
   method as an overview of the aggregate's top-level parts. Move field-by-field conversion of each distinct nested
   type into a private static helper.
+- Order a mapper's conversion helpers by direction and then by the destination aggregate's canonical part order.
 - Name each conversion helper after its destination type in the form `To<DestinationType>`, such as
   `ToRankDeclaration` or `ToUserItemDocumentEntry`. Do not rely on overloaded generic names such as `ToDeclaration`
   when a mapper converts more than one source type.

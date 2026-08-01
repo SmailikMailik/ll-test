@@ -82,9 +82,9 @@ namespace LL.Tests.EditMode
 
             return new UserSnapshot(
                 new UserIdentitySnapshot("test-user", "RU"),
-                new UserItemsSnapshot(amounts),
                 new UserProgressSnapshot(rankId ?? new RankId("bronze"), experience),
-                rankUpQuest ?? UserRankUpQuestSnapshot.Empty);
+                rankUpQuest ?? UserRankUpQuestSnapshot.Empty,
+                new UserItemsSnapshot(amounts));
         }
 
         internal static RankUpCatalog CreateRankUpCatalog()

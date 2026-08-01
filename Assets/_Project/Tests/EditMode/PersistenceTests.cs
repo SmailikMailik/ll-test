@@ -102,7 +102,7 @@ namespace LL.Tests.EditMode
             var progression = new RankProgression(gameData.Ranks);
             var progress = new UserProgress(initial.Progress, progression);
             var rankUpQuest = new UserRankUpQuest(initial.RankUpQuest, timeProvider);
-            var state = new UserState(initial.Identity, items, progress, rankUpQuest);
+            var state = new UserState(initial.Identity, progress, rankUpQuest, items);
             var repository = new RecordingUserSaveRepository();
             var coordinator = new UserSaveCoordinator(state, repository, timeProvider);
 
@@ -144,7 +144,7 @@ namespace LL.Tests.EditMode
             var progression = new RankProgression(gameData.Ranks);
             var progress = new UserProgress(initial.Progress, progression);
             var rankUpQuest = new UserRankUpQuest(initial.RankUpQuest, timeProvider);
-            var state = new UserState(initial.Identity, items, progress, rankUpQuest);
+            var state = new UserState(initial.Identity, progress, rankUpQuest, items);
             var repository = new RecordingUserSaveRepository(1);
             var coordinator = new UserSaveCoordinator(state, repository, timeProvider);
 

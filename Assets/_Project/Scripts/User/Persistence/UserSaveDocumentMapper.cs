@@ -17,9 +17,9 @@ namespace LL.User.Persistence
 
             return new UserSnapshot(
                 ToUserIdentitySnapshot(document.Identity),
-                new UserItemsSnapshot(document.Items.Select(ToItemAmount)),
                 ToUserProgressSnapshot(document.Progress),
-                ToUserRankUpQuestSnapshot(document.RankUpQuest));
+                ToUserRankUpQuestSnapshot(document.RankUpQuest),
+                new UserItemsSnapshot(document.Items.Select(ToItemAmount)));
         }
 
         internal static UserSaveDocument ToDocument(UserSnapshot snapshot)
@@ -42,11 +42,6 @@ namespace LL.User.Persistence
             return new UserIdentitySnapshot(identity.UserId, identity.RegionCode);
         }
 
-        private static ItemAmount ToItemAmount(UserItemDocumentEntry item)
-        {
-            return new ItemAmount(new ItemId(item.Id), item.Amount);
-        }
-
         private static UserProgressSnapshot ToUserProgressSnapshot(UserProgressDocumentEntry progress)
         {
             return new UserProgressSnapshot(new RankId(progress.RankId), progress.Experience);
@@ -60,14 +55,14 @@ namespace LL.User.Persistence
                 rankUpQuest.IsCompleted);
         }
 
+        private static ItemAmount ToItemAmount(UserItemDocumentEntry item)
+        {
+            return new ItemAmount(new ItemId(item.Id), item.Amount);
+        }
+
         private static UserIdentityDocumentEntry ToUserIdentityDocumentEntry(UserIdentitySnapshot identity)
         {
             return new UserIdentityDocumentEntry(identity.UserId, identity.RegionCode);
-        }
-
-        private static UserItemDocumentEntry ToUserItemDocumentEntry(ItemAmount item)
-        {
-            return new UserItemDocumentEntry(item.Id.Value, item.Amount);
         }
 
         private static UserProgressDocumentEntry ToUserProgressDocumentEntry(UserProgressSnapshot progress)
@@ -81,6 +76,11 @@ namespace LL.User.Persistence
                 rankUpQuest.QuestId.Value,
                 rankUpQuest.DeadlineUnixMilliseconds,
                 rankUpQuest.IsCompleted);
+        }
+
+        private static UserItemDocumentEntry ToUserItemDocumentEntry(ItemAmount item)
+        {
+            return new UserItemDocumentEntry(item.Id.Value, item.Amount);
         }
     }
 }

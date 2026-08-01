@@ -49,7 +49,7 @@ namespace LL.User.Persistence
                 return UserReconciliationResult.Unchanged(snapshot);
 
             return UserReconciliationResult.Changed(
-                new UserSnapshot(snapshot.Identity, items, snapshot.Progress, rankUpQuest));
+                new UserSnapshot(snapshot.Identity, snapshot.Progress, rankUpQuest, items));
         }
 
         private UserItemsSnapshot ReconcileItems(
