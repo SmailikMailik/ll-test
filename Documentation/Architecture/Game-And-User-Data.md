@@ -215,59 +215,117 @@ classDiagram
 
 ## Загрузка и сохранение пользователя
 
+Пользовательский поток состоит из трёх независимых частей: подготовки начальных значений, запуска сессии и
+автосохранения изменяемого состояния. На схемах ниже стрелка означает порядок вызова или преобразования данных.
+
+### Подготовка начальных значений
+
+Начальные значения загружаются раньше пользовательского сохранения и не изменяются во время сессии:
+
 ```mermaid
 flowchart LR
-    Storage["JSON-файл"]
-    Repository["SerializedUserSaveRepository"]
-    Document["UserSaveDocument<br/>Version + DocumentEntry"]
-    Mapper["UserSaveDocumentMapper"]
-    Snapshot["UserSnapshot"]
-    Loader["UserSessionLoader"]
     Config["UserDefaultsConfig"]
-    Source["IDataSource&lt;UserDefaultsDeclaration&gt;"]
+    Source["ScriptableObjectUserDefaultsSource"]
     Declaration["UserDefaultsDeclaration"]
     Compiler["UserDefaultsCompiler"]
     Defaults["UserDefaultsSnapshot"]
-    Reconciler["UserSnapshotReconciler"]
-    State["UserState"]
-    Coordinator["UserSaveCoordinator"]
+    Catalogs["Текущие игровые каталоги"]
 
-    Storage --> Repository
-    Repository --> Document
-    Document --> Mapper
-    Mapper --> Snapshot
-    Repository --> Loader
     Config --> Source
-    Source --> Declaration
-    Declaration --> Compiler
+    Source -- "Read()" --> Declaration
+    Declaration -- "Compile()" --> Compiler
+    Catalogs --> Compiler
     Compiler --> Defaults
-    Defaults --> Loader
-    Loader --> Reconciler
-    Snapshot --> Reconciler
-    Reconciler --> Snapshot
-    Snapshot --> State
-    State -- Changed --> Coordinator
-    Coordinator --> Repository
-    State -- CreateSnapshot --> Snapshot
-    Snapshot --> Mapper
-    Mapper --> Document
-    Document --> Storage
 ```
 
 `IDataSource<UserDefaultsDeclaration>` преобразует конкретный источник начальных значений в
-`UserDefaultsDeclaration`.
-Декларация сохраняет те же смысловые группы, что и конфиг и снимок: `Identity`, `HeroSelection`, `Heroes` и `Items`.
-Каждый элемент `Heroes` содержит собственные `HeroId`, ранг и опыт. `UserDefaultsCompiler` проверяет выбранного героя,
-стартовый ранг и допустимый опыт каждого героя, а также наличие всех предметов, используемых встроенными
-правилами, картами, оплатами и наградами, после чего создаёт `UserDefaultsSnapshot`. `UserSessionLoader` сначала
-пытается загрузить сохранение. `UserSnapshotReconciler` проверяет его относительно текущих игровых каталогов,
-заменяет отсутствующего выбранного героя явным героем по умолчанию, добавляет отсутствующие обязательные предметы и
-согласует независимые попытки вариантов повышения каждого героя и очищает устаревшие состояния требований.
-Несовместимый прогресс конкретного героя приводит к явному сбросу этого героя на defaults. Во время сессии
-`UserState` объединяет изменяемые части состояния и сворачивает все
-изменения одной синхронной игровой операции в одно уведомление. `UserSaveCoordinator` собирает частые изменения
-в течение короткого интервала, сохраняет последний итоговый снимок, последовательно повторяет временно неудачную
-запись и принудительно записывает dirty-состояние при завершении.
+`UserDefaultsDeclaration`. Декларация сохраняет те же смысловые группы, что и конфиг и снимок: `Identity`,
+`HeroSelection`, `Heroes` и `Items`. Каждый элемент `Heroes` содержит собственные `HeroId`, ранг и опыт.
+
+`UserDefaultsCompiler` сверяет декларацию с текущими игровыми каталогами: проверяет выбранного героя, стартовый ранг
+и допустимый опыт каждого героя, а также наличие всех предметов, используемых встроенными правилами, картами,
+оплатами и наградами. Результат — один согласованный `UserDefaultsSnapshot`, из которого при необходимости можно
+создать нового пользователя.
+
+### Запуск пользовательской сессии
+
+`UserSessionLoader` управляет выбором итогового снимка сессии. Репозиторий скрывает чтение файла, JSON-десериализацию,
+проверку версии документа и преобразование `UserSaveDocument` в `UserSnapshot`.
+
+```mermaid
+flowchart TD
+    Loader["UserSessionLoader.Load()"]
+    Repository["SerializedUserSaveRepository.Load()"]
+    LoadResult{"UserLoadResult.Status"}
+    Reconciler["UserSnapshotReconciler.Reconcile()"]
+    Reconciliation{"Reconciliation.Status"}
+    Defaults["UserDefaultsSnapshot.CreateUserSnapshot()"]
+    SaveReconciled["Repository.Save(reconciled snapshot)"]
+    SaveDefault["Repository.Save(default snapshot)"]
+    Session["Итоговый UserSnapshot сессии"]
+    State["UserState и его составные части"]
+
+    Loader --> Repository
+    Repository --> LoadResult
+    LoadResult -- "Loaded" --> Reconciler
+    LoadResult -- "NotFound / Corrupted / UnsupportedVersion" --> Defaults
+    Reconciler --> Reconciliation
+    Reconciliation -- "Unchanged" --> Session
+    Reconciliation -- "Changed" --> SaveReconciled
+    SaveReconciled --> Session
+    Reconciliation -- "Incompatible" --> Defaults
+    Defaults --> SaveDefault
+    SaveDefault --> Session
+    Session --> State
+```
+
+При успешной загрузке `UserSnapshotReconciler` согласует сохранение с текущими игровыми каталогами. Он заменяет
+отсутствующего выбранного героя явным героем по умолчанию, добавляет отсутствующие обязательные предметы, удаляет
+недействительные попытки повышения и очищает устаревшие состояния требований. Несовместимый прогресс конкретного
+героя сбрасывается на его defaults.
+
+Если согласование изменило снимок, `UserSessionLoader` сразу пытается записать исправленную версию. Если сохранение
+не найдено, повреждено, имеет неподдерживаемую версию или в целом несовместимо, loader создаёт снимок из defaults и
+тоже сразу пытается его записать. Ошибка этой стартовой записи логируется, но не препятствует созданию сессии.
+
+### Автосохранение во время сессии
+
+Во время игры изменяется `UserState`, а не загруженный `UserSnapshot`. `UserState` сворачивает изменения одной
+синхронной игровой операции в одно уведомление `Changed`.
+
+```mermaid
+flowchart LR
+    State["UserState"]
+    Coordinator["UserSaveCoordinator"]
+    Snapshot["Новый UserSnapshot"]
+    Repository["SerializedUserSaveRepository.Save()"]
+    Mapper["UserSaveDocumentMapper.ToDocument()"]
+    Document["UserSaveDocument v2"]
+    SaveService["SaveService.TrySave()"]
+    Serializer["JsonSaveSerializer"]
+    Bytes["JSON bytes"]
+    FileStorage["FileSaveStorage.TryWrite()"]
+    Temporary["user.save.tmp"]
+    Storage["user.save"]
+
+    State -- "Changed" --> Coordinator
+    Coordinator -- "500 мс без новых изменений" --> Snapshot
+    State -- "CreateSnapshot()" --> Snapshot
+    Snapshot --> Repository
+    Repository --> Mapper
+    Mapper --> Document
+    Document --> SaveService
+    SaveService --> Serializer
+    Serializer --> Bytes
+    Bytes --> FileStorage
+    FileStorage --> Temporary
+    Temporary -- "атомарная замена" --> Storage
+    Repository -. "ошибка: повтор через 500 мс" .-> Coordinator
+```
+
+Каждое новое уведомление переносит срок сохранения, поэтому в файл попадает последний итоговый снимок серии
+изменений. После неудачной записи coordinator оставляет состояние dirty и повторяет попытки последовательно. При
+завершении `Dispose()` выполняет ещё одну немедленную попытку записи dirty-состояния.
 
 Текущая версия контракта пользовательского сохранения — `UserSaveDocument.CurrentVersion = 2`. Предыдущий формат не
 мигрируется, поскольку опубликованных сохранений ещё нет; сохранение другой версии считается неподдерживаемым.
