@@ -104,9 +104,9 @@ UI получает `UserHeroSelectionSnapshot` и наблюдает `IUserItem
 получает mutating API. Игровые сервисы изменяют те же singleton-состояния через отдельные `IUserItemsCommands`,
 `IUserHeroProgressCommands` и `IUserRankUpAttemptsCommands`.
 
-Подробное описание представлений и преобразований находится в
-[`Game-And-User-Data.md`](Game-And-User-Data.md). Модель отдельного прогресса каждого героя и произвольного набора
-вариантов повышения определена в [`Ranks-And-Rank-Up.md`](Ranks-And-Rank-Up.md).
+Подробные описания находятся в [`Game-Data.md`](Game-Data.md) и [`User-Data.md`](User-Data.md). Модель отдельного
+прогресса каждого героя и произвольного набора вариантов повышения определена в
+[`Ranks-And-Rank-Up.md`](Ranks-And-Rank-Up.md).
 
 ### UI-навигация
 

@@ -4,7 +4,7 @@ namespace LL.User.Persistence.Documents
 {
     internal sealed class UserSaveDocument
     {
-        internal const int CurrentVersion = 2;
+        internal const int CurrentVersion = 1;
 
         public int Version { get; }
         public UserIdentityDocumentEntry Identity { get; }

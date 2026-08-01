@@ -6,8 +6,8 @@ the implementation, and its validators synchronized after an architectural decis
 
 For a concise map of runtime areas, lifetime boundaries, and core flows, see
 [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md).
-For a detailed walkthrough of the game-data and user-data pipelines, see
-[`Game-And-User-Data.md`](../Architecture/Game-And-User-Data.md).
+For detailed walkthroughs of the runtime data pipelines, see
+[`Game-Data.md`](../Architecture/Game-Data.md) and [`User-Data.md`](../Architecture/User-Data.md).
 For the feature-level agreement on hero experience, rank progression, and configurable rank-up options, see
 [`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md).
 For C# syntax and lifecycle conventions, see [`Code-Style.md`](Code-Style.md). For validation semantics, automated
@@ -399,7 +399,8 @@ source is therefore a composition-root change rather than an installer or consum
 
 Current runtime flows, concrete participants, and document versions are descriptive implementation information. Keep
 them synchronized in [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md)
-and [`Game-And-User-Data.md`](../Architecture/Game-And-User-Data.md). Feature-level target behavior for hero experience,
+and the focused [`Game-Data.md`](../Architecture/Game-Data.md) and
+[`User-Data.md`](../Architecture/User-Data.md) documents. Feature-level target behavior for hero experience,
 rank progression, and rank-up options is defined in
 [`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). The normative representation boundaries that those
 flows must follow remain in this document.
