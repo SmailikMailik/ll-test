@@ -53,7 +53,6 @@ MonoBehaviour:
   _flagImage: {fileID: 5165802195693140859}
   _nameLabel: {fileID: 4904977596225820036}
   _portrait: {fileID: 0}
-  _initialHeroId: soldier
 --- !u!1 &1376225147575856431
 GameObject:
   m_ObjectHideFlags: 0

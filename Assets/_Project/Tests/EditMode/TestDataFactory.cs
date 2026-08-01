@@ -59,10 +59,12 @@ namespace LL.Tests.EditMode
         {
             var declaration = new UserDefaultsDeclaration(
                 new UserIdentityDefaultDeclaration("test-user", "RU"),
+                new UserHeroSelectionDefaultDeclaration("hero"),
                 new UserProgressDefaultDeclaration("bronze", 0),
                 ItemIds.All.Select(id => new UserItemDefaultDeclaration(id.Value, 0)));
             var compiler = new UserDefaultsCompiler(
                 gameData.Ranks,
+                gameData.Heroes,
                 gameData.Cards,
                 gameData.RankUps,
                 gameData.Rewards);
@@ -72,6 +74,7 @@ namespace LL.Tests.EditMode
 
         internal static UserSnapshot CreateUserSnapshot(
             RankId? rankId = null,
+            HeroId? heroId = null,
             int experience = 0,
             UserRankUpQuestSnapshot rankUpQuest = null,
             params ItemAmount[] items)
@@ -82,6 +85,7 @@ namespace LL.Tests.EditMode
 
             return new UserSnapshot(
                 new UserIdentitySnapshot("test-user", "RU"),
+                new UserHeroSelectionSnapshot(heroId ?? new HeroId("hero")),
                 new UserProgressSnapshot(rankId ?? new RankId("bronze"), experience),
                 rankUpQuest ?? UserRankUpQuestSnapshot.Empty,
                 new UserItemsSnapshot(amounts));

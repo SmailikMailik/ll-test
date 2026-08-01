@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
+using LL.Game.Heroes;
 using LL.Game.Identifiers;
 using LL.Game.Items;
 using LL.Game.RankUp;
@@ -17,6 +18,7 @@ namespace LL.User.Defaults
 {
     internal sealed class UserDefaultsCompiler : IDataCompiler<UserDefaultsDeclaration, UserDefaultsSnapshot>
     {
+        private const string HeroExistsCode = "user-defaults.hero-selection.hero.exists";
         private const string RankExistsCode = "user-defaults.progress.rank.exists";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
         private const string ExperienceMaxCode = "user-defaults.progress.experience.maximum";
@@ -27,6 +29,7 @@ namespace LL.User.Defaults
         private const string RewardItemCode = "reward.user-item.exists";
 
         private readonly RankCatalog _ranks;
+        private readonly HeroCatalog _heroes;
         private readonly CardCatalog _cards;
         private readonly RankUpCatalog _rankUps;
         private readonly RewardCatalog _rewards;
@@ -34,11 +37,13 @@ namespace LL.User.Defaults
         [Inject]
         internal UserDefaultsCompiler(
             RankCatalog ranks,
+            HeroCatalog heroes,
             CardCatalog cards,
             RankUpCatalog rankUps,
             RewardCatalog rewards)
         {
             _ranks = ranks ?? throw new ArgumentNullException(nameof(ranks));
+            _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _cards = cards ?? throw new ArgumentNullException(nameof(cards));
             _rankUps = rankUps ?? throw new ArgumentNullException(nameof(rankUps));
             _rewards = rewards ?? throw new ArgumentNullException(nameof(rewards));
@@ -49,6 +54,9 @@ namespace LL.User.Defaults
             if (declaration is null)
                 throw new ArgumentNullException(nameof(declaration));
 
+            var heroId = new HeroId(declaration.HeroSelection.HeroId);
+            EnsureHeroExists(heroId, _heroes);
+
             var rankId = new RankId(declaration.Progress.RankId);
             EnsureProgressIsValid(rankId, declaration.Progress.Experience, _ranks);
 
@@ -58,10 +66,26 @@ namespace LL.User.Defaults
             var identity = new UserIdentitySnapshot(
                 declaration.Identity.UserId,
                 declaration.Identity.RegionCode);
+            var heroSelection = new UserHeroSelectionSnapshot(heroId);
             var progress = new UserProgressSnapshot(rankId, declaration.Progress.Experience);
             var items = new UserItemsSnapshot(itemAmounts);
 
-            return new UserDefaultsSnapshot(identity, progress, items);
+            return new UserDefaultsSnapshot(identity, heroSelection, progress, items);
+        }
+
+        private static void EnsureHeroExists(HeroId heroId, HeroCatalog heroes)
+        {
+            var heroIds = heroes.Heroes.Select(hero => hero.Id).ToHashSet();
+
+            ValidationRunner.EnsureValid(
+                context => ValidationRules.ReferenceExists(
+                    heroId,
+                    heroIds,
+                    context
+                        .At(nameof(UserDefaultsDeclaration.HeroSelection))
+                        .At(nameof(UserHeroSelectionDefaultDeclaration.HeroId)),
+                    HeroExistsCode),
+                nameof(heroId));
         }
 
         private static IReadOnlyList<ItemAmount> CompileItemAmounts(

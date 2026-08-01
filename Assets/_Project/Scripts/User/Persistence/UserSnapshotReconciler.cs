@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Heroes;
 using LL.Game.Items;
 using LL.Game.RankUp;
 using LL.Game.Ranks;
@@ -14,6 +15,7 @@ namespace LL.User.Persistence
     internal sealed class UserSnapshotReconciler
     {
         private readonly UserDefaultsSnapshot _defaults;
+        private readonly HeroCatalog _heroes;
         private readonly IRankProgression _rankProgression;
         private readonly RankUpCatalog _rankUps;
         private readonly TimeProvider _timeProvider;
@@ -21,11 +23,13 @@ namespace LL.User.Persistence
         [Inject]
         internal UserSnapshotReconciler(
             UserDefaultsSnapshot defaults,
+            HeroCatalog heroes,
             IRankProgression rankProgression,
             RankUpCatalog rankUps,
             TimeProvider timeProvider)
         {
             _defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
+            _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _rankUps = rankUps ?? throw new ArgumentNullException(nameof(rankUps));
             _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
@@ -39,17 +43,29 @@ namespace LL.User.Persistence
                 return UserReconciliationResult.Incompatible();
             }
 
-            var items = ReconcileItems(snapshot.Items, out var itemsChanged);
+            var heroSelection = ReconcileHeroSelection(snapshot.HeroSelection, out var heroSelectionChanged);
             var rankUpQuest = ReconcileRankUpQuest(
                 snapshot.Progress,
                 snapshot.RankUpQuest,
                 out var rankUpQuestChanged);
+            var items = ReconcileItems(snapshot.Items, out var itemsChanged);
 
-            if (itemsChanged is false && rankUpQuestChanged is false)
+            if (heroSelectionChanged is false && rankUpQuestChanged is false && itemsChanged is false)
                 return UserReconciliationResult.Unchanged(snapshot);
 
             return UserReconciliationResult.Changed(
-                new UserSnapshot(snapshot.Identity, snapshot.Progress, rankUpQuest, items));
+                new UserSnapshot(snapshot.Identity, heroSelection, snapshot.Progress, rankUpQuest, items));
+        }
+
+        private UserHeroSelectionSnapshot ReconcileHeroSelection(
+            UserHeroSelectionSnapshot heroSelection,
+            out bool changed)
+        {
+            changed = _heroes.TryGetHero(heroSelection.HeroId, out _) is false;
+
+            return changed
+                ? _defaults.CreateUserSnapshot().HeroSelection
+                : heroSelection;
         }
 
         private UserItemsSnapshot ReconcileItems(

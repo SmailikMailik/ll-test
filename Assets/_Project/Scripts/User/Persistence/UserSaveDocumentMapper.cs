@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using LL.Game.Heroes;
 using LL.Game.Items;
 using LL.Game.Quests;
 using LL.Game.Ranks;
@@ -17,6 +18,7 @@ namespace LL.User.Persistence
 
             return new UserSnapshot(
                 ToUserIdentitySnapshot(document.Identity),
+                ToUserHeroSelectionSnapshot(document.HeroSelection),
                 ToUserProgressSnapshot(document.Progress),
                 ToUserRankUpQuestSnapshot(document.RankUpQuest),
                 new UserItemsSnapshot(document.Items.Select(ToItemAmount)));
@@ -30,6 +32,7 @@ namespace LL.User.Persistence
             return new UserSaveDocument(
                 UserSaveDocument.CurrentVersion,
                 ToUserIdentityDocumentEntry(snapshot.Identity),
+                ToUserHeroSelectionDocumentEntry(snapshot.HeroSelection),
                 ToUserProgressDocumentEntry(snapshot.Progress),
                 ToUserRankUpQuestDocumentEntry(snapshot.RankUpQuest),
                 snapshot.Items.Amounts
@@ -40,6 +43,12 @@ namespace LL.User.Persistence
         private static UserIdentitySnapshot ToUserIdentitySnapshot(UserIdentityDocumentEntry identity)
         {
             return new UserIdentitySnapshot(identity.UserId, identity.RegionCode);
+        }
+
+        private static UserHeroSelectionSnapshot ToUserHeroSelectionSnapshot(
+            UserHeroSelectionDocumentEntry heroSelection)
+        {
+            return new UserHeroSelectionSnapshot(new HeroId(heroSelection.HeroId));
         }
 
         private static UserProgressSnapshot ToUserProgressSnapshot(UserProgressDocumentEntry progress)
@@ -63,6 +72,12 @@ namespace LL.User.Persistence
         private static UserIdentityDocumentEntry ToUserIdentityDocumentEntry(UserIdentitySnapshot identity)
         {
             return new UserIdentityDocumentEntry(identity.UserId, identity.RegionCode);
+        }
+
+        private static UserHeroSelectionDocumentEntry ToUserHeroSelectionDocumentEntry(
+            UserHeroSelectionSnapshot heroSelection)
+        {
+            return new UserHeroSelectionDocumentEntry(heroSelection.HeroId.Value);
         }
 
         private static UserProgressDocumentEntry ToUserProgressDocumentEntry(UserProgressSnapshot progress)

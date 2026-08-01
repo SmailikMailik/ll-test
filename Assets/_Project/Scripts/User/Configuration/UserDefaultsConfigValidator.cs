@@ -14,6 +14,7 @@ namespace LL.User.Configuration
         private const string RegionCodeCode = "user-defaults.identity.region-code.not-empty";
         private const string RegionWhitespaceCode = "user-defaults.identity.region-code.trimmed";
         private const string RegionCaseCode = "user-defaults.identity.region-code.uppercase";
+        private const string HeroSelectionCode = "user-defaults.hero-selection.required";
         private const string ProgressCode = "user-defaults.progress.required";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
 
@@ -32,6 +33,7 @@ namespace LL.User.Configuration
                 return;
 
             ValidateIdentity(defaults.Identity, context.At(nameof(UserDefaultsConfig.Identity)));
+            ValidateHeroSelection(defaults.HeroSelection, context.At(nameof(UserDefaultsConfig.HeroSelection)));
             ValidateProgress(defaults.Progress, context.At(nameof(UserDefaultsConfig.Progress)));
             _itemsValidator.Validate(defaults.Items, context.At(nameof(UserDefaultsConfig.Items)));
         }
@@ -67,6 +69,18 @@ namespace LL.User.Configuration
                 identity.RegionCode,
                 context.At(nameof(UserIdentityDefaults.RegionCode)),
                 RegionCaseCode);
+        }
+
+        private static void ValidateHeroSelection(
+            UserHeroSelectionDefaults heroSelection,
+            ValidationContext context)
+        {
+            if (ValidationRules.NotNull(heroSelection, context, HeroSelectionCode) is false)
+                return;
+
+            IdentifierValidator.Validate(
+                heroSelection.HeroId,
+                context.At(nameof(UserHeroSelectionDefaults.HeroId)));
         }
 
         private static void ValidateProgress(

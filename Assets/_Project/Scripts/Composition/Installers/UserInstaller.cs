@@ -49,9 +49,10 @@ namespace LL.Composition.Installers
             builder.Register<UserSessionLoader>(Lifetime.Singleton).As<IDataLoader<UserSnapshot>>();
             builder.RegisterLoadedData<UserSnapshot>();
             builder.RegisterSnapshotPart<UserSnapshot, UserIdentitySnapshot>(snapshot => snapshot.Identity);
-            builder.RegisterSnapshotPart<UserSnapshot, UserItemsSnapshot>(snapshot => snapshot.Items);
+            builder.RegisterSnapshotPart<UserSnapshot, UserHeroSelectionSnapshot>(snapshot => snapshot.HeroSelection);
             builder.RegisterSnapshotPart<UserSnapshot, UserProgressSnapshot>(snapshot => snapshot.Progress);
             builder.RegisterSnapshotPart<UserSnapshot, UserRankUpQuestSnapshot>(snapshot => snapshot.RankUpQuest);
+            builder.RegisterSnapshotPart<UserSnapshot, UserItemsSnapshot>(snapshot => snapshot.Items);
 
             builder
                 .Register<UserItems>(Lifetime.Singleton)

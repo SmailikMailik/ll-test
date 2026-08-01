@@ -68,7 +68,7 @@ group of closely related types. Do not create a one-type folder merely to make t
 | `Infrastructure` | Reusable technical mechanisms | Collection snapshots, compilation and loading contracts, serialization, storage, reporting |
 | `Presentation` | Display meaning without visual lifecycle | Flags, hero portraits, item icons, localization, formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
-| `User` | User defaults, persistence, snapshots, and live state | Identity, inventory, rank progress, rank-up quest |
+| `User` | User defaults, persistence, snapshots, and live state | Identity, hero selection, inventory, rank progress, rank-up quest |
 | `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
 
 `AssemblyInfo.cs` and `LL.Runtime.asmdef` are the only files allowed directly at the runtime root. Adding another

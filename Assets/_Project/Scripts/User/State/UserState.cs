@@ -15,6 +15,7 @@ namespace LL.User.State
         internal Observable<Unit> Changed => _changed;
 
         private readonly UserIdentitySnapshot _identity;
+        private readonly UserHeroSelectionSnapshot _heroSelection;
         private readonly IUserProgress _progress;
         private readonly IUserRankUpQuest _rankUpQuest;
         private readonly IUserItems _items;
@@ -28,11 +29,13 @@ namespace LL.User.State
         [Inject]
         internal UserState(
             UserIdentitySnapshot identity,
+            UserHeroSelectionSnapshot heroSelection,
             IUserProgress progress,
             IUserRankUpQuest rankUpQuest,
             IUserItems items)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
+            _heroSelection = heroSelection ?? throw new ArgumentNullException(nameof(heroSelection));
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
             _items = items ?? throw new ArgumentNullException(nameof(items));
@@ -49,6 +52,7 @@ namespace LL.User.State
         {
             return new UserSnapshot(
                 _identity,
+                _heroSelection,
                 _progress.CreateSnapshot(),
                 _rankUpQuest.CreateSnapshot(),
                 _items.CreateSnapshot());

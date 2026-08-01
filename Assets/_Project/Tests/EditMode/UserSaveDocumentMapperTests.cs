@@ -1,4 +1,5 @@
 using System.Linq;
+using LL.Game.Heroes;
 using LL.Game.Items;
 using LL.Game.Quests;
 using LL.Game.Ranks;
@@ -15,6 +16,7 @@ namespace LL.Tests.EditMode
         {
             var source = new UserSnapshot(
                 new UserIdentitySnapshot("test-user", "RU"),
+                new UserHeroSelectionSnapshot(new HeroId("hero")),
                 new UserProgressSnapshot(new RankId("bronze"), 25),
                 new UserRankUpQuestSnapshot(new QuestId("quest"), 123456L, true),
                 new UserItemsSnapshot(
@@ -29,6 +31,7 @@ namespace LL.Tests.EditMode
 
             Assert.That(restored.Identity.UserId, Is.EqualTo(source.Identity.UserId));
             Assert.That(restored.Identity.RegionCode, Is.EqualTo(source.Identity.RegionCode));
+            Assert.That(restored.HeroSelection.HeroId, Is.EqualTo(source.HeroSelection.HeroId));
             Assert.That(restored.Progress.RankId, Is.EqualTo(source.Progress.RankId));
             Assert.That(restored.Progress.Experience, Is.EqualTo(source.Progress.Experience));
             Assert.That(restored.RankUpQuest.QuestId, Is.EqualTo(source.RankUpQuest.QuestId));

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
 using LL.Game.Items;
 using LL.Game.Ranks;
 using LL.Validation;
@@ -16,6 +17,10 @@ namespace LL.User.Configuration
         [HideLabel]
         [SerializeField] private UserIdentityDefaults _identity = new();
 
+        [BoxGroup("Hero Selection")]
+        [HideLabel]
+        [SerializeField] private UserHeroSelectionDefaults _heroSelection = new();
+
         [BoxGroup("Progress")]
         [HideLabel]
         [SerializeField] private UserProgressDefaults _progress = new();
@@ -31,6 +36,7 @@ namespace LL.User.Configuration
         private static readonly IDataValidator<UserDefaultsConfig> _validator = new UserDefaultsConfigValidator(_itemsValidator);
 
         internal UserIdentityDefaults Identity => _identity;
+        internal UserHeroSelectionDefaults HeroSelection => _heroSelection;
         internal UserProgressDefaults Progress => _progress;
         internal IReadOnlyList<UserItemDefaultEntry> Items => _items;
 
@@ -43,6 +49,16 @@ namespace LL.User.Configuration
         {
             _validator.Validate(this, context);
         }
+    }
+
+    [Serializable]
+    [InlineProperty]
+    internal sealed class UserHeroSelectionDefaults
+    {
+        [LabelText("Hero ID")]
+        [SerializeField] private string _heroId;
+
+        internal HeroId HeroId => new(_heroId);
     }
 
     [Serializable]

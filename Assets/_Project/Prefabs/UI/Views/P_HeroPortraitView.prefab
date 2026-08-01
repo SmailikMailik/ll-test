@@ -188,7 +188,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _image: {fileID: 3885683048809538968}
   _size: 1
-  _initialHeroId: soldier
 --- !u!1 &5024861305724690088
 GameObject:
   m_ObjectHideFlags: 0

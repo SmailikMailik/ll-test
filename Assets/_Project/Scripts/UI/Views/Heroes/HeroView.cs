@@ -3,6 +3,7 @@ using LL.Game.Flags;
 using LL.Game.Heroes;
 using LL.Presentation.Localization;
 using LL.Presentation.Sprites;
+using LL.User.Snapshots;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -16,11 +17,11 @@ namespace LL.UI.Views.Heroes
     {
         [SerializeField] private Image _flagImage;
         [SerializeField] private TMP_Text _nameLabel;
-        [SerializeField] private string _initialHeroId;
 
         private HeroCatalog _heroes;
         private SpriteCatalog<FlagId> _flags;
         private ILocalizationService _localization;
+        private UserHeroSelectionSnapshot _heroSelection;
         private HeroId _heroId;
         private bool _hasHero;
 
@@ -28,19 +29,21 @@ namespace LL.UI.Views.Heroes
         private void Construct(
             HeroCatalog heroes,
             SpriteCatalog<FlagId> flags,
-            ILocalizationService localization)
+            ILocalizationService localization,
+            UserHeroSelectionSnapshot heroSelection)
         {
             _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _flags = flags ?? throw new ArgumentNullException(nameof(flags));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+            _heroSelection = heroSelection ?? throw new ArgumentNullException(nameof(heroSelection));
         }
 
         private void Start()
         {
             _localization.LocaleChanged.Subscribe(_ => OnLocaleChanged()).AddTo(this);
 
-            if (_hasHero is false && string.IsNullOrWhiteSpace(_initialHeroId) is false)
-                Show(new HeroId(_initialHeroId));
+            if (_hasHero is false)
+                Show(_heroSelection.HeroId);
         }
 
         internal void Show(HeroId heroId)
