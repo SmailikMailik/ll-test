@@ -3,6 +3,11 @@
 Этот документ объясняет, какие представления данных существуют в проекте, как они преобразуются друг в друга и
 где искать код каждого этапа.
 
+Текущая реализация хранит один пользовательский прогресс и одно rank-up задание. Целевая модель переносит прогресс и
+попытки повышения внутрь состояния каждого героя и заменяет фиксированные quest/instant ветки набором вариантов с
+требованиями. Решение и порядок перехода определены в [`Ranks-And-Rank-Up.md`](Ranks-And-Rank-Up.md); разделы ниже
+остаются описанием фактически работающего потока до изменения production-кода.
+
 ## Главное различие
 
 Игровые и пользовательские данные решают разные задачи:
@@ -149,7 +154,7 @@ Assets/_Project/Configuration/
 ```mermaid
 classDiagram
     class GameDataDocument {
-        +int Version = 4
+        +int Version = 5
         +RankDocumentEntry[] Ranks
         +CardDocumentEntry[] Cards
         +QuestDocumentEntry[] Quests
@@ -176,7 +181,10 @@ classDiagram
     GameDataDocument *-- QuestDocumentEntry
     GameDataDocument *-- RankUpDocumentEntry
     GameDataDocument *-- RewardDocumentEntry
-    RankUpDocumentEntry *-- PaymentDocumentEntry
+    RankUpDocumentEntry *-- RankUpOptionDocumentEntry
+    RankUpOptionDocumentEntry *-- QuestRankUpRequirementDocumentEntry
+    RankUpOptionDocumentEntry *-- PaymentRankUpRequirementDocumentEntry
+    PaymentRankUpRequirementDocumentEntry *-- PaymentDocumentEntry
     RewardDocumentEntry *-- RewardItemDocumentEntry
 
     GameDataDeclaration *-- RankDeclaration
@@ -184,11 +192,14 @@ classDiagram
     GameDataDeclaration *-- QuestDeclaration
     GameDataDeclaration *-- RankUpDeclaration
     GameDataDeclaration *-- RewardDeclaration
-    RankUpDeclaration *-- PaymentDeclaration
+    RankUpDeclaration *-- RankUpOptionDeclaration
+    RankUpOptionDeclaration *-- QuestRankUpRequirementDeclaration
+    RankUpOptionDeclaration *-- PaymentRankUpRequirementDeclaration
+    PaymentRankUpRequirementDeclaration *-- PaymentDeclaration
     RewardDeclaration *-- RewardItemDeclaration
 ```
 
-Текущая версия внешнего контракта игровых данных — `GameDataDocument.CurrentVersion = 4`.
+Текущая версия внешнего контракта игровых данных — `GameDataDocument.CurrentVersion = 5`.
 
 Файлы разделены, но агрегаты не раздроблены: источник всё ещё возвращает один `GameDataDeclaration`, а сериализатор
 всё ещё читает один `GameDataDocument`.
@@ -236,16 +247,21 @@ flowchart LR
 
 `IDataSource<UserDefaultsDeclaration>` преобразует конкретный источник начальных значений в
 `UserDefaultsDeclaration`.
-Декларация сохраняет те же смысловые группы, что и конфиг и снимок: `Identity`, `Progress` и `Items`.
-`UserDefaultsCompiler` проверяет стартовый ранг, допустимый опыт и наличие всех предметов, используемых встроенными
+Декларация сохраняет те же смысловые группы, что и конфиг и снимок: `Identity`, `HeroSelection`, `Heroes` и `Items`.
+Каждый элемент `Heroes` содержит собственные `HeroId`, ранг и опыт. `UserDefaultsCompiler` проверяет выбранного героя,
+стартовый ранг и допустимый опыт каждого героя, а также наличие всех предметов, используемых встроенными
 правилами, картами, оплатами и наградами, после чего создаёт `UserDefaultsSnapshot`. `UserSessionLoader` сначала
 пытается загрузить сохранение. `UserSnapshotReconciler` проверяет его относительно текущих игровых каталогов,
 заменяет отсутствующего выбранного героя явным героем по умолчанию, добавляет отсутствующие обязательные предметы и
-очищает устаревшее rank-up задание. Несовместимый прогресс приводит к явному сбросу на defaults. Во время сессии
+согласует независимые попытки вариантов повышения каждого героя и очищает устаревшие состояния требований.
+Несовместимый прогресс конкретного героя приводит к явному сбросу этого героя на defaults. Во время сессии
 `UserState` объединяет изменяемые части состояния и сворачивает все
 изменения одной синхронной игровой операции в одно уведомление. `UserSaveCoordinator` собирает частые изменения
 в течение короткого интервала, сохраняет последний итоговый снимок, последовательно повторяет временно неудачную
 запись и принудительно записывает dirty-состояние при завершении.
+
+Текущая версия контракта пользовательского сохранения — `UserSaveDocument.CurrentVersion = 2`. Предыдущий формат не
+мигрируется, поскольку опубликованных сохранений ещё нет; сохранение другой версии считается неподдерживаемым.
 
 ### Файлы пользовательского потока
 
@@ -258,17 +274,17 @@ flowchart LR
 | `Defaults/UserDefaultsCompiler.cs` | Runtime-проверка ссылок и построение согласованного снимка начальных значений |
 | `Defaults/UserDefaultsSnapshot.cs` | Неизменяемые начальные значения для создания нового пользователя |
 | `Persistence/Documents/UserSaveDocument.cs` | Корневой версионируемый контракт сохранения |
-| `Persistence/Documents/*DocumentEntry.cs` | Сериализуемые части identity, hero selection, progress, rank-up quest и inventory |
+| `Persistence/Documents/*DocumentEntry.cs` | Сериализуемые части identity, hero selection, heroes, rank-up attempts и inventory |
 | `Persistence/UserSaveDocumentMapper.cs` | Двустороннее преобразование `UserSaveDocument` ↔ `UserSnapshot` |
 | `Persistence/IUserSaveRepository.cs` | Семантический контракт загрузки и сохранения пользователя |
 | `Persistence/SerializedUserSaveRepository.cs` | I/O, проверка версии и классификация ошибок загрузки |
 | `Persistence/UserLoadResult.cs` и `UserLoadStatus.cs` | Результат загрузки: loaded, not found, corrupted или unsupported version |
 | `Persistence/UserSessionLoader.cs` | Выбрать согласованный сохранённый снимок либо создать значения по умолчанию |
-| `Persistence/UserSnapshotReconciler.cs` | Вернуть явный результат согласования с текущими героями, рангами, предметами и rank-up заданием |
+| `Persistence/UserSnapshotReconciler.cs` | Согласовать героев, ранги, предметы, варианты повышения и состояния их требований |
 | `Snapshots/UserSnapshot.cs` | Корень неизменяемого снимка пользователя |
-| `Snapshots/*Snapshot.cs` | Неизменяемые части identity, hero selection, progress, rank-up quest и inventory |
+| `Snapshots/*Snapshot.cs` | Неизменяемые части identity, hero selection, heroes, rank-up attempts и inventory |
 | `State/UserState.cs` | Объединить части сессии и пакетировать уведомления составных операций |
-| `State/Items`, `State/Progress`, `State/RankUp` | Read-интерфейсы, command-интерфейсы и состояние пользовательских возможностей |
+| `State/Items`, `State/Heroes`, `State/RankUp` | Read-интерфейсы, command-интерфейсы и состояние пользовательских возможностей |
 | `Persistence/UserSaveCoordinator.cs` | Debounce, последовательный retry и финальный flush нового снимка состояния |
 | `Composition/Factories/UserDefaultsSourceFactory.cs` | Выбрать конкретный источник начальных значений |
 | `Composition/Factories/UserSaveRepositoryFactory.cs` | Собрать JSON-сериализацию, файловое хранилище и репозиторий |
@@ -300,8 +316,8 @@ flowchart LR
 4. Проверить изменяемую реализацию в `User/State`.
 5. При проблеме сохранения пройти `UserState.Changed` → `UserSaveCoordinator` → `SerializedUserSaveRepository`.
 
-UI получает неизменяемый снимок выбранного героя и только read-интерфейсы `IUserItems`, `IUserProgress` и
-`IUserRankUpQuest`. Изменения выполняют игровые
+UI получает неизменяемый снимок выбранного героя и только read-интерфейсы `IUserItems`, `IUserHeroProgress` и
+`IUserRankUpAttempts`. Изменения выполняют игровые
 сервисы через соответствующие `*Commands` интерфейсы. Например, кнопка добавления карты вызывает
 `CardCollectionService`, а не изменяет пользовательский инвентарь напрямую.
 

@@ -19,7 +19,8 @@ namespace LL.Tests.EditMode
 
             Assert.That(snapshot.Identity.UserId, Is.EqualTo("test-user"));
             Assert.That(snapshot.HeroSelection.HeroId, Is.EqualTo(new HeroId("hero")));
-            Assert.That(snapshot.Progress.RankId.Value, Is.EqualTo("bronze"));
+            Assert.That(snapshot.Heroes.TryGetHero(new HeroId("hero"), out var hero), Is.True);
+            Assert.That(hero.Progress.RankId.Value, Is.EqualTo("bronze"));
             Assert.That(snapshot.Items.Amounts, Has.Count.EqualTo(ItemIds.All.Count));
         }
 
@@ -36,7 +37,7 @@ namespace LL.Tests.EditMode
             var declaration = new UserDefaultsDeclaration(
                 new UserIdentityDefaultDeclaration("test-user", "RU"),
                 new UserHeroSelectionDefaultDeclaration("hero"),
-                new UserProgressDefaultDeclaration("bronze", 0),
+                new[] { new UserHeroDefaultDeclaration("hero", "bronze", 0) },
                 ItemIds.All
                     .Where(id => id.Equals(ItemIds.Hard) is false)
                     .Select(id => new UserItemDefaultDeclaration(id.Value, 0)));
@@ -57,7 +58,7 @@ namespace LL.Tests.EditMode
             var declaration = new UserDefaultsDeclaration(
                 new UserIdentityDefaultDeclaration("test-user", "RU"),
                 new UserHeroSelectionDefaultDeclaration("unknown"),
-                new UserProgressDefaultDeclaration("bronze", 0),
+                new[] { new UserHeroDefaultDeclaration("hero", "bronze", 0) },
                 ItemIds.All.Select(id => new UserItemDefaultDeclaration(id.Value, 0)));
 
             Assert.Throws<ArgumentException>(() => compiler.Compile(declaration));

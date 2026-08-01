@@ -263,7 +263,7 @@ function Test-DataBoundaryRoles {
 }
 
 function Test-UserStateCommandConsumers {
-    $commandsPattern = "\bIUser(?:Items|Progress|RankUpQuest)Commands\b"
+    $commandsPattern = "\bIUser(?:Items|HeroProgress|RankUpAttempts)Commands\b"
 
     foreach ($file in Get-ChildItem -LiteralPath (Join-Path $scriptsRoot "UI") -Recurse -Filter "*.cs") {
         $content = [IO.File]::ReadAllText($file.FullName)

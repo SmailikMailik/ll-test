@@ -4,33 +4,72 @@ namespace LL.Game.Data.Persistence.Documents
 {
     internal sealed class RankUpDocumentEntry
     {
-        public string RankId { get; }
-        public string QuestId { get; }
         public string HeroId { get; }
-        public int RequiredCount { get; }
-        public int DurationMinutes { get; }
-        public PaymentDocumentEntry QuestPayment { get; }
-        public PaymentDocumentEntry InstantPayment { get; }
+        public string RankId { get; }
         public string RewardId { get; }
+        public RankUpOptionDocumentEntry[] Options { get; }
 
         public RankUpDocumentEntry(
-            string rankId,
-            string questId,
             string heroId,
-            int requiredCount,
-            int durationMinutes,
-            PaymentDocumentEntry questPayment,
-            PaymentDocumentEntry instantPayment,
-            string rewardId)
+            string rankId,
+            string rewardId,
+            RankUpOptionDocumentEntry[] options)
         {
-            RankId = rankId;
-            QuestId = questId;
             HeroId = heroId;
+            RankId = rankId;
+            RewardId = rewardId;
+            Options = options ?? Array.Empty<RankUpOptionDocumentEntry>();
+        }
+    }
+
+    internal sealed class RankUpOptionDocumentEntry
+    {
+        public string OptionId { get; }
+        public QuestRankUpRequirementDocumentEntry[] Quests { get; }
+        public PaymentRankUpRequirementDocumentEntry[] Payments { get; }
+
+        public RankUpOptionDocumentEntry(
+            string optionId,
+            QuestRankUpRequirementDocumentEntry[] quests,
+            PaymentRankUpRequirementDocumentEntry[] payments)
+        {
+            OptionId = optionId;
+            Quests = quests ?? Array.Empty<QuestRankUpRequirementDocumentEntry>();
+            Payments = payments ?? Array.Empty<PaymentRankUpRequirementDocumentEntry>();
+        }
+    }
+
+    internal sealed class QuestRankUpRequirementDocumentEntry
+    {
+        public string RequirementId { get; }
+        public string QuestId { get; }
+        public int RequiredCount { get; }
+        public int DurationMinutes { get; }
+
+        public QuestRankUpRequirementDocumentEntry(
+            string requirementId,
+            string questId,
+            int requiredCount,
+            int durationMinutes)
+        {
+            RequirementId = requirementId;
+            QuestId = questId;
             RequiredCount = requiredCount;
             DurationMinutes = durationMinutes;
-            QuestPayment = questPayment ?? throw new ArgumentNullException(nameof(questPayment));
-            InstantPayment = instantPayment ?? throw new ArgumentNullException(nameof(instantPayment));
-            RewardId = rewardId;
+        }
+    }
+
+    internal sealed class PaymentRankUpRequirementDocumentEntry
+    {
+        public string RequirementId { get; }
+        public PaymentDocumentEntry Payment { get; }
+
+        public PaymentRankUpRequirementDocumentEntry(
+            string requirementId,
+            PaymentDocumentEntry payment)
+        {
+            RequirementId = requirementId;
+            Payment = payment ?? throw new ArgumentNullException(nameof(payment));
         }
     }
 }

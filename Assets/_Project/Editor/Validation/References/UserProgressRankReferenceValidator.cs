@@ -27,20 +27,19 @@ namespace LLEditor.Validation.References
                 return;
 
             ValidateReferences(
-                userDefaults.Progress,
+                userDefaults.Heroes,
                 ranks.Ranks,
                 context
                     .At(AssetDatabase.GetAssetPath(userDefaults))
-                    .At(nameof(UserDefaultsConfig.Progress)));
+                    .At(nameof(UserDefaultsConfig.Heroes)));
         }
 
         private static void ValidateReferences(
-            UserProgressDefaults progress,
+            IReadOnlyList<UserHeroDefaultEntry> heroes,
             IReadOnlyList<RankEntry> ranks,
             ValidationContext context)
         {
-            if (progress is null ||
-                IdentifierValidator.IsValid(progress.RankId) is false ||
+            if (heroes is null ||
                 ranks is null ||
                 ranks.Count == 0)
             {
@@ -57,26 +56,43 @@ namespace LLEditor.Validation.References
                     rankIds.Add(rank.Id);
             }
 
+            for (var index = 0; index < heroes.Count; index++)
+            {
+                var hero = heroes[index];
+
+                if (hero is null || IdentifierValidator.IsValid(hero.RankId) is false)
+                    continue;
+
+                ValidateProgress(hero, ranks, rankIds, context.At(index));
+            }
+        }
+
+        private static void ValidateProgress(
+            UserHeroDefaultEntry hero,
+            IReadOnlyList<RankEntry> ranks,
+            ISet<RankId> rankIds,
+            ValidationContext context)
+        {
             if (ValidationRules.ReferenceExists(
-                    progress.RankId,
+                    hero.RankId,
                     rankIds,
-                    context.At(nameof(UserProgressDefaults.RankId)),
+                    context.At(nameof(UserHeroDefaultEntry.RankId)),
                     RankExistsCode) is false)
             {
                 return;
             }
 
-            var experienceContext = context.At(nameof(UserProgressDefaults.Experience));
+            var experienceContext = context.At(nameof(UserHeroDefaultEntry.Experience));
 
-            if (ValidationRules.NonNegative(progress.Experience, experienceContext, ExperienceCode) is false)
+            if (ValidationRules.NonNegative(hero.Experience, experienceContext, ExperienceCode) is false)
                 return;
 
-            var rankIndex = FindRankIndex(ranks, progress.RankId);
+            var rankIndex = FindRankIndex(ranks, hero.RankId);
 
             if (rankIndex + 1 < ranks.Count)
             {
                 ValidationRules.LessThanOrEqual(
-                    progress.Experience,
+                    hero.Experience,
                     ranks[rankIndex + 1].RequiredExperience,
                     experienceContext,
                     ExperienceMaxCode);
@@ -84,7 +100,7 @@ namespace LLEditor.Validation.References
             }
 
             ValidationRules.Equal(
-                progress.Experience,
+                hero.Experience,
                 0,
                 experienceContext,
                 FinalRankExperienceCode);

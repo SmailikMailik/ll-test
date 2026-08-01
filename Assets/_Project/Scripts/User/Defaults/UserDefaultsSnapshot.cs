@@ -7,18 +7,18 @@ namespace LL.User.Defaults
     {
         private readonly UserIdentitySnapshot _identity;
         private readonly UserHeroSelectionSnapshot _heroSelection;
-        private readonly UserProgressSnapshot _progress;
+        private readonly UserHeroesSnapshot _heroes;
         private readonly UserItemsSnapshot _items;
 
         internal UserDefaultsSnapshot(
             UserIdentitySnapshot identity,
             UserHeroSelectionSnapshot heroSelection,
-            UserProgressSnapshot progress,
+            UserHeroesSnapshot heroes,
             UserItemsSnapshot items)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _heroSelection = heroSelection ?? throw new ArgumentNullException(nameof(heroSelection));
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
+            _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _items = items ?? throw new ArgumentNullException(nameof(items));
         }
 
@@ -27,8 +27,7 @@ namespace LL.User.Defaults
             return new UserSnapshot(
                 _identity,
                 _heroSelection,
-                _progress,
-                UserRankUpQuestSnapshot.Empty,
+                _heroes,
                 _items);
         }
     }

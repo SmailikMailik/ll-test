@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
 using LL.Game.Identifiers;
 using LL.Validation;
 
@@ -15,7 +16,7 @@ namespace LL.User.Configuration
         private const string RegionWhitespaceCode = "user-defaults.identity.region-code.trimmed";
         private const string RegionCaseCode = "user-defaults.identity.region-code.uppercase";
         private const string HeroSelectionCode = "user-defaults.hero-selection.required";
-        private const string ProgressCode = "user-defaults.progress.required";
+        private const string HeroesCode = "user-defaults.heroes.not-empty";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
 
         private readonly IDataValidator<IReadOnlyList<UserItemDefaultEntry>> _itemsValidator;
@@ -34,7 +35,7 @@ namespace LL.User.Configuration
 
             ValidateIdentity(defaults.Identity, context.At(nameof(UserDefaultsConfig.Identity)));
             ValidateHeroSelection(defaults.HeroSelection, context.At(nameof(UserDefaultsConfig.HeroSelection)));
-            ValidateProgress(defaults.Progress, context.At(nameof(UserDefaultsConfig.Progress)));
+            ValidateHeroes(defaults.Heroes, context.At(nameof(UserDefaultsConfig.Heroes)));
             _itemsValidator.Validate(defaults.Items, context.At(nameof(UserDefaultsConfig.Items)));
         }
 
@@ -83,21 +84,35 @@ namespace LL.User.Configuration
                 context.At(nameof(UserHeroSelectionDefaults.HeroId)));
         }
 
-        private static void ValidateProgress(
-            UserProgressDefaults progress,
+        private static void ValidateHeroes(
+            IReadOnlyList<UserHeroDefaultEntry> heroes,
             ValidationContext context)
         {
-            if (ValidationRules.NotNull(progress, context, ProgressCode) is false)
+            if (ValidationRules.NotEmpty(heroes, context, HeroesCode) is false)
                 return;
 
-            IdentifierValidator.Validate(
-                progress.RankId,
-                context.At(nameof(UserProgressDefaults.RankId)));
+            IdentifierCollectionValidator.Validate(
+                heroes,
+                hero => hero.HeroId,
+                context);
 
-            ValidationRules.NonNegative(
-                progress.Experience,
-                context.At(nameof(UserProgressDefaults.Experience)),
-                ExperienceCode);
+            for (var index = 0; index < heroes.Count; index++)
+            {
+                var hero = heroes[index];
+
+                if (hero is null)
+                    continue;
+
+                var heroContext = context.At(index);
+                IdentifierValidator.Validate(
+                    hero.RankId,
+                    heroContext.At(nameof(UserHeroDefaultEntry.RankId)));
+
+                ValidationRules.NonNegative(
+                    hero.Experience,
+                    heroContext.At(nameof(UserHeroDefaultEntry.Experience)),
+                    ExperienceCode);
+            }
         }
     }
 }

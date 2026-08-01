@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Heroes;
-using LL.Game.Payments;
+using LL.Game.RankUp;
 using LL.Presentation.Localization;
 using LL.Presentation.Payments;
 using LL.Presentation.RankUp;
@@ -30,10 +30,15 @@ namespace LL.UI.Windows.Modal
             _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
         }
 
-        public void Confirm(HeroId heroId, Payment payment, Action onConfirmed, Action onRejected)
+        public void Confirm(
+            HeroId heroId,
+            RankUpOptionDefinition option,
+            Action onConfirmed,
+            Action onRejected)
         {
             var hero = _heroes.GetHero(heroId);
-            var priceText = PaymentFormatter.Format(payment);
+            var payment = GetPayment(option);
+            var priceText = payment is null ? string.Empty : PaymentFormatter.Format(payment.Value);
             var priceLabel = TextTags.Style(
                 _localization.GetText(RankUpLocalizationKeys.PriceLabel),
                 TextStyle.Muted);
@@ -58,6 +63,20 @@ namespace LL.UI.Windows.Modal
                 negativeCallback: onRejected,
                 closeCallback: onRejected
             ));
+        }
+
+        private static LL.Game.Payments.Payment? GetPayment(RankUpOptionDefinition option)
+        {
+            if (option is null)
+                throw new ArgumentNullException(nameof(option));
+
+            foreach (var requirement in option.Requirements)
+            {
+                if (requirement is PaymentRankUpRequirementDefinition payment)
+                    return payment.Payment;
+            }
+
+            return null;
         }
     }
 }

@@ -100,12 +100,13 @@ UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository
 короткий debounce, последовательно сохраняет последний снимок, повторяет временно неудачную запись и выполняет
 финальный flush при завершении.
 
-UI получает `UserHeroSelectionSnapshot` и наблюдает `IUserItems`, `IUserProgress` и `IUserRankUpQuest`, но не получает mutating API. Игровые сервисы изменяют
-те же singleton-состояния через отдельные `IUserItemsCommands`, `IUserProgressCommands` и
-`IUserRankUpQuestCommands`.
+UI получает `UserHeroSelectionSnapshot` и наблюдает `IUserItems`, `IUserHeroProgress` и `IUserRankUpAttempts`, но не
+получает mutating API. Игровые сервисы изменяют те же singleton-состояния через отдельные `IUserItemsCommands`,
+`IUserHeroProgressCommands` и `IUserRankUpAttemptsCommands`.
 
 Подробное описание представлений и преобразований находится в
-[`Game-And-User-Data.md`](Game-And-User-Data.md).
+[`Game-And-User-Data.md`](Game-And-User-Data.md). Модель отдельного прогресса каждого героя и произвольного набора
+вариантов повышения определена в [`Ranks-And-Rank-Up.md`](Ranks-And-Rank-Up.md).
 
 ### UI-навигация
 

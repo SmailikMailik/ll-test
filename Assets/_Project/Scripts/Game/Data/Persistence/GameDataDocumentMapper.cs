@@ -50,14 +50,36 @@ namespace LL.Game.Data.Persistence
                 throw new ArgumentException("Rank-up data cannot contain null entries.");
 
             return new RankUpDeclaration(
-                rankUp.RankId,
-                rankUp.QuestId,
                 rankUp.HeroId,
-                rankUp.RequiredCount,
-                rankUp.DurationMinutes,
-                ToPaymentDeclaration(rankUp.QuestPayment),
-                ToPaymentDeclaration(rankUp.InstantPayment),
-                rankUp.RewardId);
+                rankUp.RankId,
+                rankUp.RewardId,
+                rankUp.Options.Select(ToRankUpOptionDeclaration));
+        }
+
+        private static RankUpOptionDeclaration ToRankUpOptionDeclaration(RankUpOptionDocumentEntry option)
+        {
+            return new RankUpOptionDeclaration(
+                option.OptionId,
+                option.Quests.Select(ToQuestRankUpRequirementDeclaration),
+                option.Payments.Select(ToPaymentRankUpRequirementDeclaration));
+        }
+
+        private static QuestRankUpRequirementDeclaration ToQuestRankUpRequirementDeclaration(
+            QuestRankUpRequirementDocumentEntry quest)
+        {
+            return new QuestRankUpRequirementDeclaration(
+                quest.RequirementId,
+                quest.QuestId,
+                quest.RequiredCount,
+                quest.DurationMinutes);
+        }
+
+        private static PaymentRankUpRequirementDeclaration ToPaymentRankUpRequirementDeclaration(
+            PaymentRankUpRequirementDocumentEntry payment)
+        {
+            return new PaymentRankUpRequirementDeclaration(
+                payment.RequirementId,
+                ToPaymentDeclaration(payment.Payment));
         }
 
         private static PaymentDeclaration ToPaymentDeclaration(PaymentDocumentEntry payment)

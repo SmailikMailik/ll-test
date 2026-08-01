@@ -1,8 +1,8 @@
 using System.Linq;
 using LL.Game.Heroes;
 using LL.Game.Items;
-using LL.Game.Quests;
 using LL.Game.Ranks;
+using LL.Game.RankUp;
 using LL.User.Persistence;
 using LL.User.Snapshots;
 using NUnit.Framework;
@@ -17,8 +17,26 @@ namespace LL.Tests.EditMode
             var source = new UserSnapshot(
                 new UserIdentitySnapshot("test-user", "RU"),
                 new UserHeroSelectionSnapshot(new HeroId("hero")),
-                new UserProgressSnapshot(new RankId("bronze"), 25),
-                new UserRankUpQuestSnapshot(new QuestId("quest"), 123456L, true),
+                new UserHeroesSnapshot(
+                    new[]
+                    {
+                        new UserHeroSnapshot(
+                            new HeroId("hero"),
+                            new UserProgressSnapshot(new RankId("bronze"), 25),
+                            new[]
+                            {
+                                new UserRankUpAttemptSnapshot(
+                                    new RankId("bronze"),
+                                    new RankUpOptionId("quest"),
+                                    new[]
+                                    {
+                                        new UserRankUpQuestRequirementSnapshot(
+                                            new RankUpRequirementId("quest"),
+                                            5,
+                                            123456L)
+                                    })
+                            })
+                    }),
                 new UserItemsSnapshot(
                     new[]
                     {
@@ -32,10 +50,12 @@ namespace LL.Tests.EditMode
             Assert.That(restored.Identity.UserId, Is.EqualTo(source.Identity.UserId));
             Assert.That(restored.Identity.RegionCode, Is.EqualTo(source.Identity.RegionCode));
             Assert.That(restored.HeroSelection.HeroId, Is.EqualTo(source.HeroSelection.HeroId));
-            Assert.That(restored.Progress.RankId, Is.EqualTo(source.Progress.RankId));
-            Assert.That(restored.Progress.Experience, Is.EqualTo(source.Progress.Experience));
-            Assert.That(restored.RankUpQuest.QuestId, Is.EqualTo(source.RankUpQuest.QuestId));
-            Assert.That(restored.RankUpQuest.IsCompleted, Is.True);
+            Assert.That(restored.Heroes.TryGetHero(new HeroId("hero"), out var restoredHero), Is.True);
+            Assert.That(source.Heroes.TryGetHero(new HeroId("hero"), out var sourceHero), Is.True);
+            Assert.That(restoredHero.Progress.RankId, Is.EqualTo(sourceHero.Progress.RankId));
+            Assert.That(restoredHero.Progress.Experience, Is.EqualTo(sourceHero.Progress.Experience));
+            Assert.That(restoredHero.RankUpAttempts[0].OptionId, Is.EqualTo(new RankUpOptionId("quest")));
+            Assert.That(restoredHero.RankUpAttempts[0].Quests[0].CurrentCount, Is.EqualTo(5));
             Assert.That(
                 restored.Items.Amounts.Select(item => item.Id),
                 Is.EqualTo(source.Items.Amounts.Select(item => item.Id)));

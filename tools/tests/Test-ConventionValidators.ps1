@@ -103,6 +103,19 @@ try {
         -ExpectedExitCode 1 `
         -ExpectedOutput "Game domain data may use IDataLoader only at GameDataSnapshot boundary"
 
+    $invalidUserCommandsRoot = New-ArchitectureFixture "architecture-invalid-ui-user-commands"
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidUserCommandsRoot "Assets/_Project/Scripts/UI/DirectUserMutation.cs"),
+        "using LL.User.State.Heroes;`nusing LL.User.State.RankUp;`n`nnamespace LL.UI;`n`n" +
+            "internal sealed class DirectUserMutation`n{`n    private IUserHeroProgressCommands _progress;`n" +
+            "    private IUserRankUpAttemptsCommands _attempts;`n}")
+    Invoke-ExpectedResult `
+        -Name "UI user hero commands" `
+        -Script $architectureValidator `
+        -Arguments @("-ProjectRoot", $invalidUserCommandsRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "UI must mutate user state through game services"
+
     $missingContentMenuRoot = New-ArchitectureFixture "architecture-missing-content-menu"
     [IO.Directory]::CreateDirectory(
         (Join-Path $missingContentMenuRoot "Assets/_Project/Scripts/Game/Configuration")) | Out-Null

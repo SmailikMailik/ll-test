@@ -23,7 +23,7 @@ namespace LL.User.Defaults.Sources
             return new UserDefaultsDeclaration(
                 ToUserIdentityDefaultDeclaration(_config.Identity),
                 ToUserHeroSelectionDefaultDeclaration(_config.HeroSelection),
-                ToUserProgressDefaultDeclaration(_config.Progress),
+                _config.Heroes.Select(ToUserHeroDefaultDeclaration),
                 _config.Items.Select(ToUserItemDefaultDeclaration));
         }
 
@@ -38,9 +38,12 @@ namespace LL.User.Defaults.Sources
             return new UserHeroSelectionDefaultDeclaration(heroSelection.HeroId.Value);
         }
 
-        private static UserProgressDefaultDeclaration ToUserProgressDefaultDeclaration(UserProgressDefaults progress)
+        private static UserHeroDefaultDeclaration ToUserHeroDefaultDeclaration(UserHeroDefaultEntry hero)
         {
-            return new UserProgressDefaultDeclaration(progress.RankId.Value, progress.Experience);
+            return new UserHeroDefaultDeclaration(
+                hero.HeroId.Value,
+                hero.RankId.Value,
+                hero.Experience);
         }
 
         private static UserItemDefaultDeclaration ToUserItemDefaultDeclaration(UserItemDefaultEntry item)

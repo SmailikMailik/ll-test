@@ -8,6 +8,8 @@ For a concise map of runtime areas, lifetime boundaries, and core flows, see
 [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md).
 For a detailed walkthrough of the game-data and user-data pipelines, see
 [`Game-And-User-Data.md`](../Architecture/Game-And-User-Data.md).
+For the feature-level agreement on hero experience, rank progression, and configurable rank-up options, see
+[`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md).
 For C# syntax and lifecycle conventions, see [`Code-Style.md`](Code-Style.md). For validation semantics, automated
 coverage, and required verification, see [`Validation.md`](Validation.md).
 
@@ -68,7 +70,7 @@ group of closely related types. Do not create a one-type folder merely to make t
 | `Infrastructure` | Reusable technical mechanisms | Collection snapshots, compilation and loading contracts, serialization, storage, reporting |
 | `Presentation` | Display meaning without visual lifecycle | Flags, hero portraits, item icons, localization, formatting, text tokens, confirmations |
 | `UI` | Concrete visual lifecycle and navigation | Controls, graphics, views, visual states, windows, UI flows |
-| `User` | User defaults, persistence, snapshots, and live state | Identity, hero selection, inventory, rank progress, rank-up quest |
+| `User` | User defaults, persistence, snapshots, and live state | Identity, hero selection, inventory, per-hero rank progress, rank-up attempts |
 | `Validation` | Reusable validation vocabulary | Contexts, issues, results, rules, reporting contracts |
 
 `AssemblyInfo.cs` and `LL.Runtime.asmdef` are the only files allowed directly at the runtime root. Adding another
@@ -124,13 +126,17 @@ and use-case services.
   calculations must remain independent of concrete user-state implementations.
 - UI may consume read-only user-state interfaces for display and queries. Only game application services may consume
   `*Commands` interfaces and mutate user state; UI actions must cross a game service boundary.
-- `Game/RankUp` owns the rules for advancing to the next rank: its quest path, instant-payment path, and reward.
-  `RankUpDefinition` is one immutable rule set, `RankUpQuest` describes its quest path, and `RankUpService` executes
-  the selected path. `RankUpQuestService` is the command boundary for starting, completing, expiring, and clearing
-  the persisted user quest; UI may observe quest state but must issue mutations through this service. Within this
-  feature, use `Definition` for APIs and variables that expose the immutable rule set, and `RankUp` for commands and
-  capability names that describe the player action. Use `RankUp`, never `Promotion`, as the code and folder vocabulary
-  for this feature.
+- `Game/RankUp` owns the rules for advancing a specific hero to the next rank. A `RankUpDefinition` is selected by
+  `(HeroId, RankId)` and exposes a non-empty collection of alternative `RankUpOptionDefinition` values. Each option
+  contains zero or more conjunctive `RankUpRequirementDefinition` values; options are alternatives, and an empty
+  requirement collection intentionally represents a free option. Quest completion, payment, accumulated progress,
+  observed state, and external confirmation are concrete requirement kinds rather than fixed rank-up paths.
+  `RankUpService` activates and completes the option selected by `RankUpOptionId`; UI may observe read-only option
+  status but must issue mutations through this game-service boundary. Detailed semantics and the transition from the
+  current quest/payment implementation are defined in
+  [`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). Within this feature, use `Definition` for APIs and
+  variables that expose immutable rule sets, and `RankUp` for commands and capability names that describe the player
+  action. Use `RankUp`, never `Promotion`, as the code and folder vocabulary for this feature.
 - `Game/Heroes` owns hero identity and immutable hero definitions. A hero definition contains its localized-name key
   and `FlagId`, while rank-up and other game capabilities refer to it only through `HeroId`.
 - `Game/Flags` owns the semantic identity of flags. A `FlagId` names the represented flag directly and must not be
@@ -393,8 +399,10 @@ source is therefore a composition-root change rather than an installer or consum
 
 Current runtime flows, concrete participants, and document versions are descriptive implementation information. Keep
 them synchronized in [`LL-Runtime-Overview.md`](../Architecture/LL-Runtime-Overview.md)
-and [`Game-And-User-Data.md`](../Architecture/Game-And-User-Data.md). The
-normative representation boundaries that those flows must follow remain in this document.
+and [`Game-And-User-Data.md`](../Architecture/Game-And-User-Data.md). Feature-level target behavior for hero experience,
+rank progression, and rank-up options is defined in
+[`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). The normative representation boundaries that those
+flows must follow remain in this document.
 
 ## Dependency rules
 

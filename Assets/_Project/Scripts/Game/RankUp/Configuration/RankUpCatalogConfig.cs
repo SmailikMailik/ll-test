@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using LL.Game.Payments.Configuration;
 using LL.Game.Heroes;
+using LL.Game.Payments.Configuration;
 using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
@@ -37,9 +37,34 @@ namespace LL.Game.RankUp.Configuration
     [Serializable]
     internal sealed class RankUpEntry
     {
-        [SerializeField] private string _rankId;
-        [SerializeField] private string _questId;
         [SerializeField] private string _heroId;
+        [SerializeField] private string _rankId;
+        [SerializeField] private string _rewardId;
+        [SerializeField] private RankUpOptionEntry[] _options;
+
+        internal HeroId HeroId => new(_heroId);
+        internal RankId RankId => new(_rankId);
+        internal RewardId RewardId => new(_rewardId);
+        internal IReadOnlyList<RankUpOptionEntry> Options => _options;
+    }
+
+    [Serializable]
+    internal sealed class RankUpOptionEntry
+    {
+        [SerializeField] private string _optionId;
+        [SerializeField] private QuestRankUpRequirementEntry[] _quests;
+        [SerializeField] private PaymentRankUpRequirementEntry[] _payments;
+
+        internal RankUpOptionId OptionId => new(_optionId);
+        internal IReadOnlyList<QuestRankUpRequirementEntry> Quests => _quests;
+        internal IReadOnlyList<PaymentRankUpRequirementEntry> Payments => _payments;
+    }
+
+    [Serializable]
+    internal sealed class QuestRankUpRequirementEntry
+    {
+        [SerializeField] private string _requirementId;
+        [SerializeField] private string _questId;
 
         [MinValue(1)]
         [SerializeField] private int _requiredCount = 1;
@@ -47,17 +72,19 @@ namespace LL.Game.RankUp.Configuration
         [MinValue(1)]
         [SerializeField] private int _durationMinutes = 1440;
 
-        [SerializeField] private PaymentEntry _questPayment = new();
-        [SerializeField] private PaymentEntry _instantPayment = new();
-        [SerializeField] private string _rewardId;
-
-        internal RankId RankId => new(_rankId);
+        internal RankUpRequirementId RequirementId => new(_requirementId);
         internal QuestId QuestId => new(_questId);
-        internal HeroId HeroId => new(_heroId);
         internal int RequiredCount => _requiredCount;
         internal int DurationMinutes => _durationMinutes;
-        internal PaymentEntry QuestPayment => _questPayment;
-        internal PaymentEntry InstantPayment => _instantPayment;
-        internal RewardId RewardId => new(_rewardId);
+    }
+
+    [Serializable]
+    internal sealed class PaymentRankUpRequirementEntry
+    {
+        [SerializeField] private string _requirementId;
+        [SerializeField] private PaymentEntry _payment = new();
+
+        internal RankUpRequirementId RequirementId => new(_requirementId);
+        internal PaymentEntry Payment => _payment;
     }
 }

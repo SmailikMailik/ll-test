@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Cards;
 using LL.Game.Data;
@@ -33,14 +34,33 @@ namespace LL.Tests.EditMode
                 new[]
                 {
                     new RankUpDeclaration(
-                        "bronze",
-                        "quest",
                         "hero",
-                        1,
-                        10,
-                        new PaymentDeclaration(ItemIds.Soft.Value, 1),
-                        new PaymentDeclaration(ItemIds.Hard.Value, 1),
-                        rewardId)
+                        "bronze",
+                        rewardId,
+                        new[]
+                        {
+                            new RankUpOptionDeclaration(
+                                "quest",
+                                new[]
+                                {
+                                    new QuestRankUpRequirementDeclaration("quest", "quest", 1, 10)
+                                },
+                                new[]
+                                {
+                                    new PaymentRankUpRequirementDeclaration(
+                                        "soft-payment",
+                                        new PaymentDeclaration(ItemIds.Soft.Value, 1))
+                                }),
+                            new RankUpOptionDeclaration(
+                                "instant",
+                                Array.Empty<QuestRankUpRequirementDeclaration>(),
+                                new[]
+                                {
+                                    new PaymentRankUpRequirementDeclaration(
+                                        "hard-payment",
+                                        new PaymentDeclaration(ItemIds.Hard.Value, 1))
+                                })
+                        })
                 },
                 new[]
                 {
@@ -60,7 +80,7 @@ namespace LL.Tests.EditMode
             var declaration = new UserDefaultsDeclaration(
                 new UserIdentityDefaultDeclaration("test-user", "RU"),
                 new UserHeroSelectionDefaultDeclaration("hero"),
-                new UserProgressDefaultDeclaration("bronze", 0),
+                new[] { new UserHeroDefaultDeclaration("hero", "bronze", 0) },
                 ItemIds.All.Select(id => new UserItemDefaultDeclaration(id.Value, 0)));
             var compiler = new UserDefaultsCompiler(
                 gameData.Ranks,
@@ -76,7 +96,7 @@ namespace LL.Tests.EditMode
             RankId? rankId = null,
             HeroId? heroId = null,
             int experience = 0,
-            UserRankUpQuestSnapshot rankUpQuest = null,
+            IReadOnlyList<UserRankUpAttemptSnapshot> rankUpAttempts = null,
             params ItemAmount[] items)
         {
             var amounts = items.Length > 0
@@ -86,8 +106,14 @@ namespace LL.Tests.EditMode
             return new UserSnapshot(
                 new UserIdentitySnapshot("test-user", "RU"),
                 new UserHeroSelectionSnapshot(heroId ?? new HeroId("hero")),
-                new UserProgressSnapshot(rankId ?? new RankId("bronze"), experience),
-                rankUpQuest ?? UserRankUpQuestSnapshot.Empty,
+                new UserHeroesSnapshot(
+                    new[]
+                    {
+                        new UserHeroSnapshot(
+                            heroId ?? new HeroId("hero"),
+                            new UserProgressSnapshot(rankId ?? new RankId("bronze"), experience),
+                            rankUpAttempts ?? Array.Empty<UserRankUpAttemptSnapshot>())
+                    }),
                 new UserItemsSnapshot(amounts));
         }
 
@@ -97,14 +123,32 @@ namespace LL.Tests.EditMode
                 new[]
                 {
                     new RankUpDefinition(
+                        new HeroId("hero"),
                         new RankId("bronze"),
-                        new RankUpQuest(
-                            new QuestId("quest"),
-                            new HeroId("hero"),
-                            1,
-                            TimeSpan.FromMinutes(10d),
-                            new Payment(ItemIds.Soft, 1)),
-                        new Payment(ItemIds.Hard, 1),
+                        new[]
+                        {
+                            new RankUpOptionDefinition(
+                                new RankUpOptionId("quest"),
+                                new RankUpRequirementDefinition[]
+                                {
+                                    new QuestRankUpRequirementDefinition(
+                                        new RankUpRequirementId("quest"),
+                                        new QuestId("quest"),
+                                        1,
+                                        TimeSpan.FromMinutes(10d)),
+                                    new PaymentRankUpRequirementDefinition(
+                                        new RankUpRequirementId("soft-payment"),
+                                        new Payment(ItemIds.Soft, 1))
+                                }),
+                            new RankUpOptionDefinition(
+                                new RankUpOptionId("instant"),
+                                new RankUpRequirementDefinition[]
+                                {
+                                    new PaymentRankUpRequirementDefinition(
+                                        new RankUpRequirementId("hard-payment"),
+                                        new Payment(ItemIds.Hard, 1))
+                                })
+                        },
                         new RewardId("reward"))
                 });
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
 using LL.Game.RankUp;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
@@ -45,10 +46,10 @@ namespace LL.UI.Rewards
             _localization.LocaleChanged.Subscribe(_ => OnLocaleChanged()).AddTo(this);
         }
 
-        internal void ShowNextRank(RankId currentRankId)
+        internal void ShowNextRank(HeroId heroId, RankId currentRankId)
         {
             if (_rankCatalog.TryGetRank(currentRankId, out var currentRank) is false ||
-                _rankUpCatalog.TryGetDefinition(currentRankId, out var definition) is false)
+                _rankUpCatalog.TryGetDefinition(heroId, currentRankId, out var definition) is false)
             {
                 Clear();
                 return;

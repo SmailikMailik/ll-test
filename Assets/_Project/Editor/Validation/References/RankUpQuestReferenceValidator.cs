@@ -38,14 +38,36 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUpEntries[index];
 
-                if (rankUp is null || IdentifierValidator.IsValid(rankUp.QuestId) is false)
+                if (rankUp?.Options is null)
                     continue;
 
-                ValidationRules.ReferenceExists(
-                    rankUp.QuestId,
-                    questIds,
-                    rankUpContext.At(index).At(nameof(RankUpEntry.QuestId)),
-                    QuestExistsCode);
+                for (var optionIndex = 0; optionIndex < rankUp.Options.Count; optionIndex++)
+                {
+                    var option = rankUp.Options[optionIndex];
+
+                    if (option?.Quests is null)
+                        continue;
+
+                    for (var questIndex = 0; questIndex < option.Quests.Count; questIndex++)
+                    {
+                        var quest = option.Quests[questIndex];
+
+                        if (quest is null || IdentifierValidator.IsValid(quest.QuestId) is false)
+                            continue;
+
+                        ValidationRules.ReferenceExists(
+                            quest.QuestId,
+                            questIds,
+                            rankUpContext
+                                .At(index)
+                                .At(nameof(RankUpEntry.Options))
+                                .At(optionIndex)
+                                .At(nameof(RankUpOptionEntry.Quests))
+                                .At(questIndex)
+                                .At(nameof(QuestRankUpRequirementEntry.QuestId)),
+                            QuestExistsCode);
+                    }
+                }
             }
         }
     }

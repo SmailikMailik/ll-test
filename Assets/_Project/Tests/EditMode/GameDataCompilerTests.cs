@@ -1,6 +1,7 @@
 using System;
 using LL.Game.Data;
 using LL.Game.Ranks;
+using LL.Game.RankUp;
 using NUnit.Framework;
 
 namespace LL.Tests.EditMode
@@ -27,6 +28,16 @@ namespace LL.Tests.EditMode
             var declaration = TestDataFactory.CreateGameDataDeclaration("missing-reward");
 
             Assert.Throws<ArgumentException>(() => new GameDataCompiler().Compile(declaration));
+        }
+
+        [Test]
+        public void RankUpOptionMayHaveNoRequirements()
+        {
+            var option = new RankUpOptionDefinition(
+                new RankUpOptionId("free"),
+                Array.Empty<RankUpRequirementDefinition>());
+
+            Assert.That(option.Requirements, Is.Empty);
         }
     }
 }

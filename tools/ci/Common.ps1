@@ -36,9 +36,22 @@ function Invoke-UnityEditor {
     )
 
     $unityEditor = Get-UnityEditorPath
-    & $unityEditor @Arguments
+    $escapedArguments = $Arguments | ForEach-Object {
+        if ($_ -match '\s') {
+            '"' + $_.Replace('"', '\"') + '"'
+        }
+        else {
+            $_
+        }
+    }
+    $process = Start-Process `
+        -FilePath $unityEditor `
+        -ArgumentList $escapedArguments `
+        -WindowStyle Hidden `
+        -Wait `
+        -PassThru
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Unity exited with code $LASTEXITCODE."
+    if ($process.ExitCode -ne 0) {
+        throw "Unity exited with code $($process.ExitCode)."
     }
 }

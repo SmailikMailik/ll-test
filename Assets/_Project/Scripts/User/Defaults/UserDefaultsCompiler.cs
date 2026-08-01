@@ -19,6 +19,7 @@ namespace LL.User.Defaults
     internal sealed class UserDefaultsCompiler : IDataCompiler<UserDefaultsDeclaration, UserDefaultsSnapshot>
     {
         private const string HeroExistsCode = "user-defaults.hero-selection.hero.exists";
+        private const string SelectedHeroDefaultCode = "user-defaults.hero-selection.default.exists";
         private const string RankExistsCode = "user-defaults.progress.rank.exists";
         private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
         private const string ExperienceMaxCode = "user-defaults.progress.experience.maximum";
@@ -55,10 +56,8 @@ namespace LL.User.Defaults
                 throw new ArgumentNullException(nameof(declaration));
 
             var heroId = new HeroId(declaration.HeroSelection.HeroId);
-            EnsureHeroExists(heroId, _heroes);
-
-            var rankId = new RankId(declaration.Progress.RankId);
-            EnsureProgressIsValid(rankId, declaration.Progress.Experience, _ranks);
+            var heroes = CompileHeroes(declaration.Heroes, _heroes, _ranks);
+            EnsureSelectedHeroExists(heroId, heroes);
 
             var itemAmounts = CompileItemAmounts(declaration.Items);
             EnsureRequiredItemsExist(itemAmounts, _cards, _rankUps, _rewards);
@@ -67,24 +66,70 @@ namespace LL.User.Defaults
                 declaration.Identity.UserId,
                 declaration.Identity.RegionCode);
             var heroSelection = new UserHeroSelectionSnapshot(heroId);
-            var progress = new UserProgressSnapshot(rankId, declaration.Progress.Experience);
             var items = new UserItemsSnapshot(itemAmounts);
 
-            return new UserDefaultsSnapshot(identity, heroSelection, progress, items);
+            return new UserDefaultsSnapshot(identity, heroSelection, heroes, items);
         }
 
-        private static void EnsureHeroExists(HeroId heroId, HeroCatalog heroes)
+        private static UserHeroesSnapshot CompileHeroes(
+            IReadOnlyList<UserHeroDefaultDeclaration> declarations,
+            HeroCatalog heroes,
+            RankCatalog ranks)
         {
-            var heroIds = heroes.Heroes.Select(hero => hero.Id).ToHashSet();
+            if (declarations is null)
+                throw new ArgumentNullException(nameof(declarations));
+
+            IdentifierCollectionValidator.EnsureValid(
+                declarations,
+                declaration => new HeroId(declaration.HeroId),
+                nameof(declarations));
+
+            var availableHeroIds = heroes.Heroes.Select(hero => hero.Id).ToHashSet();
+
+            ValidationRunner.EnsureValid(
+                context =>
+                {
+                    for (var index = 0; index < declarations.Count; index++)
+                    {
+                        var declaration = declarations[index];
+                        var heroContext = context.At(index);
+                        ValidationRules.ReferenceExists(
+                            new HeroId(declaration.HeroId),
+                            availableHeroIds,
+                            heroContext.At(nameof(declaration.HeroId)),
+                            HeroExistsCode);
+                        EnsureProgressIsValid(
+                            new RankId(declaration.RankId),
+                            declaration.Experience,
+                            ranks,
+                            heroContext);
+                    }
+                },
+                nameof(declarations));
+
+            return new UserHeroesSnapshot(declarations.Select(ToUserHeroSnapshot));
+        }
+
+        private static UserHeroSnapshot ToUserHeroSnapshot(UserHeroDefaultDeclaration declaration)
+        {
+            return new UserHeroSnapshot(
+                new HeroId(declaration.HeroId),
+                new UserProgressSnapshot(new RankId(declaration.RankId), declaration.Experience),
+                Array.Empty<UserRankUpAttemptSnapshot>());
+        }
+
+        private static void EnsureSelectedHeroExists(
+            HeroId heroId,
+            UserHeroesSnapshot heroes)
+        {
+            var heroIds = heroes.Heroes.Select(hero => hero.HeroId).ToHashSet();
 
             ValidationRunner.EnsureValid(
                 context => ValidationRules.ReferenceExists(
                     heroId,
                     heroIds,
-                    context
-                        .At(nameof(UserDefaultsDeclaration.HeroSelection))
-                        .At(nameof(UserHeroSelectionDefaultDeclaration.HeroId)),
-                    HeroExistsCode),
+                    context.At(nameof(UserDefaultsDeclaration.HeroSelection)),
+                    SelectedHeroDefaultCode),
                 nameof(heroId));
         }
 
@@ -113,51 +158,43 @@ namespace LL.User.Defaults
         private static void EnsureProgressIsValid(
             RankId rankId,
             int experience,
-            RankCatalog ranks)
+            RankCatalog ranks,
+            ValidationContext context)
         {
             var rankIds = ranks.Ranks.Select(definition => definition.Id).ToHashSet();
             ranks.TryGetRank(rankId, out var rank);
 
-            ValidationRunner.EnsureValid(
-                context =>
-                {
-                    if (ValidationRules.ReferenceExists(
-                            rankId,
-                            rankIds,
-                            context
-                                .At(nameof(UserDefaultsDeclaration.Progress))
-                                .At(nameof(UserProgressDefaultDeclaration.RankId)),
-                            RankExistsCode) is false)
-                    {
-                        return;
-                    }
+            if (ValidationRules.ReferenceExists(
+                    rankId,
+                    rankIds,
+                    context.At(nameof(UserHeroDefaultDeclaration.RankId)),
+                    RankExistsCode) is false)
+            {
+                return;
+            }
 
-                    var experienceContext = context
-                        .At(nameof(UserDefaultsDeclaration.Progress))
-                        .At(nameof(UserProgressDefaultDeclaration.Experience));
+            var experienceContext = context.At(nameof(UserHeroDefaultDeclaration.Experience));
 
-                    if (ValidationRules.NonNegative(experience, experienceContext, ExperienceCode) is false)
-                        return;
+            if (ValidationRules.NonNegative(experience, experienceContext, ExperienceCode) is false)
+                return;
 
-                    var rankIndex = rank.Number - 1;
+            var rankIndex = rank.Number - 1;
 
-                    if (rankIndex + 1 < ranks.Ranks.Count)
-                    {
-                        ValidationRules.LessThanOrEqual(
-                            experience,
-                            ranks.Ranks[rankIndex + 1].RequiredExperience,
-                            experienceContext,
-                            ExperienceMaxCode);
-                        return;
-                    }
+            if (rankIndex + 1 < ranks.Ranks.Count)
+            {
+                ValidationRules.LessThanOrEqual(
+                    experience,
+                    ranks.Ranks[rankIndex + 1].RequiredExperience,
+                    experienceContext,
+                    ExperienceMaxCode);
+                return;
+            }
 
-                    ValidationRules.Equal(
-                        experience,
-                        0,
-                        experienceContext,
-                        FinalRankExperienceCode);
-                },
-                nameof(experience));
+            ValidationRules.Equal(
+                experience,
+                0,
+                experienceContext,
+                FinalRankExperienceCode);
         }
 
         private static void EnsureRequiredItemsExist(
@@ -203,16 +240,16 @@ namespace LL.User.Defaults
         {
             foreach (var rankUp in rankUps.Definitions)
             {
-                ValidationRules.ReferenceExists(
-                    rankUp.Quest.Payment.ItemId,
-                    itemIds,
-                    context,
-                    RankUpPaymentItemCode);
-                ValidationRules.ReferenceExists(
-                    rankUp.InstantPayment.ItemId,
-                    itemIds,
-                    context,
-                    RankUpPaymentItemCode);
+                foreach (var payment in rankUp.Options
+                             .SelectMany(option => option.Requirements)
+                             .OfType<PaymentRankUpRequirementDefinition>())
+                {
+                    ValidationRules.ReferenceExists(
+                        payment.Payment.ItemId,
+                        itemIds,
+                        context,
+                        RankUpPaymentItemCode);
+                }
             }
         }
 

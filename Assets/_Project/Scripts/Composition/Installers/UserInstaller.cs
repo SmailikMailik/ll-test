@@ -8,8 +8,8 @@ using LL.User.Defaults.Sources;
 using LL.User.Persistence;
 using LL.User.Snapshots;
 using LL.User.State;
+using LL.User.State.Heroes;
 using LL.User.State.Items;
-using LL.User.State.Progress;
 using LL.User.State.RankUp;
 using VContainer;
 using VContainer.Unity;
@@ -50,23 +50,21 @@ namespace LL.Composition.Installers
             builder.RegisterLoadedData<UserSnapshot>();
             builder.RegisterSnapshotPart<UserSnapshot, UserIdentitySnapshot>(snapshot => snapshot.Identity);
             builder.RegisterSnapshotPart<UserSnapshot, UserHeroSelectionSnapshot>(snapshot => snapshot.HeroSelection);
-            builder.RegisterSnapshotPart<UserSnapshot, UserProgressSnapshot>(snapshot => snapshot.Progress);
-            builder.RegisterSnapshotPart<UserSnapshot, UserRankUpQuestSnapshot>(snapshot => snapshot.RankUpQuest);
+            builder.RegisterSnapshotPart<UserSnapshot, UserHeroesSnapshot>(snapshot => snapshot.Heroes);
             builder.RegisterSnapshotPart<UserSnapshot, UserItemsSnapshot>(snapshot => snapshot.Items);
 
             builder
                 .Register<UserItems>(Lifetime.Singleton)
                 .As<IUserItems>()
                 .As<IUserItemsCommands>();
-            builder
-                .Register<UserRankUpQuest>(Lifetime.Singleton)
-                .As<IUserRankUpQuest>()
-                .As<IUserRankUpQuestCommands>();
             builder.Register<RankProgression>(Lifetime.Singleton).As<IRankProgression>();
             builder
-                .Register<UserProgress>(Lifetime.Singleton)
-                .As<IUserProgress>()
-                .As<IUserProgressCommands>();
+                .Register<UserHeroes>(Lifetime.Singleton)
+                .AsSelf()
+                .As<IUserHeroProgress>()
+                .As<IUserHeroProgressCommands>()
+                .As<IUserRankUpAttempts>()
+                .As<IUserRankUpAttemptsCommands>();
             builder.RegisterEntryPoint<UserState>().AsSelf().As<IUserStateChangeBatch>();
             builder.RegisterEntryPoint<UserSaveCoordinator>();
         }

@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using LL.Game.Heroes;
 using LL.Game.Items;
-using LL.Game.Quests;
 using LL.Game.Ranks;
+using LL.Game.RankUp;
 using LL.User.Persistence;
 using LL.User.Snapshots;
 using NUnit.Framework;
@@ -42,31 +42,39 @@ namespace LL.Tests.EditMode
         }
 
         [Test]
-        public void ExpiredRankUpQuestIsClearedUsingProvidedTime()
+        public void ExpiredRankUpAttemptIsClearedUsingProvidedTime()
         {
-            var quest = new UserRankUpQuestSnapshot(
-                new QuestId("quest"),
-                _now.AddMilliseconds(-1d).ToUnixTimeMilliseconds(),
-                false);
-            var snapshot = TestDataFactory.CreateUserSnapshot(rankUpQuest: quest);
+            var attempt = new UserRankUpAttemptSnapshot(
+                new RankId("bronze"),
+                new RankUpOptionId("quest"),
+                new[]
+                {
+                    new UserRankUpQuestRequirementSnapshot(
+                        new RankUpRequirementId("quest"),
+                        0,
+                        _now.AddMilliseconds(-1d).ToUnixTimeMilliseconds())
+                });
+            var snapshot = TestDataFactory.CreateUserSnapshot(rankUpAttempts: new[] { attempt });
             var reconciler = CreateReconciler();
 
             var result = reconciler.Reconcile(snapshot);
 
             Assert.That(result.Status, Is.EqualTo(UserReconciliationStatus.Changed));
-            Assert.That(result.Snapshot.RankUpQuest, Is.SameAs(UserRankUpQuestSnapshot.Empty));
+            Assert.That(result.Snapshot.Heroes.TryGetHero(new HeroId("hero"), out var hero), Is.True);
+            Assert.That(hero.RankUpAttempts, Is.Empty);
         }
 
         [Test]
-        public void UnknownRankReturnsExplicitIncompatibleResult()
+        public void UnknownHeroRankIsReplacedWithDefaultProgress()
         {
             var snapshot = TestDataFactory.CreateUserSnapshot(rankId: new RankId("unknown"));
             var reconciler = CreateReconciler();
 
             var result = reconciler.Reconcile(snapshot);
 
-            Assert.That(result.Status, Is.EqualTo(UserReconciliationStatus.Incompatible));
-            Assert.That(result.Snapshot, Is.Null);
+            Assert.That(result.Status, Is.EqualTo(UserReconciliationStatus.Changed));
+            Assert.That(result.Snapshot.Heroes.TryGetHero(new HeroId("hero"), out var hero), Is.True);
+            Assert.That(hero.Progress.RankId, Is.EqualTo(new RankId("bronze")));
         }
 
         [Test]

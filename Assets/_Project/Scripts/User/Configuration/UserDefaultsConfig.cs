@@ -21,9 +21,9 @@ namespace LL.User.Configuration
         [HideLabel]
         [SerializeField] private UserHeroSelectionDefaults _heroSelection = new();
 
-        [BoxGroup("Progress")]
-        [HideLabel]
-        [SerializeField] private UserProgressDefaults _progress = new();
+        [BoxGroup("Heroes")]
+        [ValidateInput(nameof(HasValidHeroes), "User hero defaults are invalid.")]
+        [SerializeField] private UserHeroDefaultEntry[] _heroes;
 
         [BoxGroup("Items")]
         [ValidateInput(nameof(HasValidItems), "User item defaults are invalid.")]
@@ -37,8 +37,13 @@ namespace LL.User.Configuration
 
         internal UserIdentityDefaults Identity => _identity;
         internal UserHeroSelectionDefaults HeroSelection => _heroSelection;
-        internal UserProgressDefaults Progress => _progress;
+        internal IReadOnlyList<UserHeroDefaultEntry> Heroes => _heroes;
         internal IReadOnlyList<UserItemDefaultEntry> Items => _items;
+
+        private static bool HasValidHeroes(UserHeroDefaultEntry[] entries)
+        {
+            return entries is not null;
+        }
 
         private static bool HasValidItems(UserItemDefaultEntry[] entries)
         {
@@ -77,8 +82,11 @@ namespace LL.User.Configuration
 
     [Serializable]
     [InlineProperty]
-    internal sealed class UserProgressDefaults
+    internal sealed class UserHeroDefaultEntry
     {
+        [LabelText("Hero ID")]
+        [SerializeField] private string _heroId;
+
         [LabelText("Rank ID")]
         [SerializeField] private string _rankId;
 
@@ -87,6 +95,7 @@ namespace LL.User.Configuration
         [MinValue(0)]
         [SerializeField] private int _experience;
 
+        internal HeroId HeroId => new(_heroId);
         internal RankId RankId => new(_rankId);
         internal int Experience => _experience;
     }

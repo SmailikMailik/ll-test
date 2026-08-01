@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Cards;
+using LL.Game.Heroes;
 using LL.Game.Items;
+using LL.Game.Ranks.Services;
 using LL.User.State;
 using LL.User.State.Items;
-using LL.User.State.Progress;
 using VContainer;
 
 namespace LL.Game.Upgrades.Services
@@ -14,34 +15,31 @@ namespace LL.Game.Upgrades.Services
         private const int MinAmount = 0;
 
         private readonly IUserItemsCommands _userItems;
-        private readonly IUserProgress _userProgress;
-        private readonly IUserProgressCommands _userProgressCommands;
+        private readonly IHeroExperienceService _experienceService;
         private readonly CardCatalog _cardCatalog;
         private readonly IUserStateChangeBatch _changeBatch;
 
         [Inject]
         internal CardExperienceService(
             IUserItemsCommands userItems,
-            IUserProgress userProgress,
-            IUserProgressCommands userProgressCommands,
+            IHeroExperienceService experienceService,
             CardCatalog cardCatalog,
             IUserStateChangeBatch changeBatch)
         {
             _userItems = userItems ?? throw new ArgumentNullException(nameof(userItems));
-            _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _userProgressCommands = userProgressCommands ?? throw new ArgumentNullException(nameof(userProgressCommands));
+            _experienceService = experienceService ?? throw new ArgumentNullException(nameof(experienceService));
             _cardCatalog = cardCatalog ?? throw new ArgumentNullException(nameof(cardCatalog));
             _changeBatch = changeBatch ?? throw new ArgumentNullException(nameof(changeBatch));
         }
 
-        public bool TryApply(IReadOnlyList<ItemAmount> cards)
+        public bool TryApply(HeroId heroId, IReadOnlyList<ItemAmount> cards)
         {
-            return _changeBatch.Execute(() => TryApplyCore(cards));
+            return _changeBatch.Execute(() => TryApplyCore(heroId, cards));
         }
 
-        private bool TryApplyCore(IReadOnlyList<ItemAmount> cards)
+        private bool TryApplyCore(HeroId heroId, IReadOnlyList<ItemAmount> cards)
         {
-            if (TryGetApplication(cards, out var application) is false)
+            if (TryGetApplication(heroId, cards, out var application) is false)
                 return false;
 
             var spentCards = new List<ItemAmount>(cards.Count);
@@ -58,7 +56,7 @@ namespace LL.Game.Upgrades.Services
                 return false;
             }
 
-            if (_userProgressCommands.TryAddExperience(application.GrantedExperience))
+            if (_experienceService.TryGrant(heroId, application.GrantedExperience))
                 return true;
 
             RestoreCards(spentCards);
@@ -66,6 +64,7 @@ namespace LL.Game.Upgrades.Services
         }
 
         public bool TryGetApplication(
+            HeroId heroId,
             IReadOnlyList<ItemAmount> cards,
             out ExperienceApplication application)
         {
@@ -74,7 +73,7 @@ namespace LL.Game.Upgrades.Services
             if (TryCalculateExperience(cards, out var grantedExperience) is false)
                 return false;
 
-            var appliedExperience = _userProgress.GetApplicableExperience(grantedExperience);
+            var appliedExperience = _experienceService.GetApplicableExperience(heroId, grantedExperience);
 
             if (appliedExperience <= MinAmount)
                 return false;

@@ -12,9 +12,8 @@ using LL.Infrastructure.Saving.Storage;
 using LL.User.Persistence;
 using LL.User.Snapshots;
 using LL.User.State;
+using LL.User.State.Heroes;
 using LL.User.State.Items;
-using LL.User.State.Progress;
-using LL.User.State.RankUp;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -37,6 +36,7 @@ namespace LL.Tests.EditMode
             var result = repository.Load();
 
             Assert.That(result.Status, Is.EqualTo(UserLoadStatus.Loaded));
+            Assert.That(UserSaveDocumentMapper.ToDocument(result.Snapshot).Version, Is.EqualTo(2));
             Assert.That(result.Snapshot.Identity.UserId, Is.EqualTo(source.Identity.UserId));
             Assert.That(result.Snapshot.Items.Amounts[0].Amount, Is.EqualTo(15));
         }
@@ -71,14 +71,24 @@ namespace LL.Tests.EditMode
                 new[]
                 {
                     new RankUpDocumentEntry(
-                        "bronze",
-                        "quest",
                         "hero",
-                        20,
-                        10,
-                        new PaymentDocumentEntry("soft", 1),
-                        new PaymentDocumentEntry("hard", 1),
-                        "reward")
+                        "bronze",
+                        "reward",
+                        new[]
+                        {
+                            new RankUpOptionDocumentEntry(
+                                "quest",
+                                new[]
+                                {
+                                    new QuestRankUpRequirementDocumentEntry("quest", "quest", 20, 10)
+                                },
+                                new[]
+                                {
+                                    new PaymentRankUpRequirementDocumentEntry(
+                                        "soft-payment",
+                                        new PaymentDocumentEntry("soft", 1))
+                                })
+                        })
                 },
                 Array.Empty<RewardDocumentEntry>());
 
@@ -88,8 +98,8 @@ namespace LL.Tests.EditMode
             Assert.That(json, Does.Contain("\"RequiredCount\": 20"));
             Assert.That(json, Does.Not.Contain("RequiredAmount"));
             Assert.That(serializer.TryDeserialize(bytes, out GameDataDocument restored), Is.True);
-            Assert.That(restored.Version, Is.EqualTo(4));
-            Assert.That(restored.RankUps[0].RequiredCount, Is.EqualTo(20));
+            Assert.That(restored.Version, Is.EqualTo(5));
+            Assert.That(restored.RankUps[0].Options[0].Quests[0].RequiredCount, Is.EqualTo(20));
         }
 
         [Test]
@@ -100,9 +110,8 @@ namespace LL.Tests.EditMode
             var initial = TestDataFactory.CreateUserSnapshot();
             var items = new UserItems(initial.Items);
             var progression = new RankProgression(gameData.Ranks);
-            var progress = new UserProgress(initial.Progress, progression);
-            var rankUpQuest = new UserRankUpQuest(initial.RankUpQuest, timeProvider);
-            var state = new UserState(initial.Identity, initial.HeroSelection, progress, rankUpQuest, items);
+            var heroes = new UserHeroes(initial.Heroes, progression, timeProvider);
+            var state = new UserState(initial.Identity, initial.HeroSelection, heroes, items);
             var repository = new RecordingUserSaveRepository();
             var coordinator = new UserSaveCoordinator(state, repository, timeProvider);
 
@@ -129,8 +138,7 @@ namespace LL.Tests.EditMode
                 coordinator.Dispose();
                 state.Dispose();
                 items.Dispose();
-                progress.Dispose();
-                rankUpQuest.Dispose();
+                heroes.Dispose();
             }
         }
 
@@ -142,9 +150,8 @@ namespace LL.Tests.EditMode
             var initial = TestDataFactory.CreateUserSnapshot();
             var items = new UserItems(initial.Items);
             var progression = new RankProgression(gameData.Ranks);
-            var progress = new UserProgress(initial.Progress, progression);
-            var rankUpQuest = new UserRankUpQuest(initial.RankUpQuest, timeProvider);
-            var state = new UserState(initial.Identity, initial.HeroSelection, progress, rankUpQuest, items);
+            var heroes = new UserHeroes(initial.Heroes, progression, timeProvider);
+            var state = new UserState(initial.Identity, initial.HeroSelection, heroes, items);
             var repository = new RecordingUserSaveRepository(1);
             var coordinator = new UserSaveCoordinator(state, repository, timeProvider);
 
@@ -168,8 +175,7 @@ namespace LL.Tests.EditMode
                 coordinator.Dispose();
                 state.Dispose();
                 items.Dispose();
-                progress.Dispose();
-                rankUpQuest.Dispose();
+                heroes.Dispose();
             }
         }
 

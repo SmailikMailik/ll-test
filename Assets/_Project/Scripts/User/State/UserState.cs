@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using LL.User.Snapshots;
+using LL.User.State.Heroes;
 using LL.User.State.Items;
-using LL.User.State.Progress;
-using LL.User.State.RankUp;
 using R3;
 using VContainer;
 using VContainer.Unity;
@@ -16,8 +15,7 @@ namespace LL.User.State
 
         private readonly UserIdentitySnapshot _identity;
         private readonly UserHeroSelectionSnapshot _heroSelection;
-        private readonly IUserProgress _progress;
-        private readonly IUserRankUpQuest _rankUpQuest;
+        private readonly UserHeroes _heroes;
         private readonly IUserItems _items;
 
         private readonly Subject<Unit> _changed = new();
@@ -30,22 +28,19 @@ namespace LL.User.State
         internal UserState(
             UserIdentitySnapshot identity,
             UserHeroSelectionSnapshot heroSelection,
-            IUserProgress progress,
-            IUserRankUpQuest rankUpQuest,
+            UserHeroes heroes,
             IUserItems items)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _heroSelection = heroSelection ?? throw new ArgumentNullException(nameof(heroSelection));
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
+            _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _items = items ?? throw new ArgumentNullException(nameof(items));
         }
 
         public void Initialize()
         {
             _subscriptions.Add(_items.Changed.Subscribe(OnStateChanged));
-            _subscriptions.Add(_progress.Changed.Subscribe(OnStateChanged));
-            _subscriptions.Add(_rankUpQuest.Changed.Subscribe(OnStateChanged));
+            _subscriptions.Add(_heroes.Changed.Subscribe(OnStateChanged));
         }
 
         internal UserSnapshot CreateSnapshot()
@@ -53,8 +48,7 @@ namespace LL.User.State
             return new UserSnapshot(
                 _identity,
                 _heroSelection,
-                _progress.CreateSnapshot(),
-                _rankUpQuest.CreateSnapshot(),
+                _heroes.CreateSnapshot(),
                 _items.CreateSnapshot());
         }
 

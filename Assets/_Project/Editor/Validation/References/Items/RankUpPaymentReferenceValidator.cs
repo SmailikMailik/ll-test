@@ -47,23 +47,38 @@ namespace LLEditor.Validation.References.Items
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp is null)
+                if (rankUp?.Options is null)
                     continue;
 
-                ValidatePayment(
-                    rankUp.QuestPayment,
-                    configContext.At(index).At(nameof(RankUpEntry.QuestPayment)),
-                    hasUserItems,
-                    userItemIds,
-                    hasIcons,
-                    iconIds);
-                ValidatePayment(
-                    rankUp.InstantPayment,
-                    configContext.At(index).At(nameof(RankUpEntry.InstantPayment)),
-                    hasUserItems,
-                    userItemIds,
-                    hasIcons,
-                    iconIds);
+                for (var optionIndex = 0; optionIndex < rankUp.Options.Count; optionIndex++)
+                {
+                    var option = rankUp.Options[optionIndex];
+
+                    if (option?.Payments is null)
+                        continue;
+
+                    for (var paymentIndex = 0; paymentIndex < option.Payments.Count; paymentIndex++)
+                    {
+                        var payment = option.Payments[paymentIndex];
+
+                        if (payment is null)
+                            continue;
+
+                        ValidatePayment(
+                            payment.Payment,
+                            configContext
+                                .At(index)
+                                .At(nameof(RankUpEntry.Options))
+                                .At(optionIndex)
+                                .At(nameof(RankUpOptionEntry.Payments))
+                                .At(paymentIndex)
+                                .At(nameof(PaymentRankUpRequirementEntry.Payment)),
+                            hasUserItems,
+                            userItemIds,
+                            hasIcons,
+                            iconIds);
+                    }
+                }
             }
         }
 

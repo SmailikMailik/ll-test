@@ -76,14 +76,36 @@ namespace LL.Game.Data.Sources
         private static RankUpDeclaration ToRankUpDeclaration(RankUpEntry rankUp)
         {
             return new RankUpDeclaration(
-                rankUp.RankId.Value,
-                rankUp.QuestId.Value,
                 rankUp.HeroId.Value,
-                rankUp.RequiredCount,
-                rankUp.DurationMinutes,
-                ToPaymentDeclaration(rankUp.QuestPayment),
-                ToPaymentDeclaration(rankUp.InstantPayment),
-                rankUp.RewardId.Value);
+                rankUp.RankId.Value,
+                rankUp.RewardId.Value,
+                rankUp.Options.Select(ToRankUpOptionDeclaration));
+        }
+
+        private static RankUpOptionDeclaration ToRankUpOptionDeclaration(RankUpOptionEntry option)
+        {
+            return new RankUpOptionDeclaration(
+                option.OptionId.Value,
+                option.Quests.Select(ToQuestRankUpRequirementDeclaration),
+                option.Payments.Select(ToPaymentRankUpRequirementDeclaration));
+        }
+
+        private static QuestRankUpRequirementDeclaration ToQuestRankUpRequirementDeclaration(
+            QuestRankUpRequirementEntry quest)
+        {
+            return new QuestRankUpRequirementDeclaration(
+                quest.RequirementId.Value,
+                quest.QuestId.Value,
+                quest.RequiredCount,
+                quest.DurationMinutes);
+        }
+
+        private static PaymentRankUpRequirementDeclaration ToPaymentRankUpRequirementDeclaration(
+            PaymentRankUpRequirementEntry payment)
+        {
+            return new PaymentRankUpRequirementDeclaration(
+                payment.RequirementId.Value,
+                ToPaymentDeclaration(payment.Payment));
         }
 
         private static PaymentDeclaration ToPaymentDeclaration(PaymentEntry payment)
