@@ -10,6 +10,7 @@ namespace LL.Composition.Scopes
     internal sealed class BootstrapLifetimeScope : LifetimeScope
     {
         [SerializeField] private ProgressBar _progressBar;
+
         [Min(0f)]
         [SerializeField] private float _minDisplaySeconds = 0.75f;
 

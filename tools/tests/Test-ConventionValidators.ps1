@@ -147,6 +147,10 @@ try {
             "    private readonly object _dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException;`n`n" +
             "    internal LongGuard(object dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException)`n    {`n" +
             "        _dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException = dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException ?? throw new ArgumentNullException(nameof(dependencyWithAnIntentionallyLongNameForTestingTheHardLimitException));`n    }`n}")
+    [IO.File]::WriteAllText(
+        (Join-Path $validStyleRoot "Scripts/Game/AttributedFields.cs"),
+        "internal sealed class AttributedFields`n{`n    [SerializeField] private string _id;`n`n" +
+            "    [MinValue(1)]`n    [SerializeField] private int _amount;`n}")
     Invoke-ExpectedResult `
         -Name "Valid code style" `
         -Script $codeStyleValidator `
@@ -269,6 +273,20 @@ try {
         -Arguments @("-ProjectAssetsRoot", $invalidAttributeLayerRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "Presentation and value-validation attributes must use separate layers"
+
+    $invalidAttributedFieldSpacingRoot = Join-Path $fixtureRoot "style-invalid-attributed-field-spacing"
+    [IO.Directory]::CreateDirectory(
+        (Join-Path $invalidAttributedFieldSpacingRoot "Scripts/Game")) | Out-Null
+    [IO.File]::WriteAllText(
+        (Join-Path $invalidAttributedFieldSpacingRoot "Scripts/Game/Config.cs"),
+        "internal sealed class Config`n{`n    [SerializeField] private string _id;`n" +
+            "    [MinValue(1)]`n    [SerializeField] private int _amount;`n}")
+    Invoke-ExpectedResult `
+        -Name "Invalid attributed field spacing" `
+        -Script $codeStyleValidator `
+        -Arguments @("-ProjectAssetsRoot", $invalidAttributedFieldSpacingRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Attributed field block must be separated from the preceding field by a blank line"
 
     $validOdinRoot = Join-Path $fixtureRoot "odin-valid-catalog"
     [IO.Directory]::CreateDirectory((Join-Path $validOdinRoot "Scripts/Game/Configuration")) | Out-Null

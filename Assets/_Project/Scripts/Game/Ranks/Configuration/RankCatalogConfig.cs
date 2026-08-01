@@ -33,6 +33,7 @@ namespace LL.Game.Ranks.Configuration
     internal sealed class RankEntry
     {
         [SerializeField] private string _id;
+
         [MinValue(0)]
         [SerializeField] private int _requiredExperience;
 

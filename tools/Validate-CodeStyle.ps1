@@ -162,8 +162,49 @@ function Test-EnumDeclarations {
     }
 }
 
+function Test-FieldDeclarationLine {
+    param([string]$Line)
+
+    return $Line -match (
+        "^[ \t]*(?:\[[^\]\r\n]+\][ \t]+)*(?:private|protected|public|internal)[ \t]+" +
+        "(?![^;\r\n]*\bevent\b)(?![^;\r\n]*=>)(?![^;\r\n]*\()[^;{}\r\n]+;[ \t]*$")
+}
+
+function Test-AttributedFieldSpacing {
+    foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter "*.cs") {
+        $content = Remove-CSharpCommentsAndLiterals ([IO.File]::ReadAllText($file.FullName))
+        $lines = [regex]::Split($content, "\r\n|\r|\n")
+
+        for ($index = 1; $index -lt $lines.Length; $index++) {
+            if (
+                $lines[$index] -notmatch "^[ \t]*\[[^\]\r\n]+\][ \t]*$" -or
+                [string]::IsNullOrWhiteSpace($lines[$index - 1]) -or
+                (Test-FieldDeclarationLine $lines[$index - 1]) -eq $false) {
+                continue
+            }
+
+            $declarationIndex = $index
+
+            while (
+                $declarationIndex -lt $lines.Length -and
+                $lines[$declarationIndex] -match "^[ \t]*\[[^\]\r\n]+\][ \t]*$") {
+                $declarationIndex++
+            }
+
+            if (
+                $declarationIndex -lt $lines.Length -and
+                (Test-FieldDeclarationLine $lines[$declarationIndex])) {
+                Add-CodeStyleError (
+                    "Attributed field block must be separated from the preceding field by a blank line: " +
+                    "$($file.FullName):$($index + 1)")
+            }
+        }
+    }
+}
+
 Test-EnumDeclarations
 Test-UnityNullPatterns
+Test-AttributedFieldSpacing
 
 foreach ($file in Get-ChildItem -LiteralPath $projectAssetsRoot -Recurse -Filter "*.cs") {
     $content = [IO.File]::ReadAllText($file.FullName)

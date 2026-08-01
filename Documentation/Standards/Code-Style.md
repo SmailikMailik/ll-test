@@ -85,11 +85,17 @@ exception set.
 - Presentation attributes such as `PreviewField`, `TableColumnWidth`, `SuffixLabel`, and `Tooltip` belong on the
   first line. Value constraints such as `ValidateInput`, `Min`, `Max`, `Range`, `MinValue`, and `MaxValue` belong on
   the next line. Omit a layer when it has no attributes.
+- Treat the attribute lines and declaration as one field block. When such a block starts with an attribute on its
+  own line and follows another field, put one blank line before the block. Keep the block itself contiguous: do not
+  put blank lines between its attribute layers or between the final attribute layer and the declaration. Fields
+  whose attributes all remain inline with their declarations may stay adjacent without blank lines.
 - For example:
 
   ```csharp
-  [SpritePreview]
-  [SerializeField, Required] private Sprite _icon;
+  [SerializeField] private string _itemId;
+
+  [MinValue(1)]
+  [SerializeField] private int _amount = 1;
   ```
 - Serialized-field migration rules belong to the authored-asset section of `Architecture.md` because they protect
   persisted data rather than formatting.
