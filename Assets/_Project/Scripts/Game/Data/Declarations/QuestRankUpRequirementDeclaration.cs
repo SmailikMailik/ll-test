@@ -1,8 +1,7 @@
 namespace LL.Game.Data.Declarations
 {
-    internal sealed class QuestRankUpRequirementDeclaration
+    internal sealed class QuestRankUpRequirementDeclaration : RankUpRequirementDeclaration
     {
-        internal string RequirementId { get; }
         internal string QuestId { get; }
         internal int RequiredCount { get; }
         internal int DurationMinutes { get; }
@@ -11,9 +10,8 @@ namespace LL.Game.Data.Declarations
             string requirementId,
             string questId,
             int requiredCount,
-            int durationMinutes)
+            int durationMinutes) : base(requirementId)
         {
-            RequirementId = requirementId;
             QuestId = questId;
             RequiredCount = requiredCount;
             DurationMinutes = durationMinutes;

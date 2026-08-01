@@ -60,8 +60,20 @@ namespace LL.Game.Data.Persistence
         {
             return new RankUpOptionDeclaration(
                 option.OptionId,
-                option.Quests.Select(ToQuestRankUpRequirementDeclaration),
-                option.Payments.Select(ToPaymentRankUpRequirementDeclaration));
+                option.Requirements.Select(ToRankUpRequirementDeclaration));
+        }
+
+        private static RankUpRequirementDeclaration ToRankUpRequirementDeclaration(
+            RankUpRequirementDocumentEntry requirement)
+        {
+            return requirement switch
+            {
+                QuestRankUpRequirementDocumentEntry quest => ToQuestRankUpRequirementDeclaration(quest),
+                PaymentRankUpRequirementDocumentEntry payment => ToPaymentRankUpRequirementDeclaration(payment),
+                _ => throw new ArgumentException(
+                    $"Unsupported rank-up requirement type '{requirement?.GetType().Name}'.",
+                    nameof(requirement))
+            };
         }
 
         private static QuestRankUpRequirementDeclaration ToQuestRankUpRequirementDeclaration(

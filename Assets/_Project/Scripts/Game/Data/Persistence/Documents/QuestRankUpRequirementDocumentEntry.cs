@@ -1,8 +1,7 @@
 namespace LL.Game.Data.Persistence.Documents
 {
-    internal sealed class QuestRankUpRequirementDocumentEntry
+    internal sealed class QuestRankUpRequirementDocumentEntry : RankUpRequirementDocumentEntry
     {
-        public string RequirementId { get; }
         public string QuestId { get; }
         public int RequiredCount { get; }
         public int DurationMinutes { get; }
@@ -11,9 +10,8 @@ namespace LL.Game.Data.Persistence.Documents
             string requirementId,
             string questId,
             int requiredCount,
-            int durationMinutes)
+            int durationMinutes) : base(requirementId)
         {
-            RequirementId = requirementId;
             QuestId = questId;
             RequiredCount = requiredCount;
             DurationMinutes = durationMinutes;

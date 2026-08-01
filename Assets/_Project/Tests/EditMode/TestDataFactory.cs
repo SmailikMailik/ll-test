@@ -41,25 +41,24 @@ namespace LL.Tests.EditMode
                         {
                             new RankUpOptionDeclaration(
                                 "quest",
-                                new[]
+                                new RankUpRequirementDeclaration[]
                                 {
-                                    new QuestRankUpRequirementDeclaration("quest", "quest", 1, 10)
-                                },
-                                new[]
-                                {
+                                    new QuestRankUpRequirementDeclaration("quest", "quest", 1, 10),
                                     new PaymentRankUpRequirementDeclaration(
                                         "soft-payment",
                                         new PaymentDeclaration(ItemIds.Soft.Value, 1))
                                 }),
                             new RankUpOptionDeclaration(
                                 "instant",
-                                Array.Empty<QuestRankUpRequirementDeclaration>(),
-                                new[]
+                                new RankUpRequirementDeclaration[]
                                 {
                                     new PaymentRankUpRequirementDeclaration(
                                         "hard-payment",
                                         new PaymentDeclaration(ItemIds.Hard.Value, 1))
-                                })
+                                }),
+                            new RankUpOptionDeclaration(
+                                "free",
+                                Array.Empty<RankUpRequirementDeclaration>())
                         })
                 },
                 new[]

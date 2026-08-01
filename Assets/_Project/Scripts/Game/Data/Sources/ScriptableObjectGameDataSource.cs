@@ -86,8 +86,20 @@ namespace LL.Game.Data.Sources
         {
             return new RankUpOptionDeclaration(
                 option.OptionId.Value,
-                option.Quests.Select(ToQuestRankUpRequirementDeclaration),
-                option.Payments.Select(ToPaymentRankUpRequirementDeclaration));
+                option.Requirements.Select(ToRankUpRequirementDeclaration));
+        }
+
+        private static RankUpRequirementDeclaration ToRankUpRequirementDeclaration(
+            RankUpRequirementEntry requirement)
+        {
+            return requirement switch
+            {
+                QuestRankUpRequirementEntry quest => ToQuestRankUpRequirementDeclaration(quest),
+                PaymentRankUpRequirementEntry payment => ToPaymentRankUpRequirementDeclaration(payment),
+                _ => throw new ArgumentException(
+                    $"Unsupported rank-up requirement type '{requirement?.GetType().Name}'.",
+                    nameof(requirement))
+            };
         }
 
         private static QuestRankUpRequirementDeclaration ToQuestRankUpRequirementDeclaration(

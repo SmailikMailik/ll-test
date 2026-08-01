@@ -78,12 +78,9 @@ namespace LL.Tests.EditMode
                         {
                             new RankUpOptionDocumentEntry(
                                 "quest",
-                                new[]
+                                new RankUpRequirementDocumentEntry[]
                                 {
-                                    new QuestRankUpRequirementDocumentEntry("quest", "quest", 20, 10)
-                                },
-                                new[]
-                                {
+                                    new QuestRankUpRequirementDocumentEntry("quest", "quest", 20, 10),
                                     new PaymentRankUpRequirementDocumentEntry(
                                         "soft-payment",
                                         new PaymentDocumentEntry("soft", 1))
@@ -95,11 +92,19 @@ namespace LL.Tests.EditMode
             Assert.That(serializer.TrySerialize(document, out var bytes), Is.True);
 
             var json = Encoding.UTF8.GetString(bytes);
+            Assert.That(json, Does.Contain("\"Type\": \"quest\""));
+            Assert.That(json, Does.Contain("\"Type\": \"payment\""));
             Assert.That(json, Does.Contain("\"RequiredCount\": 20"));
             Assert.That(json, Does.Not.Contain("RequiredAmount"));
+            Assert.That(json, Does.Not.Contain("$type"));
             Assert.That(serializer.TryDeserialize(bytes, out GameDataDocument restored), Is.True);
-            Assert.That(restored.Version, Is.EqualTo(5));
-            Assert.That(restored.RankUps[0].Options[0].Quests[0].RequiredCount, Is.EqualTo(20));
+            Assert.That(restored.Version, Is.EqualTo(6));
+            Assert.That(
+                restored.RankUps[0].Options[0].Requirements[0],
+                Is.TypeOf<QuestRankUpRequirementDocumentEntry>());
+            Assert.That(
+                ((QuestRankUpRequirementDocumentEntry)restored.RankUps[0].Options[0].Requirements[0]).RequiredCount,
+                Is.EqualTo(20));
         }
 
         [Test]

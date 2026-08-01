@@ -9,9 +9,9 @@ namespace LL.Game.RankUp.Configuration
     {
         private const string EntriesCode = "rank-up.entries.required";
         private const string OptionsCode = "rank-up.options.not-empty";
-        private const string QuestsCode = "rank-up.option.quests.required";
-        private const string PaymentsCode = "rank-up.option.payments.required";
+        private const string RequirementsCode = "rank-up.option.requirements.required";
         private const string RequirementCode = "rank-up.requirement.required";
+        private const string RequirementTypeCode = "rank-up.requirement.type.supported";
         private const string RequiredCountCode = "rank-up.quest.count.positive";
         private const string DurationCode = "rank-up.quest.duration.positive";
 
@@ -64,44 +64,53 @@ namespace LL.Game.RankUp.Configuration
             RankUpOptionEntry option,
             ValidationContext context)
         {
-            if (ValidationRules.NotNull(option.Quests, context.At(nameof(option.Quests)), QuestsCode) is false ||
-                ValidationRules.NotNull(option.Payments, context.At(nameof(option.Payments)), PaymentsCode) is false)
-            {
+            if (ValidationRules.NotNull(
+                    option.Requirements,
+                    context.At(nameof(option.Requirements)),
+                    RequirementsCode) is false)
                 return;
-            }
 
             var requirementIds = new HashSet<RankUpRequirementId>();
 
-            for (var index = 0; index < option.Quests.Count; index++)
+            for (var index = 0; index < option.Requirements.Count; index++)
             {
-                var quest = option.Quests[index];
+                var requirement = option.Requirements[index];
 
-                if (quest is null)
+                if (requirement is null)
                     continue;
 
-                var questContext = context.At(nameof(option.Quests)).At(index);
-                ValidateRequirementId(quest.RequirementId, requirementIds, questContext);
-                IdentifierValidator.Validate(quest.QuestId, questContext.At(nameof(quest.QuestId)));
-                ValidationRules.Positive(
-                    quest.RequiredCount,
-                    questContext.At(nameof(quest.RequiredCount)),
-                    RequiredCountCode);
-                ValidationRules.Positive(
-                    quest.DurationMinutes,
-                    questContext.At(nameof(quest.DurationMinutes)),
-                    DurationCode);
+                var requirementContext = context.At(nameof(option.Requirements)).At(index);
+                ValidateRequirementId(requirement.RequirementId, requirementIds, requirementContext);
+                ValidateRequirement(requirement, requirementContext);
             }
+        }
 
-            for (var index = 0; index < option.Payments.Count; index++)
+        private static void ValidateRequirement(
+            RankUpRequirementEntry requirement,
+            ValidationContext context)
+        {
+            switch (requirement)
             {
-                var payment = option.Payments[index];
-
-                if (payment is null)
-                    continue;
-
-                var paymentContext = context.At(nameof(option.Payments)).At(index);
-                ValidateRequirementId(payment.RequirementId, requirementIds, paymentContext);
-                _paymentValidator.Validate(payment.Payment, paymentContext.At(nameof(payment.Payment)));
+                case QuestRankUpRequirementEntry quest:
+                    IdentifierValidator.Validate(quest.QuestId, context.At(nameof(quest.QuestId)));
+                    ValidationRules.Positive(
+                        quest.RequiredCount,
+                        context.At(nameof(quest.RequiredCount)),
+                        RequiredCountCode);
+                    ValidationRules.Positive(
+                        quest.DurationMinutes,
+                        context.At(nameof(quest.DurationMinutes)),
+                        DurationCode);
+                    break;
+                case PaymentRankUpRequirementEntry payment:
+                    _paymentValidator.Validate(payment.Payment, context.At(nameof(payment.Payment)));
+                    break;
+                default:
+                    context.Report(
+                        ValidationSeverity.Error,
+                        RequirementTypeCode,
+                        $"Unsupported rank-up requirement type '{requirement.GetType().Name}'.");
+                    break;
             }
         }
 

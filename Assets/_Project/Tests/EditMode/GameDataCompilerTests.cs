@@ -20,6 +20,10 @@ namespace LL.Tests.EditMode
             Assert.That(snapshot.Rewards.Rewards, Has.Count.EqualTo(1));
             Assert.That(progress.RankNumber, Is.EqualTo(1));
             Assert.That(progress.ExperienceRequiredForRankUp, Is.EqualTo(100));
+            Assert.That(
+                snapshot.RankUps.Definitions[0].TryGetOption(new RankUpOptionId("free"), out var freeOption),
+                Is.True);
+            Assert.That(freeOption.Requirements, Is.Empty);
         }
 
         [Test]

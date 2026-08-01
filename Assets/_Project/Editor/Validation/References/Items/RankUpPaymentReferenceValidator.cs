@@ -54,14 +54,14 @@ namespace LLEditor.Validation.References.Items
                 {
                     var option = rankUp.Options[optionIndex];
 
-                    if (option?.Payments is null)
+                    if (option?.Requirements is null)
                         continue;
 
-                    for (var paymentIndex = 0; paymentIndex < option.Payments.Count; paymentIndex++)
+                    for (var requirementIndex = 0;
+                         requirementIndex < option.Requirements.Count;
+                         requirementIndex++)
                     {
-                        var payment = option.Payments[paymentIndex];
-
-                        if (payment is null)
+                        if (option.Requirements[requirementIndex] is not PaymentRankUpRequirementEntry payment)
                             continue;
 
                         ValidatePayment(
@@ -70,8 +70,8 @@ namespace LLEditor.Validation.References.Items
                                 .At(index)
                                 .At(nameof(RankUpEntry.Options))
                                 .At(optionIndex)
-                                .At(nameof(RankUpOptionEntry.Payments))
-                                .At(paymentIndex)
+                                .At(nameof(RankUpOptionEntry.Requirements))
+                                .At(requirementIndex)
                                 .At(nameof(PaymentRankUpRequirementEntry.Payment)),
                             hasUserItems,
                             userItemIds,

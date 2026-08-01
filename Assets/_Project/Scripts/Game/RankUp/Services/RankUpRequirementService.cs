@@ -1,29 +1,19 @@
 using System;
+using System.Collections.Generic;
 using LL.Game.Heroes;
-using LL.Game.Payments.Services;
 using LL.Game.Ranks;
-using LL.User.State.RankUp;
 using VContainer;
 
 namespace LL.Game.RankUp.Services
 {
-    internal sealed class RankUpRequirementService :
-        IRankUpRequirementService,
-        IRankUpQuestRequirementService
+    internal sealed class RankUpRequirementService : IRankUpRequirementService
     {
-        private readonly IUserRankUpAttempts _attempts;
-        private readonly IUserRankUpAttemptsCommands _attemptCommands;
-        private readonly IPaymentService _paymentService;
+        private readonly IReadOnlyList<IRankUpRequirementKindService> _services;
 
         [Inject]
-        internal RankUpRequirementService(
-            IUserRankUpAttempts attempts,
-            IUserRankUpAttemptsCommands attemptCommands,
-            IPaymentService paymentService)
+        internal RankUpRequirementService(IReadOnlyList<IRankUpRequirementKindService> services)
         {
-            _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
-            _attemptCommands = attemptCommands ?? throw new ArgumentNullException(nameof(attemptCommands));
-            _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
         public bool IsSatisfied(
@@ -35,12 +25,8 @@ namespace LL.Game.RankUp.Services
             if (requirement is null)
                 throw new ArgumentNullException(nameof(requirement));
 
-            return requirement switch
-            {
-                QuestRankUpRequirementDefinition quest => IsQuestSatisfied(heroId, rankId, optionId, quest),
-                PaymentRankUpRequirementDefinition payment => _paymentService.CanPay(payment.Payment),
-                _ => false
-            };
+            return TryGetService(requirement, out var service) &&
+                   service.IsSatisfied(heroId, rankId, optionId, requirement);
         }
 
         public bool TryActivate(
@@ -52,12 +38,8 @@ namespace LL.Game.RankUp.Services
             if (requirement is null)
                 throw new ArgumentNullException(nameof(requirement));
 
-            return requirement switch
-            {
-                QuestRankUpRequirementDefinition quest => TryStart(heroId, rankId, optionId, quest),
-                PaymentRankUpRequirementDefinition => true,
-                _ => false
-            };
+            return TryGetService(requirement, out var service) &&
+                   service.TryActivate(heroId, rankId, optionId, requirement);
         }
 
         public bool TryCommit(
@@ -69,12 +51,8 @@ namespace LL.Game.RankUp.Services
             if (requirement is null)
                 throw new ArgumentNullException(nameof(requirement));
 
-            return requirement switch
-            {
-                QuestRankUpRequirementDefinition quest => IsQuestSatisfied(heroId, rankId, optionId, quest),
-                PaymentRankUpRequirementDefinition payment => _paymentService.TryPay(payment.Payment),
-                _ => false
-            };
+            return TryGetService(requirement, out var service) &&
+                   service.TryCommit(heroId, rankId, optionId, requirement);
         }
 
         public bool TryRollback(RankUpRequirementDefinition requirement)
@@ -82,79 +60,24 @@ namespace LL.Game.RankUp.Services
             if (requirement is null)
                 throw new ArgumentNullException(nameof(requirement));
 
-            return requirement switch
+            return TryGetService(requirement, out var service) && service.TryRollback(requirement);
+        }
+
+        private bool TryGetService(
+            RankUpRequirementDefinition requirement,
+            out IRankUpRequirementKindService service)
+        {
+            foreach (var candidate in _services)
             {
-                QuestRankUpRequirementDefinition => true,
-                PaymentRankUpRequirementDefinition payment => _paymentService.TryRefund(payment.Payment),
-                _ => false
-            };
-        }
+                if (candidate.Supports(requirement))
+                {
+                    service = candidate;
+                    return true;
+                }
+            }
 
-        public bool TryStart(
-            HeroId heroId,
-            RankId rankId,
-            RankUpOptionId optionId,
-            QuestRankUpRequirementDefinition quest)
-        {
-            if (quest is null)
-                throw new ArgumentNullException(nameof(quest));
-
-            if (_attempts.TryGetQuest(heroId, rankId, optionId, quest.Id, out _))
-                return true;
-
-            return _attemptCommands.TryStartQuest(
-                heroId,
-                rankId,
-                optionId,
-                quest.Id,
-                quest.Duration);
-        }
-
-        public bool TryCompleteForTesting(
-            HeroId heroId,
-            RankId rankId,
-            RankUpOptionId optionId,
-            QuestRankUpRequirementDefinition quest)
-        {
-            if (quest is null)
-                throw new ArgumentNullException(nameof(quest));
-
-            if (_attempts.TryGetQuest(heroId, rankId, optionId, quest.Id, out var state) is false)
-                return false;
-
-            var remainingCount = Math.Max(0, quest.RequiredCount - state.CurrentCount);
-            return remainingCount == 0 ||
-                   _attemptCommands.TryAddQuestProgress(heroId, rankId, optionId, quest.Id, remainingCount);
-        }
-
-        public bool TryExpire(
-            HeroId heroId,
-            RankId rankId,
-            RankUpOptionId optionId,
-            QuestRankUpRequirementDefinition quest)
-        {
-            if (quest is null)
-                throw new ArgumentNullException(nameof(quest));
-
-            if (IsQuestSatisfied(heroId, rankId, optionId, quest))
-                return false;
-
-            return _attemptCommands.TryExpireQuest(heroId, rankId, optionId, quest.Id);
-        }
-
-        public void Clear(HeroId heroId, RankId rankId, RankUpOptionId optionId)
-        {
-            _attemptCommands.ClearOption(heroId, rankId, optionId);
-        }
-
-        private bool IsQuestSatisfied(
-            HeroId heroId,
-            RankId rankId,
-            RankUpOptionId optionId,
-            QuestRankUpRequirementDefinition quest)
-        {
-            return _attempts.TryGetQuest(heroId, rankId, optionId, quest.Id, out var state) &&
-                   state.CurrentCount >= quest.RequiredCount;
+            service = null;
+            return false;
         }
     }
 }

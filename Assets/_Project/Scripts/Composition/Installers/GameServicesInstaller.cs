@@ -16,10 +16,14 @@ namespace LL.Composition.Installers
             builder.Register<CardCollectionService>(Lifetime.Singleton).As<ICardCollectionService>();
             builder.Register<PaymentService>(Lifetime.Singleton).As<IPaymentService>();
             builder.Register<HeroExperienceService>(Lifetime.Singleton).As<IHeroExperienceService>();
+            builder.Register<RankUpRequirementService>(Lifetime.Singleton).As<IRankUpRequirementService>();
             builder
-                .Register<RankUpRequirementService>(Lifetime.Singleton)
-                .As<IRankUpRequirementService>()
+                .Register<QuestRankUpRequirementService>(Lifetime.Singleton)
+                .As<IRankUpRequirementKindService>()
                 .As<IRankUpQuestRequirementService>();
+            builder
+                .Register<PaymentRankUpRequirementService>(Lifetime.Singleton)
+                .As<IRankUpRequirementKindService>();
             builder.Register<CardExperienceService>(Lifetime.Singleton).As<ICardExperienceService>();
             builder.Register<RewardGrantService>(Lifetime.Singleton).As<IRewardGrantService>();
         }

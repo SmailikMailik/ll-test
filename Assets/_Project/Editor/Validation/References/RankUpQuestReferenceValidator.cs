@@ -45,14 +45,15 @@ namespace LLEditor.Validation.References
                 {
                     var option = rankUp.Options[optionIndex];
 
-                    if (option?.Quests is null)
+                    if (option?.Requirements is null)
                         continue;
 
-                    for (var questIndex = 0; questIndex < option.Quests.Count; questIndex++)
+                    for (var requirementIndex = 0; requirementIndex < option.Requirements.Count; requirementIndex++)
                     {
-                        var quest = option.Quests[questIndex];
+                        if (option.Requirements[requirementIndex] is not QuestRankUpRequirementEntry quest)
+                            continue;
 
-                        if (quest is null || IdentifierValidator.IsValid(quest.QuestId) is false)
+                        if (IdentifierValidator.IsValid(quest.QuestId) is false)
                             continue;
 
                         ValidationRules.ReferenceExists(
@@ -62,8 +63,8 @@ namespace LLEditor.Validation.References
                                 .At(index)
                                 .At(nameof(RankUpEntry.Options))
                                 .At(optionIndex)
-                                .At(nameof(RankUpOptionEntry.Quests))
-                                .At(questIndex)
+                                .At(nameof(RankUpOptionEntry.Requirements))
+                                .At(requirementIndex)
                                 .At(nameof(QuestRankUpRequirementEntry.QuestId)),
                             QuestExistsCode);
                     }

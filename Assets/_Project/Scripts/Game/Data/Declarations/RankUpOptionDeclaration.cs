@@ -6,17 +6,14 @@ namespace LL.Game.Data.Declarations
     internal sealed class RankUpOptionDeclaration
     {
         internal string OptionId { get; }
-        internal IReadOnlyList<QuestRankUpRequirementDeclaration> Quests { get; }
-        internal IReadOnlyList<PaymentRankUpRequirementDeclaration> Payments { get; }
+        internal IReadOnlyList<RankUpRequirementDeclaration> Requirements { get; }
 
         internal RankUpOptionDeclaration(
             string optionId,
-            IEnumerable<QuestRankUpRequirementDeclaration> quests,
-            IEnumerable<PaymentRankUpRequirementDeclaration> payments)
+            IEnumerable<RankUpRequirementDeclaration> requirements)
         {
             OptionId = optionId;
-            Quests = quests.ToReadOnlyCopy();
-            Payments = payments.ToReadOnlyCopy();
+            Requirements = requirements.ToReadOnlyCopy();
         }
     }
 }

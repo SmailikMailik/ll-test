@@ -3,10 +3,9 @@
 Этот документ объясняет, какие представления данных существуют в проекте, как они преобразуются друг в друга и
 где искать код каждого этапа.
 
-Текущая реализация хранит один пользовательский прогресс и одно rank-up задание. Целевая модель переносит прогресс и
-попытки повышения внутрь состояния каждого героя и заменяет фиксированные quest/instant ветки набором вариантов с
-требованиями. Решение и порядок перехода определены в [`Ranks-And-Rank-Up.md`](Ranks-And-Rank-Up.md); разделы ниже
-остаются описанием фактически работающего потока до изменения production-кода.
+Текущая реализация группирует прогресс и независимые попытки повышения по `HeroId`. Повышение представлено набором
+равноправных вариантов, каждый из которых содержит единый полиморфный список требований. Подробная модель определена
+в [`Ranks-And-Rank-Up.md`](Ranks-And-Rank-Up.md).
 
 ## Главное различие
 
@@ -14,7 +13,7 @@
 
 - игровые данные описывают общие правила и справочники: ранги, карты, задания, повышения и награды;
 - пользовательские данные описывают состояние конкретного игрока: идентификатор, выбранного героя, инвентарь,
-  прогресс и активное задание повышения ранга.
+  прогресс героев и их активные попытки повышения ранга.
 
 Обе системы загружаются одним согласованным агрегатом через общий `IDataSource<TDeclaration>` и
 `CompiledDataLoader<TDeclaration, TSnapshot>`, но жизненный цикл агрегатов различается:
@@ -42,6 +41,12 @@
 собирает ошибки недоверенных представлений, а guard clauses runtime-объектов отдельно защищают программные контракты.
 
 ## Загрузка игровых данных
+
+Загрузка игровых данных сейчас является синхронной: `IDataSource<TDeclaration>.Read()` возвращает декларацию до
+вызова compiler. `ScriptableObject`-конфиги служат удобными таблицами для редактирования в Unity Inspector, а не
+runtime-моделью. JSON и другие внешние форматы используют собственные версионируемые документы. Каждый адаптер
+нормализует свой формат в одну source-neutral `GameDataDeclaration`, поэтому замена источника не меняет compiler,
+snapshot, каталоги или игровые сервисы.
 
 ```mermaid
 flowchart LR
@@ -154,7 +159,7 @@ Assets/_Project/Configuration/
 ```mermaid
 classDiagram
     class GameDataDocument {
-        +int Version = 5
+        +int Version = 6
         +RankDocumentEntry[] Ranks
         +CardDocumentEntry[] Cards
         +QuestDocumentEntry[] Quests
@@ -182,8 +187,9 @@ classDiagram
     GameDataDocument *-- RankUpDocumentEntry
     GameDataDocument *-- RewardDocumentEntry
     RankUpDocumentEntry *-- RankUpOptionDocumentEntry
-    RankUpOptionDocumentEntry *-- QuestRankUpRequirementDocumentEntry
-    RankUpOptionDocumentEntry *-- PaymentRankUpRequirementDocumentEntry
+    RankUpOptionDocumentEntry *-- RankUpRequirementDocumentEntry
+    RankUpRequirementDocumentEntry <|-- QuestRankUpRequirementDocumentEntry
+    RankUpRequirementDocumentEntry <|-- PaymentRankUpRequirementDocumentEntry
     PaymentRankUpRequirementDocumentEntry *-- PaymentDocumentEntry
     RewardDocumentEntry *-- RewardItemDocumentEntry
 
@@ -193,13 +199,16 @@ classDiagram
     GameDataDeclaration *-- RankUpDeclaration
     GameDataDeclaration *-- RewardDeclaration
     RankUpDeclaration *-- RankUpOptionDeclaration
-    RankUpOptionDeclaration *-- QuestRankUpRequirementDeclaration
-    RankUpOptionDeclaration *-- PaymentRankUpRequirementDeclaration
+    RankUpOptionDeclaration *-- RankUpRequirementDeclaration
+    RankUpRequirementDeclaration <|-- QuestRankUpRequirementDeclaration
+    RankUpRequirementDeclaration <|-- PaymentRankUpRequirementDeclaration
     PaymentRankUpRequirementDeclaration *-- PaymentDeclaration
     RewardDeclaration *-- RewardItemDeclaration
 ```
 
-Текущая версия внешнего контракта игровых данных — `GameDataDocument.CurrentVersion = 5`.
+Текущая версия внешнего контракта игровых данных — `GameDataDocument.CurrentVersion = 6`. Rank-up варианты хранят
+единый `Requirements[]`; конкретная document-разновидность выбирается стабильным JSON-discriminator `Type`, описанным
+в [`Ranks-And-Rank-Up.md`](Ranks-And-Rank-Up.md#представления-данных-и-json-контракт).
 
 Файлы разделены, но агрегаты не раздроблены: источник всё ещё возвращает один `GameDataDeclaration`, а сериализатор
 всё ещё читает один `GameDataDocument`.

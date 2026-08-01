@@ -132,8 +132,8 @@ and use-case services.
   requirement collection intentionally represents a free option. Quest completion, payment, accumulated progress,
   observed state, and external confirmation are concrete requirement kinds rather than fixed rank-up paths.
   `RankUpService` activates and completes the option selected by `RankUpOptionId`; UI may observe read-only option
-  status but must issue mutations through this game-service boundary. Detailed semantics and the transition from the
-  current quest/payment implementation are defined in
+  status but must issue mutations through this game-service boundary. Detailed semantics and the polymorphic
+  requirement representations are defined in
   [`Ranks-And-Rank-Up.md`](../Architecture/Ranks-And-Rank-Up.md). Within this feature, use `Definition` for APIs and
   variables that expose immutable rule sets, and `RankUp` for commands and capability names that describe the player
   action. Use `RankUp`, never `Promotion`, as the code and folder vocabulary for this feature.
