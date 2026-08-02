@@ -10,7 +10,6 @@ using LL.Presentation.Payments;
 using LL.Presentation.Typography;
 using LL.UI.Controls;
 using LL.UI.Rewards;
-using LL.UI.Views.Heroes;
 using LL.UI.Windows.Flows;
 using LL.User.State.Heroes;
 using R3;
@@ -32,7 +31,6 @@ namespace LL.UI.Windows.RankUp
         [SerializeField] private InteractiveButton _instantButton;
 
         [SerializeField] private NextRankRewardView _nextRankRewardView;
-        [SerializeField] private HeroView _heroView;
         [SerializeField] private RankUpQuestView _questView;
 
         private IUserHeroProgress _userProgress;
@@ -89,12 +87,13 @@ namespace LL.UI.Windows.RankUp
                 return;
             }
 
-            _questOption = _definition.Options.FirstOrDefault(
-                option => option.Requirements.OfType<QuestRankUpRequirementDefinition>().Any());
-            _instantOption = _definition.Options.FirstOrDefault(option => ReferenceEquals(option, _questOption) is false);
+            _questOption = _definition.Options.FirstOrDefault(option =>
+                option.Requirements.OfType<QuestRankUpRequirementDefinition>().Any());
+            _instantOption = _definition.Options.FirstOrDefault(option =>
+                ReferenceEquals(option, _questOption) is false);
+
             _questRequirement = _questOption?.Requirements.OfType<QuestRankUpRequirementDefinition>().FirstOrDefault();
 
-            _heroView.Show(Parameters.HeroId);
             RefreshOptionPrice(_questOption, _questPriceLabel);
             RefreshOptionPrice(_instantOption, _instantPriceLabel);
 

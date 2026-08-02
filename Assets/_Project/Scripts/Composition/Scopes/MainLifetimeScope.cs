@@ -16,12 +16,10 @@ namespace LL.Composition.Scopes
     internal sealed class MainLifetimeScope : LifetimeScope
     {
         [SerializeField] private WindowController _windowController;
-        [SerializeField] private HeroPortraitView _heroPortraitView;
 
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterComponent(_windowController);
-            builder.RegisterComponent(_heroPortraitView);
             RegisterConfirmations(builder);
             RegisterRankUp(builder);
             RegisterUpgradeFlow(builder);

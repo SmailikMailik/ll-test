@@ -17,6 +17,7 @@ namespace LL.UI.Views.Heroes
 
         private SpriteVariantCatalog<HeroId, HeroPortraitSize> _portraits;
         private UserHeroSelectionSnapshot _heroSelection;
+
         private bool _hasHero;
 
         [Inject]
@@ -37,15 +38,7 @@ namespace LL.UI.Views.Heroes
         internal void Show(HeroId heroId)
         {
             _image.sprite = _portraits.GetSprite(heroId, _size);
-            _image.enabled = true;
             _hasHero = true;
-        }
-
-        internal void Clear()
-        {
-            _image.sprite = null;
-            _image.enabled = false;
-            _hasHero = false;
         }
     }
 }

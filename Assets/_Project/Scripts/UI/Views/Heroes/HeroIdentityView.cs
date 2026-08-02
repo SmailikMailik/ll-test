@@ -13,7 +13,7 @@ using VContainer;
 namespace LL.UI.Views.Heroes
 {
     [DisallowMultipleComponent]
-    internal sealed class HeroView : MonoBehaviour
+    internal sealed class HeroIdentityView : MonoBehaviour
     {
         [SerializeField] private Image _flagImage;
         [SerializeField] private TMP_Text _nameLabel;
@@ -22,6 +22,7 @@ namespace LL.UI.Views.Heroes
         private SpriteCatalog<FlagId> _flags;
         private ILocalizationService _localization;
         private UserHeroSelectionSnapshot _heroSelection;
+
         private HeroId _heroId;
         private bool _hasHero;
 
@@ -55,8 +56,8 @@ namespace LL.UI.Views.Heroes
 
             _heroId = heroId;
             _hasHero = true;
+
             _flagImage.sprite = flag;
-            _flagImage.enabled = true;
             RefreshName(hero);
         }
 

@@ -11,8 +11,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d860472f6454d9a49a7dc4d01a3760bb, type: 3}
   m_Name: HeroPortraitCatalogConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   _portraits:
   - _heroId: soldier
     _smallPortrait: {fileID: 21300000, guid: 0dabed9b6961cb449a6390839d0291e8, type: 3}
-    _largePortrait: {fileID: 21300000, guid: f39840ba4ee310b4e8f6b3f7e23841bc, type: 3}
+    _largePortrait: {fileID: 21300000, guid: a456e652e1d29fc4195ede449afe5d5e, type: 3}
