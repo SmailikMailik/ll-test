@@ -1,4 +1,5 @@
-using LL.UI.VisualStates.Sources;
+using LL.UI.StateRendering.Renderers;
+using LL.UI.StateRendering.States;
 using R3;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -16,11 +17,16 @@ namespace LL.UI.Controls
         IPointerUpHandler,
         IPointerExitHandler
     {
-        [SerializeField] private InteractiveStateSource _stateSource;
+        [SerializeField] private InteractiveStateRenderer _stateRenderer;
 
         internal Observable<Unit> Clicked => _clicked;
 
         private readonly Subject<Unit> _clicked = new();
+
+        private InteractiveState _state;
+
+        private bool IsInteractable => _state != InteractiveState.Disabled;
+        private bool IsPressed => _state == InteractiveState.Pressed;
 
         public void OnPointerClick(PointerEventData _)
         {
@@ -31,22 +37,22 @@ namespace LL.UI.Controls
         public void OnPointerDown(PointerEventData _)
         {
             if (CanInteract())
-                _stateSource.Press();
+                SetState(InteractiveState.Pressed);
         }
 
         public void OnPointerUp(PointerEventData _)
         {
-            _stateSource.Release();
+            Release();
         }
 
         public void OnPointerExit(PointerEventData _)
         {
-            _stateSource.Release();
+            Release();
         }
 
         private void OnDisable()
         {
-            _stateSource.Release();
+            Release();
         }
 
         private void OnDestroy()
@@ -56,10 +62,28 @@ namespace LL.UI.Controls
 
         internal void SetInteractable(bool isInteractable)
         {
-            _stateSource.SetInteractable(isInteractable);
+            if (isInteractable == IsInteractable)
+                return;
+
+            SetState(isInteractable ? InteractiveState.Normal : InteractiveState.Disabled);
         }
 
         private bool CanInteract() =>
-            isActiveAndEnabled && _stateSource.IsInteractable;
+            isActiveAndEnabled && IsInteractable;
+
+        private void Release()
+        {
+            if (IsPressed)
+                SetState(InteractiveState.Normal);
+        }
+
+        private void SetState(InteractiveState state)
+        {
+            if (_state == state)
+                return;
+
+            _state = state;
+            _stateRenderer.Render(state);
+        }
     }
 }

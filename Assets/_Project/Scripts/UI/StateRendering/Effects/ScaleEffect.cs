@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using LL.UI.VisualStates.Effects.Values;
+using LL.UI.StateRendering.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.UI.VisualStates.Effects
+namespace LL.UI.StateRendering.Effects
 {
     [Serializable]
     internal sealed class ScaleEffect : TweenStateEffect

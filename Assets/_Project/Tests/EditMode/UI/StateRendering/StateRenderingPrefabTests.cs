@@ -2,26 +2,26 @@ using System;
 using System.Collections;
 using System.Reflection;
 using LL.UI.Controls;
-using LL.UI.VisualStates.Effects;
-using LL.UI.VisualStates.Sources;
+using LL.UI.StateRendering.Effects;
+using LL.UI.StateRendering.Renderers;
 using LL.UI.Windows.Upgrade.Cards;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-namespace LL.Tests.EditMode.UI.VisualStates
+namespace LL.Tests.EditMode.UI.StateRendering
 {
-    internal sealed class VisualStatePrefabTests
+    internal sealed class StateRenderingPrefabTests
     {
         [Test]
-        public void VisualStateEffect_IsSerializableManagedContract()
+        public void StateEffect_IsSerializableManagedContract()
         {
-            Assert.That(typeof(VisualStateEffect).GetCustomAttribute<SerializableAttribute>(), Is.Not.Null);
-            Assert.That(typeof(Component).IsAssignableFrom(typeof(VisualStateEffect)), Is.False);
+            Assert.That(typeof(StateEffect).GetCustomAttribute<SerializableAttribute>(), Is.Not.Null);
+            Assert.That(typeof(Component).IsAssignableFrom(typeof(StateEffect)), Is.False);
         }
 
         [Test]
-        public void VisualStateSources_InPrefabsContainValidEffects()
+        public void StateRenderers_InPrefabsContainValidEffects()
         {
             foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs" }))
             {
@@ -30,15 +30,15 @@ namespace LL.Tests.EditMode.UI.VisualStates
 
                 try
                 {
-                    foreach (var source in prefab.GetComponentsInChildren<VisualStateSource>(true))
+                    foreach (var renderer in prefab.GetComponentsInChildren<StateRenderer>(true))
                     {
-                        var ownerPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(source);
+                        var ownerPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(renderer);
 
                         if (!string.IsNullOrEmpty(ownerPath) &&
                             !string.Equals(ownerPath, path, StringComparison.Ordinal))
                             continue;
 
-                        AssertSource(source, path);
+                        AssertRenderer(renderer, path);
                     }
                 }
                 finally
@@ -49,7 +49,7 @@ namespace LL.Tests.EditMode.UI.VisualStates
         }
 
         [Test]
-        public void VisualStateControllers_InPrefabsReferenceSources()
+        public void StateOwners_InPrefabsReferenceRenderers()
         {
             foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs" }))
             {
@@ -59,10 +59,10 @@ namespace LL.Tests.EditMode.UI.VisualStates
                 try
                 {
                     foreach (var button in prefab.GetComponentsInChildren<InteractiveButton>(true))
-                        AssertStateSource(button, path);
+                        AssertStateRenderer(button, path);
 
                     foreach (var cardView in prefab.GetComponentsInChildren<UpgradeCardView>(true))
-                        AssertStateSource(cardView, path);
+                        AssertStateRenderer(cardView, path);
                 }
                 finally
                 {
@@ -71,36 +71,36 @@ namespace LL.Tests.EditMode.UI.VisualStates
             }
         }
 
-        private static void AssertStateSource(Component controller, string path)
+        private static void AssertStateRenderer(Component owner, string path)
         {
-            var context = $"{path} ({controller.name}, {controller.GetType().Name})";
-            var serializedController = new SerializedObject(controller);
-            var stateSource = serializedController.FindProperty("_stateSource");
+            var context = $"{path} ({owner.name}, {owner.GetType().Name})";
+            var serializedOwner = new SerializedObject(owner);
+            var stateRenderer = serializedOwner.FindProperty("_stateRenderer");
 
-            Assert.That(stateSource, Is.Not.Null, context);
-            Assert.That(stateSource.objectReferenceValue, Is.Not.Null, context);
+            Assert.That(stateRenderer, Is.Not.Null, context);
+            Assert.That(stateRenderer.objectReferenceValue, Is.Not.Null, context);
         }
 
-        private static void AssertSource(VisualStateSource source, string path)
+        private static void AssertRenderer(StateRenderer renderer, string path)
         {
-            var context = $"{path} ({source.name})";
-            var serializedSource = new SerializedObject(source);
-            var effects = serializedSource.FindProperty("_effects");
+            var context = $"{path} ({renderer.name})";
+            var serializedRenderer = new SerializedObject(renderer);
+            var effects = serializedRenderer.FindProperty("_effects");
 
             Assert.That(effects, Is.Not.Null, context);
             Assert.That(effects.arraySize, Is.GreaterThan(0), context);
 
             for (var index = 0; index < effects.arraySize; index++)
             {
-                var effect = effects.GetArrayElementAtIndex(index).managedReferenceValue as VisualStateEffect;
+                var effect = effects.GetArrayElementAtIndex(index).managedReferenceValue as StateEffect;
                 Assert.That(effect, Is.Not.Null, $"{context}, effect {index}");
-                AssertEffect(effect, source, context);
+                AssertEffect(effect, renderer, context);
             }
         }
 
         private static void AssertEffect(
-            VisualStateEffect effect,
-            VisualStateSource source,
+            StateEffect effect,
+            StateRenderer renderer,
             string context)
         {
             var effectType = effect.GetType();
@@ -115,7 +115,7 @@ namespace LL.Tests.EditMode.UI.VisualStates
             Assert.That(states, Is.Not.Null, $"{context}, {effectType.Name} states");
             Assert.That(
                 states.Count,
-                Is.EqualTo(Enum.GetValues(source.StateType).Length),
+                Is.EqualTo(Enum.GetValues(renderer.StateType).Length),
                 $"{context}, {effectType.Name} states");
         }
     }

@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
-using LL.UI.VisualStates.Effects.Values;
+using LL.UI.StateRendering.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
 
-namespace LL.UI.VisualStates.Effects
+namespace LL.UI.StateRendering.Effects
 {
     [Serializable]
-    [MovedFrom(true, "LL.UI.VisualStates.Effects", null, "ObjectToggleEffect")]
-    internal sealed class GameObjectActiveEffect : VisualStateEffect
+    internal sealed class GameObjectActiveEffect : StateEffect
     {
-        [ValidateInput(nameof(IsValidTarget), "Target cannot be the source GameObject or one of its parents.")]
+        [ValidateInput(nameof(IsValidTarget), "Target cannot be the renderer GameObject or one of its parents.")]
         [SerializeField, Required] private GameObject _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
@@ -55,8 +53,8 @@ namespace LL.UI.VisualStates.Effects
 
         private bool IsValidTarget(GameObject target) =>
             target == null ||
-            Source == null ||
-            target != Source.gameObject && Source.transform.IsChildOf(target.transform) is false;
+            Renderer == null ||
+            target != Renderer.gameObject && Renderer.transform.IsChildOf(target.transform) is false;
 
         [Serializable]
         private sealed class ActiveStateValue : StateValue<bool>

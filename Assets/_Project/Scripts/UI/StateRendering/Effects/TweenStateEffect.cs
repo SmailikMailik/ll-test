@@ -3,10 +3,10 @@ using DG.Tweening;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.UI.VisualStates.Effects
+namespace LL.UI.StateRendering.Effects
 {
     [Serializable]
-    internal abstract class TweenStateEffect : VisualStateEffect
+    internal abstract class TweenStateEffect : StateEffect
     {
         [PropertyOrder(100)]
         [MinValue(0f)]

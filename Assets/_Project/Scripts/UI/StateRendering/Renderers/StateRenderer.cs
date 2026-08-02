@@ -1,50 +1,39 @@
 using System;
 using System.Collections.Generic;
-using LL.UI.VisualStates.Effects;
-using R3;
+using LL.UI.StateRendering.Effects;
 using Sirenix.OdinInspector;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace LL.UI.VisualStates.Sources
+namespace LL.UI.StateRendering.Renderers
 {
-    internal abstract class VisualStateSource : MonoBehaviour
+    internal abstract class StateRenderer : MonoBehaviour
     {
-        [SerializeReference] private List<VisualStateEffect> _effects = new();
+        [SerializeReference] private List<StateEffect> _effects = new();
 
-        // Used by visual effects to synchronize enum states in the Unity Inspector.
+        // Used by state effects to synchronize enum states in the Unity Inspector.
         internal abstract Type StateType { get; }
-        internal ReactiveProperty<int> State { get; } = new();
 
+        private int _state;
         private bool _isStarted;
 
         private void Start()
         {
-            _effects ??= new List<VisualStateEffect>();
+            _effects ??= new List<StateEffect>();
 
             foreach (var effect in _effects)
                 effect?.Initialize(this);
 
             _isStarted = true;
-            var applyInstantly = true;
-
-            State
-                .Subscribe(state =>
-                {
-                    if (isActiveAndEnabled)
-                        ApplyState(state, applyInstantly);
-
-                    applyInstantly = false;
-                })
-                .AddTo(this);
+            ApplyState(_state, true);
         }
 
         private void OnEnable()
         {
             if (_isStarted)
-                ApplyState(State.Value, true);
+                ApplyState(_state, true);
         }
 
         private void OnDisable()
@@ -56,15 +45,10 @@ namespace LL.UI.VisualStates.Sources
                 effect?.Restore();
         }
 
-        protected void SetState<TState>(TState state)
+        protected void RenderState<TState>(TState state)
             where TState : struct, Enum
         {
-            State.Value = Convert.ToInt32(state);
-        }
-
-        protected virtual void OnDestroy()
-        {
-            State.Dispose();
+            RenderState(Convert.ToInt32(state));
         }
 
         private void ApplyState(int state, bool instantly)
@@ -73,10 +57,21 @@ namespace LL.UI.VisualStates.Sources
                 effect?.Apply(state, instantly);
         }
 
+        private void RenderState(int state)
+        {
+            if (_state == state)
+                return;
+
+            _state = state;
+
+            if (_isStarted && isActiveAndEnabled)
+                ApplyState(_state, false);
+        }
+
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
-            _effects ??= new List<VisualStateEffect>();
+            _effects ??= new List<StateEffect>();
 
             foreach (var effect in _effects)
                 effect?.Synchronize(this);
@@ -104,7 +99,7 @@ namespace LL.UI.VisualStates.Sources
                     var stateName = Enum.GetName(StateType, state) ?? stateValue.ToString();
 
                     if (GUILayout.Button(stateName))
-                        State.Value = stateValue;
+                        RenderState(stateValue);
                 }
 
                 GUILayout.EndHorizontal();

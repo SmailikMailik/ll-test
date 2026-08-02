@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LL.UI.VisualStates.Effects.Values
+namespace LL.UI.StateRendering.Effects.Values
 {
     [Serializable]
     internal sealed class AlphaStateValue : StateValue<float>

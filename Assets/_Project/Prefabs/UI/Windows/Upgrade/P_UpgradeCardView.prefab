@@ -56,7 +56,7 @@ MonoBehaviour:
   _iconImage: {fileID: 3736454698003732823}
   _progressLabel: {fileID: 1525261692928005945}
   _addButton: {fileID: 7502684135798462419}
-  _stateSource: {fileID: 7419062748502947183}
+  _stateRenderer: {fileID: 7419062748502947183}
 --- !u!114 &7419062748502947183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75,7 +75,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 1664193352940388378
-      type: {class: GameObjectActiveEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      type: {class: GameObjectActiveEffect, ns: LL.UI.StateRendering.Effects, asm: LL.Runtime}
       data:
         _target: {fileID: 8897623689837278141}
         _states:

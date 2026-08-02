@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using LL.UI.VisualStates.Effects.Values;
+using LL.UI.Extensions;
+using LL.UI.StateRendering.Effects.Values;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.UI;
 
-namespace LL.UI.VisualStates.Effects
+namespace LL.UI.StateRendering.Effects
 {
     [Serializable]
-    internal sealed class CanvasGroupAlphaEffect : TweenStateEffect
+    internal sealed class GraphicAlphaEffect : TweenStateEffect
     {
-        [SerializeField, Required] private CanvasGroup _target;
+        [SerializeField, Required] private Graphic _target;
 
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<AlphaStateValue> _states = new();
@@ -20,7 +22,7 @@ namespace LL.UI.VisualStates.Effects
         protected override void CaptureInitialValue()
         {
             if (_target != null)
-                _initialAlpha = _target.alpha;
+                _initialAlpha = _target.color.a;
         }
 
         protected override void ApplyState(int state, bool instantly)
@@ -35,7 +37,7 @@ namespace LL.UI.VisualStates.Effects
             if (ShouldApplyImmediately(instantly))
             {
                 StopTransition();
-                _target.alpha = targetAlpha;
+                _target.SetAlpha(targetAlpha);
                 return;
             }
 
@@ -45,13 +47,13 @@ namespace LL.UI.VisualStates.Effects
         protected override void RestoreInitialValue()
         {
             if (_target != null)
-                _target.alpha = _initialAlpha;
+                _target.SetAlpha(_initialAlpha);
         }
 
         protected override void SynchronizeValues(Type stateType)
         {
             _states ??= new List<AlphaStateValue>();
-            var defaultAlpha = _target == null ? 1f : _target.alpha;
+            var defaultAlpha = _target == null ? 1f : _target.color.a;
             SynchronizeStateValues(
                 _states,
                 stateType,

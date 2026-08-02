@@ -2,7 +2,7 @@ using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace LL.UI.VisualStates.Effects.Values
+namespace LL.UI.StateRendering.Effects.Values
 {
     [Serializable]
     internal abstract class StateValue

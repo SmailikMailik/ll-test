@@ -6,7 +6,8 @@ using LL.Game.Items;
 using LL.Presentation.Sprites;
 using LL.Presentation.Typography;
 using LL.UI.Controls;
-using LL.UI.VisualStates.Sources;
+using LL.UI.StateRendering.Renderers;
+using LL.UI.StateRendering.States;
 using LL.User.State.Items;
 using R3;
 using TMPro;
@@ -23,7 +24,7 @@ namespace LL.UI.Windows.Upgrade.Cards
         [SerializeField] private Image _iconImage;
         [SerializeField] private TMP_Text _progressLabel;
         [SerializeField] private InteractiveButton _addButton;
-        [SerializeField] private SelectionStateSource _stateSource;
+        [SerializeField] private SelectionStateRenderer _stateRenderer;
 
         private const int AddAmount = 1;
         private const int MinAmount = 0;
@@ -42,6 +43,7 @@ namespace LL.UI.Windows.Upgrade.Cards
         private IUserItems _userItems;
         private ICardCollectionService _cardCollectionService;
         private SpriteCatalog<ItemId> _iconCatalog;
+        private SelectionState _state;
         private bool _isInitialized;
 
         [Inject]
@@ -98,7 +100,13 @@ namespace LL.UI.Windows.Upgrade.Cards
 
         internal void SetSelected(bool isSelected)
         {
-            _stateSource.SetSelected(isSelected);
+            var state = isSelected ? SelectionState.Selected : SelectionState.Normal;
+
+            if (_state == state)
+                return;
+
+            _state = state;
+            _stateRenderer.Render(state);
         }
 
         private void OnAvailableAmountChanged(int availableAmount)

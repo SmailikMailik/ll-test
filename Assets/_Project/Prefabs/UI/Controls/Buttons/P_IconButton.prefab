@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13a5df11b5cd49bd90028e5ee77d64b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _stateSource: {fileID: 8428503926411970011}
+  _stateRenderer: {fileID: 8428503926411970011}
 --- !u!114 &8428503926411970011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,7 +145,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 4144094152000328299
-      type: {class: ScaleEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      type: {class: ScaleEffect, ns: LL.UI.StateRendering.Effects, asm: LL.Runtime}
       data:
         _transitionSeconds: 0.08
         _ease: 6
@@ -161,7 +161,7 @@ MonoBehaviour:
           _stateName: Disabled
           _value: {x: 1, y: 1, z: 1}
     - rid: 8563111371980756099
-      type: {class: GraphicAlphaEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      type: {class: GraphicAlphaEffect, ns: LL.UI.StateRendering.Effects, asm: LL.Runtime}
       data:
         _transitionSeconds: 0.08
         _ease: 6

@@ -1,4 +1,4 @@
-namespace LL.UI.VisualStates.Sources
+namespace LL.UI.StateRendering.States
 {
     internal enum SelectionState : byte
     {

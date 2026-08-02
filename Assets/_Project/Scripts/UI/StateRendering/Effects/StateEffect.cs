@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Generic;
-using LL.UI.VisualStates.Effects.Values;
-using LL.UI.VisualStates.Sources;
+using LL.UI.StateRendering.Effects.Values;
+using LL.UI.StateRendering.Renderers;
 
-namespace LL.UI.VisualStates.Effects
+namespace LL.UI.StateRendering.Effects
 {
     [Serializable]
-    internal abstract class VisualStateEffect
+    internal abstract class StateEffect
     {
-        [NonSerialized] private VisualStateSource _source;
+        [NonSerialized] private StateRenderer _renderer;
 
-        protected VisualStateSource Source => _source;
+        protected StateRenderer Renderer => _renderer;
 
-        internal void Initialize(VisualStateSource source)
+        internal void Initialize(StateRenderer renderer)
         {
-            _source = source;
+            _renderer = renderer;
             CaptureInitialValue();
         }
 
@@ -29,11 +29,11 @@ namespace LL.UI.VisualStates.Effects
             RestoreInitialValue();
         }
 
-        internal void Synchronize(VisualStateSource source)
+        internal void Synchronize(StateRenderer renderer)
         {
-            _source = source;
+            _renderer = renderer;
             Normalize();
-            SynchronizeValues(source.StateType);
+            SynchronizeValues(renderer.StateType);
         }
 
         protected abstract void CaptureInitialValue();

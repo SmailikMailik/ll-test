@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13a5df11b5cd49bd90028e5ee77d64b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _stateSource: {fileID: 8428503926411970011}
+  _stateRenderer: {fileID: 8428503926411970011}
 --- !u!114 &8428503926411970011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +244,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 6710565635728696054
-      type: {class: ScaleEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      type: {class: ScaleEffect, ns: LL.UI.StateRendering.Effects, asm: LL.Runtime}
       data:
         _transitionSeconds: 0.08
         _ease: 6
@@ -260,7 +260,7 @@ MonoBehaviour:
           _stateName: Disabled
           _value: {x: 1, y: 1, z: 1}
     - rid: 3931049387857354584
-      type: {class: CanvasGroupAlphaEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      type: {class: CanvasGroupAlphaEffect, ns: LL.UI.StateRendering.Effects, asm: LL.Runtime}
       data:
         _transitionSeconds: 0.08
         _ease: 6
@@ -276,7 +276,7 @@ MonoBehaviour:
           _stateName: Disabled
           _value: 0.5
     - rid: 4664974932589829248
-      type: {class: GameObjectActiveEffect, ns: LL.UI.VisualStates.Effects, asm: LL.Runtime}
+      type: {class: GameObjectActiveEffect, ns: LL.UI.StateRendering.Effects, asm: LL.Runtime}
       data:
         _target: {fileID: 2600983914219750658}
         _states:
