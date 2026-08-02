@@ -19,23 +19,25 @@ namespace LL.UI.StateRendering.Effects
         [NonSerialized] private float _initialAlpha;
 
         internal override string DisplayName => "Canvas Group Alpha";
+        internal override bool HasTarget => _target != null;
+        internal override IReadOnlyList<StateValue> StateValues => _states;
 
         protected override void CaptureInitialValue()
         {
-            if (_target != null)
+            if (IsTargetValid(Renderer))
                 _initialAlpha = _target.alpha;
         }
 
-        protected override void ApplyState(int state, bool instantly)
+        protected override void ApplyState(int state, bool immediately)
         {
-            if (_target == null)
+            if (IsTargetValid(Renderer) is false)
                 return;
 
             var targetAlpha = TryGetStateValue(_states, state, out var stateValue)
                 ? stateValue.Value
                 : _initialAlpha;
 
-            if (ShouldApplyImmediately(instantly))
+            if (ShouldApplyImmediately(immediately))
             {
                 StopTransition();
                 _target.alpha = targetAlpha;
@@ -47,14 +49,14 @@ namespace LL.UI.StateRendering.Effects
 
         protected override void RestoreInitialValue()
         {
-            if (_target != null)
+            if (IsTargetValid(Renderer))
                 _target.alpha = _initialAlpha;
         }
 
         protected override void SynchronizeValues(Type stateType)
         {
             _states ??= new List<AlphaStateValue>();
-            var defaultAlpha = _target == null ? 1f : _target.alpha;
+            var defaultAlpha = IsTargetValid(Renderer) ? _target.alpha : 1f;
             SynchronizeStateValues(
                 _states,
                 stateType,

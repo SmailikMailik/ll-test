@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using LL.UI.StateRendering.Effects.Values;
 using LL.UI.StateRendering.Inspector;
+using LL.UI.StateRendering.Renderers;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -19,16 +20,21 @@ namespace LL.UI.StateRendering.Effects
         [NonSerialized] private bool _initialActive;
 
         internal override string DisplayName => "Game Object Active";
+        internal override bool HasTarget => _target != null;
+        internal override IReadOnlyList<StateValue> StateValues => _states;
+
+        internal override bool IsTargetValid(StateRenderer renderer) =>
+            HasTarget && IsValidTargetForRenderer(_target, renderer);
 
         protected override void CaptureInitialValue()
         {
-            if (_target != null)
+            if (IsTargetValid(Renderer))
                 _initialActive = _target.activeSelf;
         }
 
-        protected override void ApplyState(int state, bool instantly)
+        protected override void ApplyState(int state, bool immediately)
         {
-            if (_target == null || IsValidTarget(_target) is false)
+            if (IsTargetValid(Renderer) is false)
                 return;
 
             var active = TryGetStateValue(_states, state, out var stateValue)
@@ -40,14 +46,14 @@ namespace LL.UI.StateRendering.Effects
 
         protected override void RestoreInitialValue()
         {
-            if (_target != null && IsValidTarget(_target))
+            if (IsTargetValid(Renderer))
                 _target.SetActive(_initialActive);
         }
 
         protected override void SynchronizeValues(Type stateType)
         {
             _states ??= new List<ActiveStateValue>();
-            var defaultActive = _target != null && _target.activeSelf;
+            var defaultActive = IsTargetValid(Renderer) && _target.activeSelf;
             SynchronizeStateValues(
                 _states,
                 stateType,
@@ -56,8 +62,11 @@ namespace LL.UI.StateRendering.Effects
 
         private bool IsValidTarget(GameObject target) =>
             target == null ||
-            Renderer == null ||
-            target != Renderer.gameObject && Renderer.transform.IsChildOf(target.transform) is false;
+            IsValidTargetForRenderer(target, Renderer);
+
+        private static bool IsValidTargetForRenderer(GameObject target, StateRenderer renderer) =>
+            renderer == null ||
+            target != renderer.gameObject && renderer.transform.IsChildOf(target.transform) is false;
 
         [Serializable]
         private sealed class ActiveStateValue : StateValue<bool>

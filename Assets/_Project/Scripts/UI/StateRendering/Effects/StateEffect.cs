@@ -15,6 +15,8 @@ namespace LL.UI.StateRendering.Effects
         protected StateRenderer Renderer => _renderer;
 
         internal abstract string DisplayName { get; }
+        internal abstract bool HasTarget { get; }
+        internal abstract IReadOnlyList<StateValue> StateValues { get; }
 
         internal void Initialize(StateRenderer renderer)
         {
@@ -22,9 +24,9 @@ namespace LL.UI.StateRendering.Effects
             CaptureInitialValue();
         }
 
-        internal void Apply(int state, bool instantly)
+        internal void Apply(int state, bool immediately)
         {
-            ApplyState(state, instantly);
+            ApplyState(state, immediately);
         }
 
         internal void Restore()
@@ -40,8 +42,10 @@ namespace LL.UI.StateRendering.Effects
             SynchronizeValues(renderer.StateType);
         }
 
+        internal virtual bool IsTargetValid(StateRenderer renderer) => HasTarget;
+
         protected abstract void CaptureInitialValue();
-        protected abstract void ApplyState(int state, bool instantly);
+        protected abstract void ApplyState(int state, bool immediately);
         protected virtual void StopTransition() { }
         protected abstract void RestoreInitialValue();
         protected virtual void Normalize() { }

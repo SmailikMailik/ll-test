@@ -31,13 +31,13 @@ namespace LL.UI.StateRendering.Renderers
                 effect?.Initialize(this);
 
             _isStarted = true;
-            ApplyState(_state, true);
+            ApplyEffects(_state, true);
         }
 
         private void OnEnable()
         {
             if (_isStarted)
-                ApplyState(_state, true);
+                ApplyEffects(_state, true);
         }
 
         private void OnDisable()
@@ -52,16 +52,16 @@ namespace LL.UI.StateRendering.Renderers
         protected void RenderState<TState>(TState state)
             where TState : struct, Enum
         {
-            RenderState(Convert.ToInt32(state));
+            SetState(Convert.ToInt32(state));
         }
 
-        private void ApplyState(int state, bool instantly)
+        private void ApplyEffects(int state, bool immediately)
         {
             foreach (var effect in _effects)
-                effect?.Apply(state, instantly);
+                effect?.Apply(state, immediately);
         }
 
-        private void RenderState(int state)
+        private void SetState(int state)
         {
             if (_state == state)
                 return;
@@ -69,7 +69,7 @@ namespace LL.UI.StateRendering.Renderers
             _state = state;
 
             if (_isStarted && isActiveAndEnabled)
-                ApplyState(_state, false);
+                ApplyEffects(_state, false);
         }
 
 #if UNITY_EDITOR
@@ -102,7 +102,7 @@ namespace LL.UI.StateRendering.Renderers
                 var stateName = Enum.GetName(StateType, state) ?? stateValue.ToString();
 
                 if (GUILayout.Button(stateName))
-                    RenderState(stateValue);
+                    SetState(stateValue);
             }
 
             GUILayout.EndHorizontal();

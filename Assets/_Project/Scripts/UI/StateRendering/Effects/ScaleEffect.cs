@@ -19,23 +19,25 @@ namespace LL.UI.StateRendering.Effects
         [NonSerialized] private Vector3 _initialScale;
 
         internal override string DisplayName => "Scale";
+        internal override bool HasTarget => _target != null;
+        internal override IReadOnlyList<StateValue> StateValues => _states;
 
         protected override void CaptureInitialValue()
         {
-            if (_target != null)
+            if (IsTargetValid(Renderer))
                 _initialScale = _target.localScale;
         }
 
-        protected override void ApplyState(int state, bool instantly)
+        protected override void ApplyState(int state, bool immediately)
         {
-            if (_target == null)
+            if (IsTargetValid(Renderer) is false)
                 return;
 
             var targetScale = TryGetStateValue(_states, state, out var stateValue)
                 ? stateValue.Value
                 : _initialScale;
 
-            if (ShouldApplyImmediately(instantly))
+            if (ShouldApplyImmediately(immediately))
             {
                 StopTransition();
                 _target.localScale = targetScale;
@@ -47,14 +49,14 @@ namespace LL.UI.StateRendering.Effects
 
         protected override void RestoreInitialValue()
         {
-            if (_target != null)
+            if (IsTargetValid(Renderer))
                 _target.localScale = _initialScale;
         }
 
         protected override void SynchronizeValues(Type stateType)
         {
             _states ??= new List<ScaleStateValue>();
-            var defaultScale = _target == null ? Vector3.one : _target.localScale;
+            var defaultScale = IsTargetValid(Renderer) ? _target.localScale : Vector3.one;
             SynchronizeStateValues(
                 _states,
                 stateType,
