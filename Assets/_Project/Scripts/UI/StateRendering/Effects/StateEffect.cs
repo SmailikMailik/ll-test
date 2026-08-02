@@ -2,15 +2,19 @@ using System;
 using System.Collections.Generic;
 using LL.UI.StateRendering.Effects.Values;
 using LL.UI.StateRendering.Renderers;
+using Sirenix.OdinInspector;
 
 namespace LL.UI.StateRendering.Effects
 {
     [Serializable]
+    [HideReferenceObjectPicker]
     internal abstract class StateEffect
     {
         [NonSerialized] private StateRenderer _renderer;
 
         protected StateRenderer Renderer => _renderer;
+
+        internal abstract string DisplayName { get; }
 
         internal void Initialize(StateRenderer renderer)
         {

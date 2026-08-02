@@ -11,6 +11,10 @@ namespace LL.UI.StateRendering.Renderers
 {
     internal abstract class StateRenderer : MonoBehaviour
     {
+        [ListDrawerSettings(
+            DefaultExpandedState = true,
+            ListElementLabelName = nameof(StateEffect.DisplayName),
+            ShowItemCount = false)]
         [SerializeReference] private List<StateEffect> _effects = new();
 
         // Used by state effects to synchronize enum states in the Unity Inspector.
@@ -87,23 +91,21 @@ namespace LL.UI.StateRendering.Renderers
                 EditorGUILayout.HelpBox(
                     "State testing is available only in Play Mode.",
                     MessageType.Info);
+                return;
             }
 
-            using (new EditorGUI.DisabledScope(isPlaying is false))
+            GUILayout.BeginHorizontal();
+
+            foreach (var state in Enum.GetValues(StateType))
             {
-                GUILayout.BeginHorizontal();
+                var stateValue = Convert.ToInt32(state);
+                var stateName = Enum.GetName(StateType, state) ?? stateValue.ToString();
 
-                foreach (var state in Enum.GetValues(StateType))
-                {
-                    var stateValue = Convert.ToInt32(state);
-                    var stateName = Enum.GetName(StateType, state) ?? stateValue.ToString();
-
-                    if (GUILayout.Button(stateName))
-                        RenderState(stateValue);
-                }
-
-                GUILayout.EndHorizontal();
+                if (GUILayout.Button(stateName))
+                    RenderState(stateValue);
             }
+
+            GUILayout.EndHorizontal();
         }
 #endif
     }

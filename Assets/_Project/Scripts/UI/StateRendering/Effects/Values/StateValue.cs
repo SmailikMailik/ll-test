@@ -10,8 +10,7 @@ namespace LL.UI.StateRendering.Effects.Values
         [HideInInspector]
         [SerializeField] private int _state;
 
-        [ReadOnly]
-        [TableColumnWidth(160)]
+        [DisplayAsString, HideLabel, TableColumnWidth(160)]
         [SerializeField] private string _stateName;
 
         internal int State => _state;

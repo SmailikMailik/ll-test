@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using LL.UI.Extensions;
 using LL.UI.StateRendering.Effects.Values;
+using LL.UI.StateRendering.Inspector;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,10 +15,12 @@ namespace LL.UI.StateRendering.Effects
     {
         [SerializeField, Required] private Graphic _target;
 
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [StateValuesTable]
         [SerializeField] private List<AlphaStateValue> _states = new();
 
         [NonSerialized] private float _initialAlpha;
+
+        internal override string DisplayName => "Graphic Alpha";
 
         protected override void CaptureInitialValue()
         {

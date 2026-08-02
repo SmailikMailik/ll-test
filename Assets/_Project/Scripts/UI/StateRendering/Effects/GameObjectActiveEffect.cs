@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.UI.StateRendering.Effects.Values;
+using LL.UI.StateRendering.Inspector;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -12,10 +13,12 @@ namespace LL.UI.StateRendering.Effects
         [ValidateInput(nameof(IsValidTarget), "Target cannot be the renderer GameObject or one of its parents.")]
         [SerializeField, Required] private GameObject _target;
 
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [StateValuesTable]
         [SerializeField] private List<ActiveStateValue> _states = new();
 
         [NonSerialized] private bool _initialActive;
+
+        internal override string DisplayName => "Game Object Active";
 
         protected override void CaptureInitialValue()
         {

@@ -8,11 +8,11 @@ namespace LL.UI.StateRendering.Effects
     [Serializable]
     internal abstract class TweenStateEffect : StateEffect
     {
-        [PropertyOrder(100)]
+        [HorizontalGroup("Transition", Order = 100), LabelText("Duration"), SuffixLabel("s", true)]
         [MinValue(0f)]
         [SerializeField] private float _transitionSeconds = 0.08f;
 
-        [PropertyOrder(101)]
+        [HorizontalGroup("Transition", Order = 100), LabelText("Ease")]
         [SerializeField] private Ease _ease = Ease.OutQuad;
 
         protected float TransitionSeconds => _transitionSeconds;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using LL.UI.StateRendering.Effects.Values;
+using LL.UI.StateRendering.Inspector;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -12,10 +13,12 @@ namespace LL.UI.StateRendering.Effects
     {
         [SerializeField, Required] private RectTransform _target;
 
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [StateValuesTable]
         [SerializeField] private List<ScaleStateValue> _states = new();
 
         [NonSerialized] private Vector3 _initialScale;
+
+        internal override string DisplayName => "Scale";
 
         protected override void CaptureInitialValue()
         {
