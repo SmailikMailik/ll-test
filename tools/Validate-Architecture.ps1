@@ -236,11 +236,31 @@ function Test-DataBoundaryRoles {
     }
 
     foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*Compiler.cs") {
-        $content = [IO.File]::ReadAllText($file.FullName)
+        if ($file.Name -eq "IDataCompiler.cs") {
+            continue
+        }
 
-        if ($content -notmatch "\bIDataCompiler\s*<") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+        $compilerMatch = [regex]::Match(
+            $content,
+            "\bIDataCompiler\s*<\s*(?<declaration>[A-Za-z_][A-Za-z0-9_]*)\s*,")
+
+        if ($compilerMatch.Success -eq $false) {
             Add-ArchitectureError (
                 "Compiler must implement IDataCompiler<TDeclaration, TSnapshot>: " +
+                "$($file.FullName)")
+            continue
+        }
+
+        $declarationType = $compilerMatch.Groups["declaration"].Value
+        $validatorType = "${declarationType}Validator"
+        $validatorFile = Join-Path $file.DirectoryName "${validatorType}.cs"
+
+        if (
+            [IO.File]::Exists($validatorFile) -eq $false -or
+            $content -notmatch "\b$([regex]::Escape($validatorType))\b") {
+            Add-ArchitectureError (
+                "Compiler must delegate aggregate validation to adjacent ${validatorType}: " +
                 "$($file.FullName)")
         }
     }

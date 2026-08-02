@@ -64,14 +64,16 @@ GameDataManifestConfig
     -> ScriptableObjectGameDataSource : IDataSource<GameDataDeclaration>
     -> GameDataDeclaration
     -> CompiledDataLoader + GameDataCompiler
+       -> GameDataDeclarationValidator
     -> GameDataSnapshot
     -> неизменяемые каталоги
 ```
 
-Источник нормализует Unity-конфигурации. Компилятор проверяет идентификаторы и ссылки, затем создаёт согласованный
-снимок с каталогами рангов, карт, героев, квестов, вариантов повышения ранга и наград. `GameDataInstaller` регистрирует
-как весь `GameDataSnapshot`, так и каждый каталог отдельно. Альтернативный сериализованный источник заканчивается тем
-же `GameDataDeclaration`, поэтому правила компиляции не зависят от формата хранения.
+Источник нормализует Unity-конфигурации. Компилятор координирует `GameDataDeclarationValidator`, затем создаёт
+согласованный снимок с каталогами рангов, карт, героев, квестов, вариантов повышения ранга и наград.
+`GameDataInstaller` регистрирует как весь `GameDataSnapshot`, так и каждый каталог отдельно. Альтернативный
+сериализованный источник заканчивается тем же `GameDataDeclaration`, поэтому правила компиляции не зависят от
+формата хранения.
 
 ### Пользовательские данные
 
@@ -79,6 +81,7 @@ GameDataManifestConfig
 UserDefaultsConfig
     -> IDataSource<UserDefaultsDeclaration>
     -> CompiledDataLoader + UserDefaultsCompiler
+       -> UserDefaultsDeclarationValidator
     -> UserDefaultsSnapshot -----\
                                   -> UserSessionLoader -> UserSnapshot -> UserState
 IUserSaveRepository -------------/
@@ -86,11 +89,12 @@ IUserSaveRepository -------------/
 UserState.Changed -> UserSaveCoordinator -> IUserSaveRepository.Save()
 ```
 
-Источник отделяет Unity-конфигурацию от runtime-представления. Компилятор проверяет начальный ранг, опыт и наличие
-всех предметов, на которые ссылаются встроенные правила, карты, оплаты и награды, после чего создаёт неизменяемый
-снимок начальных значений. `UserSessionLoader` координирует загрузку: передаёт успешно загруженный snapshot в
-`UserSnapshotReconciler`, а при отсутствии, повреждении, неподдерживаемой версии или несовместимости создаёт новый
-пользовательский snapshot из defaults. `UserSnapshotReconciler` возвращает явный результат согласования сохранения
+Источник отделяет Unity-конфигурацию от runtime-представления. `UserDefaultsDeclarationValidator` проверяет начальный
+ранг, опыт и наличие всех предметов, на которые ссылаются встроенные правила, карты, оплаты и награды, после чего
+`UserDefaultsCompiler` создаёт неизменяемый снимок начальных значений. `UserSessionLoader` координирует загрузку:
+передаёт успешно загруженный snapshot в `UserSnapshotReconciler`, а при отсутствии, повреждении, неподдерживаемой
+версии или несовместимости создаёт новый пользовательский snapshot из defaults. `UserSnapshotReconciler` возвращает
+явный результат согласования сохранения
 с актуальными героями, рангами, обязательными предметами и rank-up заданиями. Время истечения заданий поступает через
 зарегистрированный `TimeProvider`. `UserInstaller` регистрирует части загруженного snapshot-а отдельно, создаёт
 `UserItems` и `UserHeroes` как singleton-объекты для read-only и command-интерфейсов и объединяет их уведомления в

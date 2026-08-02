@@ -15,6 +15,7 @@ GameDataManifestConfig
     -> ScriptableObjectGameDataSource
     -> GameDataDeclaration
     -> CompiledDataLoader + GameDataCompiler
+       -> GameDataDeclarationValidator
     -> GameDataSnapshot
     -> RankCatalog, CardCatalog, HeroCatalog, QuestCatalog, RankUpCatalog, RewardCatalog
 ```
@@ -31,7 +32,7 @@ JSON / storage
     -> GameDataDocument
     -> GameDataDocumentMapper
     -> GameDataDeclaration
-    -> GameDataCompiler
+    -> GameDataCompiler (GameDataDeclarationValidator)
 ```
 
 Источник читает данные синхронно через `IDataSource<TDeclaration>.Read()`. Оба пути сходятся на декларации, поэтому
@@ -45,7 +46,8 @@ JSON / storage
 | `GameDataManifestConfig` | Ссылки на все обязательные игровые конфиги |
 | `GameDataDocument` и `*DocumentEntry` | Версионируемый внешний контракт |
 | `GameDataDeclaration` и `*Declaration` | Единый непроверенный формат для любого источника |
-| `GameDataCompiler` | Проверка ID, дубликатов и межкаталожных ссылок; создание доменных объектов |
+| `GameDataDeclarationValidator` | Проверка ID, дубликатов и межкаталожных ссылок |
+| `GameDataCompiler` | Координация проверки и создание доменных объектов в каноническом порядке |
 | `GameDataSnapshot` | Один согласованный результат загрузки |
 | `*Catalog` и доменные типы | Неизменяемые данные для игровых сервисов и UI |
 
@@ -67,7 +69,8 @@ JSON / storage
 | `Game/Data/Sources` | Адаптеры `ScriptableObject` и сериализованного источника |
 | `Game/Data/Persistence` | Внешний документ и преобразование в декларацию |
 | `Game/Data/Declarations` | Source-neutral непроверенное представление |
-| `Game/Data/GameDataCompiler.cs` | Общая проверка и сборка доменных каталогов |
+| `Game/Data/GameDataDeclarationValidator.cs` | Общая проверка declaration и межкаталожных ссылок |
+| `Game/Data/GameDataCompiler.cs` | Сборка доменных каталогов и корневого snapshot-а |
 | `Game/Data/GameDataSnapshot.cs` | Корень неизменяемого агрегата |
 | `Composition/Factories/GameDataLoaderFactory.cs` | Выбор технологии источника |
 | `Composition/Installers/GameDataInstaller.cs` | Загрузка и DI-регистрация каталогов |
@@ -80,7 +83,7 @@ JSON / storage
 Чтобы проследить значение, пройдите цепочку:
 
 ```text
-capability config -> GameDataManifestConfig -> source -> declaration -> GameDataCompiler -> catalog
+capability config -> GameDataManifestConfig -> source -> declaration -> GameDataCompiler (validator) -> catalog
 ```
 
 При добавлении новой группы игровых данных обычно нужно:

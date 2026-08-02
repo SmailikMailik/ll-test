@@ -75,6 +75,14 @@ try {
     [IO.File]::WriteAllText(
         (Join-Path $validArchitectureRoot "Assets/_Project/Scripts/User/Persistence/UserSessionLoader.cs"),
         "namespace LL.User.Persistence;`n`ninternal sealed class UserSessionLoader : IDataLoader<int> { }")
+    [IO.File]::WriteAllText(
+        (Join-Path $validArchitectureRoot "Assets/_Project/Scripts/Game/ExampleCompiler.cs"),
+        "namespace LL.Game;`n`ninternal sealed class ExampleCompiler : " +
+            "IDataCompiler<ExampleDeclaration, ExampleSnapshot>`n{`n" +
+            "    private readonly ExampleDeclarationValidator _validator;`n}")
+    [IO.File]::WriteAllText(
+        (Join-Path $validArchitectureRoot "Assets/_Project/Scripts/Game/ExampleDeclarationValidator.cs"),
+        "namespace LL.Game;`n`ninternal sealed class ExampleDeclarationValidator { }")
     Invoke-ExpectedResult `
         -Name "Valid architecture" `
         -Script $architectureValidator `
@@ -102,6 +110,18 @@ try {
         -Arguments @("-ProjectRoot", $invalidDomainLoaderRoot) `
         -ExpectedExitCode 1 `
         -ExpectedOutput "Game domain data may use IDataLoader only at GameDataSnapshot boundary"
+
+    $missingCompilerValidatorRoot = New-ArchitectureFixture "architecture-missing-compiler-validator"
+    [IO.File]::WriteAllText(
+        (Join-Path $missingCompilerValidatorRoot "Assets/_Project/Scripts/Game/ExampleCompiler.cs"),
+        "namespace LL.Game;`n`ninternal sealed class ExampleCompiler : " +
+            "IDataCompiler<ExampleDeclaration, ExampleSnapshot> { }")
+    Invoke-ExpectedResult `
+        -Name "Compiler without declaration validator" `
+        -Script $architectureValidator `
+        -Arguments @("-ProjectRoot", $missingCompilerValidatorRoot) `
+        -ExpectedExitCode 1 `
+        -ExpectedOutput "Compiler must delegate aggregate validation to adjacent ExampleDeclarationValidator"
 
     $invalidUserCommandsRoot = New-ArchitectureFixture "architecture-invalid-ui-user-commands"
     [IO.File]::WriteAllText(

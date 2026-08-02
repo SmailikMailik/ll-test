@@ -5,82 +5,31 @@ using LL.Game.Cards;
 using LL.Game.Data.Declarations;
 using LL.Game.Flags;
 using LL.Game.Heroes;
-using LL.Game.Identifiers;
 using LL.Game.Items;
 using LL.Game.Payments;
-using LL.Game.RankUp;
 using LL.Game.Quests;
 using LL.Game.Ranks;
+using LL.Game.RankUp;
 using LL.Game.Rewards;
 using LL.Infrastructure.Compilation;
-using LL.Validation;
 
 namespace LL.Game.Data
 {
     internal sealed class GameDataCompiler : IDataCompiler<GameDataDeclaration, GameDataSnapshot>
     {
-        private const string RankEntriesCode = "rank-catalog.entries.not-empty";
-        private const string RankReferenceCode = "rank-up.rank.exists";
-        private const string QuestReferenceCode = "rank-up.quest.exists";
-        private const string HeroReferenceCode = "rank-up.hero.exists";
-        private const string RewardReferenceCode = "rank-up.reward.exists";
-        private const string FinalRankCode = "rank-up.rank.not-final";
-        private const string RankUpRequiredCode = "rank-up.rank.required";
-        private const string RankUpUniqueCode = "rank-up.hero-rank.unique";
-        private const string OptionsCode = "rank-up.options.not-empty";
-        private const string OptionUniqueCode = "rank-up.option.unique";
-        private const string RequirementUniqueCode = "rank-up.requirement.unique";
-        private const string RequirementTypeCode = "rank-up.requirement.type.supported";
-        private const string RequiredCountCode = "rank-up.quest.count.positive";
-        private const string DurationCode = "rank-up.quest.duration.positive";
-
         public GameDataSnapshot Compile(GameDataDeclaration declaration)
         {
-            if (declaration is null)
-                throw new ArgumentNullException(nameof(declaration));
+            GameDataDeclarationValidator.EnsureValid(declaration);
 
-            ValidationRunner.EnsureValid(
-                context => ValidationRules.NotEmpty(
-                    declaration.Ranks,
-                    context.At(nameof(declaration.Ranks)),
-                    RankEntriesCode),
-                nameof(declaration));
-
-            var rankIds = EnsureValidAndCollectIds(
-                declaration.Ranks,
-                entry => new RankId(entry.Id),
-                nameof(declaration.Ranks));
-            EnsureValidIds(
-                declaration.Cards,
-                entry => new ItemId(entry.Id),
-                nameof(declaration.Cards));
-            var heroIds = EnsureValidAndCollectIds(
-                declaration.Heroes,
-                entry => new HeroId(entry.Id),
-                nameof(declaration.Heroes));
-            var questIds = EnsureValidAndCollectIds(
-                declaration.Quests,
-                entry => new QuestId(entry.Id),
-                nameof(declaration.Quests));
-            var rewardIds = EnsureValidAndCollectIds(
-                declaration.Rewards,
-                entry => new RewardId(entry.Id),
-                nameof(declaration.Rewards));
-            EnsureRankUpRelationsAreValid(
-                declaration,
-                rankIds,
-                questIds,
-                heroIds,
-                rewardIds);
-
-            var ranks = CompileRanks(declaration.Ranks);
-            var cards = CompileCards(declaration.Cards);
-            var heroes = CompileHeroes(declaration.Heroes);
-            var quests = CompileQuests(declaration.Quests);
-            var rankUps = CompileRankUps(declaration.RankUps);
-            var rewards = CompileRewards(declaration.Rewards);
-
-            return new GameDataSnapshot(ranks, cards, heroes, quests, rankUps, rewards);
+            return new GameDataSnapshot
+            (
+                CompileRanks(declaration.Ranks),
+                CompileCards(declaration.Cards),
+                CompileHeroes(declaration.Heroes),
+                CompileQuests(declaration.Quests),
+                CompileRankUps(declaration.RankUps),
+                CompileRewards(declaration.Rewards)
+            );
         }
 
         private static RankCatalog CompileRanks(IReadOnlyList<RankDeclaration> declarations)
@@ -207,189 +156,6 @@ namespace LL.Game.Data
                 throw new ArgumentNullException(nameof(payment));
 
             return new Payment(new ItemId(payment.ItemId), payment.Amount);
-        }
-
-        private static HashSet<TId> EnsureValidAndCollectIds<TEntry, TId>(
-            IEnumerable<TEntry> entries,
-            Func<TEntry, TId> getId,
-            string collectionName)
-            where TId : struct, IIdentifier
-        {
-            IdentifierCollectionValidator.EnsureValid(entries, getId, collectionName);
-            return entries.Select(getId).ToHashSet();
-        }
-
-        private static void EnsureValidIds<TEntry, TId>(
-            IEnumerable<TEntry> entries,
-            Func<TEntry, TId> getId,
-            string collectionName)
-            where TId : struct, IIdentifier
-        {
-            IdentifierCollectionValidator.EnsureValid(entries, getId, collectionName);
-        }
-
-        private static void EnsureRankUpRelationsAreValid(
-            GameDataDeclaration declaration,
-            ISet<RankId> rankIds,
-            ISet<QuestId> questIds,
-            ISet<HeroId> heroIds,
-            ISet<RewardId> rewardIds)
-        {
-            var finalRankId = new RankId(declaration.Ranks[declaration.Ranks.Count - 1].Id);
-
-            ValidationRunner.EnsureValid(
-                context =>
-                {
-                    var rankUpsContext = context.At(nameof(declaration.RankUps));
-                    var rankUpKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                    for (var index = 0; index < declaration.RankUps.Count; index++)
-                    {
-                        var rankUp = declaration.RankUps[index];
-                        var rankUpContext = rankUpsContext.At(index);
-
-                        if (ValidationRules.NotNull(rankUp, rankUpContext, RankUpRequiredCode) is false)
-                            continue;
-
-                        var heroId = new HeroId(rankUp.HeroId);
-                        var rankId = new RankId(rankUp.RankId);
-                        var rewardId = new RewardId(rankUp.RewardId);
-
-                        ValidationRules.ReferenceExists(
-                            rankId,
-                            rankIds,
-                            rankUpContext.At(nameof(rankUp.RankId)),
-                            RankReferenceCode);
-                        ValidationRules.ReferenceExists(
-                            heroId,
-                            heroIds,
-                            rankUpContext.At(nameof(rankUp.HeroId)),
-                            HeroReferenceCode);
-                        ValidationRules.ReferenceExists(
-                            rewardId,
-                            rewardIds,
-                            rankUpContext.At(nameof(rankUp.RewardId)),
-                            RewardReferenceCode);
-                        ValidationRules.NotEqual(
-                            rankId,
-                            finalRankId,
-                            rankUpContext.At(nameof(rankUp.RankId)),
-                            FinalRankCode);
-
-                        ValidationRules.TryAddUnique(
-                            $"{heroId.Value}\n{rankId.Value}",
-                            rankUpKeys,
-                            rankUpContext,
-                            RankUpUniqueCode);
-
-                        ValidateRankUpOptions(rankUp, questIds, rankUpContext);
-                    }
-
-                    foreach (var heroId in heroIds)
-                    {
-                        for (var index = 0; index + 1 < declaration.Ranks.Count; index++)
-                        {
-                            var rankId = new RankId(declaration.Ranks[index].Id);
-                            ValidationRules.ReferenceExists(
-                                $"{heroId.Value}\n{rankId.Value}",
-                                rankUpKeys,
-                                rankUpsContext,
-                                RankUpRequiredCode);
-                        }
-                    }
-                },
-                nameof(declaration));
-        }
-
-        private static void ValidateRankUpOptions(
-            RankUpDeclaration rankUp,
-            ISet<QuestId> questIds,
-            ValidationContext context)
-        {
-            var optionsContext = context.At(nameof(rankUp.Options));
-
-            if (ValidationRules.NotEmpty(rankUp.Options, optionsContext, OptionsCode) is false)
-                return;
-
-            var optionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            for (var optionIndex = 0; optionIndex < rankUp.Options.Count; optionIndex++)
-            {
-                var option = rankUp.Options[optionIndex];
-                var optionContext = optionsContext.At(optionIndex);
-
-                if (ValidationRules.NotNull(option, optionContext, OptionsCode) is false)
-                    continue;
-
-                var optionId = new RankUpOptionId(option.OptionId);
-                IdentifierValidator.Validate(optionId, optionContext.At(nameof(option.OptionId)));
-                ValidationRules.TryAddUnique(optionId.Value, optionIds, optionContext, OptionUniqueCode);
-                ValidateRankUpRequirements(option, questIds, optionContext);
-            }
-        }
-
-        private static void ValidateRankUpRequirements(
-            RankUpOptionDeclaration option,
-            ISet<QuestId> questIds,
-            ValidationContext context)
-        {
-            var requirementIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            for (var index = 0; index < option.Requirements.Count; index++)
-            {
-                var requirement = option.Requirements[index];
-                var requirementContext = context.At(nameof(option.Requirements)).At(index);
-
-                if (ValidationRules.NotNull(requirement, requirementContext, OptionsCode) is false)
-                    continue;
-
-                ValidateRequirementId(requirement.RequirementId, requirementIds, requirementContext);
-                ValidateRankUpRequirement(requirement, questIds, requirementContext);
-            }
-        }
-
-        private static void ValidateRankUpRequirement(
-            RankUpRequirementDeclaration requirement,
-            ISet<QuestId> questIds,
-            ValidationContext context)
-        {
-            switch (requirement)
-            {
-                case QuestRankUpRequirementDeclaration quest:
-                    ValidationRules.ReferenceExists(
-                        new QuestId(quest.QuestId),
-                        questIds,
-                        context.At(nameof(quest.QuestId)),
-                        QuestReferenceCode);
-                    ValidationRules.Positive(
-                        quest.RequiredCount,
-                        context.At(nameof(quest.RequiredCount)),
-                        RequiredCountCode);
-                    ValidationRules.Positive(
-                        quest.DurationMinutes,
-                        context.At(nameof(quest.DurationMinutes)),
-                        DurationCode);
-                    break;
-                case PaymentRankUpRequirementDeclaration payment:
-                    ToPayment(payment.Payment);
-                    break;
-                default:
-                    context.Report(
-                        ValidationSeverity.Error,
-                        RequirementTypeCode,
-                        $"Unsupported rank-up requirement type '{requirement.GetType().Name}'.");
-                    break;
-            }
-        }
-
-        private static void ValidateRequirementId(
-            string value,
-            ISet<string> usedIds,
-            ValidationContext context)
-        {
-            var requirementId = new RankUpRequirementId(value);
-            IdentifierValidator.Validate(requirementId, context.At("RequirementId"));
-            ValidationRules.TryAddUnique(value, usedIds, context, RequirementUniqueCode);
         }
     }
 }

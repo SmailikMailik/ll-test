@@ -15,18 +15,21 @@ UserDefaultsConfig
     -> ScriptableObjectUserDefaultsSource
     -> UserDefaultsDeclaration
     -> CompiledDataLoader + UserDefaultsCompiler
+       -> UserDefaultsDeclarationValidator
     -> UserDefaultsSnapshot
 ```
 
-`UserDefaultsCompiler` использует актуальные игровые каталоги: проверяет героев, выбранного героя, ранг и опыт, а
-также наличие предметов, на которые ссылаются встроенные правила, карты, оплаты и награды. Результат неизменяем и
-служит только для создания нового пользователя или восстановления несовместимого сохранения.
+`UserDefaultsDeclarationValidator` использует актуальные игровые каталоги: проверяет героев, выбранного героя, ранг и
+опыт, а также наличие предметов, на которые ссылаются встроенные правила, карты, оплаты и награды.
+`UserDefaultsCompiler` координирует эту проверку и преобразует declaration в неизменяемый результат, который служит
+только для создания нового пользователя или восстановления несовместимого сохранения.
 
 | Представление | Ответственность |
 | --- | --- |
 | `UserDefaultsConfig` | Unity-authoring начальных значений |
 | `UserDefaultsDeclaration` и вложенные декларации | Непроверенное source-neutral представление |
-| `UserDefaultsCompiler` | Проверка ссылок на игровые данные и создание defaults |
+| `UserDefaultsDeclarationValidator` | Проверка ссылок на игровые данные и обязательных предметов |
+| `UserDefaultsCompiler` | Координация проверки и создание defaults в каноническом порядке |
 | `UserDefaultsSnapshot` | Согласованные начальные значения |
 
 ## Загрузка сессии
@@ -88,7 +91,7 @@ game service -> *Commands -> UserState.Changed
 | Путь | Что находится |
 | --- | --- |
 | `User/Configuration` | `UserDefaultsConfig` и его authoring-валидация |
-| `User/Defaults` | Декларации, источник, compiler и snapshot defaults |
+| `User/Defaults` | Декларации, источник, validator, compiler и snapshot defaults |
 | `User/Persistence/Documents` | Версионируемый контракт сохранения |
 | `User/Persistence` | Репозиторий, mapping, reconciliation, загрузка сессии и autosave |
 | `User/Snapshots` | Неизменяемое представление пользователя |
@@ -103,7 +106,7 @@ Unity-ассет defaults находится в `Assets/_Project/Configuration/U
 Для defaults:
 
 ```text
-UserDefaultsConfig -> source -> declaration -> UserDefaultsCompiler -> UserDefaultsSnapshot
+UserDefaultsConfig -> source -> declaration -> UserDefaultsCompiler (validator) -> UserDefaultsSnapshot
 ```
 
 Для сохранённого или изменяемого значения:
