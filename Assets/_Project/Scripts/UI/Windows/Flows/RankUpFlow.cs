@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
 using LL.Game.Items;
-using LL.Game.Payments;
 using LL.Game.RankUp;
 using LL.Game.RankUp.Services;
 using LL.Presentation.RankUp;
@@ -25,18 +25,21 @@ namespace LL.UI.Windows.Flows
             _confirmation = confirmation ?? throw new ArgumentNullException(nameof(confirmation));
         }
 
-        internal bool TryGetDefinition(out RankUpDefinition definition)
+        internal bool TryGetDefinition(HeroId heroId, out RankUpDefinition definition)
         {
-            return _rankUpService.TryGetDefinition(out definition);
+            return _rankUpService.TryGetDefinition(heroId, out definition);
         }
 
         internal void RequestRankUp(
-            Payment payment,
+            HeroId heroId,
+            RankUpOptionId optionId,
             Action<IReadOnlyList<ItemAmount>> onSucceeded,
             Action onFailed)
         {
             if (_isPending ||
-                _rankUpService.CanRankUp(payment) is false)
+                _rankUpService.TryGetDefinition(heroId, out var definition) is false ||
+                definition.TryGetOption(optionId, out var option) is false ||
+                _rankUpService.CanCompleteOption(heroId, optionId) is false)
             {
                 onFailed?.Invoke();
                 return;
@@ -44,20 +47,22 @@ namespace LL.UI.Windows.Flows
 
             _isPending = true;
             _confirmation.Confirm(
-                payment,
-                () => OnRankUpConfirmed(payment, onSucceeded, onFailed),
+                heroId,
+                option,
+                () => OnRankUpConfirmed(heroId, optionId, onSucceeded, onFailed),
                 () => OnRankUpRejected(onFailed));
         }
 
         private void OnRankUpConfirmed(
-            Payment payment,
+            HeroId heroId,
+            RankUpOptionId optionId,
             Action<IReadOnlyList<ItemAmount>> onSucceeded,
             Action onFailed)
         {
             if (_isPending is false)
                 return;
 
-            if (_rankUpService.TryRankUp(payment, out var rewardItems))
+            if (_rankUpService.TryCompleteOption(heroId, optionId, out var rewardItems))
                 OnRankUpSucceeded(rewardItems, onSucceeded);
             else
                 OnRankUpFailed(onFailed);

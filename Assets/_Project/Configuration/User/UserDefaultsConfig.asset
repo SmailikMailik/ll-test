@@ -15,7 +15,10 @@ MonoBehaviour:
   _identity:
     _userId: 7252511
     _regionCode: EU
-  _progress:
+  _heroSelection:
+    _heroId: soldier
+  _heroes:
+  - _heroId: soldier
     _rankId: rank_3
     _experience: 12861
   _items:

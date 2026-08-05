@@ -13,99 +13,198 @@ MonoBehaviour:
   m_Name: RankUpCatalogConfig
   m_EditorClassIdentifier:
   _rankUps:
-  - _rankId: rank_1
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+  - _heroId: soldier
+    _rankId: rank_1
     _rewardId: rank_1_rank_up
-  - _rankId: rank_2
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1001
+      - rid: 1002
+    - _optionId: instant
+      _requirements:
+      - rid: 1003
+  - _heroId: soldier
+    _rankId: rank_2
     _rewardId: rank_2_rank_up
-  - _rankId: rank_3
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1004
+      - rid: 1005
+    - _optionId: instant
+      _requirements:
+      - rid: 1006
+  - _heroId: soldier
+    _rankId: rank_3
     _rewardId: rank_3_rank_up
-  - _rankId: rank_4
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1007
+      - rid: 1008
+    - _optionId: instant
+      _requirements:
+      - rid: 1009
+  - _heroId: soldier
+    _rankId: rank_4
     _rewardId: rank_4_rank_up
-  - _rankId: rank_5
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1010
+      - rid: 1011
+    - _optionId: instant
+      _requirements:
+      - rid: 1012
+  - _heroId: soldier
+    _rankId: rank_5
     _rewardId: rank_5_rank_up
-  - _rankId: rank_6
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1013
+      - rid: 1014
+    - _optionId: instant
+      _requirements:
+      - rid: 1015
+  - _heroId: soldier
+    _rankId: rank_6
     _rewardId: rank_6_rank_up
-  - _rankId: rank_7
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1016
+      - rid: 1017
+    - _optionId: instant
+      _requirements:
+      - rid: 1018
+  - _heroId: soldier
+    _rankId: rank_7
     _rewardId: rank_7_rank_up
-  - _rankId: rank_8
-    _questId: headshots
-    _heroLocalizationKey: Game/heroes.soldier
-    _requiredAmount: 20
-    _durationMinutes: 1440
-    _questPayment:
-      _itemId: soft
-      _amount: 99900
-    _instantPayment:
-      _itemId: hard
-      _amount: 999
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1019
+      - rid: 1020
+    - _optionId: instant
+      _requirements:
+      - rid: 1021
+  - _heroId: soldier
+    _rankId: rank_8
     _rewardId: rank_8_rank_up
+    _options:
+    - _optionId: quest
+      _requirements:
+      - rid: 1022
+      - rid: 1023
+    - _optionId: instant
+      _requirements:
+      - rid: 1024
+  references:
+    version: 2
+    RefIds:
+    - rid: 1001
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1002
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1003
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}
+    - rid: 1004
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1005
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1006
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}
+    - rid: 1007
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1008
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1009
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}
+    - rid: 1010
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1011
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1012
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}
+    - rid: 1013
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1014
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1015
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}
+    - rid: 1016
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1017
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1018
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}
+    - rid: 1019
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1020
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1021
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}
+    - rid: 1022
+      type: {class: QuestRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data: {_requirementId: headshots, _questId: headshots, _requiredCount: 20, _durationMinutes: 1440}
+    - rid: 1023
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: soft-payment
+        _payment: {_itemId: soft, _amount: 99900}
+    - rid: 1024
+      type: {class: PaymentRankUpRequirementEntry, ns: LL.Game.RankUp.Configuration, asm: LL.Runtime}
+      data:
+        _requirementId: hard-payment
+        _payment: {_itemId: hard, _amount: 999}

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Cards;
+using LL.Game.Cards.Services;
 using LL.Game.Items;
-using LL.Presentation.Icons;
+using LL.Presentation.Sprites;
 using LL.Presentation.Typography;
 using LL.UI.Controls;
-using LL.UI.VisualStates.Sources;
+using LL.UI.StateRendering.Renderers;
+using LL.UI.StateRendering.States;
 using LL.User.State.Items;
 using R3;
 using TMPro;
@@ -19,11 +21,10 @@ namespace LL.UI.Windows.Upgrade.Cards
     [DisallowMultipleComponent]
     internal sealed class UpgradeCardView : MonoBehaviour, IPointerClickHandler
     {
-        [SerializeField] private SelectionStateSource _stateSource;
-
         [SerializeField] private Image _iconImage;
         [SerializeField] private TMP_Text _progressLabel;
         [SerializeField] private InteractiveButton _addButton;
+        [SerializeField] private SelectionStateRenderer _stateRenderer;
 
         private const int AddAmount = 1;
         private const int MinAmount = 0;
@@ -40,15 +41,19 @@ namespace LL.UI.Windows.Upgrade.Cards
         private readonly Subject<int> _availableAmountChanged = new();
 
         private IUserItems _userItems;
-        private IconCatalog<ItemId> _iconCatalog;
+        private ICardCollectionService _cardCollectionService;
+        private SpriteCatalog<ItemId> _iconCatalog;
+        private SelectionState _state;
         private bool _isInitialized;
 
         [Inject]
         private void Construct(
             IUserItems userItems,
-            IconCatalog<ItemId> iconCatalog)
+            ICardCollectionService cardCollectionService,
+            SpriteCatalog<ItemId> iconCatalog)
         {
             _userItems = userItems ?? throw new ArgumentNullException(nameof(userItems));
+            _cardCollectionService = cardCollectionService ?? throw new ArgumentNullException(nameof(cardCollectionService));
             _iconCatalog = iconCatalog ?? throw new ArgumentNullException(nameof(iconCatalog));
         }
 
@@ -57,13 +62,10 @@ namespace LL.UI.Windows.Upgrade.Cards
             if (_isInitialized)
                 throw new InvalidOperationException($"{nameof(UpgradeCardView)} is already initialized.");
 
-            if (card == null)
+            if (card is null)
                 throw new ArgumentNullException(nameof(card));
 
-            if (string.IsNullOrWhiteSpace(card.Id.Value))
-                throw new ArgumentException("Card Id cannot be empty.", nameof(card));
-
-            if (_iconCatalog.TryGetIcon(card.Id, out var icon) is false)
+            if (_iconCatalog.TryGetSprite(card.Id, out var icon) is false)
                 throw new KeyNotFoundException($"Missing icon for Card Id: {card.Id}");
 
             _isInitialized = true;
@@ -74,8 +76,8 @@ namespace LL.UI.Windows.Upgrade.Cards
 
             SetSelected(false);
 
-            _addButton.Clicked.Subscribe(_ => _userItems.TryAdd(Card.Id, AddAmount)).AddTo(this);
-            _userItems.ObserveAmount(Card.Id).Subscribe(UpdateProgress).AddTo(this);
+            _addButton.Clicked.Subscribe(_ => _cardCollectionService.TryAdd(Card.Id, AddAmount)).AddTo(this);
+            _userItems.ObserveAmount(Card.Id).Subscribe(OnAvailableAmountChanged).AddTo(this);
         }
 
         public void OnPointerClick(PointerEventData _)
@@ -98,10 +100,16 @@ namespace LL.UI.Windows.Upgrade.Cards
 
         internal void SetSelected(bool isSelected)
         {
-            _stateSource.SetSelected(isSelected);
+            var state = isSelected ? SelectionState.Selected : SelectionState.Normal;
+
+            if (_state == state)
+                return;
+
+            _state = state;
+            _stateRenderer.Render(state);
         }
 
-        private void UpdateProgress(int availableAmount)
+        private void OnAvailableAmountChanged(int availableAmount)
         {
             AvailableAmount = Math.Max(MinAmount, availableAmount);
             SetPlannedAmount(PlannedAmount);

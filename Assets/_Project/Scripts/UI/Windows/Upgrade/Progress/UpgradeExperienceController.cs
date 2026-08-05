@@ -1,6 +1,7 @@
 using System;
+using LL.Game.Heroes;
 using LL.Game.Ranks;
-using LL.User.State.Progress;
+using LL.User.State.Heroes;
 
 namespace LL.UI.Windows.Upgrade.Progress
 {
@@ -19,10 +20,11 @@ namespace LL.UI.Windows.Upgrade.Progress
 
         internal bool CanApplyPendingExperience =>
             _pendingExperience > MinAmount &&
-            _userProgress.CanAddExperience(_pendingExperience);
+            _userProgress.CanAddExperience(_heroId, _pendingExperience);
 
         private readonly UpgradeExperienceView _view;
-        private readonly IUserProgress _userProgress;
+        private readonly HeroId _heroId;
+        private readonly IUserHeroProgress _userProgress;
         private readonly IRankProgression _rankProgression;
 
         private RankId _baseRankId;
@@ -31,18 +33,23 @@ namespace LL.UI.Windows.Upgrade.Progress
 
         internal UpgradeExperienceController(
             UpgradeExperienceView view,
-            IUserProgress userProgress,
+            HeroId heroId,
+            IUserHeroProgress userProgress,
             IRankProgression rankProgression)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
+            _heroId = heroId;
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
         }
 
         internal void ResetPreview()
         {
-            _baseRankId = _userProgress.RankId;
-            _baseExperience = _userProgress.Experience;
+            if (_userProgress.TryGetProgress(_heroId, out var progress) is false)
+                throw new InvalidOperationException($"Missing user progress for hero '{_heroId}'.");
+
+            _baseRankId = progress.RankId;
+            _baseExperience = progress.Experience;
             ClearPreview();
         }
 
@@ -57,7 +64,7 @@ namespace LL.UI.Windows.Upgrade.Progress
             if (amount < MinAmount)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
-            if (amount > MinAmount && _userProgress.CanAddExperience(amount) is false)
+            if (amount > MinAmount && _userProgress.CanAddExperience(_heroId, amount) is false)
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
             _pendingExperience = amount;

@@ -8,22 +8,22 @@ namespace LL.User.Persistence.Documents
 
         public int Version { get; }
         public UserIdentityDocumentEntry Identity { get; }
-        public UserProgressDocumentEntry Progress { get; }
-        public UserRankUpQuestDocumentEntry RankUpQuest { get; }
-        public ItemAmountDocumentEntry[] Items { get; }
+        public UserHeroSelectionDocumentEntry HeroSelection { get; }
+        public UserHeroDocumentEntry[] Heroes { get; }
+        public UserItemDocumentEntry[] Items { get; }
 
         public UserSaveDocument(
             int version,
             UserIdentityDocumentEntry identity,
-            UserProgressDocumentEntry progress,
-            UserRankUpQuestDocumentEntry rankUpQuest,
-            ItemAmountDocumentEntry[] items)
+            UserHeroSelectionDocumentEntry heroSelection,
+            UserHeroDocumentEntry[] heroes,
+            UserItemDocumentEntry[] items)
         {
             Version = version;
             Identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            Progress = progress ?? throw new ArgumentNullException(nameof(progress));
-            RankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
-            Items = items ?? Array.Empty<ItemAmountDocumentEntry>();
+            HeroSelection = heroSelection ?? throw new ArgumentNullException(nameof(heroSelection));
+            Heroes = heroes ?? Array.Empty<UserHeroDocumentEntry>();
+            Items = items ?? Array.Empty<UserItemDocumentEntry>();
         }
     }
 }

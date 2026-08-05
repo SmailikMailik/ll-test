@@ -9,8 +9,8 @@ namespace LLEditor.Toolbar
     internal static class BootstrapPlayToolbarButton
     {
         private const string ButtonText = "B";
-        private const string ButtonName = "LastLevelBootstrapPlayButton";
-        private const string ButtonTooltip = "Play Last Level from the Bootstrap scene.";
+        private const string ButtonName = "BootstrapPlayButton";
+        private const string ButtonTooltip = "Play from the Bootstrap scene";
 
         private static readonly Button _button = CreateButton();
 
@@ -22,7 +22,7 @@ namespace LLEditor.Toolbar
 
         private static void OnEditorUpdate()
         {
-            if (_button?.panel != null)
+            if (_button?.panel is not null)
                 return;
 
             MainToolbar.TryAttachToPlayModeZone(_button);

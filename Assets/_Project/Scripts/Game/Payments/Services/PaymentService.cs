@@ -1,5 +1,4 @@
 using System;
-using LL.Game.Payments;
 using LL.User.State.Items;
 using VContainer;
 
@@ -7,10 +6,10 @@ namespace LL.Game.Payments.Services
 {
     internal sealed class PaymentService : IPaymentService
     {
-        private readonly IUserItems _items;
+        private readonly IUserItemsCommands _items;
 
         [Inject]
-        internal PaymentService(IUserItems items)
+        internal PaymentService(IUserItemsCommands items)
         {
             _items = items ?? throw new ArgumentNullException(nameof(items));
         }

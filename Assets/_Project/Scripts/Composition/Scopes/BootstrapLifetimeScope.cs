@@ -10,7 +10,9 @@ namespace LL.Composition.Scopes
     internal sealed class BootstrapLifetimeScope : LifetimeScope
     {
         [SerializeField] private ProgressBar _progressBar;
-        [SerializeField, Min(0f)] private float _minDisplaySeconds = 0.75f;
+
+        [Min(0f)]
+        [SerializeField] private float _minDisplaySeconds = 0.75f;
 
         private const string TargetSceneName = "Main";
 

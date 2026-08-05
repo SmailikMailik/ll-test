@@ -25,7 +25,7 @@ namespace LL.Game.Rewards.Configuration
             {
                 var reward = rewards[rewardIndex];
 
-                if (reward == null)
+                if (reward is null)
                     continue;
 
                 var rewardContext = context.At(rewardIndex);
@@ -45,7 +45,7 @@ namespace LL.Game.Rewards.Configuration
                 {
                     var item = items[itemIndex];
 
-                    if (item == null)
+                    if (item is null)
                         continue;
 
                     ValidationRules.Positive(

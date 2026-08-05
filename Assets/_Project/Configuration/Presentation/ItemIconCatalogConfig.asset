@@ -13,19 +13,19 @@ MonoBehaviour:
   m_Name: ItemIconCatalogConfig
   m_EditorClassIdentifier:
   _icons:
-  - _id: soft
+  - _itemId: soft
     _icon: {fileID: 21300000, guid: d2dc9b57212708b449ac93bf0b2a9955, type: 3}
-  - _id: hard
+  - _itemId: hard
     _icon: {fileID: 21300000, guid: 2a764cfe61dad194e80c90a78ffce1dc, type: 3}
-  - _id: master_point
+  - _itemId: master_point
     _icon: {fileID: 21300000, guid: a81b3f2e18e648148a232cd621b67c77, type: 3}
-  - _id: skill
+  - _itemId: skill
     _icon: {fileID: 21300000, guid: ecb22bfcb0fd5a744befb6b5506c6fbb, type: 3}
-  - _id: slot
+  - _itemId: slot
     _icon: {fileID: 21300000, guid: eff58d9945d878a4990401ad83e5220c, type: 3}
-  - _id: card_1
+  - _itemId: card_1
     _icon: {fileID: 21300000, guid: 0ab3007eec0119945943162c25800a42, type: 3}
-  - _id: card_2
+  - _itemId: card_2
     _icon: {fileID: 21300000, guid: 8e5153f072987774097e867f1cf63ebc, type: 3}
-  - _id: card_3
+  - _itemId: card_3
     _icon: {fileID: 21300000, guid: 67645833fb6750c4aa0b0d18743cec5c, type: 3}

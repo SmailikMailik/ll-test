@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
 using LL.Game.Items;
-using LL.Game.Payments;
-using LL.Game.Payments.Services;
 using LL.Game.Rewards.Services;
-using LL.User.State.Progress;
-using LL.User.State.RankUp;
+using LL.User.State;
+using LL.User.State.Heroes;
 using UnityEngine;
 using VContainer;
 
@@ -14,96 +13,140 @@ namespace LL.Game.RankUp.Services
     internal sealed class RankUpService : IRankUpService
     {
         private readonly RankUpCatalog _catalog;
-        private readonly IUserProgress _userProgress;
-        private readonly IUserRankUpQuest _rankUpQuest;
-        private readonly IPaymentService _paymentService;
+        private readonly IUserHeroProgress _progress;
+        private readonly IUserHeroProgressCommands _progressCommands;
+        private readonly IRankUpRequirementService _requirements;
         private readonly IRewardGrantService _rewardGrantService;
+        private readonly IUserStateChangeBatch _changeBatch;
 
         [Inject]
         internal RankUpService(
             RankUpCatalog catalog,
-            IUserProgress userProgress,
-            IUserRankUpQuest rankUpQuest,
-            IPaymentService paymentService,
-            IRewardGrantService rewardGrantService)
+            IUserHeroProgress progress,
+            IUserHeroProgressCommands progressCommands,
+            IRankUpRequirementService requirements,
+            IRewardGrantService rewardGrantService,
+            IUserStateChangeBatch changeBatch)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
-            _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
-            _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
+            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
+            _progressCommands = progressCommands ?? throw new ArgumentNullException(nameof(progressCommands));
+            _requirements = requirements ?? throw new ArgumentNullException(nameof(requirements));
             _rewardGrantService = rewardGrantService ?? throw new ArgumentNullException(nameof(rewardGrantService));
+            _changeBatch = changeBatch ?? throw new ArgumentNullException(nameof(changeBatch));
         }
 
-        public bool TryGetDefinition(out RankUpDefinition definition)
+        public bool TryGetDefinition(HeroId heroId, out RankUpDefinition definition)
         {
-            return _catalog.TryGetDefinition(_userProgress.RankId, out definition);
+            definition = null;
+            return _progress.TryGetProgress(heroId, out var progress) &&
+                   _catalog.TryGetDefinition(heroId, progress.RankId, out definition);
         }
 
-        public bool CanRankUp(Payment payment)
+        public bool TryActivateOption(HeroId heroId, RankUpOptionId optionId)
         {
-            return TryGetDefinition(out var definition) && CanRankUp(definition, payment);
+            if (TryGetOption(heroId, optionId, out var definition, out var option) is false ||
+                _progress.CanRankUp(heroId) is false)
+            {
+                return false;
+            }
+
+            foreach (var requirement in option.Requirements)
+            {
+                if (_requirements.TryActivate(heroId, definition.RankId, option.Id, requirement) is false)
+                    return false;
+            }
+
+            return true;
         }
 
-        public bool TryRankUp(
-            Payment payment,
+        public bool CanCompleteOption(HeroId heroId, RankUpOptionId optionId)
+        {
+            if (TryGetOption(heroId, optionId, out var definition, out var option) is false ||
+                _progress.CanRankUp(heroId) is false ||
+                _rewardGrantService.CanGrant(definition.RewardId) is false)
+            {
+                return false;
+            }
+
+            foreach (var requirement in option.Requirements)
+            {
+                if (_requirements.IsSatisfied(heroId, definition.RankId, option.Id, requirement) is false)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool TryCompleteOption(
+            HeroId heroId,
+            RankUpOptionId optionId,
+            out IReadOnlyList<ItemAmount> rewardItems)
+        {
+            IReadOnlyList<ItemAmount> appliedRewardItems = Array.Empty<ItemAmount>();
+            var succeeded = _changeBatch.Execute(() => TryCompleteOptionCore(heroId, optionId, out appliedRewardItems));
+            rewardItems = appliedRewardItems;
+            return succeeded;
+        }
+
+        private bool TryCompleteOptionCore(
+            HeroId heroId,
+            RankUpOptionId optionId,
             out IReadOnlyList<ItemAmount> rewardItems)
         {
             rewardItems = Array.Empty<ItemAmount>();
 
-            if (TryGetDefinition(out var definition) is false ||
-                CanRankUp(definition, payment) is false)
-                return false;
-
-            if (_rewardGrantService.CanGrant(definition.RewardId) is false ||
-                _paymentService.TryPay(payment) is false)
-                return false;
-
-            if (_userProgress.TryRankUp() is false)
+            if (TryGetOption(heroId, optionId, out var definition, out var option) is false ||
+                CanCompleteOption(heroId, optionId) is false)
             {
-                RefundPayment(payment);
                 return false;
             }
 
-            rewardItems = GrantReward(definition);
-            _rankUpQuest.ClearQuest();
+            var committed = new List<RankUpRequirementDefinition>(option.Requirements.Count);
+
+            foreach (var requirement in option.Requirements)
+            {
+                if (_requirements.TryCommit(heroId, definition.RankId, option.Id, requirement))
+                {
+                    committed.Add(requirement);
+                    continue;
+                }
+
+                Rollback(committed);
+                return false;
+            }
+
+            if (_progressCommands.TryRankUp(heroId) is false)
+            {
+                Rollback(committed);
+                return false;
+            }
+
+            if (_rewardGrantService.TryGrant(definition.RewardId, out rewardItems))
+                return true;
+
+            Debug.LogError($"Failed to grant rank-up reward: {definition.RewardId}");
             return true;
         }
 
-        private bool CanRankUp(RankUpDefinition definition, Payment payment)
+        private bool TryGetOption(
+            HeroId heroId,
+            RankUpOptionId optionId,
+            out RankUpDefinition definition,
+            out RankUpOptionDefinition option)
         {
-            if (_userProgress.RankId.Equals(definition.RankId) is false ||
-                _userProgress.CanRankUp is false)
+            option = null;
+            return TryGetDefinition(heroId, out definition) &&
+                   definition.TryGetOption(optionId, out option);
+        }
+
+        private void Rollback(IReadOnlyList<RankUpRequirementDefinition> requirements)
+        {
+            for (var index = requirements.Count - 1; index >= 0; index--)
             {
-                return false;
+                if (_requirements.TryRollback(requirements[index]) is false)
+                    Debug.LogError($"Failed to roll back rank-up requirement: {requirements[index].Id}");
             }
-
-            if (Matches(payment, definition.Quest.Payment))
-            {
-                return _rankUpQuest.IsCompleted &&
-                       _rankUpQuest.QuestId.Equals(definition.Quest.QuestId);
-            }
-
-            return Matches(payment, definition.InstantPayment);
-        }
-
-        private static bool Matches(Payment payment, Payment expected)
-        {
-            return payment.ItemId.Equals(expected.ItemId) && payment.Amount == expected.Amount;
-        }
-
-        private IReadOnlyList<ItemAmount> GrantReward(RankUpDefinition definition)
-        {
-            if (_rewardGrantService.TryGrant(definition.RewardId, out var items))
-                return items;
-
-            Debug.LogError($"Failed to grant rank-up reward: {definition.RewardId}");
-            return Array.Empty<ItemAmount>();
-        }
-
-        private void RefundPayment(Payment payment)
-        {
-            if (_paymentService.TryRefund(payment) is false)
-                Debug.LogError($"Failed to refund rank-up payment: {payment.Amount} {payment.ItemId}");
         }
     }
 }

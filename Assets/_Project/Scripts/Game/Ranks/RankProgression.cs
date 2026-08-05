@@ -1,10 +1,15 @@
 using System;
+using LL.Validation;
 using VContainer;
 
 namespace LL.Game.Ranks
 {
     internal sealed class RankProgression : IRankProgression
     {
+        private const string ExperienceCode = "rank-progress.experience.non-negative";
+        private const string ExperienceMaxCode = "rank-progress.experience.maximum";
+        private const string FinalRankExperienceCode = "rank-progress.final-rank-experience.zero";
+
         private readonly RankCatalog _catalog;
 
         [Inject]
@@ -16,38 +21,66 @@ namespace LL.Game.Ranks
         public RankProgress GetProgress(RankId rankId, int experience)
         {
             var rank = _catalog.GetRank(rankId);
-
-            if (experience < 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(experience),
-                    experience,
-                    "Experience must not be negative.");
-            }
-
-            var hasNextRank = rank.Number < _catalog.Ranks.Count;
+            var rankIndex = rank.Number - 1;
+            var hasNextRank = rankIndex + 1 < _catalog.Ranks.Count;
             var nextRank = hasNextRank
-                ? _catalog.Ranks[rank.Number]
+                ? _catalog.Ranks[rankIndex + 1]
                 : null;
-            var requiredExperience = nextRank?.RequiredExperience ?? 0;
+            var experienceRequiredForRankUp = nextRank?.RequiredExperience ?? 0;
 
-            if (hasNextRank && experience > requiredExperience)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(experience),
-                    experience,
-                    $"Experience at rank '{rank.Id}' must not exceed {requiredExperience}.");
-            }
+            ValidationRunner.EnsureValid(
+                context =>
+                {
+                    var experienceContext = context.At(nameof(experience));
 
-            if (hasNextRank is false && experience != 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(experience),
-                    experience,
-                    $"Experience at final rank '{rank.Id}' must be zero.");
-            }
+                    if (ValidationRules.NonNegative(experience, experienceContext, ExperienceCode) is false)
+                        return;
+
+                    if (hasNextRank)
+                    {
+                        ValidationRules.LessThanOrEqual(
+                            experience,
+                            experienceRequiredForRankUp,
+                            experienceContext,
+                            ExperienceMaxCode);
+                        return;
+                    }
+
+                    ValidationRules.Equal(
+                        experience,
+                        0,
+                        experienceContext,
+                        FinalRankExperienceCode);
+                },
+                nameof(experience));
 
             return new RankProgress(rank, nextRank, experience);
+        }
+
+        public bool TryGetProgress(RankId rankId, int experience, out RankProgress progress)
+        {
+            progress = default;
+
+            if (_catalog.TryGetRank(rankId, out var rank) is false ||
+                ValidationChecks.IsNegative(experience))
+            {
+                return false;
+            }
+
+            var rankIndex = rank.Number - 1;
+            var hasNextRank = rankIndex + 1 < _catalog.Ranks.Count;
+            var nextRank = hasNextRank
+                ? _catalog.Ranks[rankIndex + 1]
+                : null;
+
+            if (hasNextRank && experience > nextRank.RequiredExperience ||
+                hasNextRank is false && experience != 0)
+            {
+                return false;
+            }
+
+            progress = new RankProgress(rank, nextRank, experience);
+            return true;
         }
 
         public bool CanRankUp(RankId rankId, int experience)
@@ -55,7 +88,7 @@ namespace LL.Game.Ranks
             var progress = GetProgress(rankId, experience);
 
             return progress.HasNextRank &&
-                   experience >= progress.RequiredExperience;
+                   experience >= progress.ExperienceRequiredForRankUp;
         }
     }
 }

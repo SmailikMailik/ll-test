@@ -21,7 +21,7 @@ namespace LL.User.Persistence
             if (_saveService.Exists(SaveKey) is false)
                 return UserLoadResult.Failed(UserLoadStatus.NotFound);
 
-            if (_saveService.TryLoad<UserSaveDocument>(SaveKey, out var document) is false || document == null)
+            if (_saveService.TryLoad<UserSaveDocument>(SaveKey, out var document) is false || document is null)
                 return UserLoadResult.Failed(UserLoadStatus.Corrupted);
 
             if (document.Version != UserSaveDocument.CurrentVersion)

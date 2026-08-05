@@ -37,16 +37,11 @@ namespace LL.UI.Windows.Configuration
                 }
 
                 var parameterType = entry.Prefab.ParameterType;
-
-                if (parameterTypes.Add(parameterType))
-                    continue;
-
-                entryContext
-                    .At(nameof(WindowEntry.Prefab))
-                    .Report(
-                        ValidationSeverity.Error,
-                        ParameterTypeCode,
-                        $"Window parameter type '{parameterType.Name}' must be unique.");
+                ValidationRules.TryAddUnique(
+                    parameterType,
+                    parameterTypes,
+                    entryContext.At(nameof(WindowEntry.Prefab)),
+                    ParameterTypeCode);
             }
         }
     }

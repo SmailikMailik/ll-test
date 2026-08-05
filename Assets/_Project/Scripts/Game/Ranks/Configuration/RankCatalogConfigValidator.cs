@@ -25,7 +25,7 @@ namespace LL.Game.Ranks.Configuration
             {
                 var rank = ranks[index];
 
-                if (rank == null)
+                if (rank is null)
                     continue;
 
                 var rankContext = context.At(index);
@@ -33,14 +33,11 @@ namespace LL.Game.Ranks.Configuration
 
                 if (index == 0)
                 {
-                    if (rank.RequiredExperience != 0)
-                    {
-                        experienceContext.Report(
-                            ValidationSeverity.Error,
-                            InitialExperienceCode,
-                            "Rank 1 required experience must be zero.");
-                    }
-
+                    ValidationRules.Equal(
+                        rank.RequiredExperience,
+                        0,
+                        experienceContext,
+                        InitialExperienceCode);
                     continue;
                 }
 

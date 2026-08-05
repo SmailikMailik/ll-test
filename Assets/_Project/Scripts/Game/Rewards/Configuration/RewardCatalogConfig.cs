@@ -44,7 +44,9 @@ namespace LL.Game.Rewards.Configuration
     internal sealed class RewardItemEntry
     {
         [SerializeField] private string _id;
-        [SerializeField, MinValue(1)] private int _amount = 1;
+
+        [MinValue(1)]
+        [SerializeField] private int _amount = 1;
 
         internal ItemId Id => new(_id);
         internal int Amount => _amount;

@@ -15,16 +15,16 @@ namespace LL.Validation
             string path,
             string message)
         {
-            if (Enum.IsDefined(typeof(ValidationSeverity), severity) is false)
+            if (ValidationChecks.IsUndefined(severity))
                 throw new ArgumentOutOfRangeException(
                     nameof(severity),
                     severity,
                     "Validation severity is not supported.");
 
-            if (string.IsNullOrWhiteSpace(code))
+            if (ValidationChecks.IsEmpty(code))
                 throw new ArgumentException("Validation issue code must be non-empty.", nameof(code));
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (ValidationChecks.IsEmpty(message))
                 throw new ArgumentException("Validation issue message must be non-empty.", nameof(message));
 
             Severity = severity;

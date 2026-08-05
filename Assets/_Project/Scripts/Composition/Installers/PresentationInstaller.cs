@@ -1,6 +1,11 @@
 using System;
-using LL.Presentation.Icons.Configuration;
+using LL.Game.Flags;
+using LL.Game.Heroes;
+using LL.Game.Items;
+using LL.Infrastructure.Loading;
+using LL.Presentation.Heroes;
 using LL.Presentation.Localization;
+using LL.Presentation.Sprites;
 using VContainer;
 using VContainer.Unity;
 
@@ -8,17 +13,26 @@ namespace LL.Composition.Installers
 {
     internal sealed class PresentationInstaller : IInstaller
     {
-        private readonly ItemIconCatalogConfig _itemIconCatalogConfig;
+        private readonly IDataLoader<SpriteCatalog<ItemId>> _itemIconCatalogLoader;
+        private readonly IDataLoader<SpriteCatalog<FlagId>> _flagCatalogLoader;
+        private readonly IDataLoader<SpriteVariantCatalog<HeroId, HeroPortraitSize>> _heroPortraitCatalogLoader;
 
-        internal PresentationInstaller(ItemIconCatalogConfig itemIconCatalogConfig)
+        internal PresentationInstaller(
+            IDataLoader<SpriteCatalog<ItemId>> itemIconCatalogLoader,
+            IDataLoader<SpriteCatalog<FlagId>> flagCatalogLoader,
+            IDataLoader<SpriteVariantCatalog<HeroId, HeroPortraitSize>> heroPortraitCatalogLoader)
         {
-            _itemIconCatalogConfig = itemIconCatalogConfig ?? throw new ArgumentNullException(nameof(itemIconCatalogConfig));
+            _itemIconCatalogLoader = itemIconCatalogLoader ?? throw new ArgumentNullException(nameof(itemIconCatalogLoader));
+            _flagCatalogLoader = flagCatalogLoader ?? throw new ArgumentNullException(nameof(flagCatalogLoader));
+            _heroPortraitCatalogLoader = heroPortraitCatalogLoader ?? throw new ArgumentNullException(nameof(heroPortraitCatalogLoader));
         }
 
         public void Install(IContainerBuilder builder)
         {
             builder.Register<UnityLocalizationService>(Lifetime.Singleton).As<ILocalizationService>();
-            builder.RegisterLoadedData(_itemIconCatalogConfig);
+            builder.RegisterLoadedData(_itemIconCatalogLoader);
+            builder.RegisterLoadedData(_flagCatalogLoader);
+            builder.RegisterLoadedData(_heroPortraitCatalogLoader);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace LL.Infrastructure.Saving.Serialization
 
         public bool TrySerialize<T>(T data, out byte[] bytes) where T : class
         {
-            if (data == null)
+            if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
             try
@@ -37,14 +37,14 @@ namespace LL.Infrastructure.Saving.Serialization
 
         public bool TryDeserialize<T>(byte[] bytes, out T data) where T : class
         {
-            if (bytes == null)
+            if (bytes is null)
                 throw new ArgumentNullException(nameof(bytes));
 
             try
             {
                 var json = _encoding.GetString(bytes);
                 data = JsonConvert.DeserializeObject<T>(json, _settings);
-                return data != null;
+                return data is not null;
             }
             catch (Exception exception) when (IsSerializationException(exception))
             {

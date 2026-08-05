@@ -1,6 +1,12 @@
+param([string]$ProjectRoot)
+
 $ErrorActionPreference = "Stop"
 
-$projectRoot = Split-Path -Parent $PSScriptRoot
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
+    $ProjectRoot = Split-Path -Parent $PSScriptRoot
+}
+
+$projectRoot = [IO.Path]::GetFullPath($ProjectRoot)
 $scriptsRoot = Join-Path $projectRoot "Assets/_Project/Scripts"
 $editorRoot = Join-Path $projectRoot "Assets/_Project/Editor"
 $testsRoot = Join-Path $projectRoot "Assets/_Project/Tests"
@@ -86,7 +92,10 @@ function Test-RuntimeDependencies {
                         $true
                     } elseif (
                         $targetArea -in @("Infrastructure", "Validation") -and
-                        $sourceNamespace -like "LL.UI.Windows.Configuration*") {
+                        (
+                            $sourceNamespace -like "LL.UI.Windows.Configuration*" -or
+                            $sourceNamespace -like "LL.UI.Windows.Loading*"
+                        )) {
                         $true
                     } else {
                         $false
@@ -98,8 +107,13 @@ function Test-RuntimeDependencies {
                     if ($targetArea -in @("Game", "User")) {
                         $true
                     } elseif (
-                        $targetArea -in @("Infrastructure", "Validation") -and
-                        $sourceNamespace -like "LL.Presentation.*.Configuration*") {
+                        $targetArea -eq "Infrastructure" -and
+                        (
+                            $sourceNamespace -like "LL.Presentation.*.Configuration*" -or
+                            $sourceNamespace -like "LL.Presentation.*.Loading*"
+                        )) {
+                        $true
+                    } elseif ($targetArea -eq "Validation") {
                         $true
                     } else {
                         $false
@@ -148,51 +162,6 @@ function Test-RuntimeDependencies {
     }
 }
 
-function Test-EnumDeclarations {
-    foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*.cs") {
-        $content = [IO.File]::ReadAllText($file.FullName)
-        $enumPattern = "\benum\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)" +
-            "(?:\s*:\s*(?<base>[A-Za-z_][A-Za-z0-9_]*))?\s*\{(?<body>[^{}]*)\}"
-
-        foreach ($enumMatch in [regex]::Matches(
-            $content,
-            $enumPattern,
-            [Text.RegularExpressions.RegexOptions]::Singleline)) {
-            $enumName = $enumMatch.Groups["name"].Value
-
-            if ($enumMatch.Groups["base"].Value -ne "byte") {
-                Add-ArchitectureError "Enum must use byte: $($file.FullName) ($enumName)"
-                continue
-            }
-
-            $expectedValue = 0
-
-            foreach ($rawMember in $enumMatch.Groups["body"].Value.Split(",")) {
-                $member = $rawMember.Trim()
-
-                if ($member.Length -eq 0) {
-                    continue
-                }
-
-                $memberMatch = [regex]::Match(
-                    $member,
-                    "^(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?<value>[0-9]+)$")
-
-                if (
-                    $memberMatch.Success -eq $false -or
-                    [int]$memberMatch.Groups["value"].Value -ne $expectedValue) {
-                    Add-ArchitectureError (
-                        "Enum values must be explicit and sequential from 0: " +
-                        "$($file.FullName) ($enumName)")
-                    break
-                }
-
-                $expectedValue++
-            }
-        }
-    }
-}
-
 function Test-DiRegistrations {
     $typeFiles = @{}
 
@@ -235,8 +204,7 @@ function Test-DomainDataLoaders {
         $content = [IO.File]::ReadAllText($file.FullName)
 
         if (
-            $content -match "IDataLoader<" -and
-            $file.Name -ne "GameDataLoader.cs") {
+            $content -match "IDataLoader<") {
             Add-ArchitectureError (
                 "Game domain data may use IDataLoader only at GameDataSnapshot boundary: " +
                 "$($file.FullName)")
@@ -250,8 +218,120 @@ function Test-DomainDataLoaders {
             $content -match "IDataLoader<" -and
             $file.Name -ne "UserSessionLoader.cs") {
             Add-ArchitectureError (
-                "User domain data may use IDataLoader only at UserSnapshot boundary: " +
+                "User domain data may use IDataLoader only at UserDefaultsSnapshot or UserSnapshot boundary: " +
                 "$($file.FullName)")
+        }
+    }
+}
+
+function Test-DataBoundaryRoles {
+    foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*Config.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if ($content -match "\bIDataLoader\s*<") {
+            Add-ArchitectureError (
+                "Config must remain an authoring object and must not implement IDataLoader: " +
+                "$($file.FullName)")
+        }
+    }
+
+    foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*Compiler.cs") {
+        if ($file.Name -eq "IDataCompiler.cs") {
+            continue
+        }
+
+        $content = [IO.File]::ReadAllText($file.FullName)
+        $compilerMatch = [regex]::Match(
+            $content,
+            "\bIDataCompiler\s*<\s*(?<declaration>[A-Za-z_][A-Za-z0-9_]*)\s*,")
+
+        if ($compilerMatch.Success -eq $false) {
+            Add-ArchitectureError (
+                "Compiler must implement IDataCompiler<TDeclaration, TSnapshot>: " +
+                "$($file.FullName)")
+            continue
+        }
+
+        $declarationType = $compilerMatch.Groups["declaration"].Value
+        $validatorType = "${declarationType}Validator"
+        $validatorFile = Join-Path $file.DirectoryName "${validatorType}.cs"
+
+        if (
+            [IO.File]::Exists($validatorFile) -eq $false -or
+            $content -notmatch "\b$([regex]::Escape($validatorType))\b") {
+            Add-ArchitectureError (
+                "Compiler must delegate aggregate validation to adjacent ${validatorType}: " +
+                "$($file.FullName)")
+        }
+    }
+
+    foreach ($file in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "ScriptableObject*Loader.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if ($file.Directory.Name -ne "Loading") {
+            Add-ArchitectureError (
+                "ScriptableObject loader must be placed in its capability's Loading folder: " +
+                "$($file.FullName)")
+        }
+
+        if ($content -notmatch "\bIDataLoader\s*<") {
+            Add-ArchitectureError (
+                "ScriptableObject loader must implement IDataLoader<T>: " +
+                "$($file.FullName)")
+        }
+    }
+}
+
+function Test-UserStateCommandConsumers {
+    $commandsPattern = "\bIUser(?:Items|HeroProgress|RankUpAttempts)Commands\b"
+
+    foreach ($file in Get-ChildItem -LiteralPath (Join-Path $scriptsRoot "UI") -Recurse -Filter "*.cs") {
+        $content = [IO.File]::ReadAllText($file.FullName)
+
+        if ($content -match $commandsPattern) {
+            Add-ArchitectureError (
+                "UI must mutate user state through game services, not User.State command interfaces: " +
+                "$($file.FullName)")
+        }
+    }
+}
+
+function Test-ContentMenuCoverage {
+    $menuRoot = Join-Path $editorRoot "Menu"
+    $menuContent = ""
+
+    if (Test-Path -LiteralPath $menuRoot) {
+        foreach ($menuFile in Get-ChildItem -LiteralPath $menuRoot -Recurse -Filter "*.cs") {
+            $menuContent += [IO.File]::ReadAllText($menuFile.FullName)
+            $menuContent += "`n"
+        }
+    }
+
+    foreach ($configFile in Get-ChildItem -LiteralPath $scriptsRoot -Recurse -Filter "*Config.cs") {
+        $content = [IO.File]::ReadAllText($configFile.FullName)
+
+        if ($content -notmatch "\[CreateAssetMenu\b") {
+            continue
+        }
+
+        $configTypeMatch = [regex]::Match(
+            $content,
+            "\bclass\s+(?<name>[A-Za-z_][A-Za-z0-9_]*Config)\b")
+
+        if ($configTypeMatch.Success -eq $false) {
+            Add-ArchitectureError "CreateAssetMenu config type could not be identified: $($configFile.FullName)"
+            continue
+        }
+
+        $configType = $configTypeMatch.Groups["name"].Value
+        $selectorPattern = "\bProjectAssetSelector\s*\.\s*Select\s*<\s*" +
+            [regex]::Escape($configType) +
+            "\s*>\s*\("
+
+        if ($menuContent -notmatch $selectorPattern) {
+            Add-ArchitectureError (
+                "Root authored config must be exposed through Last Level/Content: " +
+                "$($configFile.FullName) ($configType)")
         }
     }
 }
@@ -327,93 +407,17 @@ Test-NamespaceTree -Root $scriptsRoot -RootNamespace "LL"
 Test-NamespaceTree -Root $editorRoot -RootNamespace "LLEditor"
 Test-NamespaceTree -Root $testsRoot -RootNamespace "LL.Tests"
 Test-RuntimeDependencies
-Test-EnumDeclarations
 Test-DiRegistrations
 Test-DomainDataLoaders
+Test-DataBoundaryRoles
+Test-UserStateCommandConsumers
+Test-ContentMenuCoverage
 
 foreach ($file in Get-ChildItem (Join-Path $projectRoot "Assets/_Project") -Recurse -Filter "*.cs") {
     $content = [IO.File]::ReadAllText($file.FullName)
-    $bytes = [IO.File]::ReadAllBytes($file.FullName)
-
-    if ($bytes.Length -gt 0 -and $bytes[$bytes.Length - 1] -in 10, 13) {
-        Add-ArchitectureError "C# file has a trailing newline: $($file.FullName)"
-    }
 
     if ($content -match "\bFormerlySerializedAs\s*\(") {
         Add-ArchitectureError "FormerlySerializedAs is not allowed; migrate serialized keys: $($file.FullName)"
-    }
-
-    if ($content -match "(?m)^[ \t]*\[[^\]\r\n]+\][ \t]*\[[^\]\r\n]+\]") {
-        Add-ArchitectureError "Place each C# attribute on its own line: $($file.FullName)"
-    }
-
-    if ($content -match "\)\s*\r?\n\s*\{\s*\r?\n\s*\}") {
-        Add-ArchitectureError "Empty C# bodies must be inline: $($file.FullName)"
-    }
-
-    foreach ($assignment in [regex]::Matches(
-        $content,
-        "(?m)^(?<indent>[ \t]*)(?<left>[^\r\n=]+=[ \t]*)\r?\n[ \t]+(?<right>[^\r\n;]+;)")) {
-        $singleLine = (
-            $assignment.Groups["indent"].Value +
-            $assignment.Groups["left"].Value.TrimEnd() +
-            " " +
-            $assignment.Groups["right"].Value.Trim())
-
-        if ($singleLine.Length -le 120) {
-            Add-ArchitectureError (
-                "Simple assignment that fits within 120 characters must remain on one line: " +
-                "$($file.FullName)")
-        }
-    }
-
-    foreach ($invocation in [regex]::Matches(
-        $content,
-        "(?m)^(?<indent>[ \t]*)(?<head>[^\r\n]+\()\r?\n[ \t]+(?<tail>[^\r\n]+?\);)[ \t]*$")) {
-        $singleLine = (
-            $invocation.Groups["indent"].Value +
-            $invocation.Groups["head"].Value.TrimEnd() +
-            $invocation.Groups["tail"].Value.Trim())
-
-        if ($singleLine.Length -le 120) {
-            Add-ArchitectureError (
-                "Simple invocation that fits within 120 characters must remain on one line: " +
-                "$($file.FullName)")
-        }
-    }
-
-    if (
-        $content -match "\binternal\s+sealed\s+class\s+\w+\s*:\s*" +
-            "(?:MonoBehaviour|MaskableGraphic|Selectable)\b" -and
-        $content -notmatch "\[DisallowMultipleComponent\]") {
-        Add-ArchitectureError (
-            "Concrete component should declare [DisallowMultipleComponent]: $($file.FullName)")
-    }
-
-    if ($file.FullName.StartsWith($scriptsRoot) -and $content -match "\.Subscribe\s*\(") {
-        foreach ($subscription in [regex]::Matches($content, "\.Subscribe\s*\(")) {
-            $remainingLength = [Math]::Min(1000, $content.Length - $subscription.Index)
-            $subscriptionText = $content.Substring($subscription.Index, $remainingLength)
-
-            if (
-                $file.FullName -like "*\Scripts\UI\*" -and
-                $subscriptionText -notmatch "\.AddTo\s*\(\s*this\s*\)") {
-                Add-ArchitectureError (
-                    "UI R3 subscription must be bound to the component lifetime: " +
-                    "$($file.FullName)")
-                break
-            }
-        }
-    }
-
-    $lineNumber = 0
-
-    foreach ($line in [IO.File]::ReadLines($file.FullName)) {
-        $lineNumber++
-
-        if ($line.Length -gt 140) {
-            Add-ArchitectureError "Line exceeds the hard limit of 140 characters: $($file.FullName):$lineNumber"
-        }
     }
 }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using LL.Game.Items;
+using LL.User.State;
 using LL.User.State.Items;
 using VContainer;
 
@@ -10,15 +11,18 @@ namespace LL.Game.Rewards.Services
     internal sealed class RewardGrantService : IRewardGrantService
     {
         private readonly RewardCatalog _catalog;
-        private readonly IUserItems _items;
+        private readonly IUserItemsCommands _items;
+        private readonly IUserStateChangeBatch _changeBatch;
 
         [Inject]
         internal RewardGrantService(
             RewardCatalog catalog,
-            IUserItems items)
+            IUserItemsCommands items,
+            IUserStateChangeBatch changeBatch)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _items = items ?? throw new ArgumentNullException(nameof(items));
+            _changeBatch = changeBatch ?? throw new ArgumentNullException(nameof(changeBatch));
         }
 
         public bool CanGrant(RewardId id)
@@ -28,6 +32,14 @@ namespace LL.Game.Rewards.Services
         }
 
         public bool TryGrant(RewardId id, out IReadOnlyList<ItemAmount> items)
+        {
+            IReadOnlyList<ItemAmount> grantedItems = Array.Empty<ItemAmount>();
+            var succeeded = _changeBatch.Execute(() => TryGrantCore(id, out grantedItems));
+            items = grantedItems;
+            return succeeded;
+        }
+
+        private bool TryGrantCore(RewardId id, out IReadOnlyList<ItemAmount> items)
         {
             items = Array.Empty<ItemAmount>();
 

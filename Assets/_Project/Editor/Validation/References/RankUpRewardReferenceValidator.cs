@@ -34,14 +34,14 @@ namespace LLEditor.Validation.References
             IEnumerable<RewardEntry> rewards,
             ValidationContext context)
         {
-            if (rankUps == null || rewards == null)
+            if (rankUps is null || rewards is null)
                 return;
 
             var rewardIds = new HashSet<RewardId>();
 
             foreach (var reward in rewards)
             {
-                if (reward != null && IdentifierValidator.IsValid(reward.Id))
+                if (reward is not null && IdentifierValidator.IsValid(reward.Id))
                     rewardIds.Add(reward.Id);
             }
 
@@ -49,7 +49,7 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp == null ||
+                if (rankUp is null ||
                     IdentifierValidator.IsValid(rankUp.RewardId) is false)
                 {
                     continue;

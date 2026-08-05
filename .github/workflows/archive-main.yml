@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   archive:
-    name: Create verified Unity project archive
+    name: Create integrity-checked Unity project archive
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -43,7 +43,6 @@ jobs:
           mkdir -p "${package_root}" "${output_directory}"
 
           include_paths=(
-            "ARCHITECTURE.md"
             "Assets"
             "Documentation"
             "Packages"
@@ -59,14 +58,6 @@ jobs:
 
             cp -a "${path}" "${package_root}/"
           done
-
-          cat > "${package_root}/BUILD-INFO.txt" <<EOF
-          Repository: ${GITHUB_REPOSITORY}
-          Branch: ${GITHUB_REF_NAME}
-          Commit: ${GITHUB_SHA}
-          Workflow run: ${GITHUB_RUN_NUMBER}
-          Created at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          EOF
 
           (
             cd "${RUNNER_TEMP}/package"
@@ -98,17 +89,14 @@ jobs:
           unzip -q "${archive_path}" -d "${validation_root}"
 
           required_paths=(
-            "ARCHITECTURE.md"
             "Assets"
             "Assets/_Project/Scenes/Bootstrap.unity"
             "Assets/_Project/Scenes/Main.unity"
-            "Documentation/Architecture/Game-And-User-Data.md"
-            "Documentation/Architecture/LL-Runtime-Overview.md"
+            "Documentation"
             "Packages/manifest.json"
             "Packages/packages-lock.json"
             "ProjectSettings/ProjectVersion.txt"
             "README.md"
-            "BUILD-INFO.txt"
           )
 
           for path in "${required_paths[@]}"; do
@@ -127,7 +115,6 @@ jobs:
             "AGENTS.md"
             "artifacts"
             "Builds"
-            "CI.md"
             "Library"
             "Logs"
             "obj"
@@ -251,10 +238,16 @@ jobs:
           )
 
           commit_url="https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          workflow_url="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          created_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           release_notes="$(
-            printf "%s\n\n%s" \
-              "Automatically generated Unity project archive for main commit [${GITHUB_SHA::7}](${commit_url})." \
-              "The archive was verified and includes Git LFS content."
+            printf "%s\n\n%s\n\n%s\n%s\n%s\n%s" \
+              "Automatically generated and integrity-checked Unity project archive." \
+              "The archive includes resolved Git LFS content." \
+              "- **Branch:** ${GITHUB_REF_NAME}" \
+              "- **Commit:** [${GITHUB_SHA::7}](${commit_url})" \
+              "- **Workflow run:** [#${GITHUB_RUN_NUMBER}](${workflow_url})" \
+              "- **Created at:** ${created_at}"
           )"
 
           if gh release view "main-latest" > /dev/null 2>&1; then

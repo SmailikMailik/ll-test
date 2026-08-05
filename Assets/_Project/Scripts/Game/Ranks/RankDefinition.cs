@@ -1,9 +1,14 @@
-using System;
+using LL.Game.Identifiers;
+using LL.Validation;
 
 namespace LL.Game.Ranks
 {
     internal sealed class RankDefinition
     {
+        private const string NumberCode = "rank.number.positive";
+        private const string InitialExperienceCode = "rank-catalog.initial-experience.zero";
+        private const string ExperienceCode = "rank-catalog.experience.positive";
+
         internal RankId Id { get; }
         internal int Number { get; }
         internal int RequiredExperience { get; }
@@ -13,17 +18,29 @@ namespace LL.Game.Ranks
             int number,
             int requiredExperience)
         {
-            if (string.IsNullOrWhiteSpace(id.Value))
-                throw new ArgumentException("Rank ID must be non-empty.", nameof(id));
+            IdentifierValidator.EnsureValid(id, nameof(id));
+            ValidationRunner.EnsureValid(
+                context => ValidationRules.Positive(number, context, NumberCode),
+                nameof(number));
+            ValidationRunner.EnsureValid(
+                context =>
+                {
+                    if (number == 1)
+                    {
+                        ValidationRules.Equal(
+                            requiredExperience,
+                            0,
+                            context,
+                            InitialExperienceCode);
+                        return;
+                    }
 
-            if (number < 1)
-                throw new ArgumentOutOfRangeException(nameof(number));
-
-            if (number == 1 && requiredExperience != 0)
-                throw new ArgumentException("Rank 1 required experience must be zero.", nameof(requiredExperience));
-
-            if (number > 1 && requiredExperience <= 0)
-                throw new ArgumentOutOfRangeException(nameof(requiredExperience));
+                    ValidationRules.Positive(
+                        requiredExperience,
+                        context,
+                        ExperienceCode);
+                },
+                nameof(requiredExperience));
 
             Id = id;
             Number = number;

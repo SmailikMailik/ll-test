@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using LL.Infrastructure.Loading;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,14 +7,9 @@ using UnityEngine;
 namespace LL.UI.Windows.Configuration
 {
     [CreateAssetMenu(fileName = nameof(WindowCatalogConfig), menuName = CreationPath)]
-    [HideMonoScript]
-    internal sealed class WindowCatalogConfig :
-        ScriptableObject,
-        IDataLoader<WindowCatalog>,
-        IValidationSource
+    internal sealed class WindowCatalogConfig : ScriptableObject, IValidationSource
     {
         [ValidateInput(nameof(HasValidEntries), "Assign every prefab and remove duplicate parameter types.")]
-        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
         [SerializeField] private List<WindowEntry> _entries = new();
 
         internal const string CreationPath = "LL/Window Catalog";
@@ -24,13 +17,6 @@ namespace LL.UI.Windows.Configuration
         private static readonly IDataValidator<IReadOnlyList<WindowEntry>> _validator = new WindowCatalogConfigValidator();
 
         internal IReadOnlyList<WindowEntry> Entries => _entries;
-
-        public WindowCatalog Load()
-        {
-            ValidationRunner.EnsureValid(this, nameof(_entries));
-
-            return new WindowCatalog(_entries.Select(entry => entry.ToDefinition()));
-        }
 
         private static bool HasValidEntries(List<WindowEntry> entries)
         {
@@ -47,21 +33,11 @@ namespace LL.UI.Windows.Configuration
     internal sealed class WindowEntry
     {
         [AssetsOnly]
-        [HideLabel]
-        [PropertyOrder(0)]
-        [TableColumnWidth(280)]
         [SerializeField, Required] private WindowBase _prefab;
 
-        [HideLabel]
-        [PropertyOrder(2)]
-        [TableColumnWidth(65, Resizable = false)]
         [SerializeField] private bool _popup;
 
         [ShowInInspector]
-        [DisplayAsString]
-        [HideLabel]
-        [PropertyOrder(1)]
-        [TableColumnWidth(180)]
         private string Parameters => _prefab == null ? "—" : _prefab.ParameterType.Name;
 
         internal WindowBase Prefab => _prefab;

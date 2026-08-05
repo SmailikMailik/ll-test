@@ -4,17 +4,30 @@ namespace LLEditor.Menu
     {
         private const string RootPath = "Last Level/";
 
-        internal const string ValidateProjectDataPath = RootPath + "Validate Project Data";
-        internal const string DeleteSavedUserDataPath = RootPath + "Delete Saved User Data";
+        internal static class Content
+        {
+            internal const string Path = RootPath + "Content/";
 
-        internal const string ContentPath = RootPath + "Content/";
-        internal const string ScenesPath = RootPath + "Scenes/";
+            // Priority gaps create separators between ownership groups.
+            internal const int GamePriority = 0;
+            internal const int PresentationPriority = 20;
+            internal const int UIPriority = 40;
+            internal const int UserPriority = 60;
+        }
 
-        internal const int GameContentPriority = 0;
-        internal const int ProjectContentPriority = 20;
-        internal const int UserContentPriority = 40;
-        internal const int ScenePriority = 0;
-        internal const int ValidateProjectDataPriority = 100;
-        internal const int DeleteSavedUserDataPriority = 101;
+        internal static class Scenes
+        {
+            internal const string Path = RootPath + "Scenes/";
+            internal const int Priority = 0;
+        }
+
+        internal static class Commands
+        {
+            internal const string ValidateProjectDataPath = RootPath + "Validate Project Data";
+            internal const string DeleteSavedUserDataPath = RootPath + "Delete Saved User Data";
+
+            internal const int ValidateProjectDataPriority = 100;
+            internal const int DeleteSavedUserDataPriority = 101;
+        }
     }
 }

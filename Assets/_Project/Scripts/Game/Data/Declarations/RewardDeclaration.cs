@@ -1,21 +1,17 @@
-using System;
 using System.Collections.Generic;
+using LL.Infrastructure.Collections;
 
 namespace LL.Game.Data.Declarations
 {
     internal sealed class RewardDeclaration
     {
         internal string Id { get; }
-        internal IReadOnlyList<ItemAmountDeclaration> Items { get; }
+        internal IReadOnlyList<RewardItemDeclaration> Items { get; }
 
-        internal RewardDeclaration(string id, IEnumerable<ItemAmountDeclaration> items)
+        internal RewardDeclaration(string id, IEnumerable<RewardItemDeclaration> items)
         {
             Id = id;
-            var copy = items == null
-                ? Array.Empty<ItemAmountDeclaration>()
-                : new List<ItemAmountDeclaration>(items).ToArray();
-
-            Items = Array.AsReadOnly(copy);
+            Items = items.ToReadOnlyCopy();
         }
     }
 }

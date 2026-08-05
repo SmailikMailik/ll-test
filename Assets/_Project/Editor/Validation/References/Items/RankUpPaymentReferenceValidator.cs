@@ -3,7 +3,7 @@ using LL.Game.Identifiers;
 using LL.Game.Items;
 using LL.Game.Payments.Configuration;
 using LL.Game.RankUp.Configuration;
-using LL.Presentation.Icons.Configuration;
+using LL.Presentation.Items.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
 using LLEditor.Validation.Sources;
@@ -23,17 +23,17 @@ namespace LLEditor.Validation.References.Items
             var config = sources.GetSingle<RankUpCatalogConfig>();
             var rankUps = config?.RankUps;
 
-            if (rankUps == null)
+            if (rankUps is null)
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
-            var hasUserItems = ItemReferenceIdCollector.TryCollect(
+            var hasUserItems = ItemReferenceIdCollector.TryCollectValidIds(
                 userDefaults?.Items,
                 item => item.Id,
                 out var userItemIds);
 
             var icons = sources.GetSingle<ItemIconCatalogConfig>();
-            var hasIcons = ItemReferenceIdCollector.TryCollect(
+            var hasIcons = ItemReferenceIdCollector.TryCollectValidIds(
                 icons?.Icons,
                 icon => icon.Id,
                 out var iconIds);
@@ -47,23 +47,38 @@ namespace LLEditor.Validation.References.Items
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp == null)
+                if (rankUp?.Options is null)
                     continue;
 
-                ValidatePayment(
-                    rankUp.QuestPayment,
-                    configContext.At(index).At(nameof(RankUpEntry.QuestPayment)),
-                    hasUserItems,
-                    userItemIds,
-                    hasIcons,
-                    iconIds);
-                ValidatePayment(
-                    rankUp.InstantPayment,
-                    configContext.At(index).At(nameof(RankUpEntry.InstantPayment)),
-                    hasUserItems,
-                    userItemIds,
-                    hasIcons,
-                    iconIds);
+                for (var optionIndex = 0; optionIndex < rankUp.Options.Count; optionIndex++)
+                {
+                    var option = rankUp.Options[optionIndex];
+
+                    if (option?.Requirements is null)
+                        continue;
+
+                    for (var requirementIndex = 0;
+                         requirementIndex < option.Requirements.Count;
+                         requirementIndex++)
+                    {
+                        if (option.Requirements[requirementIndex] is not PaymentRankUpRequirementEntry payment)
+                            continue;
+
+                        ValidatePayment(
+                            payment.Payment,
+                            configContext
+                                .At(index)
+                                .At(nameof(RankUpEntry.Options))
+                                .At(optionIndex)
+                                .At(nameof(RankUpOptionEntry.Requirements))
+                                .At(requirementIndex)
+                                .At(nameof(PaymentRankUpRequirementEntry.Payment)),
+                            hasUserItems,
+                            userItemIds,
+                            hasIcons,
+                            iconIds);
+                    }
+                }
             }
         }
 
@@ -75,7 +90,7 @@ namespace LLEditor.Validation.References.Items
             bool hasIcons,
             ISet<ItemId> iconIds)
         {
-            if (payment == null || IdentifierValidator.IsValid(payment.ItemId) is false)
+            if (payment is null || IdentifierValidator.IsValid(payment.ItemId) is false)
                 return;
 
             var idContext = context.At(nameof(PaymentEntry.ItemId));

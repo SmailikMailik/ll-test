@@ -1,7 +1,16 @@
+using LL.Composition.Factories;
 using LL.Composition.Installers;
 using LL.Game.Data.Configuration;
-using LL.Presentation.Icons.Configuration;
+using LL.Infrastructure.Saving.Serialization;
+using LL.Infrastructure.Saving.Storage;
+using LL.Presentation.Flags.Configuration;
+using LL.Presentation.Flags.Loading;
+using LL.Presentation.Heroes.Configuration;
+using LL.Presentation.Heroes.Loading;
+using LL.Presentation.Items.Configuration;
+using LL.Presentation.Items.Loading;
 using LL.UI.Windows.Configuration;
+using LL.UI.Windows.Loading;
 using LL.User.Configuration;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
@@ -22,17 +31,32 @@ namespace LL.Composition.Scopes
 
         [Header("Presentation")]
         [SerializeField] private ItemIconCatalogConfig _itemIconCatalogConfig;
+        [SerializeField] private FlagCatalogConfig _flagCatalogConfig;
+        [SerializeField] private HeroPortraitCatalogConfig _heroPortraitCatalogConfig;
 
         [Header("User")]
         [SerializeField] private UserDefaultsConfig _userDefaultsConfig;
 
         protected override void Configure(IContainerBuilder builder)
         {
-            new WindowInstaller(_windowCatalogConfig).Install(builder);
-            new PresentationInstaller(_itemIconCatalogConfig).Install(builder);
+            var gameDataLoader = GameDataLoaderFactory.CreateFromScriptableObjects(_gameDataManifestConfig);
+            var itemIconCatalogLoader = new ScriptableObjectItemIconCatalogLoader(_itemIconCatalogConfig);
+            var flagCatalogLoader = new ScriptableObjectFlagCatalogLoader(_flagCatalogConfig);
+            var heroPortraitCatalogLoader = new ScriptableObjectHeroPortraitCatalogLoader(_heroPortraitCatalogConfig);
+            var windowCatalogLoader = new ScriptableObjectWindowCatalogLoader(_windowCatalogConfig);
+            var userDefaultsSource = UserDefaultsSourceFactory.CreateFromScriptableObject(_userDefaultsConfig);
+            var userSaveRepository = UserSaveRepositoryFactory.CreateSerialized(
+                new JsonSaveSerializer(),
+                new FileSaveStorage());
+
+            new WindowInstaller(windowCatalogLoader).Install(builder);
+            new PresentationInstaller(
+                itemIconCatalogLoader,
+                flagCatalogLoader,
+                heroPortraitCatalogLoader).Install(builder);
             new ValidationReportingInstaller().Install(builder);
-            new GameDataInstaller(_gameDataManifestConfig).Install(builder);
-            new UserInstaller(_userDefaultsConfig).Install(builder);
+            new GameDataInstaller(gameDataLoader).Install(builder);
+            new UserInstaller(userDefaultsSource, userSaveRepository).Install(builder);
             new GameServicesInstaller().Install(builder);
         }
     }

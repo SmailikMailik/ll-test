@@ -16,7 +16,7 @@ namespace LLEditor.Toolbar
 
         internal static bool TryAttachToPlayModeZone(VisualElement element)
         {
-            if (_toolbarType == null || _rootField == null)
+            if (_toolbarType is null || _rootField is null)
                 return false;
 
             var toolbar = Resources.FindObjectsOfTypeAll(_toolbarType).FirstOrDefault();
@@ -27,7 +27,7 @@ namespace LLEditor.Toolbar
             var root = _rootField.GetValue(toolbar) as VisualElement;
             var playModeZone = root?.Q(PlayModeZoneName);
 
-            if (playModeZone == null)
+            if (playModeZone is null)
                 return false;
 
             playModeZone.Q(element.name)?.RemoveFromHierarchy();

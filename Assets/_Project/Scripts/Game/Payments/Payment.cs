@@ -1,5 +1,7 @@
 using System;
+using LL.Game.Identifiers;
 using LL.Game.Items;
+using LL.Validation;
 
 namespace LL.Game.Payments
 {
@@ -10,10 +12,9 @@ namespace LL.Game.Payments
 
         internal Payment(ItemId itemId, int amount)
         {
-            if (string.IsNullOrWhiteSpace(itemId.Value))
-                throw new ArgumentException("Payment item ID must be non-empty.", nameof(itemId));
+            IdentifierValidator.EnsureValid(itemId, nameof(itemId));
 
-            if (amount <= 0)
+            if (ValidationChecks.IsNonPositive(amount))
                 throw new ArgumentOutOfRangeException(nameof(amount));
 
             ItemId = itemId;

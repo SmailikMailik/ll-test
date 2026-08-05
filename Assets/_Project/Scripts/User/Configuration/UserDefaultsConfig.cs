@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using LL.Game.Heroes;
 using LL.Game.Items;
 using LL.Game.Ranks;
-using LL.User.Snapshots;
 using LL.Validation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,43 +11,41 @@ namespace LL.User.Configuration
 {
     [CreateAssetMenu(fileName = nameof(UserDefaultsConfig), menuName = CreationPath)]
     [HideMonoScript]
-    internal sealed class UserDefaultsConfig : ScriptableObject, IUserDefaultsFactory, IValidationSource
+    internal sealed class UserDefaultsConfig : ScriptableObject, IValidationSource
     {
         [BoxGroup("Identity")]
         [HideLabel]
         [SerializeField] private UserIdentityDefaults _identity = new();
 
-        [BoxGroup("Progress")]
+        [BoxGroup("Hero Selection")]
         [HideLabel]
-        [SerializeField] private UserProgressDefaults _progress = new();
+        [SerializeField] private UserHeroSelectionDefaults _heroSelection = new();
+
+        [BoxGroup("Heroes")]
+        [ValidateInput(nameof(HasValidHeroes), "User hero defaults are invalid.")]
+        [SerializeField] private UserHeroDefaultEntry[] _heroes;
 
         [BoxGroup("Items")]
         [ValidateInput(nameof(HasValidItems), "User item defaults are invalid.")]
         [TableList(AlwaysExpanded = true, DrawScrollView = false)]
-        [SerializeField] private ItemAmountEntry[] _items;
+        [SerializeField] private UserItemDefaultEntry[] _items;
 
         internal const string CreationPath = "LL/User/User Defaults Config";
 
-        private static readonly IDataValidator<IReadOnlyList<ItemAmountEntry>> _itemsValidator = new UserItemsDefaultsValidator();
-
+        private static readonly IDataValidator<IReadOnlyList<UserItemDefaultEntry>> _itemsValidator = new UserItemDefaultsValidator();
         private static readonly IDataValidator<UserDefaultsConfig> _validator = new UserDefaultsConfigValidator(_itemsValidator);
 
         internal UserIdentityDefaults Identity => _identity;
-        internal UserProgressDefaults Progress => _progress;
-        internal IReadOnlyList<ItemAmountEntry> Items => _items;
+        internal UserHeroSelectionDefaults HeroSelection => _heroSelection;
+        internal IReadOnlyList<UserHeroDefaultEntry> Heroes => _heroes;
+        internal IReadOnlyList<UserItemDefaultEntry> Items => _items;
 
-        UserSnapshot IUserDefaultsFactory.CreateSnapshot()
+        private static bool HasValidHeroes(UserHeroDefaultEntry[] entries)
         {
-            ValidationRunner.EnsureValid(this);
-
-            return new UserSnapshot(
-                Identity.ToSnapshot(),
-                new UserItemsSnapshot(Items.Select(item => item.ToItemAmount())),
-                Progress.ToSnapshot(),
-                UserRankUpQuestSnapshot.Empty);
+            return entries is not null;
         }
 
-        private static bool HasValidItems(ItemAmountEntry[] entries)
+        private static bool HasValidItems(UserItemDefaultEntry[] entries)
         {
             return ValidationRunner.IsValid(entries, _itemsValidator);
         }
@@ -57,6 +54,16 @@ namespace LL.User.Configuration
         {
             _validator.Validate(this, context);
         }
+    }
+
+    [Serializable]
+    [InlineProperty]
+    internal sealed class UserHeroSelectionDefaults
+    {
+        [LabelText("Hero ID")]
+        [SerializeField] private string _heroId;
+
+        internal HeroId HeroId => new(_heroId);
     }
 
     [Serializable]
@@ -71,39 +78,39 @@ namespace LL.User.Configuration
 
         internal string UserId => _userId;
         internal string RegionCode => _regionCode;
-
-        internal UserIdentitySnapshot ToSnapshot() => new(UserId, RegionCode);
     }
 
     [Serializable]
     [InlineProperty]
-    internal sealed class UserProgressDefaults
+    internal sealed class UserHeroDefaultEntry
     {
+        [LabelText("Hero ID")]
+        [SerializeField] private string _heroId;
+
         [LabelText("Rank ID")]
         [SerializeField] private string _rankId;
 
         [LabelText("Experience")]
         [SuffixLabel("XP", true)]
-        [SerializeField, MinValue(0)] private int _experience;
+        [MinValue(0)]
+        [SerializeField] private int _experience;
 
+        internal HeroId HeroId => new(_heroId);
         internal RankId RankId => new(_rankId);
         internal int Experience => _experience;
-
-        internal UserProgressSnapshot ToSnapshot() => new(RankId, Experience);
     }
 
     [Serializable]
-    internal sealed class ItemAmountEntry
+    internal sealed class UserItemDefaultEntry
     {
         [LabelText("ID")]
         [SerializeField] private string _id;
 
         [LabelText("Amount")]
-        [SerializeField, MinValue(0)] private int _amount;
+        [MinValue(0)]
+        [SerializeField] private int _amount;
 
         internal ItemId Id => new(_id);
         internal int Amount => _amount;
-
-        internal ItemAmount ToItemAmount() => new(Id, Amount);
     }
 }

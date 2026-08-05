@@ -12,7 +12,8 @@ namespace LLEditor.Validation.References
     internal sealed class UserProgressRankReferenceValidator : IProjectDataReferenceValidation
     {
         private const string RankExistsCode = "user-defaults.progress.rank.exists";
-        private const string ExperienceMaximumCode = "user-defaults.progress.experience.maximum";
+        private const string ExperienceCode = "user-defaults.progress.experience.non-negative";
+        private const string ExperienceMaxCode = "user-defaults.progress.experience.maximum";
         private const string FinalRankExperienceCode = "user-defaults.progress.final-rank-experience.zero";
 
         public void Validate(
@@ -26,21 +27,20 @@ namespace LLEditor.Validation.References
                 return;
 
             ValidateReferences(
-                userDefaults.Progress,
+                userDefaults.Heroes,
                 ranks.Ranks,
                 context
                     .At(AssetDatabase.GetAssetPath(userDefaults))
-                    .At(nameof(UserDefaultsConfig.Progress)));
+                    .At(nameof(UserDefaultsConfig.Heroes)));
         }
 
         private static void ValidateReferences(
-            UserProgressDefaults progress,
+            IReadOnlyList<UserHeroDefaultEntry> heroes,
             IReadOnlyList<RankEntry> ranks,
             ValidationContext context)
         {
-            if (progress == null ||
-                IdentifierValidator.IsValid(progress.RankId) is false ||
-                ranks == null ||
+            if (heroes is null ||
+                ranks is null ||
                 ranks.Count == 0)
             {
                 return;
@@ -52,52 +52,58 @@ namespace LLEditor.Validation.References
             {
                 var rank = ranks[index];
 
-                if (rank != null && IdentifierValidator.IsValid(rank.Id))
+                if (rank is not null && IdentifierValidator.IsValid(rank.Id))
                     rankIds.Add(rank.Id);
             }
 
+            for (var index = 0; index < heroes.Count; index++)
+            {
+                var hero = heroes[index];
+
+                if (hero is null || IdentifierValidator.IsValid(hero.RankId) is false)
+                    continue;
+
+                ValidateProgress(hero, ranks, rankIds, context.At(index));
+            }
+        }
+
+        private static void ValidateProgress(
+            UserHeroDefaultEntry hero,
+            IReadOnlyList<RankEntry> ranks,
+            ISet<RankId> rankIds,
+            ValidationContext context)
+        {
             if (ValidationRules.ReferenceExists(
-                    progress.RankId,
+                    hero.RankId,
                     rankIds,
-                    context.At(nameof(UserProgressDefaults.RankId)),
+                    context.At(nameof(UserHeroDefaultEntry.RankId)),
                     RankExistsCode) is false)
             {
                 return;
             }
 
-            if (progress.Experience < 0)
+            var experienceContext = context.At(nameof(UserHeroDefaultEntry.Experience));
+
+            if (ValidationRules.NonNegative(hero.Experience, experienceContext, ExperienceCode) is false)
                 return;
 
-            var rankIndex = FindRankIndex(ranks, progress.RankId);
-            var nextRank = rankIndex >= 0 && rankIndex + 1 < ranks.Count
-                ? ranks[rankIndex + 1]
-                : null;
+            var rankIndex = FindRankIndex(ranks, hero.RankId);
 
-            if (nextRank == null)
+            if (rankIndex + 1 < ranks.Count)
             {
-                if (progress.Experience != 0)
-                {
-                    context
-                        .At(nameof(UserProgressDefaults.Experience))
-                        .Report(
-                            ValidationSeverity.Error,
-                            FinalRankExperienceCode,
-                            $"Experience at final rank '{progress.RankId}' must be zero.");
-                }
-
+                ValidationRules.LessThanOrEqual(
+                    hero.Experience,
+                    ranks[rankIndex + 1].RequiredExperience,
+                    experienceContext,
+                    ExperienceMaxCode);
                 return;
             }
 
-            if (progress.Experience > nextRank.RequiredExperience)
-            {
-                context
-                    .At(nameof(UserProgressDefaults.Experience))
-                    .Report(
-                        ValidationSeverity.Error,
-                        ExperienceMaximumCode,
-                        $"Experience at rank '{progress.RankId}' must not exceed " +
-                        $"{nextRank.RequiredExperience}.");
-            }
+            ValidationRules.Equal(
+                hero.Experience,
+                0,
+                experienceContext,
+                FinalRankExperienceCode);
         }
 
         private static int FindRankIndex(

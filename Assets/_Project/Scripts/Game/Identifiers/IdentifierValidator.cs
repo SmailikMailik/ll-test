@@ -8,13 +8,8 @@ namespace LL.Game.Identifiers
         private const string WhitespaceCode = "identifier.trimmed";
         private const string CaseCode = "identifier.lowercase";
 
-        internal static ValidationResult Validate<TId>(TId id)
-            where TId : struct, IIdentifier
-        {
-            var result = new ValidationResult();
-            Validate(id, new ValidationContext(result));
-            return result;
-        }
+        internal static ValidationResult Validate<TId>(TId id) where TId : struct, IIdentifier =>
+            ValidationRunner.Run(context => Validate(id, context));
 
         internal static void Validate<TId>(
             TId id,
@@ -40,20 +35,13 @@ namespace LL.Game.Identifiers
                 CaseCode);
         }
 
-        internal static bool IsValid<TId>(TId id)
-            where TId : struct, IIdentifier
-        {
-            return Validate(id).IsValid;
-        }
+        internal static bool IsValid<TId>(TId id) where TId : struct, IIdentifier =>
+            ValidationRunner.IsValid(context => Validate(id, context));
 
         internal static void EnsureValid<TId>(
             TId id,
             string parameterName)
-            where TId : struct, IIdentifier
-        {
-            ValidationResultGuard.EnsureValid(
-                Validate(id),
-                parameterName);
-        }
+            where TId : struct, IIdentifier =>
+            ValidationRunner.EnsureValid(context => Validate(id, context), parameterName);
     }
 }

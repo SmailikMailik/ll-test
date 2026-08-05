@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LL.Game.Items;
-using LL.Presentation.Icons;
+using LL.Presentation.Sprites;
 using UnityEngine;
 using VContainer;
 
@@ -14,10 +14,10 @@ namespace LL.UI.Rewards
         [SerializeField] private RectTransform _viewContainer;
 
         private ReusableComponentCollection<RewardView> _views;
-        private IconCatalog<ItemId> _icons;
+        private SpriteCatalog<ItemId> _icons;
 
         [Inject]
-        private void Construct(IconCatalog<ItemId> icons)
+        private void Construct(SpriteCatalog<ItemId> icons)
         {
             _icons = icons ?? throw new ArgumentNullException(nameof(icons));
         }
@@ -41,7 +41,7 @@ namespace LL.UI.Rewards
             {
                 var item = items[index];
 
-                if (_icons.TryGetIcon(item.Id, out var icon) is false)
+                if (_icons.TryGetSprite(item.Id, out var icon) is false)
                     throw new KeyNotFoundException($"Missing reward item icon: {item.Id}.");
 
                 _views[index].UpdateView(icon, item.Amount);

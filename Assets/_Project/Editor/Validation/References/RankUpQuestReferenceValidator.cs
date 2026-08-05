@@ -27,7 +27,7 @@ namespace LLEditor.Validation.References
 
             foreach (var quest in quests.Quests)
             {
-                if (quest != null && IdentifierValidator.IsValid(quest.Id))
+                if (quest is not null && IdentifierValidator.IsValid(quest.Id))
                     questIds.Add(quest.Id);
             }
 
@@ -38,14 +38,37 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUpEntries[index];
 
-                if (rankUp == null || IdentifierValidator.IsValid(rankUp.QuestId) is false)
+                if (rankUp?.Options is null)
                     continue;
 
-                ValidationRules.ReferenceExists(
-                    rankUp.QuestId,
-                    questIds,
-                    rankUpContext.At(index).At(nameof(RankUpEntry.QuestId)),
-                    QuestExistsCode);
+                for (var optionIndex = 0; optionIndex < rankUp.Options.Count; optionIndex++)
+                {
+                    var option = rankUp.Options[optionIndex];
+
+                    if (option?.Requirements is null)
+                        continue;
+
+                    for (var requirementIndex = 0; requirementIndex < option.Requirements.Count; requirementIndex++)
+                    {
+                        if (option.Requirements[requirementIndex] is not QuestRankUpRequirementEntry quest)
+                            continue;
+
+                        if (IdentifierValidator.IsValid(quest.QuestId) is false)
+                            continue;
+
+                        ValidationRules.ReferenceExists(
+                            quest.QuestId,
+                            questIds,
+                            rankUpContext
+                                .At(index)
+                                .At(nameof(RankUpEntry.Options))
+                                .At(optionIndex)
+                                .At(nameof(RankUpOptionEntry.Requirements))
+                                .At(requirementIndex)
+                                .At(nameof(QuestRankUpRequirementEntry.QuestId)),
+                            QuestExistsCode);
+                    }
+                }
             }
         }
     }

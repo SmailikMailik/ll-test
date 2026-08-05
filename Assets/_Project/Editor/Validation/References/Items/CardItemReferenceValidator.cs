@@ -1,6 +1,6 @@
 using LL.Game.Cards.Configuration;
 using LL.Game.Identifiers;
-using LL.Presentation.Icons.Configuration;
+using LL.Presentation.Items.Configuration;
 using LL.User.Configuration;
 using LL.Validation;
 using LLEditor.Validation.Sources;
@@ -20,17 +20,17 @@ namespace LLEditor.Validation.References.Items
             var config = sources.GetSingle<CardCatalogConfig>();
             var cards = config?.Cards;
 
-            if (cards == null)
+            if (cards is null)
                 return;
 
             var userDefaults = sources.GetSingle<UserDefaultsConfig>();
-            var hasUserItems = ItemReferenceIdCollector.TryCollect(
+            var hasUserItems = ItemReferenceIdCollector.TryCollectValidIds(
                 userDefaults?.Items,
                 item => item.Id,
                 out var userItemIds);
 
             var icons = sources.GetSingle<ItemIconCatalogConfig>();
-            var hasIcons = ItemReferenceIdCollector.TryCollect(
+            var hasIcons = ItemReferenceIdCollector.TryCollectValidIds(
                 icons?.Icons,
                 icon => icon.Id,
                 out var iconIds);
@@ -44,7 +44,7 @@ namespace LLEditor.Validation.References.Items
             {
                 var card = cards[index];
 
-                if (card == null || IdentifierValidator.IsValid(card.Id) is false)
+                if (card is null || IdentifierValidator.IsValid(card.Id) is false)
                     continue;
 
                 var idContext = configContext.At(index).At(nameof(CardEntry.Id));

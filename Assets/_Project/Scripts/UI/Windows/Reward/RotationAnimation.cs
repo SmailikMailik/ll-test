@@ -7,7 +7,9 @@ namespace LL.UI.Windows.Reward
     internal sealed class RotationAnimation : RewardAnimation
     {
         [SerializeField] private RectTransform _target;
-        [SerializeField, Min(0.01f)] private float _durationSeconds = 20f;
+
+        [Min(0.01f)]
+        [SerializeField] private float _durationSeconds = 20f;
 
         private const float FullRotationDegrees = 360f;
 

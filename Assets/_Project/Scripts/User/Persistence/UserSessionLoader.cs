@@ -1,6 +1,6 @@
 using System;
 using LL.Infrastructure.Loading;
-using LL.User.Configuration;
+using LL.User.Defaults;
 using LL.User.Snapshots;
 using UnityEngine;
 using VContainer;
@@ -9,16 +9,19 @@ namespace LL.User.Persistence
 {
     internal sealed class UserSessionLoader : IDataLoader<UserSnapshot>
     {
-        private readonly IUserDefaultsFactory _defaultsFactory;
+        private readonly UserDefaultsSnapshot _defaults;
         private readonly IUserSaveRepository _repository;
+        private readonly UserSnapshotReconciler _reconciler;
 
         [Inject]
         internal UserSessionLoader(
-            IUserDefaultsFactory defaultsFactory,
-            IUserSaveRepository repository)
+            UserDefaultsSnapshot defaults,
+            IUserSaveRepository repository,
+            UserSnapshotReconciler reconciler)
         {
-            _defaultsFactory = defaultsFactory ?? throw new ArgumentNullException(nameof(defaultsFactory));
+            _defaults = defaults ?? throw new ArgumentNullException(nameof(defaults));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _reconciler = reconciler ?? throw new ArgumentNullException(nameof(reconciler));
         }
 
         public UserSnapshot Load()
@@ -26,7 +29,22 @@ namespace LL.User.Persistence
             var result = _repository.Load();
 
             if (result.Status == UserLoadStatus.Loaded)
-                return result.Snapshot;
+            {
+                var reconciliation = _reconciler.Reconcile(result.Snapshot);
+
+                if (reconciliation.Status != UserReconciliationStatus.Incompatible)
+                {
+                    if (reconciliation.Status == UserReconciliationStatus.Changed &&
+                        _repository.Save(reconciliation.Snapshot) is false)
+                    {
+                        Debug.LogError("Reconciled user data could not be saved.");
+                    }
+
+                    return reconciliation.Snapshot;
+                }
+
+                Debug.LogWarning("User data is incompatible with current game data. Resetting user data.");
+            }
 
             if (result.Status == UserLoadStatus.UnsupportedVersion)
             {
@@ -37,8 +55,11 @@ namespace LL.User.Persistence
                 Debug.LogWarning("User document is corrupted. Resetting user data.");
             }
 
-            var defaultSnapshot = _defaultsFactory.CreateSnapshot();
-            _repository.Save(defaultSnapshot);
+            var defaultSnapshot = _defaults.CreateUserSnapshot();
+
+            if (_repository.Save(defaultSnapshot) is false)
+                Debug.LogError("Default user data could not be saved.");
+
             return defaultSnapshot;
         }
     }

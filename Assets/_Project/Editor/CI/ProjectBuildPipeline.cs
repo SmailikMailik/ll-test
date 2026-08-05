@@ -75,8 +75,7 @@ namespace LLEditor.CI
             if (target == BuildTarget.WebGL)
                 return outputPath;
 
-            return Path.GetDirectoryName(outputPath) ??
-                   throw new BuildFailedException($"Build output has no directory: '{outputPath}'.");
+            return Path.GetDirectoryName(outputPath) ?? throw new BuildFailedException($"Build output has no directory: '{outputPath}'.");
         }
 
         private static void ApplyVersion()

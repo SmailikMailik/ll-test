@@ -1,17 +1,16 @@
 using LL.User.Persistence;
-using LL.Infrastructure.Saving;
 using LL.Infrastructure.Saving.Serialization;
 using LL.Infrastructure.Saving.Storage;
+using LL.Infrastructure.Saving;
 
 namespace LL.Composition.Factories
 {
     internal static class UserSaveRepositoryFactory
     {
-        internal static IUserSaveRepository CreateJsonFile()
+        internal static IUserSaveRepository CreateSerialized(
+            ISaveSerializer serializer,
+            ISaveStorage storage)
         {
-            var serializer = new JsonSaveSerializer();
-            var storage = new FileSaveStorage();
-
             return new SerializedUserSaveRepository(new SaveService(serializer, storage));
         }
     }

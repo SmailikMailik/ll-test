@@ -7,6 +7,8 @@ namespace LL.Game.Rewards
 {
     internal sealed class RewardCatalog
     {
+        internal IReadOnlyList<Reward> Rewards { get; }
+
         private readonly IReadOnlyDictionary<RewardId, Reward> _rewardsById;
 
         internal RewardCatalog(IEnumerable<Reward> rewards)
@@ -17,6 +19,7 @@ namespace LL.Game.Rewards
                 reward => reward.Id,
                 nameof(rewards));
 
+            Rewards = Array.AsReadOnly(entries);
             _rewardsById = entries.ToDictionary(reward => reward.Id);
         }
 

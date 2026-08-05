@@ -18,7 +18,7 @@ namespace LL.Validation
 
         internal ValidationContext At(string segment)
         {
-            if (string.IsNullOrWhiteSpace(segment))
+            if (ValidationChecks.IsEmpty(segment))
                 throw new ArgumentException("Validation path segment must be non-empty.", nameof(segment));
 
             var path = string.IsNullOrEmpty(Path)

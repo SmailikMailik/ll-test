@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using LL.Game.Heroes;
+using LL.Game.Ranks;
 using LL.Game.RankUp;
+using LL.Game.RankUp.Services;
 using LL.Game.Quests;
 using LL.Presentation.Localization;
-using LL.Presentation.RankUp;
 using LL.Presentation.Quests;
+using LL.Presentation.RankUp;
 using LL.Presentation.Typography;
 using LL.UI.Controls;
 using LL.UI.Localization;
@@ -37,26 +40,33 @@ namespace LL.UI.Windows.RankUp
         private readonly Subject<Unit> _completed = new();
 
         private IQuestCompletionConfirmation _completionConfirmation;
+        private HeroCatalog _heroes;
         private ILocalizationService _localization;
-        private IUserRankUpQuest _rankUpQuest;
+        private IUserRankUpAttempts _attempts;
+        private IRankUpQuestRequirementService _questService;
 
         private QuestState _state = QuestState.Available;
-        private RankUpQuest _rankUpQuestDefinition;
+        private HeroId _heroId;
+        private RankId _rankId;
+        private RankUpOptionId _optionId;
+        private QuestRankUpRequirementDefinition _definition;
         private QuestDefinition _quest;
         private int _displayedRemainingSeconds = -1;
         private bool _canAccept;
-        private TimeSpan _duration;
 
         [Inject]
         private void Construct(
             IQuestCompletionConfirmation completionConfirmation,
+            HeroCatalog heroes,
             ILocalizationService localization,
-            IUserRankUpQuest rankUpQuest)
+            IUserRankUpAttempts attempts,
+            IRankUpQuestRequirementService questService)
         {
-            _completionConfirmation = completionConfirmation
-                ?? throw new ArgumentNullException(nameof(completionConfirmation));
+            _completionConfirmation = completionConfirmation ?? throw new ArgumentNullException(nameof(completionConfirmation));
+            _heroes = heroes ?? throw new ArgumentNullException(nameof(heroes));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-            _rankUpQuest = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
+            _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
+            _questService = questService ?? throw new ArgumentNullException(nameof(questService));
         }
 
         private void Start()
@@ -73,16 +83,21 @@ namespace LL.UI.Windows.RankUp
         }
 
         internal void Refresh(
-            RankUpQuest rankUpQuest,
+            HeroId heroId,
+            RankId rankId,
+            RankUpOptionId optionId,
+            QuestRankUpRequirementDefinition definition,
             QuestDefinition quest,
             bool canAccept)
         {
-            _rankUpQuestDefinition = rankUpQuest ?? throw new ArgumentNullException(nameof(rankUpQuest));
+            _heroId = heroId;
+            _rankId = rankId;
+            _optionId = optionId;
+            _definition = definition ?? throw new ArgumentNullException(nameof(definition));
             _quest = quest ?? throw new ArgumentNullException(nameof(quest));
-            _duration = rankUpQuest.Duration;
             _canAccept = canAccept;
             RestoreState();
-            RefreshText(rankUpQuest, quest);
+            RefreshText();
             RefreshState();
         }
 
@@ -94,33 +109,32 @@ namespace LL.UI.Windows.RankUp
 
         internal void ClearQuest()
         {
-            _rankUpQuest.ClearQuest();
+            _questService.Clear(_heroId, _rankId, _optionId);
             SetState(QuestState.Available);
         }
 
-        private void RefreshText(
-            RankUpQuest rankUpQuest,
-            QuestDefinition quest)
+        private void RefreshText()
         {
+            var hero = _heroes.GetHero(_heroId);
             var unlockText = TextTags.Style(
                 _localization.GetText(RankUpLocalizationKeys.Unlock),
                 TextStyle.Accent);
             var countText = TextTags.Style(
-                TextFormatter.Number(rankUpQuest.RequiredAmount),
+                TextFormatter.Number(_definition.RequiredCount),
                 TextStyle.Accent);
 
             _titleLabel.text = _localization.GetText(
-                quest.TitleLocalizationKey,
+                _quest.TitleLocalizationKey,
                 new Dictionary<string, object>
                 {
                     [UnlockVariable] = unlockText
                 });
             _descriptionLabel.text = _localization.GetText(
-                quest.DescriptionLocalizationKey,
+                _quest.DescriptionLocalizationKey,
                 new Dictionary<string, object>
                 {
                     [CountVariable] = countText,
-                    [HeroVariable] = _localization.GetText(rankUpQuest.HeroLocalizationKey)
+                    [HeroVariable] = _localization.GetText(hero.NameLocalizationKey)
                 });
         }
 
@@ -149,7 +163,7 @@ namespace LL.UI.Windows.RankUp
 
         private bool StartQuest()
         {
-            if (_rankUpQuest.TryStart(_rankUpQuestDefinition.QuestId, _duration) is false)
+            if (_questService.TryStart(_heroId, _rankId, _optionId, _definition) is false)
                 return false;
 
             SetState(QuestState.Active);
@@ -158,8 +172,11 @@ namespace LL.UI.Windows.RankUp
 
         private void OnQuestCompletionConfirmed()
         {
-            if (_state != QuestState.Active || _rankUpQuest.TryComplete() is false)
+            if (_state != QuestState.Active ||
+                _questService.TryCompleteForTesting(_heroId, _rankId, _optionId, _definition) is false)
+            {
                 return;
+            }
 
             SetState(QuestState.Completed);
             _completed.OnNext(Unit.Default);
@@ -173,17 +190,17 @@ namespace LL.UI.Windows.RankUp
 
         private void RestoreState()
         {
-            if (_rankUpQuest.QuestId.Equals(_rankUpQuestDefinition.QuestId) is false)
-                _rankUpQuest.ClearQuest();
+            _questService.TryExpire(_heroId, _rankId, _optionId, _definition);
 
-            _rankUpQuest.TryExpire();
-
-            if (_rankUpQuest.IsCompleted)
-                _state = QuestState.Completed;
-            else if (_rankUpQuest.IsActive)
-                _state = QuestState.Active;
-            else
+            if (_attempts.TryGetQuest(_heroId, _rankId, _optionId, _definition.Id, out var state) is false)
+            {
                 _state = QuestState.Available;
+                return;
+            }
+
+            _state = state.CurrentCount >= _definition.RequiredCount
+                ? QuestState.Completed
+                : QuestState.Active;
         }
 
         private void RefreshState()
@@ -206,8 +223,8 @@ namespace LL.UI.Windows.RankUp
 
         private void OnLocaleChanged()
         {
-            if (_rankUpQuestDefinition != null && _quest != null)
-                RefreshText(_rankUpQuestDefinition, _quest);
+            if (_definition is not null && _quest is not null)
+                RefreshText();
 
             RefreshButtonText();
         }
@@ -229,7 +246,7 @@ namespace LL.UI.Windows.RankUp
         {
             var remainingSeconds = _state switch
             {
-                QuestState.Available => Mathf.Max(0f, (float)_duration.TotalSeconds),
+                QuestState.Available => Mathf.Max(0f, (float)_definition.Duration.TotalSeconds),
                 QuestState.Active => GetRemainingSeconds(),
                 _ => 0f
             };
@@ -250,7 +267,10 @@ namespace LL.UI.Windows.RankUp
 
         private float GetRemainingSeconds()
         {
-            return Mathf.Max(0f, (float)_rankUpQuest.GetRemainingTime().TotalSeconds);
+            if (_attempts.TryGetQuest(_heroId, _rankId, _optionId, _definition.Id, out var state) is false)
+                return 0f;
+
+            return Mathf.Max(0f, (float)_attempts.GetRemainingTime(state).TotalSeconds);
         }
 
         private enum QuestState : byte

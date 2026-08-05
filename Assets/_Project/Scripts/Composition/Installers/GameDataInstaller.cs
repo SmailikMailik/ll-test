@@ -1,12 +1,12 @@
 using System;
-using LL.Composition.Factories;
 using LL.Game.Data;
-using LL.Game.Data.Configuration;
 using LL.Game.Cards;
+using LL.Game.Heroes;
 using LL.Game.RankUp;
 using LL.Game.Quests;
 using LL.Game.Ranks;
 using LL.Game.Rewards;
+using LL.Infrastructure.Loading;
 using VContainer;
 using VContainer.Unity;
 
@@ -14,20 +14,19 @@ namespace LL.Composition.Installers
 {
     internal sealed class GameDataInstaller : IInstaller
     {
-        private readonly GameDataManifestConfig _manifest;
+        private readonly IDataLoader<GameDataSnapshot> _loader;
 
-        internal GameDataInstaller(GameDataManifestConfig manifest)
+        internal GameDataInstaller(IDataLoader<GameDataSnapshot> loader)
         {
-            _manifest = manifest ?? throw new ArgumentNullException(nameof(manifest));
+            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
         }
 
         public void Install(IContainerBuilder builder)
         {
-            var loader = GameDataLoaderFactory.CreateFromScriptableObjects(_manifest);
-
-            builder.RegisterLoadedData(loader);
+            builder.RegisterLoadedData(_loader);
             builder.RegisterSnapshotPart<GameDataSnapshot, RankCatalog>(snapshot => snapshot.Ranks);
             builder.RegisterSnapshotPart<GameDataSnapshot, CardCatalog>(snapshot => snapshot.Cards);
+            builder.RegisterSnapshotPart<GameDataSnapshot, HeroCatalog>(snapshot => snapshot.Heroes);
             builder.RegisterSnapshotPart<GameDataSnapshot, QuestCatalog>(snapshot => snapshot.Quests);
             builder.RegisterSnapshotPart<GameDataSnapshot, RankUpCatalog>(snapshot => snapshot.RankUps);
             builder.RegisterSnapshotPart<GameDataSnapshot, RewardCatalog>(snapshot => snapshot.Rewards);

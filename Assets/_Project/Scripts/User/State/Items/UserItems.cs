@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LL.Game.Identifiers;
 using LL.Game.Items;
 using LL.User.Snapshots;
 using R3;
@@ -8,7 +9,7 @@ using VContainer;
 
 namespace LL.User.State.Items
 {
-    internal sealed class UserItems : IUserItems, IDisposable
+    internal sealed class UserItems : IUserItems, IUserItemsCommands, IDisposable
     {
         public Observable<Unit> Changed => _changed;
 
@@ -18,7 +19,7 @@ namespace LL.User.State.Items
         [Inject]
         internal UserItems(UserItemsSnapshot snapshot)
         {
-            if (snapshot == null)
+            if (snapshot is null)
                 throw new ArgumentNullException(nameof(snapshot));
 
             _amounts = snapshot.Amounts.ToDictionary(
@@ -93,7 +94,7 @@ namespace LL.User.State.Items
 
         private bool TryGetAmount(ItemId id, out ReactiveProperty<int> amount)
         {
-            if (string.IsNullOrWhiteSpace(id.Value))
+            if (IdentifierValidator.IsValid(id) is false)
             {
                 amount = null;
                 return false;

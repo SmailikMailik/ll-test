@@ -1,6 +1,7 @@
 using System;
 using LL.Game.Identifiers;
 using LL.Game.Ranks;
+using LL.Validation;
 
 namespace LL.User.Snapshots
 {
@@ -11,11 +12,8 @@ namespace LL.User.Snapshots
 
         internal UserProgressSnapshot(RankId rankId, int experience)
         {
-            if (experience < 0)
-                throw new ArgumentOutOfRangeException(
-                    nameof(experience),
-                    experience,
-                    "User experience must not be negative.");
+            if (ValidationChecks.IsNegative(experience))
+                throw new ArgumentOutOfRangeException(nameof(experience), experience, "User experience must not be negative.");
 
             IdentifierValidator.EnsureValid(rankId, nameof(rankId));
 

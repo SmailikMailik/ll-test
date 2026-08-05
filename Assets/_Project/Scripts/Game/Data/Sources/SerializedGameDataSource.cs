@@ -2,17 +2,18 @@ using System;
 using LL.Game.Data.Declarations;
 using LL.Game.Data.Persistence;
 using LL.Game.Data.Persistence.Documents;
+using LL.Infrastructure.Loading;
 using LL.Infrastructure.Saving;
 
 namespace LL.Game.Data.Sources
 {
-    internal sealed class SerializedGameDataSource : IGameDataSource
+    internal sealed class SerializedGameDataSource : IDataSource<GameDataDeclaration>
     {
         internal const string DataKey = "game-data";
 
-        private readonly ISaveService _saveService;
+        private readonly IReadOnlySaveService _saveService;
 
-        internal SerializedGameDataSource(ISaveService saveService)
+        internal SerializedGameDataSource(IReadOnlySaveService saveService)
         {
             _saveService = saveService ?? throw new ArgumentNullException(nameof(saveService));
         }

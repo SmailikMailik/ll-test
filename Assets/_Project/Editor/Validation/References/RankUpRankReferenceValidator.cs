@@ -36,17 +36,21 @@ namespace LLEditor.Validation.References
             IReadOnlyList<RankEntry> ranks,
             ValidationContext context)
         {
-            if (ranks == null || ranks.Count == 0)
+            if (ranks is null || ranks.Count == 0)
                 return;
 
             var rankIds = new HashSet<RankId>();
+            var orderedRankIds = new List<RankId>(ranks.Count);
 
             for (var index = 0; index < ranks.Count; index++)
             {
                 var rank = ranks[index];
 
-                if (rank != null && IdentifierValidator.IsValid(rank.Id))
+                if (rank is not null && IdentifierValidator.IsValid(rank.Id))
+                {
                     rankIds.Add(rank.Id);
+                    orderedRankIds.Add(rank.Id);
+                }
             }
 
             var rankUpRankIds = new HashSet<RankId>();
@@ -56,7 +60,7 @@ namespace LLEditor.Validation.References
             {
                 var rankUp = rankUps[index];
 
-                if (rankUp == null || IdentifierValidator.IsValid(rankUp.RankId) is false)
+                if (rankUp is null || IdentifierValidator.IsValid(rankUp.RankId) is false)
                     continue;
 
                 rankUpRankIds.Add(rankUp.RankId);
@@ -69,50 +73,35 @@ namespace LLEditor.Validation.References
                 {
                     continue;
                 }
-
-                var rankIndex = FindRankIndex(ranks, rankUp.RankId);
-
-                if (rankIndex < 0 || rankIndex + 1 >= ranks.Count)
-                {
-                    context
-                        .At(index)
-                        .At(nameof(RankUpEntry.RankId))
-                        .Report(
-                            ValidationSeverity.Error,
-                            FinalRankCode,
-                            $"Final rank '{rankUp.RankId}' must not have a rank-up.");
-                }
             }
 
-            for (var index = 0; index + 1 < ranks.Count; index++)
-            {
-                var rank = ranks[index];
+            if (orderedRankIds.Count != ranks.Count || rankIds.Count != ranks.Count)
+                return;
 
-                if (rank == null ||
-                    IdentifierValidator.IsValid(rank.Id) is false ||
-                    rankUpRankIds.Contains(rank.Id))
-                {
+            var finalRankId = orderedRankIds[orderedRankIds.Count - 1];
+
+            for (var index = 0; index < rankUpCount; index++)
+            {
+                var rankUp = rankUps[index];
+
+                if (rankUp is null || IdentifierValidator.IsValid(rankUp.RankId) is false)
                     continue;
-                }
 
-                context.Report(
-                    ValidationSeverity.Error,
-                    RankUpRequiredCode,
-                    $"Rank '{rank.Id}' must have a rank-up to the next rank.");
+                ValidationRules.NotEqual(
+                    rankUp.RankId,
+                    finalRankId,
+                    context.At(index).At(nameof(RankUpEntry.RankId)),
+                    FinalRankCode);
             }
-        }
 
-        private static int FindRankIndex(
-            IReadOnlyList<RankEntry> ranks,
-            RankId rankId)
-        {
-            for (var index = 0; index < ranks.Count; index++)
+            for (var index = 0; index + 1 < orderedRankIds.Count; index++)
             {
-                if (ranks[index]?.Id.Equals(rankId) == true)
-                    return index;
+                ValidationRules.ReferenceExists(
+                    orderedRankIds[index],
+                    rankUpRankIds,
+                    context,
+                    RankUpRequiredCode);
             }
-
-            return -1;
         }
     }
 }

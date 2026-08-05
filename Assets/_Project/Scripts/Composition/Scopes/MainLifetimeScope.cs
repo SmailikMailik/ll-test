@@ -2,6 +2,7 @@ using LL.Game.RankUp.Services;
 using LL.Presentation.RankUp;
 using LL.Presentation.Quests;
 using LL.Presentation.Upgrades;
+using LL.UI.Views.Heroes;
 using LL.UI.Windows;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Modal;

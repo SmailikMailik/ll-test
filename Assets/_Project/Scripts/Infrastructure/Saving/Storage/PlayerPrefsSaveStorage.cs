@@ -1,4 +1,5 @@
 using System;
+using LL.Validation;
 using UnityEngine;
 
 namespace LL.Infrastructure.Saving.Storage
@@ -16,7 +17,7 @@ namespace LL.Infrastructure.Saving.Storage
 
         public bool TryWrite(string key, byte[] data)
         {
-            if (data == null)
+            if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
             try
@@ -69,7 +70,7 @@ namespace LL.Infrastructure.Saving.Storage
 
         private string GetStorageKey(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
+            if (ValidationChecks.IsEmpty(key))
                 throw new ArgumentException("Storage key cannot be empty.", nameof(key));
 
             return _keyPrefix + key;

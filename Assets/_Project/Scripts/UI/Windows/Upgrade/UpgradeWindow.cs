@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using LL.Game.Items;
 using LL.Game.Ranks;
-using LL.Game.Upgrades;
 using LL.Game.Upgrades.Services;
 using LL.Presentation.Upgrades;
 using LL.UI.Controls;
@@ -10,7 +9,7 @@ using LL.UI.Rewards;
 using LL.UI.Windows.Flows;
 using LL.UI.Windows.Upgrade.Cards;
 using LL.UI.Windows.Upgrade.Progress;
-using LL.User.State.Progress;
+using LL.User.State.Heroes;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -31,7 +30,7 @@ namespace LL.UI.Windows.Upgrade
         private const int AmountDelta = 1;
         private const int MinAmount = 0;
 
-        private IUserProgress _userProgress;
+        private IUserHeroProgress _userProgress;
         private ICardExperienceService _cardExperienceService;
         private IExperienceOverflowConfirmation _overflowConfirmation;
         private IRankProgression _rankProgression;
@@ -43,25 +42,31 @@ namespace LL.UI.Windows.Upgrade
 
         [Inject]
         private void Construct(
-            IUserProgress userProgress,
+            IUserHeroProgress userProgress,
             ICardExperienceService cardExperienceService,
             IExperienceOverflowConfirmation overflowConfirmation,
             IRankProgression rankProgression,
             UpgradeFlow upgradeFlow)
         {
             _userProgress = userProgress ?? throw new ArgumentNullException(nameof(userProgress));
-            _cardExperienceService = cardExperienceService
-                ?? throw new ArgumentNullException(nameof(cardExperienceService));
-            _overflowConfirmation = overflowConfirmation
-                ?? throw new ArgumentNullException(nameof(overflowConfirmation));
+            _cardExperienceService = cardExperienceService ?? throw new ArgumentNullException(nameof(cardExperienceService));
+            _overflowConfirmation = overflowConfirmation ?? throw new ArgumentNullException(nameof(overflowConfirmation));
             _rankProgression = rankProgression ?? throw new ArgumentNullException(nameof(rankProgression));
             _upgradeFlow = upgradeFlow ?? throw new ArgumentNullException(nameof(upgradeFlow));
         }
 
         protected override void OnShow()
         {
+            if (_userProgress.TryGetProgress(Parameters.HeroId, out var progress) is false)
+                return;
+
+            _experienceController = new UpgradeExperienceController(
+                _experienceView,
+                Parameters.HeroId,
+                _userProgress,
+                _rankProgression);
             InitializeComponents();
-            _nextRankRewardView.ShowNextRank(_userProgress.RankId);
+            _nextRankRewardView.ShowNextRank(Parameters.HeroId, progress.RankId);
             ResetPendingChanges();
         }
 
@@ -69,7 +74,7 @@ namespace LL.UI.Windows.Upgrade
         {
             _cardSelector.ClearPlan();
             _amountStepper.SetValue(MinAmount, MinAmount);
-            _experienceController.ClearPreview();
+            _experienceController?.ClearPreview();
         }
 
         private void InitializeComponents()
@@ -78,10 +83,6 @@ namespace LL.UI.Windows.Upgrade
                 return;
 
             _isInitialized = true;
-            _experienceController = new UpgradeExperienceController(
-                _experienceView,
-                _userProgress,
-                _rankProgression);
             _cardSelector.Initialize();
             _amountStepper.Initialize(AmountDelta);
 
@@ -131,7 +132,7 @@ namespace LL.UI.Windows.Upgrade
 
             var plan = _cardSelector.GetPlan();
 
-            if (_cardExperienceService.TryGetApplication(plan, out var application) is false)
+            if (_cardExperienceService.TryGetApplication(Parameters.HeroId, plan, out var application) is false)
                 return;
 
             if (application.HasLoss)
@@ -153,7 +154,7 @@ namespace LL.UI.Windows.Upgrade
 
             try
             {
-                applied = _cardExperienceService.TryApply(cards);
+                applied = _cardExperienceService.TryApply(Parameters.HeroId, cards);
             }
             finally
             {
@@ -161,7 +162,7 @@ namespace LL.UI.Windows.Upgrade
                 ResetPendingChanges();
             }
 
-            if (applied && _userProgress.CanRankUp)
+            if (applied && _userProgress.CanRankUp(Parameters.HeroId))
                 _upgradeFlow.ReplaceCurrent();
         }
 

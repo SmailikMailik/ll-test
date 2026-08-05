@@ -1,4 +1,5 @@
 using System;
+using LL.Validation;
 
 namespace LL.User.Snapshots
 {
@@ -9,23 +10,19 @@ namespace LL.User.Snapshots
 
         internal UserIdentitySnapshot(string userId, string regionCode)
         {
-            if (string.IsNullOrWhiteSpace(userId))
+            if (ValidationChecks.IsEmpty(userId))
                 throw new ArgumentException("User ID must be non-empty.", nameof(userId));
 
-            if (userId != userId.Trim())
-                throw new ArgumentException(
-                    "User ID must not contain leading or trailing whitespace.",
-                    nameof(userId));
+            if (ValidationChecks.IsNotTrimmed(userId))
+                throw new ArgumentException("User ID must not contain leading or trailing whitespace.", nameof(userId));
 
-            if (string.IsNullOrWhiteSpace(regionCode))
+            if (ValidationChecks.IsEmpty(regionCode))
                 throw new ArgumentException("Region code must be non-empty.", nameof(regionCode));
 
-            if (regionCode != regionCode.Trim())
-                throw new ArgumentException(
-                    "Region code must not contain leading or trailing whitespace.",
-                    nameof(regionCode));
+            if (ValidationChecks.IsNotTrimmed(regionCode))
+                throw new ArgumentException("Region code must not contain leading or trailing whitespace.", nameof(regionCode));
 
-            if (regionCode != regionCode.ToUpperInvariant())
+            if (ValidationChecks.IsNotUppercase(regionCode))
                 throw new ArgumentException("Region code must be uppercase.", nameof(regionCode));
 
             UserId = userId;

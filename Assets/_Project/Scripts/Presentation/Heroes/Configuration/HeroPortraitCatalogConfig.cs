@@ -1,0 +1,55 @@
+using System;
+using System.Collections.Generic;
+using LL.Game.Heroes;
+using LL.Presentation.Inspector;
+using LL.Presentation.Sprites;
+using LL.Validation;
+using Sirenix.OdinInspector;
+using UnityEngine;
+
+namespace LL.Presentation.Heroes.Configuration
+{
+    [CreateAssetMenu(fileName = nameof(HeroPortraitCatalogConfig), menuName = CreationPath)]
+    internal sealed class HeroPortraitCatalogConfig : ScriptableObject, IValidationSource
+    {
+        [TableList(AlwaysExpanded = true, DrawScrollView = false)]
+        [ValidateInput(nameof(HasValidPortraits), "Hero portrait data is invalid.")]
+        [SerializeField] private HeroPortraitEntry[] _portraits;
+
+        internal const string CreationPath = "LL/Presentation/Hero Portrait Catalog";
+
+        private static readonly IDataValidator<HeroPortraitEntry[]> _validator = new HeroPortraitCatalogConfigValidator();
+
+        internal IReadOnlyList<HeroPortraitEntry> Portraits => _portraits;
+
+        private static bool HasValidPortraits(HeroPortraitEntry[] portraits) => ValidationRunner.IsValid(portraits, _validator);
+
+        void IValidationSource.Validate(ValidationContext context)
+        {
+            _validator.Validate(_portraits, context);
+        }
+    }
+
+    [Serializable]
+    internal sealed class HeroPortraitEntry
+    {
+        [LabelText("Hero ID")]
+        [SerializeField] private string _heroId;
+
+        [SpritePreview]
+        [SerializeField, Required] private Sprite _smallPortrait;
+
+        [SpritePreview]
+        [SerializeField, Required] private Sprite _largePortrait;
+
+        internal HeroId HeroId => new(_heroId);
+        internal Sprite SmallPortrait => _smallPortrait;
+        internal Sprite LargePortrait => _largePortrait;
+
+        internal IEnumerable<SpriteVariant<HeroId, HeroPortraitSize>> ToVariants()
+        {
+            yield return new SpriteVariant<HeroId, HeroPortraitSize>(HeroId, HeroPortraitSize.Small, SmallPortrait);
+            yield return new SpriteVariant<HeroId, HeroPortraitSize>(HeroId, HeroPortraitSize.Large, LargePortrait);
+        }
+    }
+}

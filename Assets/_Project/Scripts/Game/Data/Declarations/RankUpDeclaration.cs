@@ -1,34 +1,25 @@
+using System.Collections.Generic;
+using LL.Infrastructure.Collections;
+
 namespace LL.Game.Data.Declarations
 {
     internal sealed class RankUpDeclaration
     {
+        internal string HeroId { get; }
         internal string RankId { get; }
-        internal string QuestId { get; }
-        internal string HeroLocalizationKey { get; }
-        internal int RequiredAmount { get; }
-        internal int DurationMinutes { get; }
-        internal PaymentDeclaration QuestPayment { get; }
-        internal PaymentDeclaration InstantPayment { get; }
         internal string RewardId { get; }
+        internal IReadOnlyList<RankUpOptionDeclaration> Options { get; }
 
         internal RankUpDeclaration(
+            string heroId,
             string rankId,
-            string questId,
-            string heroLocalizationKey,
-            int requiredAmount,
-            int durationMinutes,
-            PaymentDeclaration questPayment,
-            PaymentDeclaration instantPayment,
-            string rewardId)
+            string rewardId,
+            IEnumerable<RankUpOptionDeclaration> options)
         {
+            HeroId = heroId;
             RankId = rankId;
-            QuestId = questId;
-            HeroLocalizationKey = heroLocalizationKey;
-            RequiredAmount = requiredAmount;
-            DurationMinutes = durationMinutes;
-            QuestPayment = questPayment;
-            InstantPayment = instantPayment;
             RewardId = rewardId;
+            Options = options.ToReadOnlyCopy();
         }
     }
 }

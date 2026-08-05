@@ -27,7 +27,7 @@ namespace LL.UI.Windows
         [Inject]
         private void Construct(WindowController windowController)
         {
-            _windowController = windowController;
+            _windowController = windowController ?? throw new ArgumentNullException(nameof(windowController));
         }
 
         protected void Awake()
@@ -38,7 +38,7 @@ namespace LL.UI.Windows
 
         internal void Initialize(WindowDefinition definition)
         {
-            if (Definition != null)
+            if (Definition is not null)
                 throw new InvalidOperationException($"{nameof(WindowBase)} is already initialized.");
 
             Definition = definition ?? throw new ArgumentNullException(nameof(definition));

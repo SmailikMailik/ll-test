@@ -1,3 +1,4 @@
+using System;
 using LL.Game.Items;
 using LL.Presentation.Items;
 using LL.UI.Controls;
@@ -32,9 +33,9 @@ namespace LL.UI.Views
             IUserItems items,
             WindowController windowController)
         {
-            _identity = identity;
-            _items = items;
-            _windowController = windowController;
+            _identity = identity ?? throw new ArgumentNullException(nameof(identity));
+            _items = items ?? throw new ArgumentNullException(nameof(items));
+            _windowController = windowController ?? throw new ArgumentNullException(nameof(windowController));
         }
 
         private void Start()
