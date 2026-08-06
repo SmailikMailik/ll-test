@@ -21,6 +21,7 @@ namespace LL.Composition.Scopes
             builder.RegisterComponent(_progressBar);
             builder
                 .Register<LocalizationBootstrapOperation>(Lifetime.Scoped)
+                .AsSelf()
                 .As<IBootstrapOperation>();
             builder
                 .Register<MinDisplayBootstrapOperation>(Lifetime.Scoped)
@@ -29,7 +30,6 @@ namespace LL.Composition.Scopes
             builder
                 .Register<SceneLoadingBootstrapOperation>(Lifetime.Scoped)
                 .AsSelf()
-                .As<IBootstrapOperation>()
                 .WithParameter(TargetSceneName);
             builder.RegisterEntryPoint<BootstrapFlow>(Lifetime.Scoped);
         }
